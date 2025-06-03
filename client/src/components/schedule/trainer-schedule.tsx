@@ -245,7 +245,7 @@ export function TrainerSchedule() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-xl font-bold text-gray-800 capitalize">
-                  Расписание на {formatDate(selectedDate)}
+                  {formatDate(selectedDate)}
                 </CardTitle>
                 {isToday(selectedDate) && (
                   <p className="text-sm text-orange-500 font-medium mt-1">Сегодня</p>
