@@ -280,38 +280,34 @@ export function TrainerSchedule() {
             renderStudentsList()
           ) : (
             <>
-              {/* Переключатель вида для расписания */}
-              <div className="flex justify-end items-center mb-6">
-                <div className="flex bg-gray-100 rounded-lg p-1">
-                  <Button
-                    variant={viewMode === 'day' ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setViewMode('day')}
-                    className="text-xs"
-                  >
-                    <Calendar className="h-4 w-4 mr-1" />
-                    Сегодня
-                  </Button>
-                  <Button
-                    variant={viewMode === 'month' ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setViewMode('month')}
-                    className="text-xs"
-                  >
-                    <Calendar className="h-4 w-4 mr-1" />
-                    Месяц
-                  </Button>
-                </div>
-              </div>
+
 
               {viewMode === 'day' ? (
                 <Card>
                   <CardHeader className="border-b border-gray-100">
                     <div className="flex items-center justify-between">
-                      <div>
+                      <div className="flex items-center space-x-4">
                         <CardTitle className="text-xl font-bold text-gray-800 capitalize">
                           {formatDate(selectedDate)}
                         </CardTitle>
+                        <div className="flex bg-gray-100 rounded-lg p-1">
+                          <Button
+                            variant={viewMode === 'day' ? 'default' : 'ghost'}
+                            size="sm"
+                            onClick={() => setViewMode('day')}
+                            className="text-xs"
+                          >
+                            Сегодня
+                          </Button>
+                          <Button
+                            variant={viewMode === 'month' ? 'default' : 'ghost'}
+                            size="sm"
+                            onClick={() => setViewMode('month')}
+                            className="text-xs"
+                          >
+                            Месяц
+                          </Button>
+                        </div>
                       </div>
                       <div className="flex space-x-1">
                         <Button
