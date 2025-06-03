@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Clock, User, Plus, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, User, Plus, Trash2, Edit } from "lucide-react";
 
 interface TrainerSession {
   id: number;
@@ -254,53 +254,57 @@ export function TrainerSchedule() {
             </div>
           </CardHeader>
 
-          <CardContent className="p-0">
-            <div className="divide-y divide-gray-100">
+          <CardContent className="p-4">
+            <div className="grid grid-cols-4 gap-3">
               {timeSlots.map((time) => {
                 const session = getSessionForTime(time);
                 
                 return (
-                  <div key={time} className="flex min-h-[40px]">
-                    {/* Время */}
-                    <div className="w-16 flex-shrink-0 p-2 border-r border-gray-100 bg-gray-50">
-                      <div className="flex items-center">
-                        <Clock className="h-3 w-3 text-gray-500 mr-1" />
-                        <span className="text-xs font-medium text-gray-700">{time}</span>
-                      </div>
-                    </div>
-
-                    {/* Содержимое слота */}
-                    <div className="flex-1 p-2">
-                      {session ? (
-                        <div className="rounded-lg p-2 bg-blue-50 border-l-4 border-blue-500">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center flex-1">
-                              <User className="h-3 w-3 text-gray-600 mr-1" />
-                              <h4 className="text-sm font-semibold text-gray-800">{session.studentName}</h4>
-                              {getStatusIndicator(session.status)}
-                            </div>
-                            <div className="flex space-x-1">
-                              <Button size="sm" variant="outline" className="text-xs px-2 py-1">
-                                Изменить
-                              </Button>
-                              <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700 p-1">
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                            </div>
+                  <div key={time} className="relative">
+                    {session ? (
+                      <div className={`rounded-lg p-3 border-2 transition-all hover:shadow-md cursor-pointer ${
+                        session.status === 'confirmed' 
+                          ? 'bg-green-50 border-green-200 hover:border-green-300' 
+                          : session.status === 'pending'
+                          ? 'bg-yellow-50 border-yellow-200 hover:border-yellow-300'
+                          : 'bg-gray-50 border-gray-200 hover:border-gray-300'
+                      }`}>
+                        {/* Время в углу */}
+                        <div className="absolute top-1 left-1">
+                          <span className="text-[10px] font-mono text-gray-500 bg-white px-1 rounded">{time}</span>
+                        </div>
+                        
+                        {/* Ученик */}
+                        <div className="mt-3">
+                          <h4 className="text-sm font-semibold text-gray-800 truncate">{session.studentName}</h4>
+                        </div>
+                        
+                        {/* Действия */}
+                        <div className="flex justify-between items-center mt-2">
+                          <div className={`w-2 h-2 rounded-full ${
+                            session.status === 'confirmed' ? 'bg-green-500' : 
+                            session.status === 'pending' ? 'bg-yellow-500' : 'bg-gray-400'
+                          }`}></div>
+                          <div className="flex space-x-1">
+                            <Button size="sm" variant="ghost" className="h-6 w-6 p-0 hover:bg-white/50">
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                            <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-red-500 hover:bg-red-50">
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
                           </div>
                         </div>
-                      ) : (
-                        <div className="flex items-center justify-center h-full">
-                          <Button
-                            variant="ghost"
-                            className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 w-full h-full text-xs"
-                          >
-                            <Plus className="h-3 w-3 mr-1" />
-                            Добавить ученика
-                          </Button>
+                      </div>
+                    ) : (
+                      <div className="rounded-lg p-3 border-2 border-dashed border-gray-200 hover:border-gray-300 transition-colors bg-gray-50/50 hover:bg-gray-100/50 cursor-pointer group">
+                        <div className="absolute top-1 left-1">
+                          <span className="text-[10px] font-mono text-gray-400">{time}</span>
                         </div>
-                      )}
-                    </div>
+                        <div className="flex items-center justify-center h-full min-h-[40px]">
+                          <Plus className="h-4 w-4 text-gray-400 group-hover:text-gray-600" />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })}
