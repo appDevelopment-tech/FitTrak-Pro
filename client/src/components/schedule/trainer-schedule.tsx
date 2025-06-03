@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +35,18 @@ export function TrainerSchedule() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [viewMode, setViewMode] = useState<'day' | 'month'>('day');
   const [activeTab, setActiveTab] = useState<'schedule' | 'students'>('schedule');
+  
+  // Автоматически определяем активную вкладку
+  useEffect(() => {
+    // Проверяем текущий активный раздел из navigation
+    const urlParams = new URLSearchParams(window.location.search);
+    const section = urlParams.get('section');
+    if (section === 'students') {
+      setActiveTab('students');
+    } else {
+      setActiveTab('schedule');
+    }
+  }, []);
   const [sessions, setSessions] = useState<TrainerSession[]>([
     { id: 1, time: '09:00', studentName: 'Анна Петрова', status: 'confirmed' },
     { id: 2, time: '11:00', studentName: 'Михаил Сидоров', status: 'pending' },

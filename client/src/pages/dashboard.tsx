@@ -53,6 +53,7 @@ export default function Dashboard() {
 
   const viewTitles = {
     schedule: 'Расписание тренировок',
+    students: 'Ученики',
     workouts: 'Мои тренировки',
     progress: 'Прогресс тренировок',
     trainer: 'Кабинет тренера',
@@ -63,6 +64,52 @@ export default function Dashboard() {
     switch (activeView) {
       case 'schedule':
         return <TrainerSchedule />;
+      case 'students':
+        return (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <Card>
+              <CardHeader className="border-b border-gray-100">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-xl font-bold text-gray-800">Список учеников</CardTitle>
+                  <Button className="text-xs">
+                    <Plus className="h-4 w-4 mr-1" />
+                    Добавить ученика
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="divide-y divide-gray-100">
+                  {[
+                    { id: 1, name: 'Анна Петрова', phone: '+7 (999) 123-45-67', email: 'anna@email.com' },
+                    { id: 2, name: 'Михаил Сидоров', phone: '+7 (999) 234-56-78', email: 'mikhail@email.com' },
+                    { id: 3, name: 'Елена Козлова', phone: '+7 (999) 345-67-89', email: 'elena@email.com' },
+                    { id: 4, name: 'Дмитрий Волков', phone: '+7 (999) 456-78-90', email: 'dmitry@email.com' },
+                    { id: 5, name: 'София Морозова', phone: '+7 (999) 567-89-01', email: 'sofia@email.com' },
+                    { id: 6, name: 'Алексей Иванов', phone: '+7 (999) 678-90-12', email: 'alexey@email.com' },
+                    { id: 7, name: 'Мария Смирнова', phone: '+7 (999) 789-01-23', email: 'maria@email.com' },
+                  ].map((student) => (
+                    <div key={student.id} className="p-4 hover:bg-gray-50">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-800">{student.name}</h4>
+                          <p className="text-xs text-gray-500">{student.phone}</p>
+                          <p className="text-xs text-gray-400">{student.email}</p>
+                        </div>
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
       case 'trainer':
         return <TrainerCabinet />;
       case 'progress':

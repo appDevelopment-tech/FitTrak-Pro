@@ -1,4 +1,4 @@
-import { Calendar, Dumbbell, TrendingUp, User, Presentation } from "lucide-react";
+import { Calendar, Dumbbell, TrendingUp, User, Presentation, Users } from "lucide-react";
 
 interface DesktopSidebarProps {
   activeView: string;
@@ -8,6 +8,7 @@ interface DesktopSidebarProps {
 export function DesktopSidebar({ activeView, onViewChange }: DesktopSidebarProps) {
   const navItems = [
     { id: 'schedule', label: 'Расписание', icon: Calendar },
+    { id: 'students', label: 'Ученики', icon: Users },
     { id: 'workouts', label: 'Тренировки', icon: Dumbbell },
     { id: 'progress', label: 'Прогресс', icon: TrendingUp },
     { id: 'trainer', label: 'Кабинет тренера', icon: Presentation },
