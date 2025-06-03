@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Clock, User, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, User, Plus, Trash2 } from "lucide-react";
 
 interface TrainerSession {
   id: number;
@@ -285,8 +285,8 @@ export function TrainerSchedule() {
                               <Button size="sm" variant="outline" className="text-xs px-2 py-1">
                                 Изменить
                               </Button>
-                              <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700 text-xs px-2 py-1">
-                                Отменить
+                              <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700 p-1">
+                                <Trash2 className="h-3 w-3" />
                               </Button>
                             </div>
                           </div>
