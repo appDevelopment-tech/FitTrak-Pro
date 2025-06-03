@@ -173,7 +173,11 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
+    const user: User = { 
+      ...insertUser, 
+      id,
+      isTrainer: insertUser.isTrainer ?? false
+    };
     this.users.set(id, user);
     return user;
   }
@@ -206,7 +210,12 @@ export class MemStorage implements IStorage {
 
   async createWorkoutSession(insertSession: InsertWorkoutSession): Promise<WorkoutSession> {
     const id = this.currentSessionId++;
-    const session: WorkoutSession = { ...insertSession, id };
+    const session: WorkoutSession = { 
+      ...insertSession, 
+      id,
+      status: insertSession.status ?? "scheduled",
+      completedAt: insertSession.completedAt ?? null
+    };
     this.workoutSessions.set(id, session);
     return session;
   }
@@ -226,7 +235,14 @@ export class MemStorage implements IStorage {
 
   async createExerciseProgress(insertProgress: InsertExerciseProgress): Promise<ExerciseProgress> {
     const id = this.currentProgressId++;
-    const progress: ExerciseProgress = { ...insertProgress, id };
+    const progress: ExerciseProgress = { 
+      ...insertProgress, 
+      id,
+      weight: insertProgress.weight ?? null,
+      reps: insertProgress.reps ?? null,
+      sets: insertProgress.sets ?? null,
+      sessionId: insertProgress.sessionId ?? null
+    };
     this.exerciseProgress.set(id, progress);
     return progress;
   }

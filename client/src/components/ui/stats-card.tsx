@@ -14,7 +14,7 @@ export function StatsCard({ title, value, subtitle, icon: Icon, gradient = 'defa
     primary: 'bg-gradient-to-br from-orange-500 to-orange-600 text-white',
     secondary: 'bg-gradient-to-br from-blue-600 to-blue-700 text-white',
     success: 'bg-gradient-to-br from-green-500 to-green-600 text-white',
-    default: 'bg-white border border-gray-100'
+    default: 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700'
   };
 
   const iconClasses = {

@@ -118,7 +118,7 @@ export function CalendarView({ onDateSelect, selectedDate }: CalendarViewProps) 
       
       <CardContent className="p-6">
         <div className="grid grid-cols-7 gap-1 mb-4">
-          {['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'].map((day) => (
+          {['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'].map((day) => (
             <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
               {day}
             </div>
