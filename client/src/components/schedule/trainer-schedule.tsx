@@ -108,8 +108,7 @@ export function TrainerSchedule() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Переключатель вида */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Расписание тренера</h2>
+      <div className="flex justify-end items-center mb-6">
         <div className="flex bg-gray-100 rounded-lg p-1">
           <Button
             variant={viewMode === 'day' ? 'default' : 'ghost'}
@@ -118,7 +117,7 @@ export function TrainerSchedule() {
             className="text-xs"
           >
             <Calendar className="h-4 w-4 mr-1" />
-            День
+            Сегодня
           </Button>
           <Button
             variant={viewMode === 'month' ? 'default' : 'ghost'}
@@ -140,9 +139,6 @@ export function TrainerSchedule() {
                 <CardTitle className="text-xl font-bold text-gray-800 capitalize">
                   {formatDate(selectedDate)}
                 </CardTitle>
-                {isToday(selectedDate) && (
-                  <p className="text-sm text-orange-500 font-medium mt-1">Сегодня</p>
-                )}
               </div>
               <div className="flex space-x-1">
                 <Button
@@ -191,15 +187,11 @@ export function TrainerSchedule() {
                             }`}></div>
                             <div>
                               <h4 className="text-sm font-semibold text-gray-800">{session.studentName}</h4>
-                              <p className="text-xs text-gray-500 capitalize">
-                                {session.status === 'confirmed' ? 'Подтверждено' : 
-                                 session.status === 'pending' ? 'Ожидает' : 'Свободно'}
-                              </p>
                             </div>
                           </div>
                           <div className="flex space-x-2">
                             <Button size="sm" variant="outline" className="text-xs px-3 py-1">
-                              Изменить
+                              На тренировку
                             </Button>
                             <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700 p-1">
                               <Trash2 className="h-4 w-4" />
