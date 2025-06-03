@@ -10,6 +10,7 @@ import { CalendarView } from "@/components/schedule/calendar-view";
 import { TodaySchedule } from "@/components/schedule/today-schedule";
 import { TrainerCabinet } from "@/components/trainer/trainer-cabinet";
 import { ProgressView } from "@/components/progress/progress-view";
+import { ProfileView } from "@/components/profile/profile-view";
 import { Plus, BarChart3, Search, Flame, CheckCircle, Clock, Trophy } from "lucide-react";
 import type { DashboardStats } from "@/lib/types";
 import type { WorkoutSession, WorkoutProgram } from "@shared/schema";
@@ -153,6 +154,106 @@ export default function Dashboard() {
         return <TrainerCabinet />;
       case 'progress':
         return <ProgressView />;
+      case 'profile':
+        return <ProfileView />;
+      case 'workouts':
+        return (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-800">Мои тренировки</h2>
+              <p className="text-gray-600">История и управление тренировочными программами</p>
+            </div>
+
+            <div className="grid gap-6">
+              <Card>
+                <CardHeader className="border-b border-gray-100">
+                  <CardTitle className="text-lg font-semibold text-gray-800">
+                    Активные программы
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-semibold">Силовая тренировка верха</h4>
+                          <p className="text-sm text-white text-opacity-90">90 минут • Средний уровень</p>
+                          <p className="text-sm text-white text-opacity-90 mt-1">3 упражнения</p>
+                        </div>
+                        <Button size="sm" className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white border-0">
+                          Подробнее
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-semibold">Кардио тренировка</h4>
+                          <p className="text-sm text-white text-opacity-90">60 минут • Начальный уровень</p>
+                          <p className="text-sm text-white text-opacity-90 mt-1">2 упражнения</p>
+                        </div>
+                        <Button size="sm" className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white border-0">
+                          Подробнее
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="border-b border-gray-100">
+                  <CardTitle className="text-lg font-semibold text-gray-800">
+                    История тренировок
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center">
+                        <div className="bg-green-500 bg-opacity-10 rounded-lg p-2 mr-3">
+                          <CheckCircle className="h-5 w-5 text-green-500" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-800">Силовая тренировка верха</p>
+                          <p className="text-sm text-gray-600">Вчера, 14:00-16:00</p>
+                        </div>
+                      </div>
+                      <span className="text-sm font-medium text-green-600">Завершена</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center">
+                        <div className="bg-blue-500 bg-opacity-10 rounded-lg p-2 mr-3">
+                          <CheckCircle className="h-5 w-5 text-blue-500" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-800">Кардио тренировка</p>
+                          <p className="text-sm text-gray-600">2 дня назад, 18:00-19:00</p>
+                        </div>
+                      </div>
+                      <span className="text-sm font-medium text-green-600">Завершена</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center">
+                        <div className="bg-gray-400 bg-opacity-10 rounded-lg p-2 mr-3">
+                          <Clock className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-800">Силовая тренировка верха</p>
+                          <p className="text-sm text-gray-600">3 дня назад, 14:00-16:00</p>
+                        </div>
+                      </div>
+                      <span className="text-sm font-medium text-red-600">Пропущена</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        );
       default:
         return (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
