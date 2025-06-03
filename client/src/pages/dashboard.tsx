@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Bell, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatsCard } from "@/components/ui/stats-card";
 import { MobileNavigation } from "@/components/navigation/mobile-nav";
 import { DesktopSidebar } from "@/components/navigation/desktop-sidebar";
