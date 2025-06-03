@@ -8,14 +8,22 @@ interface TrainerSession {
   id: number;
   time: string;
   clientName: string;
-  workoutType: string;
   duration: number;
   status: 'confirmed' | 'pending' | 'free';
   notes?: string;
 }
 
+interface CalendarDay {
+  date: number;
+  isCurrentMonth: boolean;
+  isToday: boolean;
+  hasSession: boolean;
+  sessionCount: number;
+}
+
 export function TrainerSchedule() {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [currentMonth, setCurrentMonth] = useState(new Date());
 
   // Генерируем временные слоты с 8:00 до 20:00
   const timeSlots = [];
@@ -23,94 +31,131 @@ export function TrainerSchedule() {
     timeSlots.push(`${hour.toString().padStart(2, '0')}:00`);
   }
 
-  // Пример данных расписания тренера
-  const trainerSessions: TrainerSession[] = [
-    {
-      id: 1,
-      time: "09:00",
-      clientName: "Иван Петров",
-      workoutType: "Силовая тренировка",
-      duration: 90,
-      status: "confirmed",
-      notes: "Работа над верхом тела"
-    },
-    {
-      id: 2,
-      time: "11:00",
-      clientName: "Мария Сидорова",
-      workoutType: "Кардио",
-      duration: 60,
-      status: "confirmed",
-      notes: "Подготовка к марафону"
-    },
-    {
-      id: 3,
-      time: "14:00",
-      clientName: "Александр Козлов",
-      workoutType: "Функциональная",
-      duration: 60,
-      status: "pending",
-      notes: "Новый клиент"
-    },
-    {
-      id: 4,
-      time: "16:00",
-      clientName: "Анна Волкова",
-      workoutType: "Растяжка",
-      duration: 45,
-      status: "confirmed",
-      notes: "Восстановление после травмы"
-    },
-    {
-      id: 5,
-      time: "18:00",
-      clientName: "Сергей Морозов",
-      workoutType: "Силовая тренировка",
-      duration: 75,
-      status: "confirmed",
-      notes: "Работа над ногами"
-    }
-  ];
+  // Расписание тренера с данными по дням
+  const allTrainerSessions: { [key: string]: TrainerSession[] } = {
+    [new Date().toISOString().split('T')[0]]: [
+      {
+        id: 1,
+        time: "09:00",
+        clientName: "Иван Петров",
+        duration: 90,
+        status: "confirmed",
+        notes: "Работа над верхом тела"
+      },
+      {
+        id: 2,
+        time: "11:00",
+        clientName: "Мария Сидорова",
+        duration: 60,
+        status: "confirmed",
+        notes: "Подготовка к марафону"
+      },
+      {
+        id: 3,
+        time: "14:00",
+        clientName: "Александр Козлов",
+        duration: 60,
+        status: "pending",
+        notes: "Новый клиент"
+      },
+      {
+        id: 4,
+        time: "16:00",
+        clientName: "Анна Волкова",
+        duration: 45,
+        status: "confirmed",
+        notes: "Восстановление после травмы"
+      },
+      {
+        id: 5,
+        time: "18:00",
+        clientName: "Сергей Морозов",
+        duration: 75,
+        status: "confirmed",
+        notes: "Работа над ногами"
+      }
+    ]
+  };
 
-  const navigateDay = (direction: 'prev' | 'next') => {
-    setSelectedDate(prev => {
+  const getDaysInMonth = (date: Date): CalendarDay[] => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+    
+    const days: CalendarDay[] = [];
+    
+    // Добавляем дни предыдущего месяца
+    const prevMonth = new Date(year, month - 1, 0);
+    for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+      days.push({
+        date: prevMonth.getDate() - i,
+        isCurrentMonth: false,
+        isToday: false,
+        hasSession: false,
+        sessionCount: 0,
+      });
+    }
+    
+    // Добавляем дни текущего месяца
+    const today = new Date();
+    for (let day = 1; day <= daysInMonth; day++) {
+      const currentDate = new Date(year, month, day);
+      const isToday = currentDate.toDateString() === today.toDateString();
+      const dateString = currentDate.toISOString().split('T')[0];
+      const sessionsForDay = allTrainerSessions[dateString] || [];
+      
+      days.push({
+        date: day,
+        isCurrentMonth: true,
+        isToday,
+        hasSession: sessionsForDay.length > 0,
+        sessionCount: sessionsForDay.length,
+      });
+    }
+    
+    return days;
+  };
+
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    setCurrentMonth(prev => {
       const newDate = new Date(prev);
       if (direction === 'prev') {
-        newDate.setDate(prev.getDate() - 1);
+        newDate.setMonth(prev.getMonth() - 1);
       } else {
-        newDate.setDate(prev.getDate() + 1);
+        newDate.setMonth(prev.getMonth() + 1);
       }
       return newDate;
     });
   };
 
-  const getSessionForTime = (time: string): TrainerSession | null => {
-    return trainerSessions.find(session => session.time === time) || null;
+  const handleDayClick = (day: CalendarDay) => {
+    if (day.isCurrentMonth) {
+      const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day.date);
+      setSelectedDate(newDate);
+    }
   };
 
-  const getWorkoutTypeColor = (type: string) => {
-    switch (type) {
-      case 'Силовая тренировка':
-        return 'bg-orange-500';
-      case 'Кардио':
-        return 'bg-blue-500';
-      case 'Функциональная':
-        return 'bg-green-500';
-      case 'Растяжка':
-        return 'bg-purple-500';
-      default:
-        return 'bg-gray-500';
-    }
+  const getSessionsForSelectedDate = (): TrainerSession[] => {
+    const dateString = selectedDate.toISOString().split('T')[0];
+    return allTrainerSessions[dateString] || [];
+  };
+
+  const getSessionForTime = (time: string): TrainerSession | null => {
+    const sessions = getSessionsForSelectedDate();
+    return sessions.find(session => session.time === time) || null;
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return <Badge className="bg-green-100 text-green-800">Подтверждено</Badge>;
+        return <Badge className="bg-green-100 text-green-800 ml-2">Подтверждено</Badge>;
       case 'pending':
-        return <Badge className="bg-yellow-100 text-yellow-800">Ожидает</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800 ml-2">Ожидает</Badge>;
       case 'free':
-        return <Badge className="bg-gray-100 text-gray-800">Свободно</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800 ml-2">Свободно</Badge>;
       default:
         return null;
     }
@@ -130,124 +175,176 @@ export function TrainerSchedule() {
     return date.toDateString() === today.toDateString();
   };
 
+  const days = getDaysInMonth(currentMonth);
+  const monthName = currentMonth.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+  const sessions = getSessionsForSelectedDate();
+
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <Card>
-        <CardHeader className="border-b border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="grid lg:grid-cols-2 gap-8">
+        {/* Календарь месяца */}
+        <Card>
+          <CardHeader className="border-b border-gray-100">
+            <div className="flex items-center justify-between">
               <CardTitle className="text-xl font-bold text-gray-800 capitalize">
-                Расписание на {formatDate(selectedDate)}
+                {monthName}
               </CardTitle>
-              {isToday(selectedDate) && (
-                <p className="text-sm text-orange-500 font-medium mt-1">Сегодня</p>
-              )}
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigateMonth('prev')}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigateMonth('next')}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigateDay('prev')}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedDate(new Date())}
-                className="px-4"
-              >
-                Сегодня
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigateDay('next')}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+          </CardHeader>
+          
+          <CardContent className="p-6">
+            <div className="grid grid-cols-7 gap-1 mb-4">
+              {['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'].map((day) => (
+                <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
+                  {day}
+                </div>
+              ))}
             </div>
-          </div>
-        </CardHeader>
-
-        <CardContent className="p-0">
-          <div className="divide-y divide-gray-100">
-            {timeSlots.map((time) => {
-              const session = getSessionForTime(time);
-              
-              return (
-                <div key={time} className="flex min-h-[80px]">
-                  {/* Время */}
-                  <div className="w-20 flex-shrink-0 p-4 border-r border-gray-100 bg-gray-50">
-                    <div className="flex items-center">
-                      <Clock className="h-4 w-4 text-gray-500 mr-2" />
-                      <span className="text-sm font-medium text-gray-700">{time}</span>
-                    </div>
-                  </div>
-
-                  {/* Содержимое слота */}
-                  <div className="flex-1 p-4">
-                    {session ? (
-                      <div className={`rounded-lg p-4 ${getWorkoutTypeColor(session.workoutType)} bg-opacity-10 border-l-4`} 
-                           style={{borderLeftColor: getWorkoutTypeColor(session.workoutType).replace('bg-', '#')}}>
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center mb-2">
-                              <User className="h-4 w-4 text-gray-600 mr-2" />
-                              <h4 className="font-semibold text-gray-800">{session.clientName}</h4>
-                              {getStatusBadge(session.status)}
-                            </div>
-                            <p className="text-sm text-gray-600 mb-1">{session.workoutType}</p>
-                            <p className="text-xs text-gray-500">
-                              Длительность: {session.duration} мин
-                            </p>
-                            {session.notes && (
-                              <p className="text-xs text-gray-600 mt-2 italic">
-                                {session.notes}
-                              </p>
-                            )}
-                          </div>
-                          <div className="flex space-x-2">
-                            <Button size="sm" variant="outline">
-                              Изменить
-                            </Button>
-                            <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700">
-                              Отменить
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center h-full">
-                        <Button
-                          variant="ghost"
-                          className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 w-full h-full"
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Добавить клиента
-                        </Button>
+            
+            <div className="grid grid-cols-7 gap-1">
+              {days.map((day, index) => {
+                const isSelected = selectedDate && 
+                  selectedDate.getDate() === day.date && 
+                  selectedDate.getMonth() === currentMonth.getMonth() &&
+                  day.isCurrentMonth;
+                
+                return (
+                  <button
+                    key={index}
+                    onClick={() => handleDayClick(day)}
+                    className={`
+                      text-center py-2 relative rounded-lg transition-colors text-sm
+                      ${!day.isCurrentMonth ? 'text-gray-400' : 'hover:bg-gray-100'}
+                      ${day.isToday && day.isCurrentMonth ? 'bg-orange-500 text-white font-semibold' : ''}
+                      ${isSelected && !day.isToday ? 'bg-gray-200' : ''}
+                    `}
+                  >
+                    {day.date}
+                    {day.hasSession && !day.isToday && (
+                      <div className="absolute bottom-0.5 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                        {day.sessionCount}
                       </div>
                     )}
+                    {day.hasSession && day.isToday && (
+                      <div className="absolute bottom-0.5 left-1/2 transform -translate-x-1/2 bg-white text-orange-500 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                        {day.sessionCount}
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Почасовое расписание */}
+        <Card>
+          <CardHeader className="border-b border-gray-100">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-xl font-bold text-gray-800 capitalize">
+                  Расписание на {formatDate(selectedDate)}
+                </CardTitle>
+                {isToday(selectedDate) && (
+                  <p className="text-sm text-orange-500 font-medium mt-1">Сегодня</p>
+                )}
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent className="p-0">
+            <div className="divide-y divide-gray-100 max-h-96 overflow-y-auto">
+              {timeSlots.map((time) => {
+                const session = getSessionForTime(time);
+                
+                return (
+                  <div key={time} className="flex min-h-[60px]">
+                    {/* Время */}
+                    <div className="w-16 flex-shrink-0 p-3 border-r border-gray-100 bg-gray-50">
+                      <div className="flex items-center">
+                        <Clock className="h-3 w-3 text-gray-500 mr-1" />
+                        <span className="text-xs font-medium text-gray-700">{time}</span>
+                      </div>
+                    </div>
+
+                    {/* Содержимое слота */}
+                    <div className="flex-1 p-3">
+                      {session ? (
+                        <div className="rounded-lg p-3 bg-blue-50 border-l-4 border-blue-500">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center mb-1">
+                                <User className="h-3 w-3 text-gray-600 mr-1" />
+                                <h4 className="text-sm font-semibold text-gray-800">{session.clientName}</h4>
+                                {getStatusBadge(session.status)}
+                              </div>
+                              <p className="text-xs text-gray-500">
+                                {session.duration} мин
+                              </p>
+                              {session.notes && (
+                                <p className="text-xs text-gray-600 mt-1 italic">
+                                  {session.notes}
+                                </p>
+                              )}
+                            </div>
+                            <div className="flex space-x-1">
+                              <Button size="sm" variant="outline" className="text-xs px-2 py-1">
+                                Изменить
+                              </Button>
+                              <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700 text-xs px-2 py-1">
+                                Отменить
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center h-full">
+                          <Button
+                            variant="ghost"
+                            className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 w-full h-full text-xs"
+                          >
+                            <Plus className="h-3 w-3 mr-1" />
+                            Добавить клиента
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Статистика дня */}
       <div className="grid grid-cols-3 gap-4 mt-6">
         <Card className="p-4">
           <div className="text-center">
-            <p className="text-2xl font-bold text-orange-500">{trainerSessions.length}</p>
+            <p className="text-2xl font-bold text-orange-500">{sessions.length}</p>
             <p className="text-sm text-gray-600">Тренировок</p>
           </div>
         </Card>
         <Card className="p-4">
           <div className="text-center">
             <p className="text-2xl font-bold text-green-500">
-              {trainerSessions.filter(s => s.status === 'confirmed').length}
+              {sessions.filter(s => s.status === 'confirmed').length}
             </p>
             <p className="text-sm text-gray-600">Подтверждено</p>
           </div>
@@ -255,7 +352,7 @@ export function TrainerSchedule() {
         <Card className="p-4">
           <div className="text-center">
             <p className="text-2xl font-bold text-blue-500">
-              {timeSlots.length - trainerSessions.length}
+              {timeSlots.length - sessions.length}
             </p>
             <p className="text-sm text-gray-600">Свободно</p>
           </div>
