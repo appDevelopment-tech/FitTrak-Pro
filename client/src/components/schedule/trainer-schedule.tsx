@@ -260,9 +260,9 @@ export function TrainerSchedule() {
                 const session = getSessionForTime(time);
                 
                 return (
-                  <div key={time} className="flex min-h-[60px]">
+                  <div key={time} className="flex min-h-[40px]">
                     {/* Время */}
-                    <div className="w-16 flex-shrink-0 p-3 border-r border-gray-100 bg-gray-50">
+                    <div className="w-16 flex-shrink-0 p-2 border-r border-gray-100 bg-gray-50">
                       <div className="flex items-center">
                         <Clock className="h-3 w-3 text-gray-500 mr-1" />
                         <span className="text-xs font-medium text-gray-700">{time}</span>
@@ -270,16 +270,14 @@ export function TrainerSchedule() {
                     </div>
 
                     {/* Содержимое слота */}
-                    <div className="flex-1 p-3">
+                    <div className="flex-1 p-2">
                       {session ? (
-                        <div className="rounded-lg p-3 bg-blue-50 border-l-4 border-blue-500">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center mb-1">
-                                <User className="h-3 w-3 text-gray-600 mr-1" />
-                                <h4 className="text-sm font-semibold text-gray-800">{session.studentName}</h4>
-                                {getStatusIndicator(session.status)}
-                              </div>
+                        <div className="rounded-lg p-2 bg-blue-50 border-l-4 border-blue-500">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center flex-1">
+                              <User className="h-3 w-3 text-gray-600 mr-1" />
+                              <h4 className="text-sm font-semibold text-gray-800">{session.studentName}</h4>
+                              {getStatusIndicator(session.status)}
                             </div>
                             <div className="flex space-x-1">
                               <Button size="sm" variant="outline" className="text-xs px-2 py-1">
