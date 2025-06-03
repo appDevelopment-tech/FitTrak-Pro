@@ -2,6 +2,9 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ChevronLeft, ChevronRight, Clock, User, Plus, Trash2, Edit, Calendar } from "lucide-react";
 
 interface TrainerSession {
@@ -23,6 +26,14 @@ export function TrainerSchedule() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [viewMode, setViewMode] = useState<'day' | 'month'>('day');
+  const [sessions, setSessions] = useState<TrainerSession[]>([]);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showConflictDialog, setShowConflictDialog] = useState(false);
+  const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
+  const [selectedTime, setSelectedTime] = useState('');
+  const [studentName, setStudentName] = useState('');
+  const [conflictMessage, setConflictMessage] = useState('');
+  const [duplicateMessage, setDuplicateMessage] = useState('');
 
   // Генерируем временные слоты с 8:00 до 20:00
   const timeSlots = [];
@@ -30,17 +41,76 @@ export function TrainerSchedule() {
     timeSlots.push(`${hour.toString().padStart(2, '0')}:00`);
   }
 
-  // Примерные данные сессий
-  const sessions: TrainerSession[] = [
-    { id: 1, time: '09:00', studentName: 'Анна Петрова', status: 'confirmed' },
-    { id: 2, time: '11:00', studentName: 'Михаил Сидоров', status: 'pending' },
-    { id: 3, time: '14:00', studentName: 'Елена Козлова', status: 'confirmed' },
-    { id: 4, time: '16:00', studentName: 'Дмитрий Волков', status: 'pending' },
-    { id: 5, time: '18:00', studentName: 'София Морозова', status: 'confirmed' },
-  ];
+  // Инициализируем данные при загрузке
+  if (sessions.length === 0) {
+    setSessions([
+      { id: 1, time: '09:00', studentName: 'Анна Петрова', status: 'confirmed' },
+      { id: 2, time: '11:00', studentName: 'Михаил Сидоров', status: 'pending' },
+      { id: 3, time: '14:00', studentName: 'Елена Козлова', status: 'confirmed' },
+      { id: 4, time: '16:00', studentName: 'Дмитрий Волков', status: 'pending' },
+      { id: 5, time: '18:00', studentName: 'София Морозова', status: 'confirmed' },
+    ]);
+  }
 
-  const getSessionForTime = (time: string) => {
-    return sessions.find(session => session.time === time);
+  const getSessionsForTime = (time: string) => {
+    return sessions.filter(session => session.time === time);
+  };
+
+  const handleAddStudent = (time: string) => {
+    setSelectedTime(time);
+    setStudentName('');
+    setShowAddDialog(true);
+  };
+
+  const checkForConflicts = (time: string, name: string) => {
+    const existingSessions = getSessionsForTime(time);
+    
+    // Проверка на дублирование ученика
+    const duplicateSession = existingSessions.find(session => 
+      session.studentName.toLowerCase() === name.toLowerCase()
+    );
+    
+    if (duplicateSession) {
+      setDuplicateMessage(`Ученик ${name} записан на ${time}`);
+      setShowDuplicateDialog(true);
+      return false;
+    }
+    
+    // Проверка на занятое время
+    if (existingSessions.length > 0) {
+      setConflictMessage(`Время ${time} занято! Добавить?`);
+      setShowConflictDialog(true);
+      return false;
+    }
+    
+    return true;
+  };
+
+  const addStudent = () => {
+    if (!studentName.trim()) return;
+    
+    if (checkForConflicts(selectedTime, studentName)) {
+      confirmAddStudent();
+    }
+  };
+
+  const confirmAddStudent = () => {
+    const newId = Math.max(...sessions.map(s => s.id), 0) + 1;
+    const newSession: TrainerSession = {
+      id: newId,
+      time: selectedTime,
+      studentName: studentName,
+      status: 'confirmed'
+    };
+    
+    setSessions([...sessions, newSession]);
+    setShowAddDialog(false);
+    setShowConflictDialog(false);
+    setStudentName('');
+  };
+
+  const removeStudent = (sessionId: number) => {
+    setSessions(sessions.filter(session => session.id !== sessionId));
   };
 
   const getDaysInMonth = (date: Date): CalendarDay[] => {
@@ -164,54 +234,58 @@ export function TrainerSchedule() {
           <CardContent className="p-0">
             <div className="divide-y divide-gray-100">
               {timeSlots.map((time) => {
-                const session = getSessionForTime(time);
+                const timeSessions = getSessionsForTime(time);
                 
                 return (
-                  <div key={time} className="flex items-center py-3 px-4 hover:bg-gray-50">
-                    {/* Время */}
-                    <div className="w-20 flex-shrink-0">
+                  <div key={time} className="py-3 px-4 hover:bg-gray-50">
+                    {/* Заголовок времени */}
+                    <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center">
                         <Clock className="h-4 w-4 text-gray-400 mr-2" />
                         <span className="text-sm font-medium text-gray-700">{time}</span>
                       </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleAddStudent(time)}
+                        className="text-xs text-gray-500 hover:text-gray-700"
+                      >
+                        <Plus className="h-4 w-4 mr-1" />
+                        Добавить ученика
+                      </Button>
                     </div>
 
-                    {/* Содержимое */}
-                    <div className="flex-1 ml-4">
-                      {session ? (
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <div className={`w-3 h-3 rounded-full mr-3 ${
-                              session.status === 'confirmed' ? 'bg-green-500' : 
-                              session.status === 'pending' ? 'bg-yellow-500' : 'bg-gray-400'
-                            }`}></div>
-                            <div>
+                    {/* Список учеников на это время */}
+                    {timeSessions.length > 0 ? (
+                      <div className="space-y-2 ml-6">
+                        {timeSessions.map((session) => (
+                          <div key={session.id} className="flex items-center justify-between bg-gray-50 rounded-lg p-2">
+                            <div className="flex items-center">
+                              <div className={`w-3 h-3 rounded-full mr-3 ${
+                                session.status === 'confirmed' ? 'bg-green-500' : 
+                                session.status === 'pending' ? 'bg-yellow-500' : 'bg-gray-400'
+                              }`}></div>
                               <h4 className="text-sm font-semibold text-gray-800">{session.studentName}</h4>
                             </div>
+                            <div className="flex space-x-2">
+                              <Button size="sm" variant="outline" className="text-xs px-3 py-1">
+                                На тренировку
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="ghost" 
+                                onClick={() => removeStudent(session.id)}
+                                className="text-red-600 hover:text-red-700 p-1"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </div>
-                          <div className="flex space-x-2">
-                            <Button size="sm" variant="outline" className="text-xs px-3 py-1">
-                              На тренировку
-                            </Button>
-                            <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700 p-1">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-400">Свободно</span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-xs text-gray-500 hover:text-gray-700"
-                          >
-                            <Plus className="h-4 w-4 mr-1" />
-                            Добавить ученика
-                          </Button>
-                        </div>
-                      )}
-                    </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="ml-6 text-sm text-gray-400">Свободно</div>
+                    )}
                   </div>
                 );
               })}
@@ -313,6 +387,67 @@ export function TrainerSchedule() {
           </div>
         </Card>
       </div>
+
+      {/* Диалог добавления ученика */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Добавить ученика на {selectedTime}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="studentName">Имя ученика</Label>
+              <Input
+                id="studentName"
+                value={studentName}
+                onChange={(e) => setStudentName(e.target.value)}
+                placeholder="Введите имя ученика"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddDialog(false)}>
+              Отмена
+            </Button>
+            <Button onClick={addStudent}>
+              Добавить
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Диалог конфликта времени */}
+      <Dialog open={showConflictDialog} onOpenChange={setShowConflictDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Подтверждение</DialogTitle>
+          </DialogHeader>
+          <p>{conflictMessage}</p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowConflictDialog(false)}>
+              НЕТ
+            </Button>
+            <Button onClick={confirmAddStudent}>
+              ДА
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Диалог дублирования ученика */}
+      <Dialog open={showDuplicateDialog} onOpenChange={setShowDuplicateDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Ученик уже записан</DialogTitle>
+          </DialogHeader>
+          <p>{duplicateMessage}</p>
+          <DialogFooter>
+            <Button onClick={() => setShowDuplicateDialog(false)}>
+              ОК
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
