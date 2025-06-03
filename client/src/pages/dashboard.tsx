@@ -11,6 +11,7 @@ import { TodaySchedule } from "@/components/schedule/today-schedule";
 import { TrainerCabinet } from "@/components/trainer/trainer-cabinet";
 import { ProgressView } from "@/components/progress/progress-view";
 import { ProfileView } from "@/components/profile/profile-view";
+import { TrainerSchedule } from "@/components/schedule/trainer-schedule";
 import { Plus, BarChart3, Search, Flame, CheckCircle, Clock, Trophy } from "lucide-react";
 import type { DashboardStats } from "@/lib/types";
 import type { WorkoutSession, WorkoutProgram } from "@shared/schema";
@@ -61,95 +62,7 @@ export default function Dashboard() {
   const renderContent = () => {
     switch (activeView) {
       case 'schedule':
-        return (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <StatsCard
-                title="Сегодня"
-                value={dashboardStats?.todayWorkouts || 0}
-                icon={Flame}
-                gradient="primary"
-              />
-              <StatsCard
-                title="Выполнено"
-                value={dashboardStats?.completedWorkouts || 0}
-                icon={CheckCircle}
-                gradient="success"
-              />
-              <StatsCard
-                title="Время"
-                value={dashboardStats?.totalTime || "0 мин"}
-                icon={Clock}
-                gradient="secondary"
-              />
-              <StatsCard
-                title="Серия"
-                value={dashboardStats?.streak || "0 дней"}
-                icon={Trophy}
-              />
-            </div>
-
-            {/* Calendar */}
-            <div className="mb-6">
-              <CalendarView onDateSelect={setSelectedDate} selectedDate={selectedDate} />
-            </div>
-
-            {/* Today's Schedule & Quick Actions */}
-            <div className="grid md:grid-cols-2 gap-6">
-              <TodaySchedule sessions={todaySessions} onStartWorkout={handleStartWorkout} />
-              
-              {/* Quick Actions */}
-              <Card className="p-6">
-                <div className="border-b border-gray-100 pb-4 mb-6">
-                  <h3 className="text-lg font-semibold text-gray-800">Быстрые действия</h3>
-                </div>
-                <div className="space-y-4">
-                  <Button
-                    onClick={() => handleQuickAction('create')}
-                    className="w-full flex items-center p-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:shadow-lg transition-all justify-start h-auto"
-                  >
-                    <div className="bg-white bg-opacity-20 rounded-lg p-2 mr-4">
-                      <Plus className="h-5 w-5" />
-                    </div>
-                    <div className="text-left">
-                      <h4 className="font-semibold">Создать тренировку</h4>
-                      <p className="text-sm text-white text-opacity-90">Добавить новую программу</p>
-                    </div>
-                  </Button>
-                  
-                  <Button
-                    onClick={() => handleQuickAction('progress')}
-                    variant="outline"
-                    className="w-full flex items-center p-4 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg transition-colors justify-start h-auto border-0"
-                  >
-                    <div className="bg-gray-300 rounded-lg p-2 mr-4">
-                      <BarChart3 className="h-5 w-5" />
-                    </div>
-                    <div className="text-left">
-                      <h4 className="font-semibold">Посмотреть прогресс</h4>
-                      <p className="text-sm text-gray-600">Статистика тренировок</p>
-                    </div>
-                  </Button>
-                  
-                  <Button
-                    onClick={() => handleQuickAction('find-trainer')}
-                    variant="outline"
-                    className="w-full flex items-center p-4 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg transition-colors justify-start h-auto border-0"
-                  >
-                    <div className="bg-gray-300 rounded-lg p-2 mr-4">
-                      <Search className="h-5 w-5" />
-                    </div>
-                    <div className="text-left">
-                      <h4 className="font-semibold">Найти тренера</h4>
-                      <p className="text-sm text-gray-600">Персональные тренировки</p>
-                    </div>
-                  </Button>
-                </div>
-              </Card>
-            </div>
-          </div>
-        );
+        return <TrainerSchedule />;
       case 'trainer':
         return <TrainerCabinet />;
       case 'progress':
