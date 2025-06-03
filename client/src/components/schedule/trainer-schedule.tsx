@@ -7,10 +7,8 @@ import { ChevronLeft, ChevronRight, Clock, User, Plus } from "lucide-react";
 interface TrainerSession {
   id: number;
   time: string;
-  clientName: string;
-  duration: number;
+  studentName: string;
   status: 'confirmed' | 'pending' | 'free';
-  notes?: string;
 }
 
 interface CalendarDay {
@@ -37,42 +35,32 @@ export function TrainerSchedule() {
       {
         id: 1,
         time: "09:00",
-        clientName: "Иван Петров",
-        duration: 90,
-        status: "confirmed",
-        notes: "Работа над верхом тела"
+        studentName: "Иван Петров",
+        status: "confirmed"
       },
       {
         id: 2,
         time: "11:00",
-        clientName: "Мария Сидорова",
-        duration: 60,
-        status: "confirmed",
-        notes: "Подготовка к марафону"
+        studentName: "Мария Сидорова",
+        status: "confirmed"
       },
       {
         id: 3,
         time: "14:00",
-        clientName: "Александр Козлов",
-        duration: 60,
-        status: "pending",
-        notes: "Новый клиент"
+        studentName: "Александр Козлов",
+        status: "pending"
       },
       {
         id: 4,
         time: "16:00",
-        clientName: "Анна Волкова",
-        duration: 45,
-        status: "confirmed",
-        notes: "Восстановление после травмы"
+        studentName: "Анна Волкова",
+        status: "confirmed"
       },
       {
         id: 5,
         time: "18:00",
-        clientName: "Сергей Морозов",
-        duration: 75,
-        status: "confirmed",
-        notes: "Работа над ногами"
+        studentName: "Сергей Морозов",
+        status: "confirmed"
       }
     ]
   };
@@ -148,14 +136,12 @@ export function TrainerSchedule() {
     return sessions.find(session => session.time === time) || null;
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusIndicator = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return <Badge className="bg-green-100 text-green-800 ml-2">Подтверждено</Badge>;
+        return <div className="w-2 h-2 bg-green-500 rounded-full ml-2"></div>;
       case 'pending':
-        return <Badge className="bg-yellow-100 text-yellow-800 ml-2">Ожидает</Badge>;
-      case 'free':
-        return <Badge className="bg-gray-100 text-gray-800 ml-2">Свободно</Badge>;
+        return <div className="w-2 h-2 bg-yellow-500 rounded-full ml-2"></div>;
       default:
         return null;
     }
@@ -291,17 +277,9 @@ export function TrainerSchedule() {
                             <div className="flex-1">
                               <div className="flex items-center mb-1">
                                 <User className="h-3 w-3 text-gray-600 mr-1" />
-                                <h4 className="text-sm font-semibold text-gray-800">{session.clientName}</h4>
-                                {getStatusBadge(session.status)}
+                                <h4 className="text-sm font-semibold text-gray-800">{session.studentName}</h4>
+                                {getStatusIndicator(session.status)}
                               </div>
-                              <p className="text-xs text-gray-500">
-                                {session.duration} мин
-                              </p>
-                              {session.notes && (
-                                <p className="text-xs text-gray-600 mt-1 italic">
-                                  {session.notes}
-                                </p>
-                              )}
                             </div>
                             <div className="flex space-x-1">
                               <Button size="sm" variant="outline" className="text-xs px-2 py-1">
@@ -320,7 +298,7 @@ export function TrainerSchedule() {
                             className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 w-full h-full text-xs"
                           >
                             <Plus className="h-3 w-3 mr-1" />
-                            Добавить клиента
+                            Добавить ученика
                           </Button>
                         </div>
                       )}
