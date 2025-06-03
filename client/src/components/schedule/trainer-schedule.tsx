@@ -340,13 +340,32 @@ export function TrainerSchedule() {
                         const timeSessions = getSessionsForTime(time);
                         
                         return (
-                          <div key={time} className="py-3 px-4 hover:bg-gray-50">
-                            {/* Заголовок времени */}
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center">
-                                <Clock className="h-4 w-4 text-gray-400 mr-2" />
-                                <span className="text-sm font-medium text-gray-700">{time}</span>
-                              </div>
+                          <div key={time} className="flex items-center justify-between py-3 px-4 hover:bg-gray-50">
+                            {/* Время */}
+                            <div className="flex items-center w-20">
+                              <Clock className="h-4 w-4 text-gray-400 mr-2" />
+                              <span className="text-sm font-medium text-gray-700">{time}</span>
+                            </div>
+
+                            {/* Ученики */}
+                            <div className="flex-1 mx-4">
+                              {timeSessions.length > 0 ? (
+                                <div className="flex flex-wrap gap-2">
+                                  {timeSessions.map((session) => (
+                                    <div key={session.id} className="flex items-center">
+                                      <div className={`w-2 h-2 rounded-full mr-2 ${
+                                        session.status === 'confirmed' ? 'bg-green-500' : 
+                                        session.status === 'pending' ? 'bg-yellow-500' : 'bg-gray-400'
+                                      }`}></div>
+                                      <span className="text-sm font-medium text-gray-800">{session.studentName}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : null}
+                            </div>
+
+                            {/* Кнопки */}
+                            <div className="flex items-center space-x-2">
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -356,39 +375,12 @@ export function TrainerSchedule() {
                                 <Plus className="h-4 w-4 mr-1" />
                                 Добавить ученика
                               </Button>
+                              {timeSessions.length > 0 && (
+                                <Button size="sm" variant="outline" className="text-xs px-3 py-1">
+                                  На тренировку
+                                </Button>
+                              )}
                             </div>
-
-                            {/* Список учеников на это время */}
-                            {timeSessions.length > 0 ? (
-                              <div className="space-y-2 ml-6">
-                                {timeSessions.map((session) => (
-                                  <div key={session.id} className="flex items-center justify-between bg-gray-50 rounded-lg p-2">
-                                    <div className="flex items-center">
-                                      <div className={`w-3 h-3 rounded-full mr-3 ${
-                                        session.status === 'confirmed' ? 'bg-green-500' : 
-                                        session.status === 'pending' ? 'bg-yellow-500' : 'bg-gray-400'
-                                      }`}></div>
-                                      <h4 className="text-sm font-semibold text-gray-800">{session.studentName}</h4>
-                                    </div>
-                                    <div className="flex space-x-2">
-                                      <Button size="sm" variant="outline" className="text-xs px-3 py-1">
-                                        На тренировку
-                                      </Button>
-                                      <Button 
-                                        size="sm" 
-                                        variant="ghost" 
-                                        onClick={() => removeStudent(session.id)}
-                                        className="text-red-600 hover:text-red-700 p-1"
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </Button>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="ml-6 text-sm text-gray-400">Свободно</div>
-                            )}
                           </div>
                         );
                       })}
