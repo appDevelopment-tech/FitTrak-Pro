@@ -276,31 +276,6 @@ export function TrainerSchedule() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex">
-        {/* Левая навигация */}
-        <div className="w-48 mr-6">
-          <div className="space-y-2">
-            <Button
-              variant={activeTab === 'schedule' ? 'default' : 'ghost'}
-              onClick={() => setActiveTab('schedule')}
-              className="w-full justify-start"
-            >
-              <Calendar className="h-4 w-4 mr-2" />
-              Расписание
-            </Button>
-            <Button
-              variant={activeTab === 'students' ? 'default' : 'ghost'}
-              onClick={() => setActiveTab('students')}
-              className="w-full justify-start"
-            >
-              <Users className="h-4 w-4 mr-2" />
-              Ученики
-            </Button>
-          </div>
-        </div>
-
-        {/* Основной контент */}
-        <div className="flex-1">
           {activeTab === 'students' ? (
             renderStudentsList()
           ) : (
@@ -517,10 +492,8 @@ export function TrainerSchedule() {
               </div>
             </>
           )}
-        </div>
-      </div>
 
-      {/* Диалог добавления ученика в расписание */}
+      {/* Диалоги */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent>
           <DialogHeader>

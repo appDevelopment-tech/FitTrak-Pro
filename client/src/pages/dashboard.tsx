@@ -12,7 +12,7 @@ import { TrainerCabinet } from "@/components/trainer/trainer-cabinet";
 import { ProgressView } from "@/components/progress/progress-view";
 import { ProfileView } from "@/components/profile/profile-view";
 import { TrainerSchedule } from "@/components/schedule/trainer-schedule";
-import { Plus, BarChart3, Search, Flame, CheckCircle, Clock, Trophy } from "lucide-react";
+import { Plus, BarChart3, Search, Flame, CheckCircle, Clock, Trophy, Trash2 } from "lucide-react";
 import type { DashboardStats } from "@/lib/types";
 import type { WorkoutSession, WorkoutProgram } from "@shared/schema";
 
