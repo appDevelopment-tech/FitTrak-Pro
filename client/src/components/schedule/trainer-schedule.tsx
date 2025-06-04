@@ -343,12 +343,26 @@ export function TrainerSchedule() {
 
   const openStudentProfile = (student: Student) => {
     setSelectedStudentProfile(student);
+    setIsEditingProfile(false);
+    setEditedStudent(null);
     setActiveTab('profile');
+    
+    // Обновляем URL для корректной навигации
+    const url = new URL(window.location.href);
+    url.searchParams.set('section', 'profile');
+    window.history.pushState({}, '', url);
   };
 
   const backToStudents = () => {
     setSelectedStudentProfile(null);
+    setIsEditingProfile(false);
+    setEditedStudent(null);
     setActiveTab('students');
+    
+    // Обновляем URL для возврата к списку учеников
+    const url = new URL(window.location.href);
+    url.searchParams.set('section', 'students');
+    window.history.pushState({}, '', url);
   };
 
   const openAddStudentForm = () => {
