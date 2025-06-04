@@ -6,27 +6,197 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { User, Edit, Save, Camera, Plus, Trash2, Award, Clock, Users, Calendar } from "lucide-react";
+import { User, Edit, Save, Camera, Plus, Trash2, Award, Clock, Users, Calendar, Eye } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import type { User as UserType } from "@shared/schema";
+import { ExerciseDetail } from "@/components/exercise/exercise-detail";
 
 export function ProfileView() {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string | null>(null);
+  const [selectedExercise, setSelectedExercise] = useState<any | null>(null);
   const [exercises, setExercises] = useState([
-    { id: 1, name: 'Приседания со штангой', category: 'Ноги', description: 'Базовое упражнение для развития квадрицепсов и ягодичных мышц' },
-    { id: 2, name: 'Жим штанги лежа', category: 'Грудь', description: 'Классическое упражнение для развития грудных мышц' },
-    { id: 3, name: 'Становая тяга', category: 'Спина', description: 'Комплексное упражнение для всего тела' },
-    { id: 4, name: 'Жим гантелей лежа', category: 'Грудь', description: 'Упражнение для грудных мышц с гантелями' },
-    { id: 5, name: 'Подтягивания', category: 'Спина', description: 'Упражнение для широчайших мышц спины' },
-    { id: 6, name: 'Жим ногами', category: 'Ноги', description: 'Упражнение в тренажере для ног' },
-    { id: 7, name: 'Жим штанги стоя', category: 'Плечи', description: 'Базовое упражнение для дельтовидных мышц' },
-    { id: 8, name: 'Сгибания рук со штангой', category: 'Руки', description: 'Упражнение для бицепсов' },
-    { id: 9, name: 'Планка', category: 'Пресс', description: 'Статическое упражнение для мышц кора' },
-    { id: 10, name: 'Французский жим', category: 'Руки', description: 'Упражнение для трицепсов' },
+    {
+      id: 1,
+      name: 'Приседания со штангой',
+      category: 'Ноги',
+      primaryMuscles: ['Квадрицепс', 'Ягодичные'],
+      secondaryMuscles: ['Икры', 'Мышцы кора', 'Бицепс бедра'],
+      equipment: 'Штанга',
+      difficulty: 'Средний',
+      description: 'Базовое упражнение для развития мышц нижней части тела',
+      technique: [
+        'Поставьте ноги на ширине плеч',
+        'Положите штангу на верхнюю часть спины',
+        'Медленно опуститесь, сгибая колени',
+        'Опуститесь до параллели бедер с полом',
+        'Вернитесь в исходное положение'
+      ],
+      commonMistakes: [
+        'Колени заворачиваются внутрь',
+        'Округление спины',
+        'Неполная амплитуда движения',
+        'Перенос веса на носки'
+      ],
+      tips: [
+        'Держите грудь расправленной',
+        'Смотрите прямо перед собой',
+        'Контролируйте движение вниз и вверх'
+      ]
+    },
+    {
+      id: 2,
+      name: 'Жим штанги лежа',
+      category: 'Грудь',
+      primaryMuscles: ['Большая грудная мышца'],
+      secondaryMuscles: ['Передние дельты', 'Трицепс'],
+      equipment: 'Штанга, скамья',
+      difficulty: 'Средний',
+      description: 'Классическое упражнение для развития грудных мышц',
+      technique: [
+        'Лягте на скамью, глаза под грифом',
+        'Возьмитесь за штангу широким хватом',
+        'Опустите штангу к груди',
+        'Выжмите штангу вверх по дуге',
+        'Вернитесь в исходное положение'
+      ],
+      commonMistakes: [
+        'Отрыв ягодиц от скамьи',
+        'Слишком быстрое движение',
+        'Неполная амплитуда',
+        'Неправильная траектория'
+      ],
+      tips: [
+        'Держите лопатки сведенными',
+        'Контролируйте негативную фазу',
+        'Дышите правильно: вдох вниз, выдох вверх'
+      ]
+    },
+    {
+      id: 3,
+      name: 'Становая тяга',
+      category: 'Спина',
+      primaryMuscles: ['Мышцы спины', 'Ягодичные', 'Бицепс бедра'],
+      secondaryMuscles: ['Квадрицепс', 'Трапеции', 'Предплечья'],
+      equipment: 'Штанга',
+      difficulty: 'Сложный',
+      description: 'Базовое многосуставное упражнение для всего тела',
+      technique: [
+        'Встаньте вплотную к штанге',
+        'Наклонитесь и возьмитесь за гриф',
+        'Выпрямите спину, напрягите корпус',
+        'Поднимите штангу, разгибая ноги и спину',
+        'Вернитесь в исходное положение'
+      ],
+      commonMistakes: [
+        'Округление спины',
+        'Штанга далеко от тела',
+        'Неправильное положение головы',
+        'Слишком быстрое движение'
+      ],
+      tips: [
+        'Держите штангу близко к телу',
+        'Начинайте движение с ног',
+        'Контролируйте каждую фазу движения'
+      ]
+    },
+    {
+      id: 4,
+      name: 'Подтягивания',
+      category: 'Спина',
+      primaryMuscles: ['Широчайшие мышцы спины'],
+      secondaryMuscles: ['Бицепс', 'Задние дельты', 'Ромбовидные'],
+      equipment: 'Турник',
+      difficulty: 'Сложный',
+      description: 'Упражнение с собственным весом для спины',
+      technique: [
+        'Повисните на турнике широким хватом',
+        'Сведите лопатки и напрягите корпус',
+        'Подтянитесь до касания подбородком перекладины',
+        'Медленно опуститесь в исходное положение'
+      ],
+      commonMistakes: [
+        'Раскачивание тела',
+        'Неполная амплитуда',
+        'Слишком быстрое опускание',
+        'Помощь ногами'
+      ],
+      tips: [
+        'Контролируйте движение',
+        'Дышите равномерно',
+        'Сосредоточьтесь на работе спины'
+      ]
+    },
+    {
+      id: 5,
+      name: 'Жим штанги стоя',
+      category: 'Плечи',
+      primaryMuscles: ['Дельтовидные мышцы'],
+      secondaryMuscles: ['Трицепс', 'Верх груди', 'Мышцы кора'],
+      equipment: 'Штанга',
+      difficulty: 'Сложный',
+      description: 'Базовое упражнение для развития плеч',
+      technique: [
+        'Встаньте прямо, штанга на уровне плеч',
+        'Хват чуть шире плеч',
+        'Выжмите штангу строго вверх',
+        'Зафиксируйте на секунду наверху',
+        'Медленно опустите к плечам'
+      ],
+      commonMistakes: [
+        'Прогиб в пояснице',
+        'Жим вперед вместо вверх',
+        'Слишком широкий хват',
+        'Помощь ногами'
+      ],
+      tips: [
+        'Держите корпус напряженным',
+        'Жмите строго вертикально',
+        'Контролируйте баланс'
+      ]
+    },
+    {
+      id: 6,
+      name: 'Планка',
+      category: 'Пресс',
+      primaryMuscles: ['Прямая мышца живота', 'Поперечная мышца живота'],
+      secondaryMuscles: ['Мышцы спины', 'Плечи', 'Ягодичные'],
+      equipment: 'Собственный вес',
+      difficulty: 'Легкий',
+      description: 'Статическое упражнение для укрепления мышц кора',
+      technique: [
+        'Примите положение упор лежа на предплечьях',
+        'Тело должно образовывать прямую линию',
+        'Напрягите мышцы живота и ягодиц',
+        'Удерживайте позицию заданное время',
+        'Дышите равномерно'
+      ],
+      commonMistakes: [
+        'Провисание поясницы',
+        'Подъем таза вверх',
+        'Задержка дыхания',
+        'Неправильное положение головы'
+      ],
+      tips: [
+        'Держите тело в одной линии',
+        'Начинайте с коротких интервалов',
+        'Дышите свободно'
+      ]
+    }
   ]);
   
-  const [newExercise, setNewExercise] = useState({ name: '', category: '', description: '' });
+  const [newExercise, setNewExercise] = useState({ 
+    name: '', 
+    category: '', 
+    description: '', 
+    primaryMuscles: [], 
+    secondaryMuscles: [], 
+    equipment: '', 
+    difficulty: 'Легкий',
+    technique: [],
+    commonMistakes: [],
+    tips: []
+  });
   
   const { data: user } = useQuery<UserType>({
     queryKey: ['/api/user/1'],
@@ -36,10 +206,26 @@ export function ProfileView() {
     if (newExercise.name && newExercise.category) {
       const exercise = {
         id: exercises.length + 1,
-        ...newExercise
+        ...newExercise,
+        primaryMuscles: newExercise.primaryMuscles.length > 0 ? newExercise.primaryMuscles : [newExercise.category],
+        secondaryMuscles: newExercise.secondaryMuscles.length > 0 ? newExercise.secondaryMuscles : [],
+        technique: newExercise.technique.length > 0 ? newExercise.technique : ['Базовая техника выполнения'],
+        commonMistakes: newExercise.commonMistakes.length > 0 ? newExercise.commonMistakes : ['Стандартные ошибки'],
+        tips: newExercise.tips.length > 0 ? newExercise.tips : ['Общие рекомендации']
       };
       setExercises([...exercises, exercise]);
-      setNewExercise({ name: '', category: '', description: '' });
+      setNewExercise({ 
+        name: '', 
+        category: '', 
+        description: '', 
+        primaryMuscles: [], 
+        secondaryMuscles: [], 
+        equipment: '', 
+        difficulty: 'Легкий',
+        technique: [],
+        commonMistakes: [],
+        tips: []
+      });
     }
   };
   
@@ -306,19 +492,46 @@ export function ProfileView() {
                     <div className="grid gap-4">
                       {getExercisesByGroup(selectedMuscleGroup).map((exercise) => (
                         <div key={exercise.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-                          <div>
-                            <h4 className="font-semibold">{exercise.name}</h4>
-                            <p className="text-sm text-gray-600">{exercise.category}</p>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h4 className="font-semibold">{exercise.name}</h4>
+                              <Badge variant="outline" className="text-xs">
+                                {exercise.difficulty}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-1">{exercise.category} • {exercise.equipment}</p>
                             <p className="text-sm text-gray-500">{exercise.description}</p>
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {exercise.primaryMuscles.slice(0, 2).map((muscle, index) => (
+                                <Badge key={index} variant="secondary" className="text-xs">
+                                  {muscle}
+                                </Badge>
+                              ))}
+                              {exercise.primaryMuscles.length > 2 && (
+                                <Badge variant="secondary" className="text-xs">
+                                  +{exercise.primaryMuscles.length - 2}
+                                </Badge>
+                              )}
+                            </div>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeExercise(exercise.id)}
-                            className="text-red-600 hover:text-red-700"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setSelectedExercise(exercise)}
+                              className="text-blue-600 hover:text-blue-700"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeExercise(exercise.id)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       ))}
                       {getExercisesByGroup(selectedMuscleGroup).length === 0 && (
