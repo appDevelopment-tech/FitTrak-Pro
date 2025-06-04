@@ -11,8 +11,7 @@ export function DesktopSidebar({ activeView, onViewChange }: DesktopSidebarProps
     { id: 'students', label: 'Ученики', icon: Users },
     { id: 'workouts', label: 'Тренировки', icon: Dumbbell },
     { id: 'progress', label: 'Прогресс', icon: TrendingUp },
-    { id: 'trainer', label: 'Кабинет тренера', icon: Presentation },
-    { id: 'profile', label: 'Профиль', icon: User },
+    { id: 'profile', label: 'Профиль тренера', icon: User },
   ];
 
   return (

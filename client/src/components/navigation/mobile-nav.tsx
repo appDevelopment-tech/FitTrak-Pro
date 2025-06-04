@@ -10,7 +10,7 @@ export function MobileNavigation({ activeView, onViewChange }: MobileNavProps) {
     { id: 'schedule', label: 'Расписание', icon: Calendar },
     { id: 'workouts', label: 'Тренировки', icon: Dumbbell },
     { id: 'progress', label: 'Прогресс', icon: TrendingUp },
-    { id: 'profile', label: 'Профиль', icon: User },
+    { id: 'profile', label: 'Профиль тренера', icon: User },
   ];
 
   return (

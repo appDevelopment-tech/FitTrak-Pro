@@ -71,8 +71,7 @@ export default function Dashboard() {
     students: 'Ученики',
     workouts: 'Мои тренировки',
     progress: 'Прогресс тренировок',
-    trainer: 'Кабинет тренера',
-    profile: 'Профиль пользователя',
+    profile: 'Профиль тренера',
   };
 
   const renderContent = () => {
