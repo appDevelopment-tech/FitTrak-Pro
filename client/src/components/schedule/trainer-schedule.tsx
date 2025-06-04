@@ -339,7 +339,7 @@ export function TrainerSchedule() {
                         const timeSessions = getSessionsForTime(time);
                         
                         return (
-                          <div key={time} className="flex items-center justify-between py-3 px-4 hover:bg-gray-50">
+                          <div key={time} className="flex items-center justify-between py-1.5 px-4 hover:bg-gray-50">
                             {/* Время */}
                             <div className="flex items-center w-20">
                               <Clock className="h-4 w-4 text-gray-400 mr-2" />
@@ -351,7 +351,7 @@ export function TrainerSchedule() {
                               {timeSessions.length > 0 ? (
                                 <div className="flex flex-wrap gap-2">
                                   {timeSessions.map((session) => (
-                                    <div key={session.id} className="flex items-center bg-gray-50 rounded-lg px-2 py-1 group hover:bg-gray-100">
+                                    <div key={session.id} className="flex items-center bg-gray-50 rounded px-2 py-0.5 group hover:bg-gray-100">
                                       <div className={`w-2 h-2 rounded-full mr-2 ${
                                         session.status === 'confirmed' ? 'bg-green-500' : 
                                         session.status === 'pending' ? 'bg-yellow-500' : 'bg-gray-400'
