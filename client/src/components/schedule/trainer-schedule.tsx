@@ -11,8 +11,17 @@ import { ChevronLeft, ChevronRight, Clock, User, Plus, Trash2, Edit, Calendar, U
 interface Student {
   id: number;
   name: string;
+  firstName: string;
+  lastName: string;
+  middleName?: string;
   phone: string;
   email: string;
+  birthDate?: string;
+  weight?: number;
+  height?: number;
+  goal?: string;
+  medicalNotes?: string;
+  photo?: string;
 }
 
 interface TrainerSession {
@@ -35,7 +44,8 @@ export function TrainerSchedule() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [viewMode, setViewMode] = useState<'day' | 'month'>('day');
-  const [activeTab, setActiveTab] = useState<'schedule' | 'students'>('schedule');
+  const [activeTab, setActiveTab] = useState<'schedule' | 'students' | 'profile'>('schedule');
+  const [selectedStudentProfile, setSelectedStudentProfile] = useState<Student | null>(null);
   
   // Автоматически определяем активную вкладку
   useEffect(() => {
@@ -56,13 +66,104 @@ export function TrainerSchedule() {
     { id: 5, time: '18:00', studentName: 'София Морозова', status: 'confirmed', date: new Date(Date.now() + 3*24*60*60*1000).toISOString().split('T')[0] },
   ]);
   const [students, setStudents] = useState<Student[]>([
-    { id: 1, name: 'Анна Петрова', phone: '+7 (999) 123-45-67', email: 'anna@email.com' },
-    { id: 2, name: 'Михаил Сидоров', phone: '+7 (999) 234-56-78', email: 'mikhail@email.com' },
-    { id: 3, name: 'Елена Козлова', phone: '+7 (999) 345-67-89', email: 'elena@email.com' },
-    { id: 4, name: 'Дмитрий Волков', phone: '+7 (999) 456-78-90', email: 'dmitry@email.com' },
-    { id: 5, name: 'София Морозова', phone: '+7 (999) 567-89-01', email: 'sofia@email.com' },
-    { id: 6, name: 'Алексей Иванов', phone: '+7 (999) 678-90-12', email: 'alexey@email.com' },
-    { id: 7, name: 'Мария Смирнова', phone: '+7 (999) 789-01-23', email: 'maria@email.com' },
+    { 
+      id: 1, 
+      name: 'Анна Петрова', 
+      firstName: 'Анна', 
+      lastName: 'Петрова', 
+      middleName: 'Ивановна',
+      phone: '+7 (999) 123-45-67', 
+      email: 'anna@email.com',
+      birthDate: '1990-05-15',
+      weight: 65,
+      height: 170,
+      goal: 'Похудение и укрепление мышц',
+      medicalNotes: 'Травма правого колена 2020г.'
+    },
+    { 
+      id: 2, 
+      name: 'Михаил Сидоров', 
+      firstName: 'Михаил', 
+      lastName: 'Сидоров', 
+      middleName: 'Александрович',
+      phone: '+7 (999) 234-56-78', 
+      email: 'mikhail@email.com',
+      birthDate: '1985-12-03',
+      weight: 85,
+      height: 180,
+      goal: 'Набор мышечной массы',
+      medicalNotes: 'Здоров'
+    },
+    { 
+      id: 3, 
+      name: 'Елена Козлова', 
+      firstName: 'Елена', 
+      lastName: 'Козлова', 
+      middleName: 'Дмитриевна',
+      phone: '+7 (999) 345-67-89', 
+      email: 'elena@email.com',
+      birthDate: '1992-08-20',
+      weight: 58,
+      height: 165,
+      goal: 'Улучшение выносливости',
+      medicalNotes: 'Артрит тазобедренного сустава'
+    },
+    { 
+      id: 4, 
+      name: 'Дмитрий Волков', 
+      firstName: 'Дмитрий', 
+      lastName: 'Волков', 
+      middleName: 'Сергеевич',
+      phone: '+7 (999) 456-78-90', 
+      email: 'dmitry@email.com',
+      birthDate: '1988-03-10',
+      weight: 90,
+      height: 185,
+      goal: 'Поддержание формы',
+      medicalNotes: 'Здоров'
+    },
+    { 
+      id: 5, 
+      name: 'София Морозова', 
+      firstName: 'София', 
+      lastName: 'Морозова', 
+      middleName: 'Андреевна',
+      phone: '+7 (999) 567-89-01', 
+      email: 'sofia@email.com',
+      birthDate: '1995-11-25',
+      weight: 62,
+      height: 168,
+      goal: 'Растяжка и йога',
+      medicalNotes: 'Сколиоз, рекомендована лечебная физкультура'
+    },
+    { 
+      id: 6, 
+      name: 'Алексей Иванов', 
+      firstName: 'Алексей', 
+      lastName: 'Иванов', 
+      middleName: 'Петрович',
+      phone: '+7 (999) 678-90-12', 
+      email: 'alexey@email.com',
+      birthDate: '1983-07-14',
+      weight: 78,
+      height: 175,
+      goal: 'Восстановление после травмы',
+      medicalNotes: 'Разрыв связок левого плеча, реабилитация'
+    },
+    { 
+      id: 7, 
+      name: 'Мария Смирнова', 
+      firstName: 'Мария', 
+      lastName: 'Смирнова', 
+      middleName: 'Владимировна',
+      phone: '+7 (999) 789-01-23', 
+      email: 'maria@email.com',
+      birthDate: '1991-01-30',
+      weight: 55,
+      height: 160,
+      goal: 'Общее укрепление здоровья',
+      medicalNotes: 'Здорова'
+    },
   ]);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showConflictDialog, setShowConflictDialog] = useState(false);
@@ -167,10 +268,14 @@ export function TrainerSchedule() {
   const addNewStudent = () => {
     if (!newStudentName.trim()) return;
     
+    const nameParts = newStudentName.split(' ');
     const newId = Math.max(...students.map(s => s.id), 0) + 1;
     const newStudent: Student = {
       id: newId,
       name: newStudentName,
+      firstName: nameParts[1] || '',
+      lastName: nameParts[0] || '',
+      middleName: nameParts[2] || '',
       phone: newStudentPhone,
       email: newStudentEmail
     };
@@ -180,6 +285,16 @@ export function TrainerSchedule() {
     setNewStudentName('');
     setNewStudentPhone('');
     setNewStudentEmail('');
+  };
+
+  const openStudentProfile = (student: Student) => {
+    setSelectedStudentProfile(student);
+    setActiveTab('profile');
+  };
+
+  const backToStudents = () => {
+    setSelectedStudentProfile(null);
+    setActiveTab('students');
   };
 
   const removeStudentFromList = (studentId: number) => {
@@ -328,6 +443,109 @@ export function TrainerSchedule() {
 
   const days = getDaysInMonth(currentMonth);
   const monthName = currentMonth.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+
+  const calculateAge = (birthDate: string) => {
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  const renderStudentProfile = () => {
+    if (!selectedStudentProfile) return null;
+    
+    const student = selectedStudentProfile;
+    
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" onClick={backToStudents} className="text-sm">
+            ← Назад к списку учеников
+          </Button>
+        </div>
+        
+        <Card>
+          <CardHeader className="border-b border-gray-100">
+            <CardTitle className="text-xl font-bold text-gray-800">Профиль ученика</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Фото и основная информация */}
+              <div className="space-y-4">
+                <div className="flex items-center space-x-4">
+                  <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
+                    {student.photo ? (
+                      <img src={student.photo} alt={student.name} className="w-24 h-24 rounded-full object-cover" />
+                    ) : (
+                      <User className="h-12 w-12 text-gray-500" />
+                    )}
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">
+                      {student.lastName} {student.firstName} {student.middleName}
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                      {student.birthDate && `${calculateAge(student.birthDate)} лет`}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Дата рождения</Label>
+                    <p className="text-sm text-gray-900">{student.birthDate || 'Не указана'}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Телефон</Label>
+                    <p className="text-sm text-gray-900">{student.phone}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Email</Label>
+                    <p className="text-sm text-gray-900">{student.email}</p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Физические данные */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">Физические данные</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Вес</Label>
+                    <p className="text-sm text-gray-900">{student.weight ? `${student.weight} кг` : 'Не указан'}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Рост</Label>
+                    <p className="text-sm text-gray-900">{student.height ? `${student.height} см` : 'Не указан'}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Цель тренировки</Label>
+                  <p className="text-sm text-gray-900">{student.goal || 'Не указана'}</p>
+                </div>
+                
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Медицинские особенности</Label>
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-900">{student.medicalNotes || 'Особенности не указаны'}</p>
+                  </div>
+                </div>
+                
+                <Button className="w-full mt-4">
+                  Создать тренировку
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
 
   const renderStudentsList = () => (
     <Card>
