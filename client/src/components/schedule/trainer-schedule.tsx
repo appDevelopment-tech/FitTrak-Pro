@@ -52,6 +52,7 @@ export function TrainerSchedule() {
     // Проверяем текущий активный раздел из navigation
     const urlParams = new URLSearchParams(window.location.search);
     const section = urlParams.get('section');
+    console.log('URL section:', section);
     if (section === 'students') {
       setActiveTab('students');
     } else {
@@ -64,6 +65,7 @@ export function TrainerSchedule() {
     const handlePopState = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const section = urlParams.get('section');
+      console.log('PopState section:', section);
       if (section === 'students') {
         setActiveTab('students');
       } else if (section === 'profile') {
@@ -76,6 +78,20 @@ export function TrainerSchedule() {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
+
+  // Дополнительная проверка каждые 100мс для отладки
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const section = urlParams.get('section');
+      if (section === 'students' && activeTab !== 'students') {
+        console.log('Force setting students tab');
+        setActiveTab('students');
+      }
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [activeTab]);
   const [sessions, setSessions] = useState<TrainerSession[]>([
     { id: 1, time: '09:00', studentName: 'Анна Петрова', status: 'confirmed', date: new Date().toISOString().split('T')[0] },
     { id: 2, time: '11:00', studentName: 'Михаил Сидоров', status: 'pending', date: new Date().toISOString().split('T')[0] },
