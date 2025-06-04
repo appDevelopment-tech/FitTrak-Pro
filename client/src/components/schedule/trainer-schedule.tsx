@@ -100,15 +100,29 @@ export function TrainerSchedule() {
     const student = students.find(s => s.id.toString() === studentId);
     if (!student) return false;
     
+    const currentDateString = selectedDate.toISOString().split('T')[0];
     const existingSessions = getSessionsForTime(time);
     
-    // Проверка на дублирование ученика
-    const duplicateSession = existingSessions.find(session => 
+    // Проверка на дублирование ученика в этот же день на другое время
+    const duplicateInDay = sessions.find(session => 
+      session.date === currentDateString && 
+      session.studentName.toLowerCase() === student.name.toLowerCase() &&
+      session.time !== time
+    );
+    
+    if (duplicateInDay) {
+      setDuplicateMessage(`${student.name} уже записан на ${duplicateInDay.time} в этот день. Вы точно хотите добавить ученика на ${time}?`);
+      setShowDuplicateDialog(true);
+      return false;
+    }
+    
+    // Проверка на дублирование ученика на это же время
+    const duplicateAtTime = existingSessions.find(session => 
       session.studentName.toLowerCase() === student.name.toLowerCase()
     );
     
-    if (duplicateSession) {
-      setDuplicateMessage(`Ученик ${student.name} записан на ${time}`);
+    if (duplicateAtTime) {
+      setDuplicateMessage(`${student.name} уже записан на ${time}`);
       setShowDuplicateDialog(true);
       return false;
     }
@@ -726,9 +740,22 @@ export function TrainerSchedule() {
           </DialogHeader>
           <p>{duplicateMessage}</p>
           <DialogFooter>
-            <Button onClick={() => setShowDuplicateDialog(false)}>
-              ОК
+            <Button variant="outline" onClick={() => setShowDuplicateDialog(false)}>
+              НЕТ
             </Button>
+            {duplicateMessage.includes('Вы точно хотите добавить') && (
+              <Button onClick={() => {
+                confirmAddStudent();
+                setShowDuplicateDialog(false);
+              }}>
+                ДА
+              </Button>
+            )}
+            {!duplicateMessage.includes('Вы точно хотите добавить') && (
+              <Button onClick={() => setShowDuplicateDialog(false)}>
+                ОК
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
