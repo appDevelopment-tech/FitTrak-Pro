@@ -32,7 +32,7 @@ export default function Dashboard() {
       url.searchParams.delete('section');
     }
     window.history.pushState({}, '', url);
-    console.log('Setting view to:', view, 'URL params:', url.searchParams.get('section'));
+
   };
 
   const { data: dashboardStats } = useQuery<DashboardStats>({

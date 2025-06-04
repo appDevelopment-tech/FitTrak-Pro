@@ -10,7 +10,6 @@ import { ChevronLeft, ChevronRight, Clock, User, Plus, Trash2, Edit, Calendar, U
 
 interface Student {
   id: number;
-  name: string;
   firstName: string;
   lastName: string;
   middleName?: string;
@@ -22,6 +21,7 @@ interface Student {
   goal?: string;
   medicalNotes?: string;
   photo?: string;
+  get name(): string;
 }
 
 interface TrainerSession {
@@ -52,7 +52,7 @@ export function TrainerSchedule() {
     // Проверяем текущий активный раздел из navigation
     const urlParams = new URLSearchParams(window.location.search);
     const section = urlParams.get('section');
-    console.log('URL section:', section);
+
     if (section === 'students') {
       setActiveTab('students');
     } else {
@@ -65,7 +65,7 @@ export function TrainerSchedule() {
     const handlePopState = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const section = urlParams.get('section');
-      console.log('PopState section:', section);
+
       if (section === 'students') {
         setActiveTab('students');
       } else if (section === 'profile') {
@@ -84,7 +84,7 @@ export function TrainerSchedule() {
     const handleLocationChange = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const section = urlParams.get('section');
-      console.log('Location changed, section:', section);
+
       
       if (section === 'students') {
         setActiveTab('students');
@@ -340,7 +340,6 @@ export function TrainerSchedule() {
   };
 
   const openStudentProfile = (student: Student) => {
-    console.log('Opening profile for:', student.name);
     setSelectedStudentProfile(student);
     setActiveTab('profile');
   };
@@ -657,8 +656,7 @@ export function TrainerSchedule() {
     </Card>
   );
 
-  console.log('Current activeTab:', activeTab);
-  console.log('Selected student profile:', selectedStudentProfile);
+
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
