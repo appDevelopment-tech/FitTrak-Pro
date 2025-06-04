@@ -287,9 +287,6 @@ export function TrainerSchedule() {
                   <CardHeader className="border-b border-gray-100">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
-                        <CardTitle className="text-xl font-bold text-gray-800 capitalize">
-                          {formatDate(selectedDate)}
-                        </CardTitle>
                         <div className="flex bg-gray-100 rounded-lg p-1">
                           <Button
                             variant={viewMode === 'day' ? 'default' : 'ghost'}
@@ -311,6 +308,9 @@ export function TrainerSchedule() {
                             Месяц
                           </Button>
                         </div>
+                        <CardTitle className="text-xl font-bold text-gray-800 capitalize">
+                          {formatDate(selectedDate)}
+                        </CardTitle>
                       </div>
                       <div className="flex items-center space-x-1">
                         <Button
@@ -399,9 +399,6 @@ export function TrainerSchedule() {
                   <CardHeader className="border-b border-gray-100">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
-                        <CardTitle className="text-xl font-bold text-gray-800 capitalize">
-                          {monthName}
-                        </CardTitle>
                         <div className="flex bg-gray-100 rounded-lg p-1">
                           <Button
                             variant={viewMode === 'day' ? 'default' : 'ghost'}
@@ -423,6 +420,9 @@ export function TrainerSchedule() {
                             Месяц
                           </Button>
                         </div>
+                        <CardTitle className="text-xl font-bold text-gray-800 capitalize">
+                          {monthName}
+                        </CardTitle>
                       </div>
                       <div className="flex items-center space-x-1">
                         <Button
