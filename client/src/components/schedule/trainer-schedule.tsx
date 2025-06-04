@@ -236,6 +236,16 @@ export function TrainerSchedule() {
     setConflictMessage('');
   };
 
+  const toggleSessionStatus = (sessionId: number) => {
+    setSessions(sessions.map(session => {
+      if (session.id === sessionId) {
+        const newStatus = session.status === 'confirmed' ? 'pending' : 'confirmed';
+        return { ...session, status: newStatus };
+      }
+      return session;
+    }));
+  };
+
   const getDaysInMonth = (date: Date): CalendarDay[] => {
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -428,10 +438,17 @@ export function TrainerSchedule() {
                                       draggable
                                       onDragStart={(e) => handleDragStart(e, session)}
                                     >
-                                      <div className={`w-2 h-2 rounded-full mr-2 ${
-                                        session.status === 'confirmed' ? 'bg-green-500' : 
-                                        session.status === 'pending' ? 'bg-yellow-500' : 'bg-gray-400'
-                                      }`}></div>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          toggleSessionStatus(session.id);
+                                        }}
+                                        className={`w-3 h-3 rounded-full mr-2 cursor-pointer transition-all hover:scale-110 ${
+                                          session.status === 'confirmed' ? 'bg-green-500 hover:bg-green-600' : 
+                                          session.status === 'pending' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-gray-400 hover:bg-gray-500'
+                                        }`}
+                                        title={`Статус: ${session.status === 'confirmed' ? 'Подтверждено' : 'Ожидает'}. Нажмите для изменения`}
+                                      ></button>
                                       <span className="text-sm font-medium text-gray-800">{session.studentName}</span>
                                       <Button 
                                         size="sm" 
