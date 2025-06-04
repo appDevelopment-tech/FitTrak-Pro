@@ -58,6 +58,24 @@ export function TrainerSchedule() {
       setActiveTab('schedule');
     }
   }, []);
+
+  // Следим за изменениями URL
+  useEffect(() => {
+    const handlePopState = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const section = urlParams.get('section');
+      if (section === 'students') {
+        setActiveTab('students');
+      } else if (section === 'profile') {
+        setActiveTab('profile');
+      } else {
+        setActiveTab('schedule');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
   const [sessions, setSessions] = useState<TrainerSession[]>([
     { id: 1, time: '09:00', studentName: 'Анна Петрова', status: 'confirmed', date: new Date().toISOString().split('T')[0] },
     { id: 2, time: '11:00', studentName: 'Михаил Сидоров', status: 'pending', date: new Date().toISOString().split('T')[0] },
@@ -288,6 +306,7 @@ export function TrainerSchedule() {
   };
 
   const openStudentProfile = (student: Student) => {
+    console.log('Opening profile for:', student.name);
     setSelectedStudentProfile(student);
     setActiveTab('profile');
   };
@@ -295,6 +314,10 @@ export function TrainerSchedule() {
   const backToStudents = () => {
     setSelectedStudentProfile(null);
     setActiveTab('students');
+  };
+
+  const openAddStudentForm = () => {
+    setShowAddStudentDialog(true);
   };
 
   const removeStudentFromList = (studentId: number) => {
@@ -552,7 +575,7 @@ export function TrainerSchedule() {
       <CardHeader className="border-b border-gray-100">
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl font-bold text-gray-800">Список учеников</CardTitle>
-          <Button onClick={() => setShowAddStudentDialog(true)} className="text-xs">
+          <Button onClick={openAddStudentForm} className="text-xs">
             <Plus className="h-4 w-4 mr-1" />
             Добавить ученика
           </Button>
@@ -599,6 +622,9 @@ export function TrainerSchedule() {
       </CardContent>
     </Card>
   );
+
+  console.log('Current activeTab:', activeTab);
+  console.log('Selected student profile:', selectedStudentProfile);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
