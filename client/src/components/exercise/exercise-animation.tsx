@@ -33,6 +33,14 @@ export function ExerciseAnimation({ exerciseName, className = "w-32 h-32" }: Exe
                 <stop offset="0%" stopColor="#a29bfe" />
                 <stop offset="100%" stopColor="#6c5ce7" />
               </linearGradient>
+              <pattern id="muscleFibers" patternUnits="userSpaceOnUse" width="4" height="2">
+                <rect width="4" height="2" fill="none"/>
+                <path d="M 0 1 L 4 1" stroke="#fff" strokeWidth="0.3" opacity="0.7"/>
+              </pattern>
+              <pattern id="bonePattern" patternUnits="userSpaceOnUse" width="2" height="2">
+                <rect width="2" height="2" fill="#f8f8f8"/>
+                <circle cx="1" cy="1" r="0.2" fill="#e0e0e0"/>
+              </pattern>
               <filter id="glow">
                 <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
                 <feMerge> 
@@ -45,8 +53,129 @@ export function ExerciseAnimation({ exerciseName, className = "w-32 h-32" }: Exe
             {/* Голова */}
             <circle cx="60" cy="20" r="6" fill="#f4c2a1" stroke="#e17055" strokeWidth="0.5"/>
             
+            {/* СКЕЛЕТНАЯ СИСТЕМА */}
+            {/* Позвоночник */}
+            <rect x="58" y="25" width="4" height="25" fill="url(#bonePattern)" stroke="#ddd" strokeWidth="0.5"
+                  transform={isAnimating ? "translate(0, 3)" : "translate(0, 0)"} 
+                  style={{ transition: "transform 1s ease-in-out" }} />
+            
+            {/* Бедренные кости */}
+            <rect x="50" y="48" width="3" height="18" fill="url(#bonePattern)" stroke="#ddd" strokeWidth="0.3"
+                  transform={isAnimating ? "translate(0, 3)" : "translate(0, 0)"} 
+                  style={{ transition: "transform 1s ease-in-out" }} />
+            <rect x="67" y="48" width="3" height="18" fill="url(#bonePattern)" stroke="#ddd" strokeWidth="0.3"
+                  transform={isAnimating ? "translate(0, 3)" : "translate(0, 0)"} 
+                  style={{ transition: "transform 1s ease-in-out" }} />
+            
+            {/* Большеберцовые кости */}
+            <rect x="51" y="78" width="2" height="16" fill="url(#bonePattern)" stroke="#ddd" strokeWidth="0.3"
+                  transform={isAnimating ? "translate(0, 2)" : "translate(0, 0)"} 
+                  style={{ transition: "transform 1s ease-in-out" }} />
+            <rect x="67" y="78" width="2" height="16" fill="url(#bonePattern)" stroke="#ddd" strokeWidth="0.3"
+                  transform={isAnimating ? "translate(0, 2)" : "translate(0, 0)"} 
+                  style={{ transition: "transform 1s ease-in-out" }} />
+            
+            {/* Коленные суставы */}
+            <circle cx="52" cy="76" r="2" fill="#e0e0e0" stroke="#ccc" strokeWidth="0.5"
+                    transform={isAnimating ? "translate(0, 2)" : "translate(0, 0)"} 
+                    style={{ transition: "transform 1s ease-in-out" }} />
+            <circle cx="68" cy="76" r="2" fill="#e0e0e0" stroke="#ccc" strokeWidth="0.5"
+                    transform={isAnimating ? "translate(0, 2)" : "translate(0, 0)"} 
+                    style={{ transition: "transform 1s ease-in-out" }} />
+            
+            {/* Тазобедренные суставы */}
+            <circle cx="52" cy="50" r="2.5" fill="#e0e0e0" stroke="#ccc" strokeWidth="0.5"
+                    transform={isAnimating ? "translate(0, 3)" : "translate(0, 0)"} 
+                    style={{ transition: "transform 1s ease-in-out" }} />
+            <circle cx="68" cy="50" r="2.5" fill="#e0e0e0" stroke="#ccc" strokeWidth="0.5"
+                    transform={isAnimating ? "translate(0, 3)" : "translate(0, 0)"} 
+                    style={{ transition: "transform 1s ease-in-out" }} />
+            
+            {/* МЫШЕЧНАЯ СИСТЕМА С ВОЛОКНАМИ */}
+            {/* Ягодичные мышцы с волокнами */}
+            <ellipse cx="60" cy="48" rx="10" ry="6" fill="url(#glutesGradient)" 
+                     filter={isAnimating ? "url(#glow)" : "none"}
+                     transform={isAnimating ? "translate(0, 4)" : "translate(0, 0)"} 
+                     style={{ transition: "transform 1s ease-in-out" }} />
+            <ellipse cx="60" cy="48" rx="9" ry="5" fill="url(#muscleFibers)" opacity="0.6"
+                     transform={isAnimating ? "translate(0, 4)" : "translate(0, 0)"} 
+                     style={{ transition: "transform 1s ease-in-out" }} />
+            
+            {/* Квадрицепсы с направленными волокнами */}
+            <ellipse cx="52" cy="60" rx="4" ry="12" fill="url(#quadsGradient)" 
+                     filter={isAnimating ? "url(#glow)" : "none"}
+                     transform={isAnimating ? "scale(1.1) translate(0, 3)" : "scale(1) translate(0, 0)"} 
+                     style={{ transition: "transform 1s ease-in-out", transformOrigin: "52px 60px" }} />
+            {/* Мышечные волокна квадрицепсов */}
+            <g transform={isAnimating ? "scale(1.1) translate(0, 3)" : "scale(1) translate(0, 0)"} 
+               style={{ transition: "transform 1s ease-in-out", transformOrigin: "52px 60px" }}>
+              <path d="M 49 52 L 49 68" stroke="#fff" strokeWidth="0.4" opacity="0.7"/>
+              <path d="M 51 52 L 51 68" stroke="#fff" strokeWidth="0.4" opacity="0.7"/>
+              <path d="M 53 52 L 53 68" stroke="#fff" strokeWidth="0.4" opacity="0.7"/>
+              <path d="M 55 52 L 55 68" stroke="#fff" strokeWidth="0.4" opacity="0.7"/>
+            </g>
+            
+            <ellipse cx="68" cy="60" rx="4" ry="12" fill="url(#quadsGradient)" 
+                     filter={isAnimating ? "url(#glow)" : "none"}
+                     transform={isAnimating ? "scale(1.1) translate(0, 3)" : "scale(1) translate(0, 0)"} 
+                     style={{ transition: "transform 1s ease-in-out", transformOrigin: "68px 60px" }} />
+            {/* Мышечные волокна квадрицепсов */}
+            <g transform={isAnimating ? "scale(1.1) translate(0, 3)" : "scale(1) translate(0, 0)"} 
+               style={{ transition: "transform 1s ease-in-out", transformOrigin: "68px 60px" }}>
+              <path d="M 65 52 L 65 68" stroke="#fff" strokeWidth="0.4" opacity="0.7"/>
+              <path d="M 67 52 L 67 68" stroke="#fff" strokeWidth="0.4" opacity="0.7"/>
+              <path d="M 69 52 L 69 68" stroke="#fff" strokeWidth="0.4" opacity="0.7"/>
+              <path d="M 71 52 L 71 68" stroke="#fff" strokeWidth="0.4" opacity="0.7"/>
+            </g>
+            
+            {/* Бицепс бедра с волокнами */}
+            <ellipse cx="50" cy="62" rx="2" ry="10" fill="#ff7675" opacity="0.8"
+                     filter={isAnimating ? "url(#glow)" : "none"}
+                     transform={isAnimating ? "scale(1.05)" : "scale(1)"} 
+                     style={{ transition: "transform 1s ease-in-out", transformOrigin: "50px 62px" }} />
+            <path d="M 49 55 L 49 69" stroke="#fff" strokeWidth="0.3" opacity="0.6"
+                  transform={isAnimating ? "scale(1.05)" : "scale(1)"} 
+                  style={{ transition: "transform 1s ease-in-out", transformOrigin: "49px 62px" }}/>
+            <path d="M 51 55 L 51 69" stroke="#fff" strokeWidth="0.3" opacity="0.6"
+                  transform={isAnimating ? "scale(1.05)" : "scale(1)"} 
+                  style={{ transition: "transform 1s ease-in-out", transformOrigin: "51px 62px" }}/>
+            
+            <ellipse cx="70" cy="62" rx="2" ry="10" fill="#ff7675" opacity="0.8"
+                     filter={isAnimating ? "url(#glow)" : "none"}
+                     transform={isAnimating ? "scale(1.05)" : "scale(1)"} 
+                     style={{ transition: "transform 1s ease-in-out", transformOrigin: "70px 62px" }} />
+            <path d="M 69 55 L 69 69" stroke="#fff" strokeWidth="0.3" opacity="0.6"
+                  transform={isAnimating ? "scale(1.05)" : "scale(1)"} 
+                  style={{ transition: "transform 1s ease-in-out", transformOrigin: "69px 62px" }}/>
+            <path d="M 71 55 L 71 69" stroke="#fff" strokeWidth="0.3" opacity="0.6"
+                  transform={isAnimating ? "scale(1.05)" : "scale(1)"} 
+                  style={{ transition: "transform 1s ease-in-out", transformOrigin: "71px 62px" }}/>
+            
+            {/* Икроножные мышцы с волокнами */}
+            <ellipse cx="54" cy="88" rx="2" ry="6" fill="url(#calvesGradient)" 
+                     filter={isAnimating ? "url(#glow)" : "none"}
+                     transform={isAnimating ? "scale(1.1)" : "scale(1)"} 
+                     style={{ transition: "transform 1s ease-in-out", transformOrigin: "54px 88px" }} />
+            <path d="M 53 84 L 53 92" stroke="#fff" strokeWidth="0.3" opacity="0.6"
+                  transform={isAnimating ? "scale(1.1)" : "scale(1)"} 
+                  style={{ transition: "transform 1s ease-in-out", transformOrigin: "53px 88px" }}/>
+            <path d="M 55 84 L 55 92" stroke="#fff" strokeWidth="0.3" opacity="0.6"
+                  transform={isAnimating ? "scale(1.1)" : "scale(1)"} 
+                  style={{ transition: "transform 1s ease-in-out", transformOrigin: "55px 88px" }}/>
+            
+            <ellipse cx="66" cy="88" rx="2" ry="6" fill="url(#calvesGradient)" 
+                     filter={isAnimating ? "url(#glow)" : "none"}
+                     transform={isAnimating ? "scale(1.1)" : "scale(1)"} 
+                     style={{ transition: "transform 1s ease-in-out", transformOrigin: "66px 88px" }} />
+            <path d="M 65 84 L 65 92" stroke="#fff" strokeWidth="0.3" opacity="0.6"
+                  transform={isAnimating ? "scale(1.1)" : "scale(1)"} 
+                  style={{ transition: "transform 1s ease-in-out", transformOrigin: "65px 88px" }}/>
+            <path d="M 67 84 L 67 92" stroke="#fff" strokeWidth="0.3" opacity="0.6"
+                  transform={isAnimating ? "scale(1.1)" : "scale(1)"} 
+                  style={{ transition: "transform 1s ease-in-out", transformOrigin: "67px 88px" }}/>
+            
             {/* Торс */}
-            <ellipse cx="60" cy="35" rx="8" ry="12" fill="#4a90e2" 
+            <ellipse cx="60" cy="35" rx="8" ry="12" fill="#4a90e2" opacity="0.7"
                      transform={isAnimating ? "translate(0, 3)" : "translate(0, 0)"} 
                      style={{ transition: "transform 1s ease-in-out" }} />
             
@@ -59,70 +188,28 @@ export function ExerciseAnimation({ exerciseName, className = "w-32 h-32" }: Exe
                     style={{ transition: "cy 1s ease-in-out" }} />
             
             {/* Руки */}
-            <ellipse cx="40" cy="38" rx="3" ry="8" fill="#4a90e2" 
+            <ellipse cx="40" cy="38" rx="3" ry="8" fill="#4a90e2" opacity="0.7"
                      transform={isAnimating ? "translate(0, 3)" : "translate(0, 0)"} 
                      style={{ transition: "transform 1s ease-in-out" }} />
-            <ellipse cx="80" cy="38" rx="3" ry="8" fill="#4a90e2" 
+            <ellipse cx="80" cy="38" rx="3" ry="8" fill="#4a90e2" opacity="0.7"
                      transform={isAnimating ? "translate(0, 3)" : "translate(0, 0)"} 
                      style={{ transition: "transform 1s ease-in-out" }} />
-            
-            {/* Ягодичные мышцы */}
-            <ellipse cx="60" cy="48" rx="10" ry="6" fill="url(#glutesGradient)" 
-                     filter={isAnimating ? "url(#glow)" : "none"}
-                     transform={isAnimating ? "translate(0, 4)" : "translate(0, 0)"} 
-                     style={{ transition: "transform 1s ease-in-out" }} />
-            
-            {/* Квадрицепсы (передняя часть бедра) */}
-            <ellipse cx="52" cy="60" rx="4" ry="12" fill="url(#quadsGradient)" 
-                     filter={isAnimating ? "url(#glow)" : "none"}
-                     transform={isAnimating ? "scale(1.1) translate(0, 3)" : "scale(1) translate(0, 0)"} 
-                     style={{ transition: "transform 1s ease-in-out", transformOrigin: "52px 60px" }} />
-            <ellipse cx="68" cy="60" rx="4" ry="12" fill="url(#quadsGradient)" 
-                     filter={isAnimating ? "url(#glow)" : "none"}
-                     transform={isAnimating ? "scale(1.1) translate(0, 3)" : "scale(1) translate(0, 0)"} 
-                     style={{ transition: "transform 1s ease-in-out", transformOrigin: "68px 60px" }} />
-            
-            {/* Бицепс бедра (задняя часть) */}
-            <ellipse cx="50" cy="62" rx="2" ry="10" fill="#ff7675" opacity="0.7"
-                     filter={isAnimating ? "url(#glow)" : "none"}
-                     transform={isAnimating ? "scale(1.05)" : "scale(1)"} 
-                     style={{ transition: "transform 1s ease-in-out", transformOrigin: "50px 62px" }} />
-            <ellipse cx="70" cy="62" rx="2" ry="10" fill="#ff7675" opacity="0.7"
-                     filter={isAnimating ? "url(#glow)" : "none"}
-                     transform={isAnimating ? "scale(1.05)" : "scale(1)"} 
-                     style={{ transition: "transform 1s ease-in-out", transformOrigin: "70px 62px" }} />
-            
-            {/* Голени */}
-            <ellipse cx="52" cy="85" rx="3" ry="10" fill="#4a90e2" 
-                     transform={isAnimating ? "translate(0, 2)" : "translate(0, 0)"} 
-                     style={{ transition: "transform 1s ease-in-out" }} />
-            <ellipse cx="68" cy="85" rx="3" ry="10" fill="#4a90e2" 
-                     transform={isAnimating ? "translate(0, 2)" : "translate(0, 0)"} 
-                     style={{ transition: "transform 1s ease-in-out" }} />
-            
-            {/* Икроножные мышцы */}
-            <ellipse cx="54" cy="88" rx="2" ry="6" fill="url(#calvesGradient)" 
-                     filter={isAnimating ? "url(#glow)" : "none"}
-                     transform={isAnimating ? "scale(1.1)" : "scale(1)"} 
-                     style={{ transition: "transform 1s ease-in-out", transformOrigin: "54px 88px" }} />
-            <ellipse cx="66" cy="88" rx="2" ry="6" fill="url(#calvesGradient)" 
-                     filter={isAnimating ? "url(#glow)" : "none"}
-                     transform={isAnimating ? "scale(1.1)" : "scale(1)"} 
-                     style={{ transition: "transform 1s ease-in-out", transformOrigin: "66px 88px" }} />
             
             {/* Стопы */}
             <ellipse cx="52" cy="98" rx="4" ry="2" fill="#2d3436" />
             <ellipse cx="68" cy="98" rx="4" ry="2" fill="#2d3436" />
             
-            {/* Стрелки движения */}
+            {/* Силовые векторы */}
             {isAnimating && (
               <>
-                <path d="M 35 55 L 35 65 M 30 60 L 35 65 L 40 60" stroke="#ff4757" strokeWidth="2" fill="none" opacity="0.8"/>
-                <path d="M 85 55 L 85 65 M 80 60 L 85 65 L 90 60" stroke="#ff4757" strokeWidth="2" fill="none" opacity="0.8"/>
+                <path d="M 35 55 L 35 65 M 30 60 L 35 65 L 40 60" stroke="#ff4757" strokeWidth="2.5" fill="none" opacity="0.9"/>
+                <path d="M 85 55 L 85 65 M 80 60 L 85 65 L 90 60" stroke="#ff4757" strokeWidth="2.5" fill="none" opacity="0.9"/>
+                <text x="25" y="72" fontSize="5" fill="#ff4757" fontWeight="bold">СИЛА</text>
+                <text x="75" y="72" fontSize="5" fill="#ff4757" fontWeight="bold">СИЛА</text>
               </>
             )}
             
-            <text x="60" y="110" textAnchor="middle" fontSize="8" fill="#2d3436" fontWeight="bold">Приседания</text>
+            <text x="60" y="110" textAnchor="middle" fontSize="8" fill="#2d3436" fontWeight="bold">Приседания - Анатомия</text>
           </svg>
         );
 
@@ -142,6 +229,18 @@ export function ExerciseAnimation({ exerciseName, className = "w-32 h-32" }: Exe
                 <stop offset="0%" stopColor="#fdcb6e" />
                 <stop offset="100%" stopColor="#e17055" />
               </linearGradient>
+              <pattern id="chestFibers" patternUnits="userSpaceOnUse" width="6" height="3" patternTransform="rotate(15)">
+                <rect width="6" height="3" fill="none"/>
+                <path d="M 0 1.5 L 6 1.5" stroke="#fff" strokeWidth="0.4" opacity="0.8"/>
+              </pattern>
+              <pattern id="tricepsFibers" patternUnits="userSpaceOnUse" width="3" height="8">
+                <rect width="3" height="8" fill="none"/>
+                <path d="M 1.5 0 L 1.5 8" stroke="#fff" strokeWidth="0.3" opacity="0.7"/>
+              </pattern>
+              <pattern id="ribPattern" patternUnits="userSpaceOnUse" width="3" height="2">
+                <rect width="3" height="2" fill="#f5f5f5"/>
+                <path d="M 0 1 L 3 1" stroke="#e0e0e0" strokeWidth="0.3"/>
+              </pattern>
               <filter id="chestGlow">
                 <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
                 <feMerge> 
