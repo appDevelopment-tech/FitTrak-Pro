@@ -20,6 +20,7 @@ interface TrainerSession {
   time: string;
   studentName: string;
   status: 'confirmed' | 'pending' | 'free';
+  date: string; // формат YYYY-MM-DD
 }
 
 interface CalendarDay {
@@ -48,11 +49,11 @@ export function TrainerSchedule() {
     }
   }, []);
   const [sessions, setSessions] = useState<TrainerSession[]>([
-    { id: 1, time: '09:00', studentName: 'Анна Петрова', status: 'confirmed' },
-    { id: 2, time: '11:00', studentName: 'Михаил Сидоров', status: 'pending' },
-    { id: 3, time: '14:00', studentName: 'Елена Козлова', status: 'confirmed' },
-    { id: 4, time: '16:00', studentName: 'Дмитрий Волков', status: 'pending' },
-    { id: 5, time: '18:00', studentName: 'София Морозова', status: 'confirmed' },
+    { id: 1, time: '09:00', studentName: 'Анна Петрова', status: 'confirmed', date: new Date().toISOString().split('T')[0] },
+    { id: 2, time: '11:00', studentName: 'Михаил Сидоров', status: 'pending', date: new Date().toISOString().split('T')[0] },
+    { id: 3, time: '14:00', studentName: 'Елена Козлова', status: 'confirmed', date: new Date(Date.now() + 24*60*60*1000).toISOString().split('T')[0] },
+    { id: 4, time: '16:00', studentName: 'Дмитрий Волков', status: 'pending', date: new Date(Date.now() + 2*24*60*60*1000).toISOString().split('T')[0] },
+    { id: 5, time: '18:00', studentName: 'София Морозова', status: 'confirmed', date: new Date(Date.now() + 3*24*60*60*1000).toISOString().split('T')[0] },
   ]);
   const [students, setStudents] = useState<Student[]>([
     { id: 1, name: 'Анна Петрова', phone: '+7 (999) 123-45-67', email: 'anna@email.com' },
@@ -85,7 +86,8 @@ export function TrainerSchedule() {
   }
 
   const getSessionsForTime = (time: string) => {
-    return sessions.filter(session => session.time === time);
+    const currentDateString = selectedDate.toISOString().split('T')[0];
+    return sessions.filter(session => session.time === time && session.date === currentDateString);
   };
 
   const handleAddStudent = (time: string) => {
@@ -138,7 +140,8 @@ export function TrainerSchedule() {
       id: newId,
       time: selectedTime,
       studentName: student.name,
-      status: 'confirmed'
+      status: 'confirmed',
+      date: selectedDate.toISOString().split('T')[0]
     };
     
     setSessions([...sessions, newSession]);
@@ -261,12 +264,16 @@ export function TrainerSchedule() {
       const isCurrentMonth = current.getMonth() === month;
       const isToday = current.toDateString() === new Date().toDateString();
       
+      // Проверяем, есть ли тренировки на эту дату
+      const dateString = current.toISOString().split('T')[0];
+      const sessionsOnDate = sessions.filter(session => session.date === dateString);
+      
       days.push({
         date: current.getDate(),
         isCurrentMonth,
         isToday,
-        hasSession: isCurrentMonth && Math.random() > 0.7,
-        sessionCount: Math.floor(Math.random() * 4)
+        hasSession: isCurrentMonth && sessionsOnDate.length > 0,
+        sessionCount: sessionsOnDate.length
       });
 
       current.setDate(current.getDate() + 1);
