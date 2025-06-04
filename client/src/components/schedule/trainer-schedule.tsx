@@ -74,6 +74,9 @@ export function TrainerSchedule() {
   const [newStudentEmail, setNewStudentEmail] = useState('');
   const [conflictMessage, setConflictMessage] = useState('');
   const [duplicateMessage, setDuplicateMessage] = useState('');
+  const [conflictTime, setConflictTime] = useState('');
+  const [draggedSession, setDraggedSession] = useState<TrainerSession | null>(null);
+  const [dragOverTime, setDragOverTime] = useState<string | null>(null);
 
   // Генерируем временные слоты с 8:00 до 20:00
   const timeSlots = [];
@@ -173,6 +176,64 @@ export function TrainerSchedule() {
 
   const removeStudent = (sessionId: number) => {
     setSessions(sessions.filter(session => session.id !== sessionId));
+  };
+
+  // Drag and Drop handlers
+  const handleDragStart = (e: React.DragEvent, session: TrainerSession) => {
+    setDraggedSession(session);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent, time: string) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverTime(time);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverTime(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, targetTime: string) => {
+    e.preventDefault();
+    setDragOverTime(null);
+    
+    if (!draggedSession || draggedSession.time === targetTime) {
+      setDraggedSession(null);
+      return;
+    }
+
+    // Проверяем конфликты на новом времени
+    const existingSessions = getSessionsForTime(targetTime);
+    if (existingSessions.length > 0) {
+      setConflictMessage(`Время ${targetTime} уже занято! Переместить ученика ${draggedSession.studentName}?`);
+      setConflictTime(targetTime);
+      setShowConflictDialog(true);
+      return;
+    }
+
+    // Перемещаем ученика
+    setSessions(sessions.map(session => 
+      session.id === draggedSession.id 
+        ? { ...session, time: targetTime }
+        : session
+    ));
+    
+    setDraggedSession(null);
+  };
+
+  const confirmDragMove = () => {
+    if (draggedSession) {
+      setSessions(sessions.map(session => 
+        session.id === draggedSession.id 
+          ? { ...session, time: conflictTime }
+          : session
+      ));
+    }
+    setShowConflictDialog(false);
+    setDraggedSession(null);
+    setConflictTime('');
+    setConflictMessage('');
   };
 
   const getDaysInMonth = (date: Date): CalendarDay[] => {
@@ -339,7 +400,15 @@ export function TrainerSchedule() {
                         const timeSessions = getSessionsForTime(time);
                         
                         return (
-                          <div key={time} className="flex items-center justify-between py-1.5 px-4 hover:bg-gray-50">
+                          <div 
+                            key={time} 
+                            className={`flex items-center justify-between py-1.5 px-4 hover:bg-gray-50 transition-colors ${
+                              dragOverTime === time ? 'bg-blue-100 border-2 border-blue-300 border-dashed' : ''
+                            }`}
+                            onDragOver={(e) => handleDragOver(e, time)}
+                            onDragLeave={handleDragLeave}
+                            onDrop={(e) => handleDrop(e, time)}
+                          >
                             {/* Время */}
                             <div className="flex items-center w-20">
                               <Clock className="h-4 w-4 text-gray-400 mr-2" />
@@ -351,7 +420,14 @@ export function TrainerSchedule() {
                               {timeSessions.length > 0 ? (
                                 <div className="flex flex-wrap gap-2">
                                   {timeSessions.map((session) => (
-                                    <div key={session.id} className="flex items-center bg-gray-50 rounded px-2 py-0.5 group hover:bg-gray-100">
+                                    <div 
+                                      key={session.id} 
+                                      className={`flex items-center bg-gray-50 rounded px-2 py-0.5 group hover:bg-gray-100 cursor-move transition-all ${
+                                        draggedSession?.id === session.id ? 'opacity-50 scale-95' : ''
+                                      }`}
+                                      draggable
+                                      onDragStart={(e) => handleDragStart(e, session)}
+                                    >
                                       <div className={`w-2 h-2 rounded-full mr-2 ${
                                         session.status === 'confirmed' ? 'bg-green-500' : 
                                         session.status === 'pending' ? 'bg-yellow-500' : 'bg-gray-400'
@@ -605,10 +681,13 @@ export function TrainerSchedule() {
           </DialogHeader>
           <p>{conflictMessage}</p>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowConflictDialog(false)}>
+            <Button variant="outline" onClick={() => {
+              setShowConflictDialog(false);
+              setDraggedSession(null);
+            }}>
               НЕТ
             </Button>
-            <Button onClick={confirmAddStudent}>
+            <Button onClick={draggedSession ? confirmDragMove : confirmAddStudent}>
               ДА
             </Button>
           </DialogFooter>
