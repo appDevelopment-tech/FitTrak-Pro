@@ -1,4 +1,4 @@
-import { Calendar, Dumbbell, TrendingUp, User } from "lucide-react";
+import { Calendar, User, Users } from "lucide-react";
 
 interface MobileNavProps {
   activeView: string;
@@ -8,8 +8,7 @@ interface MobileNavProps {
 export function MobileNavigation({ activeView, onViewChange }: MobileNavProps) {
   const navItems = [
     { id: 'schedule', label: 'Расписание', icon: Calendar },
-    { id: 'workouts', label: 'Тренировки', icon: Dumbbell },
-    { id: 'progress', label: 'Прогресс', icon: TrendingUp },
+    { id: 'students', label: 'Ученики', icon: User },
     { id: 'profile', label: 'Профиль тренера', icon: User },
   ];
 

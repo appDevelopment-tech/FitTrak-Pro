@@ -69,8 +69,6 @@ export default function Dashboard() {
   const viewTitles = {
     schedule: 'Расписание тренировок',
     students: 'Ученики',
-    workouts: 'Мои тренировки',
-    progress: 'Прогресс тренировок',
     profile: 'Профиль тренера',
   };
 
@@ -125,8 +123,7 @@ export default function Dashboard() {
           </div>
         );
 
-      case 'progress':
-        return <ProgressView />;
+
       case 'profile':
         return <ProfileView />;
       case 'workouts':
