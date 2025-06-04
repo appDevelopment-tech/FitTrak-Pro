@@ -20,6 +20,21 @@ export default function Dashboard() {
   const [activeView, setActiveView] = useState('schedule');
   const [selectedDate, setSelectedDate] = useState(new Date());
 
+  const handleViewChange = (view: string) => {
+    setActiveView(view);
+    // Обновляем URL параметры для корректной навигации
+    const url = new URL(window.location.href);
+    if (view === 'students') {
+      url.searchParams.set('section', 'students');
+    } else if (view === 'profile') {
+      url.searchParams.set('section', 'profile');
+    } else {
+      url.searchParams.delete('section');
+    }
+    window.history.pushState({}, '', url);
+    console.log('Setting view to:', view, 'URL params:', url.searchParams.get('section'));
+  };
+
   const { data: dashboardStats } = useQuery<DashboardStats>({
     queryKey: ['/api/dashboard-stats/1'],
   });
@@ -231,7 +246,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Desktop Sidebar */}
-      <DesktopSidebar activeView={activeView} onViewChange={setActiveView} />
+      <DesktopSidebar activeView={activeView} onViewChange={handleViewChange} />
 
       {/* Main Content */}
       <div className="md:pl-64 flex flex-col flex-1">
@@ -273,7 +288,7 @@ export default function Dashboard() {
       </div>
 
       {/* Mobile Navigation */}
-      <MobileNavigation activeView={activeView} onViewChange={setActiveView} />
+      <MobileNavigation activeView={activeView} onViewChange={handleViewChange} />
 
       {/* Floating Action Button */}
       <Button

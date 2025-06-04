@@ -1,0 +1,82 @@
+8191-0dedc7dac8777c0c.js:1 Replit version 07af3574, pid2 version 0.0.1362
+_app-10da034c5c0319eb.js:38 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+_app-10da034c5c0319eb.js:38 [LaunchDarkly] LaunchDarkly client initialized
+framework-374f1ea5f5222862.js:1 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+_ @ framework-374f1ea5f5222862.js:1
+framework-374f1ea5f5222862.js:1 Unrecognized feature: 'ambient-light-sensor'.
+_ @ framework-374f1ea5f5222862.js:1
+framework-374f1ea5f5222862.js:1 Unrecognized feature: 'battery'.
+_ @ framework-374f1ea5f5222862.js:1
+framework-374f1ea5f5222862.js:1 Unrecognized feature: 'execution-while-not-rendered'.
+_ @ framework-374f1ea5f5222862.js:1
+framework-374f1ea5f5222862.js:1 Unrecognized feature: 'execution-while-out-of-viewport'.
+_ @ framework-374f1ea5f5222862.js:1
+framework-374f1ea5f5222862.js:1 Unrecognized feature: 'layout-animations'.
+_ @ framework-374f1ea5f5222862.js:1
+framework-374f1ea5f5222862.js:1 Unrecognized feature: 'legacy-image-formats'.
+_ @ framework-374f1ea5f5222862.js:1
+framework-374f1ea5f5222862.js:1 Unrecognized feature: 'navigation-override'.
+_ @ framework-374f1ea5f5222862.js:1
+framework-374f1ea5f5222862.js:1 Unrecognized feature: 'oversized-images'.
+_ @ framework-374f1ea5f5222862.js:1
+framework-374f1ea5f5222862.js:1 Unrecognized feature: 'publickey-credentials'.
+_ @ framework-374f1ea5f5222862.js:1
+framework-374f1ea5f5222862.js:1 Unrecognized feature: 'speaker-selection'.
+_ @ framework-374f1ea5f5222862.js:1
+framework-374f1ea5f5222862.js:1 Unrecognized feature: 'unoptimized-images'.
+_ @ framework-374f1ea5f5222862.js:1
+framework-374f1ea5f5222862.js:1 Unrecognized feature: 'unsized-media'.
+_ @ framework-374f1ea5f5222862.js:1
+framework-374f1ea5f5222862.js:1 Unrecognized feature: 'pointer-lock'.
+_ @ framework-374f1ea5f5222862.js:1
+framework-374f1ea5f5222862.js:1 Allow attribute will take precedence over 'allowfullscreen'.
+_ @ framework-374f1ea5f5222862.js:1
+framework-374f1ea5f5222862.js:1 Allow attribute will take precedence over 'allowpaymentrequest'.
+_ @ framework-374f1ea5f5222862.js:1
+workspace_iframe.html:32 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+workspace_iframe.html:32 Unrecognized feature: 'ambient-light-sensor'.
+workspace_iframe.html:32 Unrecognized feature: 'battery'.
+workspace_iframe.html:32 Unrecognized feature: 'execution-while-not-rendered'.
+workspace_iframe.html:32 Unrecognized feature: 'execution-while-out-of-viewport'.
+workspace_iframe.html:32 Unrecognized feature: 'layout-animations'.
+workspace_iframe.html:32 Unrecognized feature: 'legacy-image-formats'.
+workspace_iframe.html:32 Unrecognized feature: 'navigation-override'.
+workspace_iframe.html:32 Unrecognized feature: 'oversized-images'.
+workspace_iframe.html:32 Unrecognized feature: 'publickey-credentials'.
+workspace_iframe.html:32 Unrecognized feature: 'speaker-selection'.
+workspace_iframe.html:32 Unrecognized feature: 'unoptimized-images'.
+workspace_iframe.html:32 Unrecognized feature: 'unsized-media'.
+workspace_iframe.html:32 Allow attribute will take precedence over 'allowfullscreen'.
+workspace_iframe.html:32 Allow attribute will take precedence over 'allowpaymentrequest'.
+googleads.g.doubleclick.net/pagead/viewthroughconversion/11411994397/?random=1749037314298&cv=11&fst=1749037314298&bg=ffffff&guid=ON&async=1&gtm=45be5621v9171242957za200&gcd=13l3l3l3l1l1&dma=0&tag_exp=101509157~103116026~103200004~103233427~103351866~103351868~104611962~104611964&u_w=1920&u_h=1080&url=https%3A%2F%2Freplit.com%2F%40maxpetrusenkotu%2FFitTrak-Pro&hn=www.googleadservices.com&frm=0&tiba=-%20Replit&npa=0&pscdl=noapi&auid=732649841.1748622752&fledge=1&data=event%3Dgtag.config&rfmt=3&fmt=4:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+Console.js:61 Current activeTab: schedule
+Console.js:61 Selected student profile: null
+Console.js:61 URL section: null
+Console.js:61 Current activeTab: schedule
+Console.js:61 Selected student profile: null
+Console.js:61 Current activeTab: schedule
+Console.js:61 Selected student profile: null
+Console.js:61 Current activeTab: schedule
+Console.js:61 Selected student profile: null
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1997810398&gjid=525256525&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=913711548:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stallwart.build.js:1 stallwart: failed ping 1
