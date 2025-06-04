@@ -294,8 +294,11 @@ export function TrainerSchedule() {
                           <Button
                             variant={viewMode === 'day' ? 'default' : 'ghost'}
                             size="sm"
-                            onClick={() => setViewMode('day')}
-                            className="text-xs"
+                            onClick={() => {
+                              setViewMode('day');
+                              setSelectedDate(new Date());
+                            }}
+                            className="text-xs px-3 py-1 transition-all duration-200"
                           >
                             Сегодня
                           </Button>
@@ -303,18 +306,18 @@ export function TrainerSchedule() {
                             variant={viewMode === 'month' ? 'default' : 'ghost'}
                             size="sm"
                             onClick={() => setViewMode('month')}
-                            className="text-xs"
+                            className="text-xs px-3 py-1 transition-all duration-200"
                           >
                             Месяц
                           </Button>
                         </div>
                       </div>
-                      <div className="flex space-x-1">
+                      <div className="flex items-center space-x-1">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => setSelectedDate(new Date(selectedDate.getTime() - 24 * 60 * 60 * 1000))}
-                          className="p-1"
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
                         >
                           <ChevronLeft className="h-4 w-4" />
                         </Button>
@@ -322,7 +325,7 @@ export function TrainerSchedule() {
                           variant="ghost"
                           size="sm"
                           onClick={() => setSelectedDate(new Date(selectedDate.getTime() + 24 * 60 * 60 * 1000))}
-                          className="p-1"
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
                         >
                           <ChevronRight className="h-4 w-4" />
                         </Button>
@@ -395,14 +398,38 @@ export function TrainerSchedule() {
                 <Card>
                   <CardHeader className="border-b border-gray-100">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-xl font-bold text-gray-800 capitalize">
-                        {monthName}
-                      </CardTitle>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-4">
+                        <CardTitle className="text-xl font-bold text-gray-800 capitalize">
+                          {monthName}
+                        </CardTitle>
+                        <div className="flex bg-gray-100 rounded-lg p-1">
+                          <Button
+                            variant={viewMode === 'day' ? 'default' : 'ghost'}
+                            size="sm"
+                            onClick={() => {
+                              setViewMode('day');
+                              setSelectedDate(new Date());
+                            }}
+                            className="text-xs px-3 py-1 transition-all duration-200"
+                          >
+                            Сегодня
+                          </Button>
+                          <Button
+                            variant={viewMode === 'month' ? 'default' : 'ghost'}
+                            size="sm"
+                            onClick={() => setViewMode('month')}
+                            className="text-xs px-3 py-1 transition-all duration-200"
+                          >
+                            Месяц
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-1">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => navigateMonth('prev')}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
                         >
                           <ChevronLeft className="h-4 w-4" />
                         </Button>
@@ -410,6 +437,7 @@ export function TrainerSchedule() {
                           variant="ghost"
                           size="sm"
                           onClick={() => navigateMonth('next')}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
                         >
                           <ChevronRight className="h-4 w-4" />
                         </Button>
