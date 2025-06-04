@@ -79,19 +79,37 @@ export function TrainerSchedule() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Дополнительная проверка каждые 100мс для отладки
+  // Слушаем изменения URL в реальном времени
   useEffect(() => {
-    const interval = setInterval(() => {
+    const handleLocationChange = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const section = urlParams.get('section');
-      if (section === 'students' && activeTab !== 'students') {
-        console.log('Force setting students tab');
+      console.log('Location changed, section:', section);
+      
+      if (section === 'students') {
         setActiveTab('students');
+      } else if (section === 'profile') {
+        setActiveTab('profile');
+      } else {
+        setActiveTab('schedule');
       }
-    }, 100);
+    };
 
-    return () => clearInterval(interval);
-  }, [activeTab]);
+    // Слушаем изменения истории браузера
+    window.addEventListener('popstate', handleLocationChange);
+    
+    // Проверяем URL при каждом изменении location
+    const originalPushState = window.history.pushState;
+    window.history.pushState = function(...args) {
+      originalPushState.apply(this, args);
+      setTimeout(handleLocationChange, 0);
+    };
+
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      window.history.pushState = originalPushState;
+    };
+  }, []);
   const [sessions, setSessions] = useState<TrainerSession[]>([
     { id: 1, time: '09:00', studentName: 'Анна Петрова', status: 'confirmed', date: new Date().toISOString().split('T')[0] },
     { id: 2, time: '11:00', studentName: 'Михаил Сидоров', status: 'pending', date: new Date().toISOString().split('T')[0] },
