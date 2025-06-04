@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronLeft, ChevronRight, Clock, User, Plus, Trash2, Edit, Calendar, Users } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, User, Plus, Trash2, Edit, Calendar, Users, Save } from "lucide-react";
 
 interface Student {
   id: number;
@@ -46,6 +46,8 @@ export function TrainerSchedule() {
   const [viewMode, setViewMode] = useState<'day' | 'month'>('day');
   const [activeTab, setActiveTab] = useState<'schedule' | 'students' | 'profile'>('schedule');
   const [selectedStudentProfile, setSelectedStudentProfile] = useState<Student | null>(null);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editedStudent, setEditedStudent] = useState<Student | null>(null);
   
   // Автоматически определяем активную вкладку
   useEffect(() => {
@@ -350,7 +352,65 @@ export function TrainerSchedule() {
   };
 
   const openAddStudentForm = () => {
-    setShowAddStudentDialog(true);
+    // Создаем пустой профиль для нового ученика
+    const newStudentProfile: Student = {
+      id: 0, // Временный ID
+      firstName: '',
+      lastName: '',
+      middleName: '',
+      phone: '',
+      email: '',
+      birthDate: '',
+      weight: undefined,
+      height: undefined,
+      goal: '',
+      medicalNotes: '',
+      get name() { return `${this.firstName} ${this.lastName}`.trim(); }
+    };
+    setSelectedStudentProfile(newStudentProfile);
+    setEditedStudent({...newStudentProfile});
+    setIsEditingProfile(true);
+    setActiveTab('profile');
+  };
+
+  const startEditingProfile = () => {
+    if (selectedStudentProfile) {
+      setEditedStudent({...selectedStudentProfile});
+      setIsEditingProfile(true);
+    }
+  };
+
+  const cancelEditing = () => {
+    setEditedStudent(null);
+    setIsEditingProfile(false);
+  };
+
+  const saveStudentProfile = () => {
+    if (!editedStudent) return;
+    
+    if (editedStudent.id === 0) {
+      // Создание нового ученика
+      const newId = Math.max(...students.map(s => s.id), 0) + 1;
+      const newStudent = {...editedStudent, id: newId};
+      setStudents([...students, newStudent]);
+      setSelectedStudentProfile(newStudent);
+    } else {
+      // Обновление существующего ученика
+      setStudents(students.map(s => s.id === editedStudent.id ? editedStudent : s));
+      setSelectedStudentProfile(editedStudent);
+    }
+    
+    setIsEditingProfile(false);
+    setEditedStudent(null);
+  };
+
+  const updateEditedField = (field: keyof Student, value: any) => {
+    if (editedStudent) {
+      setEditedStudent({
+        ...editedStudent,
+        [field]: value
+      });
+    }
   };
 
   const removeStudentFromList = (studentId: number) => {
@@ -514,87 +574,299 @@ export function TrainerSchedule() {
   const renderStudentProfile = () => {
     if (!selectedStudentProfile) return null;
     
-    const student = selectedStudentProfile;
+    const student = isEditingProfile ? editedStudent! : selectedStudentProfile;
+    const isNewStudent = student.id === 0;
+    
+    const formatDate = (dateString?: string) => {
+      if (!dateString) return 'Не указана';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    };
     
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <Button variant="ghost" onClick={backToStudents} className="text-sm">
-            ← Назад к списку учеников
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Назад к списку учеников
           </Button>
+          {!isEditingProfile && !isNewStudent && (
+            <Button className="bg-orange-500 hover:bg-orange-600 text-white">
+              <Calendar className="h-4 w-4 mr-1" />
+              Создать тренировку
+            </Button>
+          )}
         </div>
         
         <Card>
           <CardHeader className="border-b border-gray-100">
-            <CardTitle className="text-xl font-bold text-gray-800">Профиль ученика</CardTitle>
+            <CardTitle className="text-xl font-bold text-gray-800">
+              {isNewStudent ? 'Добавление нового ученика' : 
+               isEditingProfile ? 'Редактирование профиля' : 'Профиль ученика'}
+            </CardTitle>
           </CardHeader>
-          <CardContent className="p-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Фото и основная информация */}
-              <div className="space-y-4">
-                <div className="flex items-center space-x-4">
-                  <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
+          <CardContent className="p-8">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+              {/* Фото */}
+              <div className="lg:col-span-1">
+                <div className="text-center">
+                  <div className="mx-auto h-40 w-40 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center mb-4 shadow-lg">
                     {student.photo ? (
-                      <img src={student.photo} alt={student.name} className="w-24 h-24 rounded-full object-cover" />
+                      <img src={student.photo} alt={student.name} className="h-40 w-40 rounded-full object-cover" />
                     ) : (
-                      <User className="h-12 w-12 text-gray-500" />
+                      <User className="h-20 w-20 text-white" />
                     )}
                   </div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900">
-                      {student.lastName} {student.firstName} {student.middleName}
-                    </h2>
-                    <p className="text-sm text-gray-500">
-                      {student.birthDate && `${calculateAge(student.birthDate)} лет`}
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700">Дата рождения</Label>
-                    <p className="text-sm text-gray-900">{student.birthDate || 'Не указана'}</p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700">Телефон</Label>
-                    <p className="text-sm text-gray-900">{student.phone}</p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700">Email</Label>
-                    <p className="text-sm text-gray-900">{student.email}</p>
-                  </div>
+                  {isEditingProfile && (
+                    <Button variant="outline" size="sm" className="text-xs">
+                      Выбрать фото
+                    </Button>
+                  )}
                 </div>
               </div>
               
-              {/* Физические данные */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">Физические данные</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700">Вес</Label>
-                    <p className="text-sm text-gray-900">{student.weight ? `${student.weight} кг` : 'Не указан'}</p>
+              {/* Основная информация */}
+              <div className="lg:col-span-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {/* Личные данные */}
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Личные данные</h3>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">Фамилия *</Label>
+                        {isEditingProfile ? (
+                          <Input
+                            value={student.lastName}
+                            onChange={(e) => updateEditedField('lastName', e.target.value)}
+                            placeholder="Введите фамилию"
+                            className="mt-1"
+                          />
+                        ) : (
+                          <div className="mt-1 p-3 bg-gray-50 rounded-md text-sm font-medium">
+                            {student.lastName}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">Имя *</Label>
+                        {isEditingProfile ? (
+                          <Input
+                            value={student.firstName}
+                            onChange={(e) => updateEditedField('firstName', e.target.value)}
+                            placeholder="Введите имя"
+                            className="mt-1"
+                          />
+                        ) : (
+                          <div className="mt-1 p-3 bg-gray-50 rounded-md text-sm font-medium">
+                            {student.firstName}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">Отчество</Label>
+                        {isEditingProfile ? (
+                          <Input
+                            value={student.middleName || ''}
+                            onChange={(e) => updateEditedField('middleName', e.target.value)}
+                            placeholder="Введите отчество"
+                            className="mt-1"
+                          />
+                        ) : (
+                          <div className="mt-1 p-3 bg-gray-50 rounded-md text-sm">
+                            {student.middleName || 'Не указано'}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">Дата рождения</Label>
+                        {isEditingProfile ? (
+                          <Input
+                            type="date"
+                            value={student.birthDate || ''}
+                            onChange={(e) => updateEditedField('birthDate', e.target.value)}
+                            className="mt-1"
+                          />
+                        ) : (
+                          <div className="mt-1 p-3 bg-gray-50 rounded-md text-sm">
+                            {formatDate(student.birthDate)}
+                            {student.birthDate && (
+                              <span className="text-gray-500 ml-2">
+                                ({calculateAge(student.birthDate)} лет)
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700">Рост</Label>
-                    <p className="text-sm text-gray-900">{student.height ? `${student.height} см` : 'Не указан'}</p>
+
+                  {/* Контакты и физические данные */}
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Контакты и параметры</h3>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">Телефон *</Label>
+                        {isEditingProfile ? (
+                          <Input
+                            value={student.phone}
+                            onChange={(e) => updateEditedField('phone', e.target.value)}
+                            placeholder="+7 (999) 123-45-67"
+                            className="mt-1"
+                          />
+                        ) : (
+                          <div className="mt-1 p-3 bg-gray-50 rounded-md text-sm font-medium">
+                            {student.phone}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">Email *</Label>
+                        {isEditingProfile ? (
+                          <Input
+                            type="email"
+                            value={student.email}
+                            onChange={(e) => updateEditedField('email', e.target.value)}
+                            placeholder="email@example.com"
+                            className="mt-1"
+                          />
+                        ) : (
+                          <div className="mt-1 p-3 bg-gray-50 rounded-md text-sm">
+                            {student.email}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label className="text-sm font-medium text-gray-700">Вес (кг)</Label>
+                          {isEditingProfile ? (
+                            <Input
+                              type="number"
+                              value={student.weight || ''}
+                              onChange={(e) => updateEditedField('weight', e.target.value ? parseInt(e.target.value) : undefined)}
+                              placeholder="70"
+                              className="mt-1"
+                            />
+                          ) : (
+                            <div className="mt-1 p-3 bg-gray-50 rounded-md text-sm font-medium">
+                              {student.weight || 'Не указан'}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div>
+                          <Label className="text-sm font-medium text-gray-700">Рост (см)</Label>
+                          {isEditingProfile ? (
+                            <Input
+                              type="number"
+                              value={student.height || ''}
+                              onChange={(e) => updateEditedField('height', e.target.value ? parseInt(e.target.value) : undefined)}
+                              placeholder="175"
+                              className="mt-1"
+                            />
+                          ) : (
+                            <div className="mt-1 p-3 bg-gray-50 rounded-md text-sm font-medium">
+                              {student.height || 'Не указан'}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Цели и медицинские особенности */}
+                  <div className="md:col-span-2 space-y-6">
+                    <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Цели и медицинские особенности</h3>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">Цель тренировки</Label>
+                        {isEditingProfile ? (
+                          <Select
+                            value={student.goal || ''}
+                            onValueChange={(value) => updateEditedField('goal', value)}
+                          >
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Выберите цель тренировки" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Похудение">Похудение</SelectItem>
+                              <SelectItem value="Набор мышечной массы">Набор мышечной массы</SelectItem>
+                              <SelectItem value="Поддержание формы">Поддержание формы</SelectItem>
+                              <SelectItem value="Силовые показатели">Силовые показатели</SelectItem>
+                              <SelectItem value="Общая физическая подготовка">Общая физическая подготовка</SelectItem>
+                              <SelectItem value="Растяжка и йога">Растяжка и йога</SelectItem>
+                              <SelectItem value="Восстановление после травмы">Восстановление после травмы</SelectItem>
+                              <SelectItem value="Улучшение выносливости">Улучшение выносливости</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <div className="mt-1 p-3 bg-gray-50 rounded-md text-sm">
+                            {student.goal || 'Не указана'}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div>
+                        <Label className="text-sm font-medium text-gray-700">
+                          Медицинские особенности и ограничения
+                        </Label>
+                        {isEditingProfile ? (
+                          <textarea
+                            value={student.medicalNotes || ''}
+                            onChange={(e) => updateEditedField('medicalNotes', e.target.value)}
+                            placeholder="Опишите медицинские особенности, травмы, ограничения..."
+                            className="mt-1 w-full p-3 border border-gray-300 rounded-md text-sm min-h-[100px] resize-y focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                          />
+                        ) : (
+                          <div className="mt-1 p-4 bg-gray-50 rounded-md text-sm min-h-[100px] border-l-4 border-orange-500">
+                            {student.medicalNotes || 'Медицинские особенности не указаны'}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
                 
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Цель тренировки</Label>
-                  <p className="text-sm text-gray-900">{student.goal || 'Не указана'}</p>
+                {/* Кнопки действий */}
+                <div className="flex justify-between items-center mt-8 pt-6 border-t">
+                  {isEditingProfile ? (
+                    <div className="flex space-x-3">
+                      <Button variant="outline" onClick={cancelEditing}>
+                        Отмена
+                      </Button>
+                      <Button 
+                        onClick={saveStudentProfile}
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        disabled={!student.firstName || !student.lastName || !student.phone || !student.email}
+                      >
+                        <Save className="h-4 w-4 mr-2" />
+                        {isNewStudent ? 'Создать ученика' : 'Сохранить изменения'}
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between w-full">
+                      <Button variant="outline" onClick={startEditingProfile}>
+                        <Edit className="h-4 w-4 mr-2" />
+                        Редактировать профиль
+                      </Button>
+                      <Button className="bg-orange-500 hover:bg-orange-600 text-white">
+                        <Calendar className="h-4 w-4 mr-2" />
+                        Создать тренировку
+                      </Button>
+                    </div>
+                  )}
                 </div>
-                
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">Медицинские особенности</Label>
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-900">{student.medicalNotes || 'Особенности не указаны'}</p>
-                  </div>
-                </div>
-                
-                <Button className="w-full mt-4">
-                  Создать тренировку
-                </Button>
               </div>
             </div>
           </CardContent>
