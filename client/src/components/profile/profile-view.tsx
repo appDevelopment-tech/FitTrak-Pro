@@ -12,10 +12,18 @@ import type { User as UserType } from "@shared/schema";
 
 export function ProfileView() {
   const [isEditing, setIsEditing] = useState(false);
+  const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string | null>(null);
   const [exercises, setExercises] = useState([
     { id: 1, name: 'Приседания со штангой', category: 'Ноги', description: 'Базовое упражнение для развития квадрицепсов и ягодичных мышц' },
-    { id: 2, name: 'Жим лежа', category: 'Грудь', description: 'Классическое упражнение для развития грудных мышц' },
+    { id: 2, name: 'Жим штанги лежа', category: 'Грудь', description: 'Классическое упражнение для развития грудных мышц' },
     { id: 3, name: 'Становая тяга', category: 'Спина', description: 'Комплексное упражнение для всего тела' },
+    { id: 4, name: 'Жим гантелей лежа', category: 'Грудь', description: 'Упражнение для грудных мышц с гантелями' },
+    { id: 5, name: 'Подтягивания', category: 'Спина', description: 'Упражнение для широчайших мышц спины' },
+    { id: 6, name: 'Жим ногами', category: 'Ноги', description: 'Упражнение в тренажере для ног' },
+    { id: 7, name: 'Жим штанги стоя', category: 'Плечи', description: 'Базовое упражнение для дельтовидных мышц' },
+    { id: 8, name: 'Сгибания рук со штангой', category: 'Руки', description: 'Упражнение для бицепсов' },
+    { id: 9, name: 'Планка', category: 'Пресс', description: 'Статическое упражнение для мышц кора' },
+    { id: 10, name: 'Французский жим', category: 'Руки', description: 'Упражнение для трицепсов' },
   ]);
   
   const [newExercise, setNewExercise] = useState({ name: '', category: '', description: '' });
@@ -37,6 +45,35 @@ export function ProfileView() {
   
   const removeExercise = (id: number) => {
     setExercises(exercises.filter(ex => ex.id !== id));
+  };
+
+  const getExerciseCount = (category: string) => {
+    return exercises.filter(exercise => exercise.category === category).length;
+  };
+
+  const getExercisesByGroup = (groupId: string) => {
+    const categoryMap = {
+      'chest': 'Грудь',
+      'back': 'Спина', 
+      'legs': 'Ноги',
+      'shoulders': 'Плечи',
+      'arms': 'Руки',
+      'abs': 'Пресс'
+    };
+    const category = categoryMap[groupId as keyof typeof categoryMap];
+    return exercises.filter(exercise => exercise.category === category);
+  };
+
+  const getMuscleGroupTitle = (groupId: string) => {
+    const titleMap = {
+      'chest': 'Грудные',
+      'back': 'Спина',
+      'legs': 'Ноги', 
+      'shoulders': 'Дельты',
+      'arms': 'Руки',
+      'abs': 'Пресс'
+    };
+    return titleMap[groupId as keyof typeof titleMap] || groupId;
   };
   
   return (
@@ -164,51 +201,175 @@ export function ProfileView() {
           <Card>
             <CardHeader>
               <CardTitle className="text-xl font-semibold">Библиотека упражнений</CardTitle>
+              <p className="text-gray-600">Выберите группу мышц для просмотра упражнений</p>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
-                <Input
-                  placeholder="Название упражнения"
-                  value={newExercise.name}
-                  onChange={(e) => setNewExercise({...newExercise, name: e.target.value})}
-                />
-                <Input
-                  placeholder="Категория"
-                  value={newExercise.category}
-                  onChange={(e) => setNewExercise({...newExercise, category: e.target.value})}
-                />
-                <Input
-                  placeholder="Описание"
-                  value={newExercise.description}
-                  onChange={(e) => setNewExercise({...newExercise, description: e.target.value})}
-                />
-                <div className="md:col-span-3">
-                  <Button onClick={addExercise} className="w-full md:w-auto">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Добавить упражнение
-                  </Button>
+            <CardContent className="space-y-6">
+              {/* Muscle Groups Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div 
+                  className="group cursor-pointer bg-gradient-to-br from-red-400 to-red-600 rounded-xl p-6 text-white text-center hover:scale-105 transition-transform"
+                  onClick={() => setSelectedMuscleGroup('chest')}
+                >
+                  <div className="w-12 h-12 mx-auto mb-3 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                    </svg>
+                  </div>
+                  <h3 className="font-semibold">Грудные</h3>
+                  <p className="text-xs opacity-90">{getExerciseCount('Грудь')} упражнений</p>
+                </div>
+
+                <div 
+                  className="group cursor-pointer bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl p-6 text-white text-center hover:scale-105 transition-transform"
+                  onClick={() => setSelectedMuscleGroup('back')}
+                >
+                  <div className="w-12 h-12 mx-auto mb-3 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M3 12h18m-9-9v18"/>
+                    </svg>
+                  </div>
+                  <h3 className="font-semibold">Спина</h3>
+                  <p className="text-xs opacity-90">{getExerciseCount('Спина')} упражнений</p>
+                </div>
+
+                <div 
+                  className="group cursor-pointer bg-gradient-to-br from-green-400 to-green-600 rounded-xl p-6 text-white text-center hover:scale-105 transition-transform"
+                  onClick={() => setSelectedMuscleGroup('legs')}
+                >
+                  <div className="w-12 h-12 mx-auto mb-3 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2v20m0-20l8 8m-8-8L4 10"/>
+                    </svg>
+                  </div>
+                  <h3 className="font-semibold">Ноги</h3>
+                  <p className="text-xs opacity-90">{getExerciseCount('Ноги')} упражнений</p>
+                </div>
+
+                <div 
+                  className="group cursor-pointer bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl p-6 text-white text-center hover:scale-105 transition-transform"
+                  onClick={() => setSelectedMuscleGroup('shoulders')}
+                >
+                  <div className="w-12 h-12 mx-auto mb-3 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    </svg>
+                  </div>
+                  <h3 className="font-semibold">Дельты</h3>
+                  <p className="text-xs opacity-90">{getExerciseCount('Плечи')} упражнений</p>
+                </div>
+
+                <div 
+                  className="group cursor-pointer bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl p-6 text-white text-center hover:scale-105 transition-transform"
+                  onClick={() => setSelectedMuscleGroup('arms')}
+                >
+                  <div className="w-12 h-12 mx-auto mb-3 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M9 12l2 2 4-4"/>
+                    </svg>
+                  </div>
+                  <h3 className="font-semibold">Руки</h3>
+                  <p className="text-xs opacity-90">{getExerciseCount('Руки')} упражнений</p>
+                </div>
+
+                <div 
+                  className="group cursor-pointer bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl p-6 text-white text-center hover:scale-105 transition-transform"
+                  onClick={() => setSelectedMuscleGroup('abs')}
+                >
+                  <div className="w-12 h-12 mx-auto mb-3 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
+                    </svg>
+                  </div>
+                  <h3 className="font-semibold">Пресс</h3>
+                  <p className="text-xs opacity-90">{getExerciseCount('Пресс')} упражнений</p>
                 </div>
               </div>
-              
-              <div className="grid gap-4">
-                {exercises.map((exercise) => (
-                  <div key={exercise.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h4 className="font-semibold">{exercise.name}</h4>
-                      <p className="text-sm text-gray-600">{exercise.category}</p>
-                      <p className="text-sm text-gray-500">{exercise.description}</p>
+
+              {/* Exercise List for Selected Muscle Group */}
+              {selectedMuscleGroup && (
+                <Card className="mt-6">
+                  <CardHeader className="border-b border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">
+                        Упражнения - {getMuscleGroupTitle(selectedMuscleGroup)}
+                      </CardTitle>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => setSelectedMuscleGroup(null)}
+                      >
+                        Закрыть
+                      </Button>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeExercise(exercise.id)}
-                      className="text-red-600 hover:text-red-700"
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="grid gap-4">
+                      {getExercisesByGroup(selectedMuscleGroup).map((exercise) => (
+                        <div key={exercise.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                          <div>
+                            <h4 className="font-semibold">{exercise.name}</h4>
+                            <p className="text-sm text-gray-600">{exercise.category}</p>
+                            <p className="text-sm text-gray-500">{exercise.description}</p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeExercise(exercise.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      {getExercisesByGroup(selectedMuscleGroup).length === 0 && (
+                        <div className="text-center py-8 text-gray-500">
+                          Упражнения для этой группы мышц пока не добавлены
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Add New Exercise Form */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Добавить новое упражнение</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Input
+                      placeholder="Название упражнения"
+                      value={newExercise.name}
+                      onChange={(e) => setNewExercise({...newExercise, name: e.target.value})}
+                    />
+                    <select
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                      value={newExercise.category}
+                      onChange={(e) => setNewExercise({...newExercise, category: e.target.value})}
                     >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                      <option value="">Выберите группу мышц</option>
+                      <option value="Грудь">Грудные</option>
+                      <option value="Спина">Спина</option>
+                      <option value="Ноги">Ноги</option>
+                      <option value="Плечи">Дельты</option>
+                      <option value="Руки">Руки</option>
+                      <option value="Пресс">Пресс</option>
+                    </select>
+                    <Input
+                      placeholder="Описание"
+                      value={newExercise.description}
+                      onChange={(e) => setNewExercise({...newExercise, description: e.target.value})}
+                    />
+                    <div className="md:col-span-3">
+                      <Button onClick={addExercise} className="w-full md:w-auto">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Добавить упражнение
+                      </Button>
+                    </div>
                   </div>
-                ))}
-              </div>
+                </CardContent>
+              </Card>
             </CardContent>
           </Card>
         </TabsContent>
