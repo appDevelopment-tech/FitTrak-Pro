@@ -8,7 +8,7 @@ import { MobileNavigation } from "@/components/navigation/mobile-nav";
 import { DesktopSidebar } from "@/components/navigation/desktop-sidebar";
 import { CalendarView } from "@/components/schedule/calendar-view";
 import { TodaySchedule } from "@/components/schedule/today-schedule";
-import { TrainerCabinet } from "@/components/trainer/trainer-cabinet";
+
 import { ProgressView } from "@/components/progress/progress-view";
 import { ProfileView } from "@/components/profile/profile-view";
 import { TrainerSchedule } from "@/components/schedule/trainer-schedule";
@@ -55,7 +55,7 @@ export default function Dashboard() {
   const handleQuickAction = (action: string) => {
     switch (action) {
       case 'create':
-        setActiveView('trainer');
+        setActiveView('profile');
         break;
       case 'progress':
         setActiveView('progress');
@@ -124,8 +124,7 @@ export default function Dashboard() {
             </Card>
           </div>
         );
-      case 'trainer':
-        return <TrainerCabinet />;
+
       case 'progress':
         return <ProgressView />;
       case 'profile':
@@ -272,7 +271,7 @@ export default function Dashboard() {
                     className="h-8 w-8 rounded-full"
                   />
                   <span className="text-sm font-medium text-gray-700">
-                    {user ? `${user.firstName} ${user.lastName}` : 'Загрузка...'}
+                    {user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : 'Александр Петров'}
                   </span>
                 </div>
               </div>
