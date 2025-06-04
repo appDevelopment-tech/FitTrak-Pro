@@ -561,17 +561,33 @@ export function TrainerSchedule() {
       <CardContent className="p-0">
         <div className="divide-y divide-gray-100">
           {students.map((student) => (
-            <div key={student.id} className="p-4 hover:bg-gray-50">
+            <div 
+              key={student.id} 
+              className="p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+              onClick={() => openStudentProfile(student)}
+            >
               <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-800">{student.name}</h4>
-                  <p className="text-xs text-gray-500">{student.phone}</p>
-                  <p className="text-xs text-gray-400">{student.email}</p>
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                    {student.photo ? (
+                      <img src={student.photo} alt={student.name} className="w-10 h-10 rounded-full object-cover" />
+                    ) : (
+                      <User className="h-5 w-5 text-gray-500" />
+                    )}
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-800">{student.name}</h4>
+                    <p className="text-xs text-gray-500">{student.phone}</p>
+                    <p className="text-xs text-gray-400">{student.goal || 'Цель не указана'}</p>
+                  </div>
                 </div>
                 <Button 
                   size="sm" 
                   variant="ghost" 
-                  onClick={() => removeStudentFromList(student.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeStudentFromList(student.id);
+                  }}
                   className="text-red-600 hover:text-red-700"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -586,7 +602,9 @@ export function TrainerSchedule() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {activeTab === 'students' ? (
+          {activeTab === 'profile' ? (
+            renderStudentProfile()
+          ) : activeTab === 'students' ? (
             renderStudentsList()
           ) : (
             <>
