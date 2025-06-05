@@ -27,7 +27,7 @@ export function ProfileView() {
 
   // Фильтрация упражнений
   const filteredExercises = exercises.filter(exercise => {
-    const matchesMuscleGroup = !selectedMuscleGroup || exercise.muscleGroup === selectedMuscleGroup;
+    const matchesMuscleGroup = !selectedMuscleGroup || exercise.primaryMuscles.includes(selectedMuscleGroup);
     const matchesEquipment = !selectedEquipment || selectedEquipment === "все" || exercise.equipment === selectedEquipment;
     const matchesSearch = !searchTerm || exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesMuscleGroup && matchesEquipment && matchesSearch;
