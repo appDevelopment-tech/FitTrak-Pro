@@ -342,6 +342,11 @@ export function TrainerSchedule() {
   };
 
   const openStudentProfile = (student: Student) => {
+    console.log('Clicked on student:', student.name);
+    console.log('Available students:', students.map(s => s.name));
+    console.log('Found student:', student);
+    console.log('Opening student profile for:', student.name);
+    
     setSelectedStudentProfile(student);
     setIsEditingProfile(false);
     setEditedStudent(null);
@@ -905,8 +910,12 @@ export function TrainerSchedule() {
           {students.map((student) => (
             <div 
               key={student.id} 
-              className="p-4 hover:bg-gray-50 cursor-pointer transition-colors"
-              onClick={() => openStudentProfile(student)}
+              className="p-4 hover:bg-blue-50 cursor-pointer transition-all duration-200 border-l-4 border-transparent hover:border-blue-400 active:bg-blue-100"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                openStudentProfile(student);
+              }}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
