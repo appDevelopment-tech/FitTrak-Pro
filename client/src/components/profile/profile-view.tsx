@@ -163,15 +163,8 @@ export function ProfileView() {
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-white" fill="currentColor" stroke="currentColor" strokeWidth="1" viewBox="0 0 120 120">
-                      {/* Большая грудная мышца левая */}
-                      <path d="M35 30 C30 25, 25 30, 25 40 C25 50, 30 55, 40 58 L45 60 C50 62, 55 60, 60 55 L60 45 C60 35, 55 30, 50 30 C45 30, 40 32, 35 30 Z" fill="rgba(255,255,255,0.9)"/>
-                      {/* Большая грудная мышца правая */}
-                      <path d="M85 30 C90 25, 95 30, 95 40 C95 50, 90 55, 80 58 L75 60 C70 62, 65 60, 60 55 L60 45 C60 35, 65 30, 70 30 C75 30, 80 32, 85 30 Z" fill="rgba(255,255,255,0.9)"/>
-                      {/* Грудина */}
-                      <path d="M55 30 L65 30 L65 65 L55 65 Z" fill="rgba(255,255,255,0.7)"/>
-                      {/* Межреберные мышцы */}
-                      <path d="M40 40 L50 40 M70 40 L80 40 M40 50 L50 50 M70 50 L80 50" stroke="rgba(255,255,255,0.5)" strokeWidth="1"/>
+                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C14 2 16 3 17 5V8C17 10 15 12 12 12C9 12 7 10 7 8V5C8 3 10 2 12 2ZM9 14H15C16 14 17 15 17 16V20C17 21 16 22 15 22H9C8 22 7 21 7 20V16C7 15 8 14 9 14Z"/>
                     </svg>
                   </div>
                 </div>
@@ -187,17 +180,8 @@ export function ProfileView() {
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-white" fill="currentColor" stroke="currentColor" strokeWidth="1" viewBox="0 0 120 120">
-                      {/* Трапециевидная мышца */}
-                      <path d="M40 20 L60 15 L80 20 L90 40 L80 50 L60 45 L40 50 L30 40 Z" fill="rgba(255,255,255,0.9)"/>
-                      {/* Широчайшая мышца спины левая */}
-                      <path d="M25 45 C20 40, 15 45, 15 55 L15 75 C15 85, 25 90, 35 85 L45 80 L50 70 L45 60 L35 50 C30 45, 25 45, 25 45 Z" fill="rgba(255,255,255,0.8)"/>
-                      {/* Широчайшая мышца спины правая */}
-                      <path d="M95 45 C100 40, 105 45, 105 55 L105 75 C105 85, 95 90, 85 85 L75 80 L70 70 L75 60 L85 50 C90 45, 95 45, 95 45 Z" fill="rgba(255,255,255,0.8)"/>
-                      {/* Ромбовидная мышца */}
-                      <path d="M50 35 L40 45 L50 55 L60 45 Z" fill="rgba(255,255,255,0.7)"/>
-                      {/* Позвоночник */}
-                      <path d="M60 20 L60 90" stroke="rgba(255,255,255,0.6)" strokeWidth="2"/>
+                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C15 2 18 4 18 7V10C18 13 15 15 12 15C9 15 6 13 6 10V7C6 4 9 2 12 2ZM8 17H16C17 17 18 18 18 19V21C18 22 17 23 16 23H8C7 23 6 22 6 21V19C6 18 7 17 8 17Z"/>
                     </svg>
                   </div>
                 </div>
@@ -213,16 +197,8 @@ export function ProfileView() {
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-white" fill="currentColor" stroke="currentColor" strokeWidth="1" viewBox="0 0 120 120">
-                      {/* Четырехглавая мышца левого бедра */}
-                      <path d="M30 20 C25 18, 20 22, 20 30 L20 50 C20 58, 25 65, 30 68 L35 70 C40 72, 42 75, 40 80 L38 90 C36 95, 40 100, 45 98 C48 97, 50 93, 48 88 L45 75 C43 70, 40 65, 35 60 L30 50 C28 40, 30 30, 30 20 Z" fill="rgba(255,255,255,0.9)"/>
-                      {/* Четырехглавая мышца правого бедра */}
-                      <path d="M90 20 C95 18, 100 22, 100 30 L100 50 C100 58, 95 65, 90 68 L85 70 C80 72, 78 75, 80 80 L82 90 C84 95, 80 100, 75 98 C72 97, 70 93, 72 88 L75 75 C77 70, 80 65, 85 60 L90 50 C92 40, 90 30, 90 20 Z" fill="rgba(255,255,255,0.9)"/>
-                      {/* Икроножные мышцы */}
-                      <path d="M35 75 C30 73, 25 78, 25 85 L25 95 C25 100, 30 105, 35 105 C40 105, 45 100, 45 95 L45 85 C45 78, 40 73, 35 75 Z" fill="rgba(255,255,255,0.8)"/>
-                      <path d="M85 75 C90 73, 95 78, 95 85 L95 95 C95 100, 90 105, 85 105 C80 105, 75 100, 75 95 L75 85 C75 78, 80 73, 85 75 Z" fill="rgba(255,255,255,0.8)"/>
-                      {/* Подколенные сухожилия */}
-                      <path d="M40 50 L45 65 M80 50 L75 65" stroke="rgba(255,255,255,0.6)" strokeWidth="2"/>
+                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M9 2H15C16 2 17 3 17 4V12C17 14 15 16 13 17V20C13 21 12 22 11 22H13C14 22 15 21 15 20V17C17 16 19 14 19 12V4C19 2 17 2 15 2H9C7 2 5 2 5 4V12C5 14 7 16 9 17V20C9 21 10 22 11 22H13C12 22 11 21 11 20V17C9 16 7 14 7 12V4C7 3 8 2 9 2Z"/>
                     </svg>
                   </div>
                 </div>
@@ -238,21 +214,8 @@ export function ProfileView() {
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-white" fill="currentColor" stroke="currentColor" strokeWidth="1" viewBox="0 0 120 120">
-                      {/* Левое плечо (дельтовидная) */}
-                      <path d="M20 30 C15 25, 10 30, 10 40 C10 50, 15 55, 20 55 L25 55 C30 55, 35 50, 35 45 L35 35 C35 30, 30 25, 25 30 L20 30 Z" fill="rgba(255,255,255,0.7)"/>
-                      {/* Правое плечо (дельтовидная) */}
-                      <path d="M100 30 C105 25, 110 30, 110 40 C110 50, 105 55, 100 55 L95 55 C90 55, 85 50, 85 45 L85 35 C85 30, 90 25, 95 30 L100 30 Z" fill="rgba(255,255,255,0.7)"/>
-                      {/* Левый бицепс */}
-                      <path d="M25 50 C20 48, 15 53, 15 60 L15 75 C15 82, 20 87, 25 87 C30 87, 35 82, 35 75 L35 60 C35 53, 30 48, 25 50 Z" fill="rgba(255,255,255,0.9)"/>
-                      {/* Правый бицепс */}
-                      <path d="M95 50 C100 48, 105 53, 105 60 L105 75 C105 82, 100 87, 95 87 C90 87, 85 82, 85 75 L85 60 C85 53, 90 48, 95 50 Z" fill="rgba(255,255,255,0.9)"/>
-                      {/* Левое предплечье */}
-                      <path d="M25 80 C22 78, 18 82, 18 88 L18 100 C18 105, 22 108, 25 108 C28 108, 32 105, 32 100 L32 88 C32 82, 28 78, 25 80 Z" fill="rgba(255,255,255,0.8)"/>
-                      {/* Правое предплечье */}
-                      <path d="M95 80 C98 78, 102 82, 102 88 L102 100 C102 105, 98 108, 95 108 C92 108, 88 105, 88 100 L88 88 C88 82, 92 78, 95 80 Z" fill="rgba(255,255,255,0.8)"/>
-                      {/* Связующие линии */}
-                      <path d="M35 45 L85 45 M25 75 L95 75" stroke="rgba(255,255,255,0.5)" strokeWidth="1"/>
+                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M6 8C6 6 7 4 9 4H15C17 4 18 6 18 8V12C18 14 17 16 15 16H9C7 16 6 14 6 12V8ZM4 10C4 9 3 8 2 8V16C3 16 4 15 4 14V10ZM20 10V14C20 15 21 16 22 16V8C21 8 20 9 20 10ZM8 18H16C17 18 18 19 18 20V22H6V20C6 19 7 18 8 18Z"/>
                     </svg>
                   </div>
                 </div>
@@ -268,19 +231,8 @@ export function ProfileView() {
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-white" fill="currentColor" stroke="currentColor" strokeWidth="1" viewBox="0 0 120 120">
-                      {/* Левая передняя дельта */}
-                      <path d="M20 25 C15 20, 10 25, 10 35 C10 45, 15 50, 25 52 L30 53 C35 54, 40 50, 40 45 L40 35 C40 25, 35 20, 30 25 L20 25 Z" fill="rgba(255,255,255,0.9)"/>
-                      {/* Правая передняя дельта */}
-                      <path d="M100 25 C105 20, 110 25, 110 35 C110 45, 105 50, 95 52 L90 53 C85 54, 80 50, 80 45 L80 35 C80 25, 85 20, 90 25 L100 25 Z" fill="rgba(255,255,255,0.9)"/>
-                      {/* Левая средняя дельта */}
-                      <path d="M15 40 C10 35, 5 40, 5 50 C5 60, 10 65, 20 67 L25 68 C30 69, 35 65, 35 60 L35 50 C35 40, 30 35, 25 40 L15 40 Z" fill="rgba(255,255,255,0.8)"/>
-                      {/* Правая средняя дельта */}
-                      <path d="M105 40 C110 35, 115 40, 115 50 C115 60, 110 65, 100 67 L95 68 C90 69, 85 65, 85 60 L85 50 C85 40, 90 35, 95 40 L105 40 Z" fill="rgba(255,255,255,0.8)"/>
-                      {/* Центральная часть (ключица) */}
-                      <path d="M40 30 L80 30 C85 30, 90 35, 90 40 L85 40 L80 35 L40 35 L35 40 L30 40 C30 35, 35 30, 40 30 Z" fill="rgba(255,255,255,0.7)"/>
-                      {/* Соединительные линии */}
-                      <path d="M30 45 L90 45 M25 55 L95 55" stroke="rgba(255,255,255,0.5)" strokeWidth="1"/>
+                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 6C6 6 4 8 4 10V14C4 16 6 18 8 18H16C18 18 20 16 20 14V10C20 8 18 6 16 6H8ZM2 8C2 7 1 6 0 6V18C1 18 2 17 2 16V8ZM22 8V16C22 17 23 18 24 18V6C23 6 22 7 22 8Z"/>
                     </svg>
                   </div>
                 </div>
@@ -296,17 +248,8 @@ export function ProfileView() {
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-white" fill="currentColor" stroke="currentColor" strokeWidth="1" viewBox="0 0 120 120">
-                      {/* Большая ягодичная мышца левая */}
-                      <path d="M25 35 C20 30, 15 35, 15 45 C15 55, 20 65, 30 70 L35 72 C40 75, 45 78, 50 80 L50 90 C50 95, 52 98, 55 98 C58 98, 60 95, 60 90 L60 80 C58 78, 55 75, 50 72 L45 70 C35 65, 30 55, 30 45 C30 35, 25 30, 25 35 Z" fill="rgba(255,255,255,0.9)"/>
-                      {/* Большая ягодичная мышца правая */}
-                      <path d="M95 35 C100 30, 105 35, 105 45 C105 55, 100 65, 90 70 L85 72 C80 75, 75 78, 70 80 L70 90 C70 95, 68 98, 65 98 C62 98, 60 95, 60 90 L60 80 C62 78, 65 75, 70 72 L75 70 C85 65, 90 55, 90 45 C90 35, 95 30, 95 35 Z" fill="rgba(255,255,255,0.9)"/>
-                      {/* Средняя ягодичная мышца левая */}
-                      <path d="M30 25 C25 22, 20 27, 20 35 C20 42, 25 47, 32 48 L38 49 C42 50, 45 47, 45 43 L45 35 C45 27, 40 22, 35 25 L30 25 Z" fill="rgba(255,255,255,0.8)"/>
-                      {/* Средняя ягодичная мышца правая */}
-                      <path d="M90 25 C95 22, 100 27, 100 35 C100 42, 95 47, 88 48 L82 49 C78 50, 75 47, 75 43 L75 35 C75 27, 80 22, 85 25 L90 25 Z" fill="rgba(255,255,255,0.8)"/>
-                      {/* Седалищная кость */}
-                      <path d="M50 75 L55 85 L65 85 L60 75 Z M50 75 L55 85 L45 85 L50 75 Z" fill="rgba(255,255,255,0.6)"/>
+                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 4C6 4 4 6 4 8V16C4 18 6 20 8 20H16C18 20 20 18 20 16V8C20 6 18 4 16 4H8ZM6 22C5 22 4 21 4 20V22H6ZM18 22H20V20C20 21 19 22 18 22Z"/>
                     </svg>
                   </div>
                 </div>
@@ -322,19 +265,8 @@ export function ProfileView() {
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-white" fill="currentColor" stroke="currentColor" strokeWidth="1" viewBox="0 0 120 120">
-                      {/* Прямая мышца живота верх */}
-                      <path d="M45 20 C40 18, 35 22, 35 30 L35 45 C35 50, 40 55, 45 55 L75 55 C80 55, 85 50, 85 45 L85 30 C85 22, 80 18, 75 20 L75 30 L75 45 L45 45 L45 30 Z" fill="rgba(255,255,255,0.9)"/>
-                      {/* Прямая мышца живота низ */}
-                      <path d="M45 60 C40 58, 35 62, 35 70 L35 85 C35 90, 40 95, 45 95 L75 95 C80 95, 85 90, 85 85 L85 70 C85 62, 80 58, 75 60 L75 70 L75 85 L45 85 L45 70 Z" fill="rgba(255,255,255,0.9)"/>
-                      {/* Кубики пресса - горизонтальные линии */}
-                      <path d="M40 35 L80 35 M40 50 L80 50 M40 65 L80 65 M40 80 L80 80" stroke="rgba(255,255,255,0.7)" strokeWidth="1.5"/>
-                      {/* Центральная линия (белая линия живота) */}
-                      <path d="M60 25 L60 90" stroke="rgba(255,255,255,0.8)" strokeWidth="2"/>
-                      {/* Косые мышцы левые */}
-                      <path d="M25 45 C20 40, 15 45, 15 55 L15 70 C15 75, 20 80, 25 80 L35 80 L35 55 C35 50, 30 45, 25 45 Z" fill="rgba(255,255,255,0.7)"/>
-                      {/* Косые мышцы правые */}
-                      <path d="M95 45 C100 40, 105 45, 105 55 L105 70 C105 75, 100 80, 95 80 L85 80 L85 55 C85 50, 90 45, 95 45 Z" fill="rgba(255,255,255,0.7)"/>
+                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 4C7 4 6 5 6 6V10C6 11 7 12 8 12H16C17 12 18 11 18 10V6C18 5 17 4 16 4H8ZM8 14C7 14 6 15 6 16V20C6 21 7 22 8 22H16C17 22 18 21 18 20V16C18 15 17 14 16 14H8Z"/>
                     </svg>
                   </div>
                 </div>
