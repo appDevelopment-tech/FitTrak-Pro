@@ -43,8 +43,10 @@ export function ProfileView() {
     : {};
 
   const handleMuscleGroupClick = (muscleGroup: string) => {
+    console.log('Клик по группе мышц:', muscleGroup);
     setSelectedMuscleGroup(muscleGroup);
     setSelectedEquipment("все"); // Сброс фильтра оборудования при смене группы мышц
+    console.log('Состояние обновлено:', muscleGroup);
   };
   
   return (
