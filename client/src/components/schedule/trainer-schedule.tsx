@@ -1054,9 +1054,15 @@ export function TrainerSchedule() {
                                         className="text-sm font-medium text-gray-800 hover:text-orange-600 hover:underline transition-colors cursor-pointer"
                                         onClick={(e) => {
                                           e.stopPropagation();
+                                          console.log('Clicked on student:', session.studentName);
+                                          console.log('Available students:', students.map(s => s.name));
                                           const student = students.find(s => s.name === session.studentName);
+                                          console.log('Found student:', student);
                                           if (student) {
+                                            console.log('Opening student profile for:', student.name);
                                             openStudentProfile(student);
+                                          } else {
+                                            console.log('Student not found in students list');
                                           }
                                         }}
                                         title="Открыть профиль ученика"
