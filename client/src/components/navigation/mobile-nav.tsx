@@ -9,6 +9,7 @@ export function MobileNavigation({ activeView, onViewChange }: MobileNavProps) {
   const navItems = [
     { id: 'schedule', label: 'Расписание', icon: Calendar },
     { id: 'students', label: 'Ученики', icon: Users },
+    { id: 'programs', label: 'Программы', icon: Target },
     { id: 'profile', label: 'Профиль тренера', icon: User },
   ];
 
