@@ -163,8 +163,8 @@ export function ProfileView() {
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 13L13.5 7.5C13.1 6.8 12.4 6.3 11.7 6.3H8.3C7.6 6.3 6.9 6.8 6.5 7.5L5 13L3 7V9H1V11H4.2L6.2 17.8C6.6 18.7 7.4 19.3 8.3 19.3H15.7C16.6 19.3 17.4 18.7 17.8 17.8L19.8 11H23V9H21Z"/>
+                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 100 100">
+                      <path d="M35 25 C25 20, 15 25, 15 35 C15 45, 25 50, 35 45 L35 55 C35 65, 45 70, 50 70 C55 70, 65 65, 65 55 L65 45 C75 50, 85 45, 85 35 C85 25, 75 20, 65 25 L65 35 C65 45, 55 50, 50 50 C45 50, 35 45, 35 35 Z"/>
                     </svg>
                   </div>
                 </div>
@@ -180,8 +180,8 @@ export function ProfileView() {
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM8.5 7C9.3 7 10 7.7 10 8.5C10 9.3 9.3 10 8.5 10C7.7 10 7 9.3 7 8.5C7 7.7 7.7 7 8.5 7ZM15.5 7C16.3 7 17 7.7 17 8.5C17 9.3 16.3 10 15.5 10C14.7 10 14 9.3 14 8.5C14 7.7 14.7 7 15.5 7ZM12 11C14.2 11 16 12.8 16 15V22H8V15C8 12.8 9.8 11 12 11Z"/>
+                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 100 100">
+                      <path d="M50 15 C40 15, 30 20, 25 30 L20 40 C18 45, 20 50, 25 50 L30 50 L30 65 C30 75, 40 85, 50 85 C60 85, 70 75, 70 65 L70 50 L75 50 C80 50, 82 45, 80 40 L75 30 C70 20, 60 15, 50 15 Z M50 25 C55 25, 60 28, 62 32 L65 40 L60 40 L60 60 C60 65, 55 70, 50 70 C45 70, 40 65, 40 60 L40 40 L35 40 L38 32 C40 28, 45 25, 50 25 Z"/>
                     </svg>
                   </div>
                 </div>
@@ -197,8 +197,8 @@ export function ProfileView() {
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M13 1C13 2.1 12.1 3 11 3C9.9 3 9 2.1 9 1H7C7 3.2 8.8 5 11 5C13.2 5 15 3.2 15 1H13ZM11 22H13V11H11V22ZM9 7.5C9 6.7 8.3 6 7.5 6S6 6.7 6 7.5S6.7 9 7.5 9S9 8.3 9 7.5ZM18 7.5C18 6.7 17.3 6 16.5 6S15 6.7 15 7.5S15.7 9 16.5 9S18 8.3 18 7.5ZM7.5 10C6.1 10 5 11.1 5 12.5V22H7V12.5C7 12.2 7.2 12 7.5 12S8 12.2 8 12.5V22H10V12.5C10 11.1 8.9 10 7.5 10ZM16.5 10C15.1 10 14 11.1 14 12.5V22H16V12.5C16 12.2 16.2 12 16.5 12S17 12.2 17 12.5V22H19V12.5C19 11.1 17.9 10 16.5 10Z"/>
+                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 100 100">
+                      <path d="M30 20 C25 15, 20 20, 20 30 L20 50 C20 55, 22 60, 25 63 L25 75 C25 80, 30 85, 35 85 C40 85, 45 80, 45 75 L45 50 L55 50 L55 75 C55 80, 60 85, 65 85 C70 85, 75 80, 75 75 L75 63 C78 60, 80 55, 80 50 L80 30 C80 20, 75 15, 70 20 L70 30 C70 45, 60 50, 50 50 C40 50, 30 45, 30 30 Z"/>
                     </svg>
                   </div>
                 </div>
@@ -214,8 +214,8 @@ export function ProfileView() {
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM17 7H7C6.4 7 6 7.4 6 8S6.4 9 7 9H8V15C8 16.1 8.9 17 10 17H14C15.1 17 16 16.1 16 15V9H17C17.6 9 18 8.6 18 8S17.6 7 17 7ZM4 9C4.6 9 5 9.4 5 10V15C5 15.6 4.6 16 4 16S3 15.6 3 15V10C3 9.4 3.4 9 4 9ZM20 9C20.6 9 21 9.4 21 10V15C21 15.6 20.6 16 20 16S19 15.6 19 15V10C19 9.4 19.4 9 20 9Z"/>
+                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 100 100">
+                      <path d="M15 35 C10 30, 5 35, 5 45 L5 60 C5 65, 10 70, 15 70 L20 70 L20 75 C20 80, 25 85, 30 85 C35 85, 40 80, 40 75 L40 45 L40 25 C40 20, 45 15, 50 15 C55 15, 60 20, 60 25 L60 45 L60 75 C60 80, 65 85, 70 85 C75 85, 80 80, 80 75 L80 70 L85 70 C90 70, 95 65, 95 60 L95 45 C95 35, 90 30, 85 35 L85 55 L80 55 L80 45 L60 45 L40 45 L20 45 L20 55 L15 55 Z"/>
                     </svg>
                   </div>
                 </div>
@@ -231,8 +231,8 @@ export function ProfileView() {
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM5.5 6C6.9 6 8 7.1 8 8.5V11H16V8.5C16 7.1 17.1 6 18.5 6S21 7.1 21 8.5V15.5C21 16.9 19.9 18 18.5 18S16 16.9 16 15.5V13H8V15.5C8 16.9 6.9 18 5.5 18S3 16.9 3 15.5V8.5C3 7.1 4.1 6 5.5 6Z"/>
+                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 100 100">
+                      <path d="M15 25 C10 20, 5 25, 5 35 L5 50 C5 55, 10 60, 15 60 L20 60 L25 55 L35 50 L40 45 L45 40 L50 35 L55 40 L60 45 L65 50 L75 55 L80 60 L85 60 C90 60, 95 55, 95 50 L95 35 C95 25, 90 20, 85 25 L85 40 L75 45 L65 40 L55 35 L50 30 L45 35 L35 40 L25 45 L15 40 Z"/>
                     </svg>
                   </div>
                 </div>
@@ -248,8 +248,8 @@ export function ProfileView() {
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM7 13V22H9V13H7ZM15 13V22H17V13H15ZM12 7C13.1 7 14 7.9 14 9V11C14 12.1 13.1 13 12 13C10.9 13 10 12.1 10 11V9C10 7.9 10.9 7 12 7Z"/>
+                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 100 100">
+                      <path d="M20 40 C15 35, 10 40, 10 50 C10 60, 15 65, 20 65 L25 65 C30 70, 35 75, 40 75 L40 85 C40 90, 45 95, 50 95 C55 95, 60 90, 60 85 L60 75 C65 75, 70 70, 75 65 L80 65 C85 65, 90 60, 90 50 C90 40, 85 35, 80 40 L80 50 C80 55, 75 60, 70 60 L65 60 C60 55, 55 50, 50 50 C45 50, 40 55, 35 60 L30 60 C25 60, 20 55, 20 50 Z"/>
                     </svg>
                   </div>
                 </div>
@@ -265,8 +265,8 @@ export function ProfileView() {
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM12 7C15.3 7 18 9.7 18 13V18C18 19.1 17.1 20 16 20H8C6.9 20 6 19.1 6 18V13C6 9.7 8.7 7 12 7ZM10 10V16H14V10H10Z"/>
+                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 100 100">
+                      <path d="M35 25 C30 20, 25 25, 25 35 L25 45 C25 50, 30 55, 35 55 L65 55 C70 55, 75 50, 75 45 L75 35 C75 25, 70 20, 65 25 L65 35 L65 45 L35 45 L35 35 Z M30 60 C25 55, 20 60, 20 70 L20 80 C20 85, 25 90, 30 90 L70 90 C75 90, 80 85, 80 80 L80 70 C80 60, 75 55, 70 60 L70 70 L70 80 L30 80 L30 70 Z"/>
                     </svg>
                   </div>
                 </div>
