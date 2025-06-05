@@ -72,6 +72,22 @@ export function ProfileView() {
                       )}
                     </div>
                     <div>
+                      <Label>Отчество</Label>
+                      {isEditing ? (
+                        <Input defaultValue="Иванович" />
+                      ) : (
+                        <div className="p-3 bg-gray-50 rounded-md">Иванович</div>
+                      )}
+                    </div>
+                    <div>
+                      <Label>Дата рождения</Label>
+                      {isEditing ? (
+                        <Input type="date" defaultValue="1990-03-15" />
+                      ) : (
+                        <div className="p-3 bg-gray-50 rounded-md">15 марта 1990</div>
+                      )}
+                    </div>
+                    <div>
                       <Label>Email</Label>
                       {isEditing ? (
                         <Input type="email" defaultValue={user?.email || "alexander.petrov@email.com"} />
