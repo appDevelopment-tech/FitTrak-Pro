@@ -5,15 +5,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Dashboard from "@/pages/dashboard";
 import NotFound from "@/pages/not-found";
-import ExerciseDemo from "@/pages/exercise-demo";
 import WgerDemo from "@/pages/wger-demo";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
-      <Route path="/exercise-demo" component={ExerciseDemo} />
-      <Route path="/wger-demo" component={WgerDemo} />
+      <Route path="/exercises" component={WgerDemo} />
       <Route component={NotFound} />
     </Switch>
   );

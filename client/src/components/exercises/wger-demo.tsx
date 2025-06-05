@@ -1,162 +1,73 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Globe, Database, Info } from "lucide-react";
+import { Search, Globe, Database, Info, Loader2 } from "lucide-react";
+import { fetchProcessedExercises, fetchWgerCategories, type ProcessedExercise, type WgerCategory } from "@/lib/wger-api";
 
-interface WgerExercise {
-  id: number;
-  uuid: string;
-  name: string;
-  nameRu: string;
-  category: number;
-  categoryName: string;
-  categoryNameRu: string;
-  muscles: number[];
-  muscleNames: string[];
-  muscleNamesRu: string[];
-  muscles_secondary: number[];
-  secondaryMuscleNames: string[];
-  secondaryMuscleNamesRu: string[];
-  equipment: number[];
-  equipmentNames: string[];
-  equipmentNamesRu: string[];
-  description: string;
-  descriptionRu: string;
-  variations: number | null;
-  license_author: string;
-  images: string[];
-  comments: string[];
-  commentsRu: string[];
-}
-
-// Демонстрационные данные на основе реальной структуры Wger API
-const wgerExercises: WgerExercise[] = [
-  {
-    id: 41,
-    uuid: "a6bced3c-72f5-42a3-9438-5569d46f49fd",
-    name: "Barbell Bench Press",
-    nameRu: "Жим штанги лежа",
-    category: 11,
-    categoryName: "Chest",
-    categoryNameRu: "Грудь",
-    muscles: [14],
-    muscleNames: ["Pectoralis major"],
-    muscleNamesRu: ["Большая грудная мышца"],
-    muscles_secondary: [1, 5],
-    secondaryMuscleNames: ["Anterior deltoid", "Triceps brachii"],
-    secondaryMuscleNamesRu: ["Передние дельты", "Трицепс"],
-    equipment: [1],
-    equipmentNames: ["Barbell"],
-    equipmentNamesRu: ["Штанга"],
-    description: "Lie on a bench and press the barbell from chest to arms extended.",
-    descriptionRu: "Лягте на скамью и выжимайте штангу от груди до полного выпрямления рук.",
-    variations: 3,
-    license_author: "wger",
-    images: ["https://wger.de/media/exercise-images/74/74.png"],
-    comments: [
-      "Keep your feet firmly on the ground",
-      "Maintain a slight arch in your back",
-      "Control the weight on the way down"
-    ],
-    commentsRu: [
-      "Держите ноги твердо на полу",
-      "Сохраняйте небольшой прогиб в спине",
-      "Контролируйте вес при опускании"
-    ]
-  },
-  {
-    id: 12,
-    uuid: "53906cd1-61f1-4d56-ac60-e4fcc5824861",
-    name: "Squats",
-    nameRu: "Приседания",
-    category: 9,
-    categoryName: "Legs",
-    categoryNameRu: "Ноги",
-    muscles: [8],
-    muscleNames: ["Quadriceps femoris"],
-    muscleNamesRu: ["Четырехглавая мышца бедра"],
-    muscles_secondary: [11, 7],
-    secondaryMuscleNames: ["Gluteus maximus", "Soleus"],
-    secondaryMuscleNamesRu: ["Большая ягодичная мышца", "Камбаловидная мышца"],
-    equipment: [],
-    equipmentNames: [],
-    equipmentNamesRu: [],
-    description: "Stand with feet shoulder-width apart and squat down keeping the back straight.",
-    descriptionRu: "Встаньте, ноги на ширине плеч, приседайте, держа спину прямой.",
-    variations: null,
-    license_author: "wger",
-    images: ["https://wger.de/media/exercise-images/12/12.png"],
-    comments: [
-      "Keep knees in line with toes",
-      "Don't let knees cave inward",
-      "Go down until thighs are parallel to floor"
-    ],
-    commentsRu: [
-      "Держите колени на одной линии с носками",
-      "Не позволяйте коленям заваливаться внутрь", 
-      "Опускайтесь до параллели бедер с полом"
-    ]
-  },
-  {
-    id: 20,
-    uuid: "f24cb758-9c0d-42d4-ad9e-6025c527dd13",
-    name: "Dumbbell Shoulder Press",
-    nameRu: "Жим гантелей стоя",
-    category: 13,
-    categoryName: "Shoulders",
-    categoryNameRu: "Плечи",
-    muscles: [2],
-    muscleNames: ["Deltoid"],
-    muscleNamesRu: ["Дельтовидная мышца"],
-    muscles_secondary: [5],
-    secondaryMuscleNames: ["Triceps brachii"],
-    secondaryMuscleNamesRu: ["Трицепс"],
-    equipment: [3],
-    equipmentNames: ["Dumbbell"],
-    equipmentNamesRu: ["Гантели"],
-    description: "Press dumbbells overhead from shoulder height to arms extended.",
-    descriptionRu: "Выжимайте гантели над головой от уровня плеч до полного выпрямления рук.",
-    variations: 5,
-    license_author: "wger",
-    images: ["https://wger.de/media/exercise-images/20/20.png"],
-    comments: [
-      "Keep core engaged",
-      "Don't arch your back excessively",
-      "Control the weight on both up and down movements"
-    ],
-    commentsRu: [
-      "Держите корпус напряженным",
-      "Не прогибайте спину чрезмерно",
-      "Контролируйте вес при подъеме и опускании"
-    ]
-  }
-];
-
-const wgerCategories = [
-  { id: 0, name: "All", nameRu: "Все" },
-  { id: 10, name: "Abs", nameRu: "Пресс" },
-  { id: 8, name: "Arms", nameRu: "Руки" },
-  { id: 12, name: "Back", nameRu: "Спина" },
-  { id: 11, name: "Chest", nameRu: "Грудь" },
-  { id: 9, name: "Legs", nameRu: "Ноги" },
-  { id: 13, name: "Shoulders", nameRu: "Плечи" },
-  { id: 15, name: "Cardio", nameRu: "Кардио" }
-];
+// Russian translations for categories
+const categoryTranslations: Record<string, string> = {
+  "Abs": "Пресс",
+  "Arms": "Руки", 
+  "Back": "Спина",
+  "Calves": "Икры",
+  "Cardio": "Кардио",
+  "Chest": "Грудь",
+  "Legs": "Ноги",
+  "Shoulders": "Плечи"
+};
 
 export function WgerDemo() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(0);
-  const [selectedExercise, setSelectedExercise] = useState<WgerExercise | null>(null);
+  const [selectedExercise, setSelectedExercise] = useState<ProcessedExercise | null>(null);
 
-  const filteredExercises = wgerExercises.filter(exercise => {
-    const matchesSearch = exercise.nameRu.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
+  // Fetch real exercises from Wger API
+  const { data: exercises = [], isLoading: exercisesLoading, error: exercisesError } = useQuery({
+    queryKey: ['wger-exercises'],
+    queryFn: fetchProcessedExercises,
+    staleTime: 1000 * 60 * 30, // 30 minutes
+  });
+
+  // Fetch categories from Wger API
+  const { data: categories = [], isLoading: categoriesLoading } = useQuery({
+    queryKey: ['wger-categories'],
+    queryFn: () => fetchWgerCategories(2), // English language
+    staleTime: 1000 * 60 * 60, // 1 hour
+  });
+
+  const filteredExercises = exercises.filter(exercise => {
+    const matchesSearch = exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 0 || exercise.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  if (exercisesLoading || categoriesLoading) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-green-600 mr-3" />
+          <span className="text-lg text-gray-600">Загружаем упражнения из Wger API...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (exercisesError) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold text-red-800 mb-2">Ошибка загрузки данных</h3>
+            <p className="text-red-600">Не удалось подключиться к Wger API. Проверьте интернет-соединение.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
