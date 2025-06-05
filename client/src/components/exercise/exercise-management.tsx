@@ -59,11 +59,7 @@ export function ExerciseManagement() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: Partial<InsertExercise> }) => 
-      apiRequest(`/api/exercises/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-        headers: { 'Content-Type': 'application/json' }
-      }),
+      apiRequest(`/api/exercises/${id}`, 'PUT', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
       setIsEditDialogOpen(false);
@@ -75,7 +71,7 @@ export function ExerciseManagement() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => apiRequest(`/api/exercises/${id}`, { method: 'DELETE' }),
+    mutationFn: (id: number) => apiRequest(`/api/exercises/${id}`, 'DELETE'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
       toast({ title: "Упражнение удалено успешно" });
