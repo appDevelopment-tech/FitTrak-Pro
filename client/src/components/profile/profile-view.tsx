@@ -6,15 +6,23 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { User, Edit, Save, Camera, Plus, Award, Clock, Users, Calendar } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { User, Edit, Save, Camera, Plus, Award, Clock, Users, Calendar, Filter, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import type { User as UserType } from "@shared/schema";
+import type { User as UserType, Exercise } from "@shared/schema";
 
 export function ProfileView() {
   const [isEditing, setIsEditing] = useState(false);
+  const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string>("");
+  const [selectedEquipment, setSelectedEquipment] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState("");
   
   const { data: user } = useQuery<UserType>({
     queryKey: ['/api/user/1'],
+  });
+
+  const { data: exercises = [] } = useQuery<Exercise[]>({
+    queryKey: ['/api/exercises'],
   });
   
   return (

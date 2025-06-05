@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertWorkoutProgramSchema, insertWorkoutSessionSchema, insertExerciseProgressSchema } from "@shared/schema";
+import { insertWorkoutProgramSchema, insertWorkoutSessionSchema, insertExerciseProgressSchema, insertExerciseSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // User routes
@@ -110,6 +110,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertExerciseProgressSchema.parse(req.body);
       const progress = await storage.createExerciseProgress(validatedData);
       res.status(201).json(progress);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid data" });
+    }
+  });
+
+  // Exercise routes
+  app.get("/api/exercises", async (req, res) => {
+    try {
+      const exercises = await storage.getExercises();
+      res.json(exercises);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/exercises/muscle-group/:muscleGroup", async (req, res) => {
+    try {
+      const muscleGroup = req.params.muscleGroup;
+      const exercises = await storage.getExercisesByMuscleGroup(muscleGroup);
+      res.json(exercises);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/exercises/equipment/:equipment", async (req, res) => {
+    try {
+      const equipment = req.params.equipment;
+      const exercises = await storage.getExercisesByEquipment(equipment);
+      res.json(exercises);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/exercises/:id", async (req, res) => {
+    try {
+      const exerciseId = parseInt(req.params.id);
+      const exercise = await storage.getExercise(exerciseId);
+      if (!exercise) {
+        return res.status(404).json({ message: "Exercise not found" });
+      }
+      res.json(exercise);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/exercises", async (req, res) => {
+    try {
+      const validatedData = insertExerciseSchema.parse(req.body);
+      const exercise = await storage.createExercise(validatedData);
+      res.status(201).json(exercise);
     } catch (error) {
       res.status(400).json({ message: "Invalid data" });
     }
