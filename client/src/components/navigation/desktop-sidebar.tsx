@@ -8,7 +8,6 @@ interface DesktopSidebarProps {
 export function DesktopSidebar({ activeView, onViewChange }: DesktopSidebarProps) {
   const navItems = [
     { id: 'schedule', label: 'Расписание', icon: Calendar },
-    { id: 'students', label: 'Ученики', icon: Users },
     { id: 'profile', label: 'Профиль тренера', icon: User },
   ];
 

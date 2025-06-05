@@ -76,49 +76,7 @@ export default function Dashboard() {
     switch (activeView) {
       case 'schedule':
         return <TrainerSchedule />;
-      case 'students':
-        return (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <Card>
-              <CardHeader className="border-b border-gray-100">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-xl font-bold text-gray-800">Управление учениками</CardTitle>
-                  <Button 
-                    className="bg-orange-500 hover:bg-orange-600"
-                    onClick={() => {
-                      // Переходим к TrainerSchedule с вкладкой students
-                      const url = new URL(window.location.href);
-                      url.searchParams.set('section', 'students');
-                      window.history.pushState({}, '', url);
-                      window.location.reload();
-                    }}
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Перейти к полному управлению
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="text-center">
-                  <div className="bg-orange-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                    <Users className="h-8 w-8 text-orange-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-700 mb-2">Управление учениками</h3>
-                  <p className="text-gray-500 mb-4">
-                    Полная система управления учениками находится в разделе расписания.
-                    Там вы можете просматривать профили, редактировать данные и планировать тренировки.
-                  </p>
-                  <Button 
-                    onClick={() => setActiveView('schedule')}
-                    className="bg-orange-500 hover:bg-orange-600"
-                  >
-                    Перейти к расписанию
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        );
+
 
 
       case 'profile':
