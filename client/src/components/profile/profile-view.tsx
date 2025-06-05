@@ -24,6 +24,28 @@ export function ProfileView() {
   const { data: exercises = [] } = useQuery<Exercise[]>({
     queryKey: ['/api/exercises'],
   });
+
+  // Фильтрация упражнений
+  const filteredExercises = exercises.filter(exercise => {
+    const matchesMuscleGroup = !selectedMuscleGroup || exercise.muscleGroup === selectedMuscleGroup;
+    const matchesEquipment = !selectedEquipment || exercise.equipment === selectedEquipment;
+    const matchesSearch = !searchTerm || exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesMuscleGroup && matchesEquipment && matchesSearch;
+  });
+
+  // Группировка упражнений по оборудованию для текущей группы мышц
+  const exercisesByEquipment = selectedMuscleGroup 
+    ? filteredExercises.reduce((acc, exercise) => {
+        if (!acc[exercise.equipment]) acc[exercise.equipment] = [];
+        acc[exercise.equipment].push(exercise);
+        return acc;
+      }, {} as Record<string, Exercise[]>)
+    : {};
+
+  const handleMuscleGroupClick = (muscleGroup: string) => {
+    setSelectedMuscleGroup(muscleGroup);
+    setSelectedEquipment(""); // Сброс фильтра оборудования при смене группы мышц
+  };
   
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -183,7 +205,10 @@ export function ProfileView() {
         <TabsContent value="exercises" className="space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {/* Грудь */}
-            <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-orange-200">
+            <Card 
+              className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'грудь' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
+              onClick={() => handleMuscleGroupClick('грудь')}
+            >
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
@@ -201,7 +226,10 @@ export function ProfileView() {
             </Card>
 
             {/* Спина */}
-            <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-orange-200">
+            <Card 
+              className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'спина' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
+              onClick={() => handleMuscleGroupClick('спина')}
+            >
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
@@ -219,7 +247,10 @@ export function ProfileView() {
             </Card>
 
             {/* Ноги */}
-            <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-orange-200">
+            <Card 
+              className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'ноги' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
+              onClick={() => handleMuscleGroupClick('ноги')}
+            >
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
@@ -237,7 +268,10 @@ export function ProfileView() {
             </Card>
 
             {/* Руки */}
-            <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-orange-200">
+            <Card 
+              className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'руки' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
+              onClick={() => handleMuscleGroupClick('руки')}
+            >
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
@@ -255,7 +289,10 @@ export function ProfileView() {
             </Card>
 
             {/* Плечи */}
-            <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-orange-200">
+            <Card 
+              className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'плечи' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
+              onClick={() => handleMuscleGroupClick('плечи')}
+            >
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
@@ -273,7 +310,10 @@ export function ProfileView() {
             </Card>
 
             {/* Ягодичные */}
-            <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-orange-200">
+            <Card 
+              className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'ягодичные' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
+              onClick={() => handleMuscleGroupClick('ягодичные')}
+            >
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center">
@@ -291,7 +331,10 @@ export function ProfileView() {
             </Card>
 
             {/* Живот */}
-            <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-orange-200">
+            <Card 
+              className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'живот' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
+              onClick={() => handleMuscleGroupClick('живот')}
+            >
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
@@ -325,6 +368,104 @@ export function ProfileView() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Панель выбора упражнений */}
+          {selectedMuscleGroup && (
+            <Card className="mt-8">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Filter className="h-5 w-5" />
+                  Упражнения для группы: {selectedMuscleGroup}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Фильтры */}
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1">
+                    <Label htmlFor="search">Поиск упражнений</Label>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        id="search"
+                        placeholder="Найти упражнение..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <Label htmlFor="equipment">Тип оборудования</Label>
+                    <Select value={selectedEquipment} onValueChange={setSelectedEquipment}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Все виды оборудования" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">Все виды оборудования</SelectItem>
+                        <SelectItem value="тренажер">Тренажеры</SelectItem>
+                        <SelectItem value="гантели">Гантели</SelectItem>
+                        <SelectItem value="резина">Резина/Эспандер</SelectItem>
+                        <SelectItem value="штанга">Штанга</SelectItem>
+                        <SelectItem value="собственный_вес">Собственный вес</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Список упражнений */}
+                <div className="space-y-4">
+                  {Object.entries(exercisesByEquipment).map(([equipment, exerciseList]) => (
+                    <div key={equipment} className="space-y-3">
+                      <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+                        {equipment === 'тренажер' && '🏋️ Тренажеры'}
+                        {equipment === 'гантели' && '🏃 Гантели'}
+                        {equipment === 'резина' && '🎯 Резина/Эспандер'}
+                        {equipment === 'штанга' && '💪 Штанга'}
+                        {equipment === 'собственный_вес' && '🤸 Собственный вес'}
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {exerciseList.map((exercise) => (
+                          <Card key={exercise.id} className="hover:shadow-md transition-shadow cursor-pointer">
+                            <CardContent className="p-4">
+                              <div className="flex justify-between items-start mb-2">
+                                <h4 className="font-medium text-gray-900">{exercise.name}</h4>
+                                <Badge variant={exercise.difficulty === 'начинающий' ? 'secondary' : exercise.difficulty === 'средний' ? 'default' : 'destructive'}>
+                                  {exercise.difficulty}
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-gray-600 mb-3">{exercise.description}</p>
+                              <div className="space-y-2">
+                                {exercise.instructions && exercise.instructions.length > 0 && (
+                                  <div>
+                                    <p className="text-xs font-medium text-gray-700">Техника:</p>
+                                    <ul className="text-xs text-gray-600 list-disc list-inside">
+                                      {exercise.instructions.slice(0, 2).map((instruction, index) => (
+                                        <li key={index}>{instruction}</li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+                                <Button size="sm" className="w-full">
+                                  Добавить в программу
+                                </Button>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {filteredExercises.length === 0 && (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>Упражнения не найдены</p>
+                    <p className="text-sm">Попробуйте изменить параметры поиска</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
       </Tabs>
     </div>
