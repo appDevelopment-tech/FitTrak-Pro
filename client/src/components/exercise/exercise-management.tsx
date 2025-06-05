@@ -27,13 +27,12 @@ interface ExerciseFormData {
 }
 
 const muscleGroups = ['грудь', 'спина', 'ноги', 'руки', 'плечи', 'ягодичные', 'живот'];
-const equipmentTypes = ['тренажер', 'гантели', 'резина', 'штанга', 'собственный_вес'];
 const difficultyLevels = ['начинающий', 'средний', 'продвинутый'];
 
 export function ExerciseManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterMuscle, setFilterMuscle] = useState<string>("");
-  const [filterEquipment, setFilterEquipment] = useState<string>("");
+
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -93,8 +92,7 @@ export function ExerciseManagement() {
   const filteredExercises = exercises.filter(exercise => {
     const matchesSearch = !searchTerm || exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesMuscle = !filterMuscle || exercise.primaryMuscles.includes(filterMuscle);
-    const matchesEquipment = !filterEquipment || exercise.equipment === filterEquipment;
-    return matchesSearch && matchesMuscle && matchesEquipment;
+    return matchesSearch && matchesMuscle;
   });
 
   return (
@@ -147,17 +145,6 @@ export function ExerciseManagement() {
                   ))}
                 </SelectContent>
               </Select>
-              <Select value={filterEquipment} onValueChange={setFilterEquipment}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Оборудование" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Все типы</SelectItem>
-                  {equipmentTypes.map(equipment => (
-                    <SelectItem key={equipment} value={equipment}>{equipment}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
           </div>
         </CardContent>
@@ -182,10 +169,7 @@ export function ExerciseManagement() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Оборудование:</span>
-                  <span className="font-medium">{exercise.equipment}</span>
-                </div>
+
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Сложность:</span>
                   <Badge variant={exercise.difficulty === 'начинающий' ? 'default' : 
@@ -294,7 +278,6 @@ function ExerciseForm({ exercise, onSubmit, isLoading }: ExerciseFormProps) {
     name: exercise?.name || "",
     primaryMuscles: exercise?.primaryMuscles || [],
     secondaryMuscles: exercise?.secondaryMuscles || [],
-    equipment: exercise?.equipment || "",
     difficulty: exercise?.difficulty || "",
     overview: exercise?.overview || "",
     technique: exercise?.technique || [""],
@@ -351,22 +334,7 @@ function ExerciseForm({ exercise, onSubmit, isLoading }: ExerciseFormProps) {
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="equipment">Оборудование *</Label>
-          <Select 
-            value={formData.equipment} 
-            onValueChange={(value) => setFormData(prev => ({ ...prev, equipment: value }))}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Выберите оборудование" />
-            </SelectTrigger>
-            <SelectContent>
-              {equipmentTypes.map(equipment => (
-                <SelectItem key={equipment} value={equipment}>{equipment}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+
 
         <div className="space-y-2">
           <Label htmlFor="difficulty">Сложность *</Label>
@@ -572,7 +540,6 @@ function ExerciseView({ exercise }: ExerciseViewProps) {
           <h3 className="font-semibold mb-2">Основная информация</h3>
           <div className="space-y-2 text-sm">
             <div><span className="font-medium">Название:</span> {exercise.name}</div>
-            <div><span className="font-medium">Оборудование:</span> {exercise.equipment}</div>
             <div><span className="font-medium">Сложность:</span> {exercise.difficulty}</div>
           </div>
         </div>
