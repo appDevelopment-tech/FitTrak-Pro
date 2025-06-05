@@ -168,11 +168,23 @@ export function WgerDemo() {
       </Card>
 
       {/* Exercise Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredExercises.map((exercise) => (
-          <Card key={exercise.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-2">
-              <div className="aspect-video bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center mb-3">
+      {filteredExercises.length === 0 ? (
+        <Card className="text-center py-12">
+          <CardContent>
+            <p className="text-gray-500 text-lg mb-2">Упражнения не найдены</p>
+            <p className="text-sm text-gray-400">
+              Всего загружено: {exercises.length} упражнений
+              {selectedCategory > 0 && ` | Фильтр: категория ${selectedCategory}`}
+              {searchTerm && ` | Поиск: "${searchTerm}"`}
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredExercises.map((exercise) => (
+            <Card key={exercise.id} className="hover:shadow-lg transition-shadow">
+              <CardHeader className="pb-2">
+                <div className="aspect-video bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center mb-3">
                 {exercise.images.length > 0 ? (
                   <img 
                     src={exercise.images[0]}
@@ -226,15 +238,7 @@ export function WgerDemo() {
             </CardContent>
           </Card>
         ))}
-      </div>
-
-      {filteredExercises.length === 0 && (
-        <Card>
-          <CardContent className="p-12 text-center">
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">Упражнения не найдены</h3>
-            <p className="text-gray-500">Попробуйте изменить параметры поиска</p>
-          </CardContent>
-        </Card>
+        </div>
       )}
 
       {/* Exercise Detail Modal */}
