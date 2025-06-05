@@ -163,8 +163,24 @@ export async function fetchProcessedExercises(): Promise<ProcessedExercise[]> {
         // Find matching exercise data
         const exercise = exercises.find(ex => ex.id === info.exercise);
         if (!exercise) {
-          console.log(`No exercise found for info ID: ${info.exercise}`);
-          return null;
+          // Create a basic exercise entry even without full exercise data
+          return {
+            id: info.exercise,
+            uuid: `info-${info.exercise}`,
+            name: info.name,
+            description: info.description,
+            category: 0, // Unknown category
+            categoryName: 'Unknown',
+            muscles: [],
+            muscleNames: [],
+            muscles_secondary: [],
+            secondaryMuscleNames: [],
+            equipment: [],
+            equipmentNames: [],
+            variations: null,
+            license_author: 'wger',
+            images: imageMap.get(info.exercise) || []
+          };
         }
         
         return {
@@ -184,8 +200,7 @@ export async function fetchProcessedExercises(): Promise<ProcessedExercise[]> {
           license_author: exercise.license_author,
           images: imageMap.get(info.exercise) || []
         };
-      })
-      .filter(exercise => exercise !== null) as ProcessedExercise[];
+      }) as ProcessedExercise[];
 
     console.log('Processed exercises:', processedExercises.length);
     console.log('Sample exercise:', processedExercises[0]);
