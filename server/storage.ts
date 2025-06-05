@@ -36,7 +36,6 @@ export interface IStorage {
   // Exercise operations
   getExercises(): Promise<Exercise[]>;
   getExercisesByMuscleGroup(muscleGroup: string): Promise<Exercise[]>;
-  getExercisesByEquipment(equipment: string): Promise<Exercise[]>;
   getExercise(id: number): Promise<Exercise | undefined>;
   createExercise(exercise: InsertExercise): Promise<Exercise>;
   updateExercise(id: number, updates: Partial<InsertExercise>): Promise<Exercise | undefined>;

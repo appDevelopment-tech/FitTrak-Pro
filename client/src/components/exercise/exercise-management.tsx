@@ -18,7 +18,6 @@ interface ExerciseFormData {
   name: string;
   primaryMuscles: string[];
   secondaryMuscles: string[];
-  equipment: string;
   difficulty: string;
   overview: string;
   technique: string[];

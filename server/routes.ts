@@ -135,15 +135,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/exercises/equipment/:equipment", async (req, res) => {
-    try {
-      const equipment = req.params.equipment;
-      const exercises = await storage.getExercisesByEquipment(equipment);
-      res.json(exercises);
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
+
 
   app.get("/api/exercises/:id", async (req, res) => {
     try {

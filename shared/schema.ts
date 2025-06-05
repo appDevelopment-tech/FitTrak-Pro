@@ -38,7 +38,6 @@ export const exercises = pgTable("exercises", {
   name: text("name").notNull(),
   primaryMuscles: text("primary_muscles").array().notNull(), // основные группы мышц
   secondaryMuscles: text("secondary_muscles").array().notNull(), // вспомогательные группы мышц
-  equipment: text("equipment").notNull(), // 'тренажер', 'гантели', 'резина', 'штанга', 'собственный_вес'
   difficulty: text("difficulty").notNull(), // 'начинающий', 'средний', 'продвинутый'
   overview: text("overview").notNull(), // обзор упражнения
   technique: text("technique").array().notNull(), // техника выполнения (пошагово)
