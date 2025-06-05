@@ -33,6 +33,12 @@ export function ProfileView() {
     return matchesMuscleGroup && matchesEquipment && matchesSearch;
   });
 
+  console.log('Текущее состояние:', {
+    selectedMuscleGroup,
+    filteredExercises: filteredExercises.length,
+    exercises: exercises.length
+  });
+
   // Группировка упражнений по оборудованию для текущей группы мышц
   const exercisesByEquipment = selectedMuscleGroup 
     ? filteredExercises.reduce((acc, exercise) => {
