@@ -39,6 +39,10 @@ export function WgerDemo() {
     staleTime: 1000 * 60 * 60, // 1 hour
   });
 
+  // Debug logging
+  console.log('Exercises data:', exercises);
+  console.log('Categories data:', categories);
+
   const filteredExercises = exercises.filter(exercise => {
     const matchesSearch = exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 0 || exercise.category === selectedCategory;

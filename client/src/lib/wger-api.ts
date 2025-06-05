@@ -110,6 +110,8 @@ export async function fetchWgerImages(): Promise<WgerImage[]> {
 // Helper function to process and combine all data
 export async function fetchProcessedExercises(): Promise<ProcessedExercise[]> {
   try {
+    console.log('Starting to fetch Wger data...');
+    
     const [exercises, exerciseInfo, categories, muscles, equipment, images] = await Promise.all([
       fetchWgerExercises(),
       fetchWgerExerciseInfo(),
@@ -118,6 +120,15 @@ export async function fetchProcessedExercises(): Promise<ProcessedExercise[]> {
       fetchWgerEquipment(),
       fetchWgerImages()
     ]);
+
+    console.log('Raw data received:', {
+      exercises: exercises.length,
+      exerciseInfo: exerciseInfo.length,
+      categories: categories.length,
+      muscles: muscles.length,
+      equipment: equipment.length,
+      images: images.length
+    });
 
     // Create lookup maps
     const infoMap = new Map(exerciseInfo.map(info => [info.exercise, info]));
@@ -134,8 +145,16 @@ export async function fetchProcessedExercises(): Promise<ProcessedExercise[]> {
       imageMap.get(img.exercise)!.push(img.image);
     });
 
+    console.log('Created lookup maps:', {
+      infoMapSize: infoMap.size,
+      categoryMapSize: categoryMap.size,
+      muscleMapSize: muscleMap.size,
+      equipmentMapSize: equipmentMap.size,
+      imageMapSize: imageMap.size
+    });
+
     // Process exercises
-    return exercises
+    const processedExercises = exercises
       .filter(exercise => infoMap.has(exercise.id)) // Only include exercises with info
       .map(exercise => {
         const info = infoMap.get(exercise.id)!;
@@ -157,6 +176,11 @@ export async function fetchProcessedExercises(): Promise<ProcessedExercise[]> {
           images: imageMap.get(exercise.id) || []
         };
       });
+
+    console.log('Processed exercises:', processedExercises.length);
+    console.log('Sample exercise:', processedExercises[0]);
+    
+    return processedExercises;
   } catch (error) {
     console.error('Error fetching Wger data:', error);
     throw error;
