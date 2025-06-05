@@ -214,7 +214,7 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <svg className="w-12 h-12 mb-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2M8 7H16C16.6 7 17 7.4 17 8V10C17 10.6 16.6 11 16 11H8C7.4 11 7 10.6 7 10V8C7 7.4 7.4 7 8 7M8 12H16C16.6 12 17 12.4 17 13V15C17 15.6 16.6 16 16 16H8C7.4 16 7 15.6 7 15V13C7 12.4 7.4 12 8 12Z"/>
+                        <path d="M6 8H18V10H6V8M6 11H18V13H6V11M6 14H18V16H6V14M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2Z"/>
                       </svg>
                       <div className="text-lg font-semibold">ГРУДЬ</div>
                     </div>
@@ -237,7 +237,7 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <svg className="w-12 h-12 mb-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2M21 9V7L15 5.5V8C15 8.8 14.3 9.5 13.5 9.5S12 8.8 12 8V6.5L9 5.5V8C9 8.8 8.3 9.5 7.5 9.5S6 8.8 6 8V5.5L0 7V9L3 10V16C3 17.1 3.9 18 5 18S7 17.1 7 16V14.5L9 15.5V17C9 18.1 9.9 19 11 19S13 18.1 13 17V15.5L15 14.5V16C15 17.1 15.9 18 17 18S19 17.1 19 16V10L21 9Z"/>
+                        <path d="M9 3V6H7V3H9M17 3V6H15V3H17M12 6C13.1 6 14 6.9 14 8V16C14 17.1 13.1 18 12 18S10 17.1 10 16V8C10 6.9 10.9 6 12 6M8 8V18H6V8H8M18 8V18H16V8H18Z"/>
                       </svg>
                       <div className="text-lg font-semibold">СПИНА</div>
                     </div>
@@ -260,7 +260,7 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <svg className="w-12 h-12 mb-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M13.5 5.5C13.5 6.3 12.8 7 12 7S10.5 6.3 10.5 5.5 11.2 4 12 4 13.5 4.7 13.5 5.5M9.89 9.38L10.71 8.56C11.1 8.17 11.73 8.17 12.12 8.56L12.94 9.38C13.33 9.77 13.33 10.4 12.94 10.79L11 12.73V18C11 18.6 10.6 19 10 19S9 18.6 9 18V13H7V18C7 18.6 6.6 19 6 19S5 18.6 5 18V12.73L3.06 10.79C2.67 10.4 2.67 9.77 3.06 9.38L3.88 8.56C4.27 8.17 4.9 8.17 5.29 8.56L6.11 9.38C6.5 9.77 6.89 9.77 7.28 9.38L8.1 8.56C8.49 8.17 9.12 8.17 9.51 8.56L10.33 9.38"/>
+                        <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2M10 8V22H8V16H6V22H4V8H10M20 8V22H18V16H16V22H14V8H20Z"/>
                       </svg>
                       <div className="text-lg font-semibold">НОГИ</div>
                     </div>
@@ -283,7 +283,7 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <svg className="w-12 h-12 mb-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2M8 7H16C16.6 7 17 7.4 17 8V9H18V11H17V12H16V13H15V14H13V13H11V14H9V13H8V12H7V11H6V9H7V8C7 7.4 7.4 7 8 7M8 15H9V16H11V17H13V16H15V15H16V18C16 18.6 15.6 19 15 19H9C8.4 19 8 18.6 8 18V15Z"/>
+                        <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2M16 8C17.1 8 18 8.9 18 10V14C18 15.1 17.1 16 16 16H15V18C15 19.1 14.1 20 13 20H11C9.9 20 9 19.1 9 18V16H8C6.9 16 6 15.1 6 14V10C6 8.9 6.9 8 8 8H16M8 10V14H16V10H8Z"/>
                       </svg>
                       <div className="text-lg font-semibold">РУКИ</div>
                     </div>
@@ -306,7 +306,7 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <svg className="w-12 h-12 mb-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2M9 7H15L16 8V9H20V11H16V12C16 12.6 15.6 13 15 13H9C8.4 13 8 12.6 8 12V11H4V9H8V8L9 7Z"/>
+                        <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2M4 8C2.9 8 2 8.9 2 10V12C2 13.1 2.9 14 4 14H6V16H10V14H14V16H18V14H20C21.1 14 22 13.1 22 12V10C22 8.9 21.1 8 20 8H4Z"/>
                       </svg>
                       <div className="text-lg font-semibold">ПЛЕЧИ</div>
                     </div>
@@ -329,7 +329,7 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <svg className="w-12 h-12 mb-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2M6 8H18C18.6 8 19 8.4 19 9V11C19 11.6 18.6 12 18 12H6C5.4 12 5 11.6 5 11V9C5 8.4 5.4 8 6 8M8 13H16V17C16 17.6 15.6 18 15 18H9C8.4 18 8 17.6 8 17V13M10 15V16H14V15H10Z"/>
+                        <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2M8 8C6.9 8 6 8.9 6 10V18C6 19.1 6.9 20 8 20H16C17.1 20 18 19.1 18 18V10C18 8.9 17.1 8 16 8H8M8 10H16V14H8V10M8 16H16V18H8V16Z"/>
                       </svg>
                       <div className="text-lg font-semibold">ЯГОДИЧНЫЕ</div>
                     </div>
@@ -352,7 +352,7 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <svg className="w-12 h-12 mb-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2M10 8H14C14.6 8 15 8.4 15 9V12C15 12.6 14.6 13 14 13H10C9.4 13 9 12.6 9 12V9C9 8.4 9.4 8 10 8M10 14H14V17C14 17.6 13.6 18 13 18H11C10.4 18 10 17.6 10 17V14M11 15V16H13V15H11Z"/>
+                        <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2M9 8H15C15.6 8 16 8.4 16 9V15C16 15.6 15.6 16 15 16H9C8.4 16 8 15.6 8 15V9C8 8.4 8.4 8 9 8M10 10V14H14V10H10Z"/>
                       </svg>
                       <div className="text-lg font-semibold">ЖИВОТ</div>
                     </div>
