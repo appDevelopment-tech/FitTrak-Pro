@@ -14,7 +14,7 @@ import type { User as UserType, Exercise } from "@shared/schema";
 export function ProfileView() {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string>("");
-  const [selectedEquipment, setSelectedEquipment] = useState<string>("");
+
   const [searchTerm, setSearchTerm] = useState("");
   
   const { data: user } = useQuery<UserType>({
@@ -28,25 +28,12 @@ export function ProfileView() {
   // Фильтрация упражнений
   const filteredExercises = exercises.filter(exercise => {
     const matchesMuscleGroup = !selectedMuscleGroup || exercise.primaryMuscles.includes(selectedMuscleGroup);
-    const matchesEquipment = !selectedEquipment || selectedEquipment === "все" || exercise.equipment === selectedEquipment;
     const matchesSearch = !searchTerm || exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesMuscleGroup && matchesEquipment && matchesSearch;
+    return matchesMuscleGroup && matchesSearch;
   });
-
-
-
-  // Группировка упражнений по оборудованию для текущей группы мышц
-  const exercisesByEquipment = selectedMuscleGroup 
-    ? filteredExercises.reduce((acc, exercise) => {
-        if (!acc[exercise.equipment]) acc[exercise.equipment] = [];
-        acc[exercise.equipment].push(exercise);
-        return acc;
-      }, {} as Record<string, Exercise[]>)
-    : {};
 
   const handleMuscleGroupClick = (muscleGroup: string) => {
     setSelectedMuscleGroup(muscleGroup);
-    setSelectedEquipment("все"); // Сброс фильтра оборудования при смене группы мышц
     
     // Прокрутка к панели упражнений через небольшую задержку
     setTimeout(() => {
@@ -407,75 +394,50 @@ export function ProfileView() {
                       />
                     </div>
                   </div>
-                  <div className="flex-1">
-                    <Label htmlFor="equipment">Тип оборудования</Label>
-                    <Select value={selectedEquipment} onValueChange={setSelectedEquipment}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Все виды оборудования" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="все">Все виды оборудования</SelectItem>
-                        <SelectItem value="тренажер">Тренажеры</SelectItem>
-                        <SelectItem value="гантели">Гантели</SelectItem>
-                        <SelectItem value="резина">Резина/Эспандер</SelectItem>
-                        <SelectItem value="штанга">Штанга</SelectItem>
-                        <SelectItem value="собственный_вес">Собственный вес</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+
                 </div>
 
                 {/* Список упражнений */}
                 <div className="space-y-4">
-                  {Object.entries(exercisesByEquipment).map(([equipment, exerciseList]) => (
-                    <div key={equipment} className="space-y-3">
-                      <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
-                        {equipment === 'тренажер' && '🏋️ Тренажеры'}
-                        {equipment === 'гантели' && '🏃 Гантели'}
-                        {equipment === 'резина' && '🎯 Резина/Эспандер'}
-                        {equipment === 'штанга' && '💪 Штанга'}
-                        {equipment === 'собственный_вес' && '🤸 Собственный вес'}
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {exerciseList.map((exercise) => (
-                          <Card key={exercise.id} className="hover:shadow-md transition-shadow cursor-pointer">
-                            <CardContent className="p-4">
-                              <div className="flex justify-between items-start mb-2">
-                                <h4 className="font-medium text-gray-900">{exercise.name}</h4>
-                                <Badge variant={exercise.difficulty === 'начинающий' ? 'secondary' : exercise.difficulty === 'средний' ? 'default' : 'destructive'}>
-                                  {exercise.difficulty}
-                                </Badge>
+                  {filteredExercises.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {filteredExercises.map((exercise) => (
+                        <Card key={exercise.id} className="hover:shadow-md transition-shadow cursor-pointer">
+                          <CardContent className="p-4">
+                            <div className="flex justify-between items-start mb-2">
+                              <h4 className="font-medium text-gray-900">{exercise.name}</h4>
+                              <Badge variant={exercise.difficulty === 'начинающий' ? 'secondary' : exercise.difficulty === 'средний' ? 'default' : 'destructive'}>
+                                {exercise.difficulty}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-3">{exercise.overview}</p>
+                            <div className="space-y-2">
+                              <div className="text-xs text-gray-600">
+                                <p className="font-medium">Основные группы мышц:</p>
+                                <p>{exercise.primaryMuscles.join(', ')}</p>
                               </div>
-                              <p className="text-sm text-gray-600 mb-3">{exercise.description}</p>
-                              <div className="space-y-2">
-                                {exercise.instructions && exercise.instructions.length > 0 && (
-                                  <div>
-                                    <p className="text-xs font-medium text-gray-700">Техника:</p>
-                                    <ul className="text-xs text-gray-600 list-disc list-inside">
-                                      {exercise.instructions.slice(0, 2).map((instruction, index) => (
-                                        <li key={index}>{instruction}</li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                )}
-                                <Button size="sm" className="w-full">
-                                  Добавить в программу
-                                </Button>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
+                              {exercise.secondaryMuscles.length > 0 && (
+                                <div className="text-xs text-gray-600">
+                                  <p className="font-medium">Вспомогательные группы мышц:</p>
+                                  <p>{exercise.secondaryMuscles.join(', ')}</p>
+                                </div>
+                              )}
+                              <Button size="sm" className="w-full">
+                                Добавить в программу
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
                     </div>
-                  ))}
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <p>Упражнения не найдены для группы "{selectedMuscleGroup}"</p>
+                    </div>
+                  )}
                 </div>
 
-                {filteredExercises.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
-                    <p>Упражнения не найдены</p>
-                    <p className="text-sm">Попробуйте изменить параметры поиска</p>
-                  </div>
-                )}
+
               </CardContent>
             </Card>
           )}
