@@ -162,10 +162,15 @@ export function ProfileView() {
             <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-orange-200">
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
-                  <div className="h-32 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
-                    <div className="text-white text-center">
-                      <div className="text-4xl font-bold mb-2">💪</div>
-                      <div className="text-lg font-semibold">ГРУДЬ</div>
+                  <div className="h-32 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center relative overflow-hidden">
+                    {/* Штанга для жима лежа */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-20 h-2 bg-gray-300 rounded-full shadow-lg"></div>
+                      <div className="absolute left-4 w-4 h-8 bg-gray-700 rounded-sm shadow-md"></div>
+                      <div className="absolute right-4 w-4 h-8 bg-gray-700 rounded-sm shadow-md"></div>
+                    </div>
+                    <div className="absolute bottom-2 left-2 text-white text-xs font-semibold bg-black bg-opacity-50 px-2 py-1 rounded">
+                      ЖИМ ЛЕЖА
                     </div>
                   </div>
                 </div>
@@ -180,10 +185,18 @@ export function ProfileView() {
             <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-orange-200">
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
-                  <div className="h-32 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                    <div className="text-white text-center">
-                      <div className="text-4xl font-bold mb-2">🏋️</div>
-                      <div className="text-lg font-semibold">СПИНА</div>
+                  <div className="h-32 bg-gradient-to-br from-blue-800 to-blue-900 flex items-center justify-center relative overflow-hidden">
+                    {/* Турник для подтягиваний */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-24 h-3 bg-gray-400 rounded-full shadow-lg"></div>
+                      <div className="absolute left-2 top-4 w-2 h-16 bg-gray-600 rounded-sm"></div>
+                      <div className="absolute right-2 top-4 w-2 h-16 bg-gray-600 rounded-sm"></div>
+                      {/* Руки на турнике */}
+                      <div className="absolute top-8 left-8 w-3 h-2 bg-orange-300 rounded-sm"></div>
+                      <div className="absolute top-8 right-8 w-3 h-2 bg-orange-300 rounded-sm"></div>
+                    </div>
+                    <div className="absolute bottom-2 left-2 text-white text-xs font-semibold bg-black bg-opacity-50 px-2 py-1 rounded">
+                      ПОДТЯГИВАНИЯ
                     </div>
                   </div>
                 </div>
@@ -198,10 +211,22 @@ export function ProfileView() {
             <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-orange-200">
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
-                  <div className="h-32 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
-                    <div className="text-white text-center">
-                      <div className="text-4xl font-bold mb-2">🦵</div>
-                      <div className="text-lg font-semibold">НОГИ</div>
+                  <div className="h-32 bg-gradient-to-br from-green-800 to-green-900 flex items-center justify-center relative overflow-hidden">
+                    {/* Тренажер для приседаний */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      {/* Основание тренажера */}
+                      <div className="w-20 h-6 bg-gray-600 rounded-lg shadow-lg"></div>
+                      {/* Стойки */}
+                      <div className="absolute left-6 bottom-4 w-3 h-12 bg-gray-500 rounded-sm"></div>
+                      <div className="absolute right-6 bottom-4 w-3 h-12 bg-gray-500 rounded-sm"></div>
+                      {/* Штанга */}
+                      <div className="absolute top-6 w-16 h-2 bg-gray-300 rounded-full"></div>
+                      {/* Диски */}
+                      <div className="absolute top-4 left-8 w-4 h-6 bg-gray-800 rounded-full"></div>
+                      <div className="absolute top-4 right-8 w-4 h-6 bg-gray-800 rounded-full"></div>
+                    </div>
+                    <div className="absolute bottom-2 left-2 text-white text-xs font-semibold bg-black bg-opacity-50 px-2 py-1 rounded">
+                      ПРИСЕДАНИЯ
                     </div>
                   </div>
                 </div>
@@ -216,10 +241,30 @@ export function ProfileView() {
             <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-orange-200">
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
-                  <div className="h-32 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
-                    <div className="text-white text-center">
-                      <div className="text-4xl font-bold mb-2">💪</div>
-                      <div className="text-lg font-semibold">РУКИ</div>
+                  <div className="h-32 bg-gradient-to-br from-purple-800 to-purple-900 flex items-center justify-center relative overflow-hidden">
+                    {/* Гантели */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      {/* Левая гантель */}
+                      <div className="absolute left-4 flex items-center">
+                        <div className="w-3 h-6 bg-gray-800 rounded-full"></div>
+                        <div className="w-8 h-2 bg-gray-400 rounded-full mx-1"></div>
+                        <div className="w-3 h-6 bg-gray-800 rounded-full"></div>
+                      </div>
+                      {/* Правая гантель */}
+                      <div className="absolute right-4 flex items-center">
+                        <div className="w-3 h-6 bg-gray-800 rounded-full"></div>
+                        <div className="w-8 h-2 bg-gray-400 rounded-full mx-1"></div>
+                        <div className="w-3 h-6 bg-gray-800 rounded-full"></div>
+                      </div>
+                      {/* Центральные гантели */}
+                      <div className="flex items-center">
+                        <div className="w-4 h-8 bg-gray-700 rounded-full"></div>
+                        <div className="w-10 h-2 bg-gray-300 rounded-full mx-1"></div>
+                        <div className="w-4 h-8 bg-gray-700 rounded-full"></div>
+                      </div>
+                    </div>
+                    <div className="absolute bottom-2 left-2 text-white text-xs font-semibold bg-black bg-opacity-50 px-2 py-1 rounded">
+                      ГАНТЕЛИ
                     </div>
                   </div>
                 </div>
@@ -234,10 +279,26 @@ export function ProfileView() {
             <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-orange-200">
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
-                  <div className="h-32 bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
-                    <div className="text-white text-center">
-                      <div className="text-4xl font-bold mb-2">🤷</div>
-                      <div className="text-lg font-semibold">ПЛЕЧИ</div>
+                  <div className="h-32 bg-gradient-to-br from-yellow-800 to-yellow-900 flex items-center justify-center relative overflow-hidden">
+                    {/* Тренажер для дельт */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      {/* Центральная стойка */}
+                      <div className="w-2 h-16 bg-gray-600 rounded-sm"></div>
+                      {/* Левая рукоять */}
+                      <div className="absolute left-6 top-8">
+                        <div className="w-8 h-1 bg-gray-400 rounded-full origin-right transform -rotate-45"></div>
+                        <div className="absolute -left-1 -top-1 w-3 h-3 bg-gray-300 rounded-full"></div>
+                      </div>
+                      {/* Правая рукоять */}
+                      <div className="absolute right-6 top-8">
+                        <div className="w-8 h-1 bg-gray-400 rounded-full origin-left transform rotate-45"></div>
+                        <div className="absolute -right-1 -top-1 w-3 h-3 bg-gray-300 rounded-full"></div>
+                      </div>
+                      {/* Основание */}
+                      <div className="absolute bottom-2 w-12 h-3 bg-gray-700 rounded-lg"></div>
+                    </div>
+                    <div className="absolute bottom-2 left-2 text-white text-xs font-semibold bg-black bg-opacity-50 px-2 py-1 rounded">
+                      ДЕЛЬТЫ
                     </div>
                   </div>
                 </div>
@@ -252,10 +313,22 @@ export function ProfileView() {
             <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-orange-200">
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
-                  <div className="h-32 bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center">
-                    <div className="text-white text-center">
-                      <div className="text-4xl font-bold mb-2">🍑</div>
-                      <div className="text-lg font-semibold">ЯГОДИЧНЫЕ</div>
+                  <div className="h-32 bg-gradient-to-br from-pink-800 to-pink-900 flex items-center justify-center relative overflow-hidden">
+                    {/* Тренажер для ягодиц */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      {/* Скамья */}
+                      <div className="w-16 h-4 bg-gray-600 rounded-lg shadow-lg"></div>
+                      {/* Спинка */}
+                      <div className="absolute -top-2 w-12 h-8 bg-gray-500 rounded-t-lg"></div>
+                      {/* Ножки скамьи */}
+                      <div className="absolute bottom-0 left-4 w-2 h-6 bg-gray-700 rounded-sm"></div>
+                      <div className="absolute bottom-0 right-4 w-2 h-6 bg-gray-700 rounded-sm"></div>
+                      {/* Резинка/эспандер */}
+                      <div className="absolute top-6 w-20 h-1 bg-orange-400 rounded-full"></div>
+                      <div className="absolute top-8 w-18 h-1 bg-orange-300 rounded-full"></div>
+                    </div>
+                    <div className="absolute bottom-2 left-2 text-white text-xs font-semibold bg-black bg-opacity-50 px-2 py-1 rounded">
+                      ЯГОДИЧНЫЙ МОСТИК
                     </div>
                   </div>
                 </div>
@@ -270,10 +343,21 @@ export function ProfileView() {
             <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-orange-200">
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
-                  <div className="h-32 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
-                    <div className="text-white text-center">
-                      <div className="text-4xl font-bold mb-2">🧘</div>
-                      <div className="text-lg font-semibold">ЖИВОТ</div>
+                  <div className="h-32 bg-gradient-to-br from-orange-800 to-orange-900 flex items-center justify-center relative overflow-hidden">
+                    {/* Коврик для пресса */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      {/* Коврик */}
+                      <div className="w-24 h-16 bg-blue-600 rounded-lg shadow-lg border-2 border-blue-500"></div>
+                      {/* Текстура коврика */}
+                      <div className="absolute w-20 h-12 border border-blue-400 rounded-lg"></div>
+                      <div className="absolute w-16 h-8 border border-blue-400 rounded-lg"></div>
+                      {/* Медицинбол */}
+                      <div className="absolute top-4 right-8 w-6 h-6 bg-gray-700 rounded-full shadow-md"></div>
+                      {/* Полотенце */}
+                      <div className="absolute bottom-6 left-8 w-8 h-3 bg-white rounded-sm opacity-80"></div>
+                    </div>
+                    <div className="absolute bottom-2 left-2 text-white text-xs font-semibold bg-black bg-opacity-50 px-2 py-1 rounded">
+                      СКРУЧИВАНИЯ
                     </div>
                   </div>
                 </div>
