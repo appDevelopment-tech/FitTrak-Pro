@@ -213,9 +213,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <svg className="w-12 h-12 mb-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M6 8H18V10H6V8M6 11H18V13H6V11M6 14H18V16H6V14M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2Z"/>
-                      </svg>
+                      <div className="text-6xl font-bold mb-2">💪</div>
                       <div className="text-lg font-semibold">ГРУДЬ</div>
                     </div>
                   </div>
@@ -236,9 +234,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <svg className="w-12 h-12 mb-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M9 3V6H7V3H9M17 3V6H15V3H17M12 6C13.1 6 14 6.9 14 8V16C14 17.1 13.1 18 12 18S10 17.1 10 16V8C10 6.9 10.9 6 12 6M8 8V18H6V8H8M18 8V18H16V8H18Z"/>
-                      </svg>
+                      <div className="text-6xl font-bold mb-2">🏋️</div>
                       <div className="text-lg font-semibold">СПИНА</div>
                     </div>
                   </div>
@@ -259,9 +255,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <svg className="w-12 h-12 mb-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2M10 8V22H8V16H6V22H4V8H10M20 8V22H18V16H16V22H14V8H20Z"/>
-                      </svg>
+                      <div className="text-6xl font-bold mb-2">🦵</div>
                       <div className="text-lg font-semibold">НОГИ</div>
                     </div>
                   </div>
@@ -282,9 +276,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <svg className="w-12 h-12 mb-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2M16 8C17.1 8 18 8.9 18 10V14C18 15.1 17.1 16 16 16H15V18C15 19.1 14.1 20 13 20H11C9.9 20 9 19.1 9 18V16H8C6.9 16 6 15.1 6 14V10C6 8.9 6.9 8 8 8H16M8 10V14H16V10H8Z"/>
-                      </svg>
+                      <div className="text-6xl font-bold mb-2">💪</div>
                       <div className="text-lg font-semibold">РУКИ</div>
                     </div>
                   </div>
@@ -305,9 +297,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <svg className="w-12 h-12 mb-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2M4 8C2.9 8 2 8.9 2 10V12C2 13.1 2.9 14 4 14H6V16H10V14H14V16H18V14H20C21.1 14 22 13.1 22 12V10C22 8.9 21.1 8 20 8H4Z"/>
-                      </svg>
+                      <div className="text-6xl font-bold mb-2">🤷</div>
                       <div className="text-lg font-semibold">ПЛЕЧИ</div>
                     </div>
                   </div>
@@ -328,9 +318,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <svg className="w-12 h-12 mb-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2M8 8C6.9 8 6 8.9 6 10V18C6 19.1 6.9 20 8 20H16C17.1 20 18 19.1 18 18V10C18 8.9 17.1 8 16 8H8M8 10H16V14H8V10M8 16H16V18H8V16Z"/>
-                      </svg>
+                      <div className="text-6xl font-bold mb-2">🍑</div>
                       <div className="text-lg font-semibold">ЯГОДИЧНЫЕ</div>
                     </div>
                   </div>
@@ -351,9 +339,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <svg className="w-12 h-12 mb-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2M9 8H15C15.6 8 16 8.4 16 9V15C16 15.6 15.6 16 15 16H9C8.4 16 8 15.6 8 15V9C8 8.4 8.4 8 9 8M10 10V14H14V10H10Z"/>
-                      </svg>
+                      <div className="text-6xl font-bold mb-2">🧘</div>
                       <div className="text-lg font-semibold">ЖИВОТ</div>
                     </div>
                   </div>
