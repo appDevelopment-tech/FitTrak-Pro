@@ -1050,25 +1050,7 @@ export function TrainerSchedule() {
                                         }`}
                                         title={`Статус: ${session.status === 'confirmed' ? 'Подтверждено' : 'Ожидает'}. Нажмите для изменения`}
                                       ></button>
-                                      <button 
-                                        className="text-sm font-medium text-gray-800 hover:text-orange-600 hover:underline transition-colors cursor-pointer"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          console.log('Clicked on student:', session.studentName);
-                                          console.log('Available students:', students.map(s => s.name));
-                                          const student = students.find(s => s.name === session.studentName);
-                                          console.log('Found student:', student);
-                                          if (student) {
-                                            console.log('Opening student profile for:', student.name);
-                                            openStudentProfile(student);
-                                          } else {
-                                            console.log('Student not found in students list');
-                                          }
-                                        }}
-                                        title="Открыть профиль ученика"
-                                      >
-                                        {session.studentName}
-                                      </button>
+                                      <span className="text-sm font-medium text-gray-800">{session.studentName}</span>
                                       <Button 
                                         size="sm" 
                                         variant="ghost" 
