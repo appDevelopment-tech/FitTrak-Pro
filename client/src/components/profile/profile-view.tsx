@@ -47,6 +47,17 @@ export function ProfileView() {
   const handleMuscleGroupClick = (muscleGroup: string) => {
     setSelectedMuscleGroup(muscleGroup);
     setSelectedEquipment("все"); // Сброс фильтра оборудования при смене группы мышц
+    
+    // Прокрутка к панели упражнений через небольшую задержку
+    setTimeout(() => {
+      const exercisePanel = document.querySelector('[data-exercise-panel]');
+      if (exercisePanel) {
+        exercisePanel.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }
+    }, 100);
   };
   
   return (
@@ -373,7 +384,7 @@ export function ProfileView() {
 
           {/* Панель выбора упражнений */}
           {selectedMuscleGroup && (
-            <Card className="mt-8">
+            <Card className="mt-8 border-2 border-orange-200 bg-orange-50/50 animate-in slide-in-from-top-5 duration-500" data-exercise-panel>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Filter className="h-5 w-5" />
