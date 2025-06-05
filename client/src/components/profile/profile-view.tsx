@@ -196,14 +196,6 @@ export function ProfileView() {
           </div>
         </TabsContent>
       </Tabs>
-
-      {/* Exercise Detail Modal */}
-      {selectedExercise && (
-        <ExerciseDetail 
-          exercise={selectedExercise} 
-          onClose={() => setSelectedExercise(null)} 
-        />
-      )}
     </div>
   );
 }
