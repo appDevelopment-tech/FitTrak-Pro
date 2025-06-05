@@ -1,4 +1,4 @@
-import { Calendar, User, Users } from "lucide-react";
+import { Calendar, User, Users, Target } from "lucide-react";
 
 interface MobileNavProps {
   activeView: string;
