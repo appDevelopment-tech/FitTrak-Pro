@@ -33,11 +33,7 @@ export function ProfileView() {
     return matchesMuscleGroup && matchesEquipment && matchesSearch;
   });
 
-  console.log('Текущее состояние:', {
-    selectedMuscleGroup,
-    filteredExercises: filteredExercises.length,
-    exercises: exercises.length
-  });
+
 
   // Группировка упражнений по оборудованию для текущей группы мышц
   const exercisesByEquipment = selectedMuscleGroup 
@@ -49,10 +45,8 @@ export function ProfileView() {
     : {};
 
   const handleMuscleGroupClick = (muscleGroup: string) => {
-    console.log('Клик по группе мышц:', muscleGroup);
     setSelectedMuscleGroup(muscleGroup);
     setSelectedEquipment("все"); // Сброс фильтра оборудования при смене группы мышц
-    console.log('Состояние обновлено:', muscleGroup);
   };
   
   return (
@@ -378,7 +372,6 @@ export function ProfileView() {
           </div>
 
           {/* Панель выбора упражнений */}
-          {console.log('Проверка условия отображения панели:', !!selectedMuscleGroup, selectedMuscleGroup)}
           {selectedMuscleGroup && (
             <Card className="mt-8">
               <CardHeader>
