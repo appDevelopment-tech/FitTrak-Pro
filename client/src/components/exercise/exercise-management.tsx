@@ -46,11 +46,7 @@ export function ExerciseManagement() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data: InsertExercise) => apiRequest('/api/exercises', {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: { 'Content-Type': 'application/json' }
-    }),
+    mutationFn: (data: InsertExercise) => apiRequest('/api/exercises', 'POST', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
       setIsCreateDialogOpen(false);

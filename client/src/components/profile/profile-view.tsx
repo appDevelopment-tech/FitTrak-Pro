@@ -351,7 +351,9 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="text-4xl font-bold mb-2">🧘</div>
+                      <svg className="w-12 h-12 mb-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C13.1 2 14 2.9 14 4S13.1 6 12 6 10 5.1 10 4 10.9 2 12 2M10 8H14C14.6 8 15 8.4 15 9V12C15 12.6 14.6 13 14 13H10C9.4 13 9 12.6 9 12V9C9 8.4 9.4 8 10 8M10 14H14V17C14 17.6 13.6 18 13 18H11C10.4 18 10 17.6 10 17V14M11 15V16H13V15H11Z"/>
+                      </svg>
                       <div className="text-lg font-semibold">ЖИВОТ</div>
                     </div>
                   </div>

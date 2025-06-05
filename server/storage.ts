@@ -122,53 +122,8 @@ export class MemStorage implements IStorage {
     this.currentProgramId = 3;
 
     // Create sample exercises database
-    const sampleExercises: Exercise[] = [
-      // Грудь - тренажеры
-      { id: 1, name: "Жим в тренажере", muscleGroup: "грудь", equipment: "тренажер", difficulty: "начинающий", description: "Жим грудью в специальном тренажере", instructions: ["Сядьте в тренажер", "Возьмитесь за рукоятки", "Выжмите вес вперед"], tips: ["Контролируйте движение", "Не разводите локти широко"], createdBy: 1 },
-      { id: 2, name: "Сведение в тренажере", muscleGroup: "грудь", equipment: "тренажер", difficulty: "средний", description: "Сведение рук в тренажере для груди", instructions: ["Сядьте в тренажер", "Обхватите рукоятки", "Сведите руки перед собой"], tips: ["Чувствуйте растяжение груди", "Медленное возвращение"], createdBy: 1 },
-      
-      // Грудь - гантели
-      { id: 3, name: "Жим гантелей лежа", muscleGroup: "грудь", equipment: "гантели", difficulty: "средний", description: "Жим гантелей на горизонтальной скамье", instructions: ["Лягте на скамью", "Возьмите гантели", "Выжмите вверх"], tips: ["Локти под углом 45°", "Полная амплитуда"], createdBy: 1 },
-      { id: 4, name: "Разводка гантелей", muscleGroup: "грудь", equipment: "гантели", difficulty: "продвинутый", description: "Разведение гантелей лежа", instructions: ["Лягте на скамью", "Разведите гантели в стороны", "Сведите над грудью"], tips: ["Слегка согнутые локти", "Чувствуйте растяжение"], createdBy: 1 },
-
-      // Спина - тренажеры
-      { id: 5, name: "Тяга верхнего блока", muscleGroup: "спина", equipment: "тренажер", difficulty: "начинающий", description: "Тяга рукоятки к груди", instructions: ["Сядьте в тренажер", "Возьмитесь за рукоятку", "Тяните к груди"], tips: ["Сведите лопатки", "Не раскачивайтесь"], createdBy: 1 },
-      { id: 6, name: "Горизонтальная тяга", muscleGroup: "спина", equipment: "тренажер", difficulty: "средний", description: "Тяга к поясу сидя", instructions: ["Сядьте в тренажер", "Тяните рукоятку к поясу", "Сведите лопатки"], tips: ["Прямая спина", "Контролируемое движение"], createdBy: 1 },
-
-      // Спина - гантели
-      { id: 7, name: "Тяга гантели в наклоне", muscleGroup: "спина", equipment: "гантели", difficulty: "средний", description: "Тяга гантели одной рукой", instructions: ["Упритесь в скамью", "Тяните гантель к поясу", "Сведите лопатку"], tips: ["Держите спину прямо", "Не вращайте корпус"], createdBy: 1 },
-
-      // Ноги - тренажеры
-      { id: 8, name: "Жим ногами", muscleGroup: "ноги", equipment: "тренажер", difficulty: "начинающий", description: "Жим ногами в тренажере", instructions: ["Сядьте в тренажер", "Поставьте ноги на платформу", "Выжмите вес"], tips: ["Полная амплитуда", "Не блокируйте колени"], createdBy: 1 },
-      { id: 9, name: "Разгибание ног", muscleGroup: "ноги", equipment: "тренажер", difficulty: "начинающий", description: "Разгибание ног сидя", instructions: ["Сядьте в тренажер", "Разгибайте ноги", "Медленно опускайте"], tips: ["Полное сокращение квадрицепса", "Контролируемое движение"], createdBy: 1 },
-
-      // Ноги - гантели
-      { id: 10, name: "Приседания с гантелями", muscleGroup: "ноги", equipment: "гантели", difficulty: "средний", description: "Приседания с гантелями в руках", instructions: ["Держите гантели", "Приседайте до параллели", "Поднимайтесь"], tips: ["Колени по направлению носков", "Прямая спина"], createdBy: 1 },
-      { id: 11, name: "Выпады с гантелями", muscleGroup: "ноги", equipment: "гантели", difficulty: "продвинутый", description: "Выпады вперед с гантелями", instructions: ["Держите гантели", "Сделайте шаг вперед", "Опуститесь вниз"], tips: ["90° в коленях", "Равновесие"], createdBy: 1 },
-
-      // Руки - тренажеры
-      { id: 12, name: "Сгибание рук в тренажере", muscleGroup: "руки", equipment: "тренажер", difficulty: "начинающий", description: "Сгибание на бицепс в тренажере", instructions: ["Сядьте в тренажер", "Согните руки", "Медленно разогните"], tips: ["Изолированная работа бицепса", "Полная амплитуда"], createdBy: 1 },
-
-      // Руки - гантели
-      { id: 13, name: "Подъем гантелей на бицепс", muscleGroup: "руки", equipment: "гантели", difficulty: "начинающий", description: "Сгибание рук с гантелями", instructions: ["Встаньте прямо", "Согните руки", "Опустите медленно"], tips: ["Не раскачивайтесь", "Полное сокращение"], createdBy: 1 },
-      { id: 14, name: "Французский жим гантелей", muscleGroup: "руки", equipment: "гантели", difficulty: "средний", description: "Разгибание рук с гантелями", instructions: ["Лягте на скамью", "Разгибайте руки", "Контролируйте движение"], tips: ["Работают только предплечья", "Локти неподвижны"], createdBy: 1 },
-
-      // Упражнения с резиной
-      { id: 15, name: "Жим резины от груди", muscleGroup: "грудь", equipment: "резина", difficulty: "начинающий", description: "Жим эспандера от груди", instructions: ["Закрепите резину сзади", "Жмите вперед", "Медленно возвращайте"], tips: ["Постоянное натяжение", "Контролируйте возврат"], createdBy: 1 },
-      { id: 16, name: "Тяга резины к поясу", muscleGroup: "спина", equipment: "резина", difficulty: "начинающий", description: "Горизонтальная тяга эспандера", instructions: ["Закрепите резину впереди", "Тяните к поясу", "Сведите лопатки"], tips: ["Прямая спина", "Максимальное сведение лопаток"], createdBy: 1 },
-
-      // Ягодичные
-      { id: 17, name: "Подъемы таза с гантелей", muscleGroup: "ягодичные", equipment: "гантели", difficulty: "средний", description: "Мостик с отягощением", instructions: ["Лягте на спину", "Поставьте гантель на таз", "Поднимайте таз"], tips: ["Сжимайте ягодицы вверху", "Полная амплитуда"], createdBy: 1 },
-      { id: 18, name: "Отведение ног в тренажере", muscleGroup: "ягодичные", equipment: "тренажер", difficulty: "начинающий", description: "Отведение ног в специальном тренажере", instructions: ["Встаньте в тренажер", "Отводите ногу в сторону", "Контролируйте движение"], tips: ["Изолированная работа", "Чувствуйте работу ягодиц"], createdBy: 1 },
-
-      // Живот
-      { id: 19, name: "Скручивания в тренажере", muscleGroup: "живот", equipment: "тренажер", difficulty: "начинающий", description: "Скручивания на пресс в тренажере", instructions: ["Сядьте в тренажер", "Скручивайтесь вперед", "Медленно возвращайтесь"], tips: ["Не тяните шею", "Дышите правильно"], createdBy: 1 },
-      { id: 20, name: "Планка с резиной", muscleGroup: "живот", equipment: "резина", difficulty: "средний", description: "Планка с сопротивлением резины", instructions: ["Встаньте в планку", "Натяните резину", "Держите позицию"], tips: ["Прямая линия тела", "Напряженный живот"], createdBy: 1 },
-
-      // Плечи
-      { id: 21, name: "Жим гантелей сидя", muscleGroup: "плечи", equipment: "гантели", difficulty: "средний", description: "Жим гантелей вверх сидя", instructions: ["Сядьте на скамью", "Жмите гантели вверх", "Опускайте медленно"], tips: ["Прямая спина", "Полная амплитуда"], createdBy: 1 },
-      { id: 22, name: "Разводка резины", muscleGroup: "плечи", equipment: "резина", difficulty: "начинающий", description: "Разведение рук с эспандером", instructions: ["Держите резину перед собой", "Разводите руки в стороны", "Медленно возвращайте"], tips: ["Слегка согнутые локти", "Контролируйте натяжение"], createdBy: 1 }
-    ];
+    // Удаляем примерные данные - теперь база данных пустая
+    const sampleExercises: Exercise[] = [];
 
     sampleExercises.forEach(exercise => {
       this.exercises.set(exercise.id, exercise);
@@ -328,11 +283,9 @@ export class MemStorage implements IStorage {
   }
 
   async getExercisesByMuscleGroup(muscleGroup: string): Promise<Exercise[]> {
-    return Array.from(this.exercises.values()).filter(exercise => exercise.muscleGroup === muscleGroup);
-  }
-
-  async getExercisesByEquipment(equipment: string): Promise<Exercise[]> {
-    return Array.from(this.exercises.values()).filter(exercise => exercise.equipment === equipment);
+    return Array.from(this.exercises.values()).filter(exercise => 
+      exercise.primaryMuscles.includes(muscleGroup) || exercise.secondaryMuscles.includes(muscleGroup)
+    );
   }
 
   async getExercise(id: number): Promise<Exercise | undefined> {
@@ -344,12 +297,30 @@ export class MemStorage implements IStorage {
     const exercise: Exercise = { 
       ...insertExercise, 
       id,
-      instructions: insertExercise.instructions ?? null,
-      tips: insertExercise.tips ?? null,
-      createdBy: insertExercise.createdBy ?? null
+      createdBy: insertExercise.createdBy ?? null,
+      muscleImageUrl: insertExercise.muscleImageUrl ?? null,
+      createdAt: insertExercise.createdAt ?? new Date(),
+      updatedAt: insertExercise.updatedAt ?? new Date()
     };
     this.exercises.set(id, exercise);
     return exercise;
+  }
+
+  async updateExercise(id: number, updates: Partial<InsertExercise>): Promise<Exercise | undefined> {
+    const exercise = this.exercises.get(id);
+    if (!exercise) return undefined;
+    
+    const updatedExercise = { 
+      ...exercise, 
+      ...updates, 
+      updatedAt: new Date() 
+    };
+    this.exercises.set(id, updatedExercise);
+    return updatedExercise;
+  }
+
+  async deleteExercise(id: number): Promise<boolean> {
+    return this.exercises.delete(id);
   }
 }
 
