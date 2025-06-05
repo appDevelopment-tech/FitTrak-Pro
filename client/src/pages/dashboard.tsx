@@ -12,6 +12,7 @@ import { TodaySchedule } from "@/components/schedule/today-schedule";
 
 import { ProfileView } from "@/components/profile/profile-view";
 import { TrainerSchedule } from "@/components/schedule/trainer-schedule";
+import { StudentsManagement } from "@/components/students/students-management";
 import { Plus, BarChart3, Search, Flame, Trash2, Users } from "lucide-react";
 import type { DashboardStats } from "@/lib/types";
 import type { WorkoutSession, WorkoutProgram } from "@shared/schema";
@@ -76,9 +77,8 @@ export default function Dashboard() {
     switch (activeView) {
       case 'schedule':
         return <TrainerSchedule />;
-
-
-
+      case 'students':
+        return <StudentsManagement />;
       case 'profile':
         return <ProfileView />;
 
