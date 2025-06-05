@@ -44,12 +44,42 @@ export function TrainerSchedule() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [viewMode, setViewMode] = useState<'day' | 'month'>('day');
-  const [activeTab, setActiveTab] = useState<'schedule'>('schedule');
+  const [activeTab, setActiveTab] = useState<'schedule' | 'students' | 'profile'>('schedule');
   const [selectedStudentProfile, setSelectedStudentProfile] = useState<Student | null>(null);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editedStudent, setEditedStudent] = useState<Student | null>(null);
   
-  // Компонент теперь отвечает только за расписание тренировок
+  // Автоматически определяем активную вкладку
+  useEffect(() => {
+    // Проверяем текущий активный раздел из navigation
+    const urlParams = new URLSearchParams(window.location.search);
+    const section = urlParams.get('section');
+
+    if (section === 'students') {
+      setActiveTab('students');
+    } else {
+      setActiveTab('schedule');
+    }
+  }, []);
+
+  // Следим за изменениями URL
+  useEffect(() => {
+    const handlePopState = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const section = urlParams.get('section');
+
+      if (section === 'students') {
+        setActiveTab('students');
+      } else if (section === 'profile') {
+        setActiveTab('profile');
+      } else {
+        setActiveTab('schedule');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // Слушаем изменения URL в реальном времени
   useEffect(() => {

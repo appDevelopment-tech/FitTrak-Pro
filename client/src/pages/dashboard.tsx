@@ -11,7 +11,7 @@ import { TodaySchedule } from "@/components/schedule/today-schedule";
 
 
 import { ProfileView } from "@/components/profile/profile-view";
-import { ScheduleOnly } from "@/components/schedule/schedule-only";
+import { TrainerSchedule } from "@/components/schedule/trainer-schedule";
 import { Plus, BarChart3, Search, Flame, Trash2, Users } from "lucide-react";
 import type { DashboardStats } from "@/lib/types";
 import type { WorkoutSession, WorkoutProgram } from "@shared/schema";
@@ -75,7 +75,7 @@ export default function Dashboard() {
   const renderContent = () => {
     switch (activeView) {
       case 'schedule':
-        return <ScheduleOnly />;
+        return <TrainerSchedule />;
       case 'students':
         return (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -85,10 +85,16 @@ export default function Dashboard() {
                   <CardTitle className="text-xl font-bold text-gray-800">Управление учениками</CardTitle>
                   <Button 
                     className="bg-orange-500 hover:bg-orange-600"
-                    onClick={() => setActiveView('schedule')}
+                    onClick={() => {
+                      // Переходим к TrainerSchedule с вкладкой students
+                      const url = new URL(window.location.href);
+                      url.searchParams.set('section', 'students');
+                      window.history.pushState({}, '', url);
+                      window.location.reload();
+                    }}
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Перейти к расписанию
+                    Перейти к полному управлению
                   </Button>
                 </div>
               </CardHeader>
