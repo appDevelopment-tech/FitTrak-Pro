@@ -27,8 +27,8 @@ export function ProfileView() {
       <Tabs defaultValue="profile" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="profile">Личные данные</TabsTrigger>
+          <TabsTrigger value="exercises">Упражнения</TabsTrigger>
           <TabsTrigger value="programs">Программы</TabsTrigger>
-          <TabsTrigger value="stats">Статистика</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="space-y-6">
@@ -156,44 +156,25 @@ export function ProfileView() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="stats" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Всего учеников</p>
-                    <p className="text-2xl font-bold text-gray-900">7</p>
-                  </div>
-                  <Users className="h-8 w-8 text-orange-500" />
+        <TabsContent value="exercises" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold">Мои упражнения</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-12">
+                <div className="bg-orange-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                  <Plus className="h-8 w-8 text-orange-600" />
                 </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Тренировок в месяце</p>
-                    <p className="text-2xl font-bold text-gray-900">42</p>
-                  </div>
-                  <Calendar className="h-8 w-8 text-orange-500" />
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Часов работы</p>
-                    <p className="text-2xl font-bold text-gray-900">168</p>
-                  </div>
-                  <Clock className="h-8 w-8 text-orange-500" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">Создайте базу упражнений</h3>
+                <p className="text-gray-500 mb-4">Добавляйте и настраивайте упражнения для ваших тренировочных программ</p>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Добавить упражнение
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
