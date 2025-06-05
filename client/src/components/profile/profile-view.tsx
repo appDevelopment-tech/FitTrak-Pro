@@ -378,6 +378,7 @@ export function ProfileView() {
           </div>
 
           {/* Панель выбора упражнений */}
+          {console.log('Проверка условия отображения панели:', !!selectedMuscleGroup, selectedMuscleGroup)}
           {selectedMuscleGroup && (
             <Card className="mt-8">
               <CardHeader>
