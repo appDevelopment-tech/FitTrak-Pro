@@ -136,7 +136,15 @@ export function WgerDemo() {
               </div>
             </div>
             <div className="flex gap-2 flex-wrap">
-              {wgerCategories.map((category) => (
+              <Button
+                variant={selectedCategory === 0 ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCategory(0)}
+                className="whitespace-nowrap"
+              >
+                Все
+              </Button>
+              {categories.map((category) => (
                 <Button
                   key={category.id}
                   variant={selectedCategory === category.id ? "default" : "outline"}
@@ -144,7 +152,7 @@ export function WgerDemo() {
                   onClick={() => setSelectedCategory(category.id)}
                   className="whitespace-nowrap"
                 >
-                  {category.nameRu}
+                  {categoryTranslations[category.name] || category.name}
                 </Button>
               ))}
             </div>
@@ -158,22 +166,30 @@ export function WgerDemo() {
           <Card key={exercise.id} className="hover:shadow-lg transition-shadow">
             <CardHeader className="pb-2">
               <div className="aspect-video bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center mb-3">
-                <div className="text-center">
+                {exercise.images.length > 0 ? (
                   <img 
-                    src="/api/placeholder/200/150" 
-                    alt="Wger exercise"
-                    className="w-16 h-16 mx-auto mb-2 opacity-60"
+                    src={exercise.images[0]}
+                    alt={exercise.name}
+                    className="w-full h-full object-cover rounded-lg"
+                    onError={(e) => {
+                      const target = e.currentTarget as HTMLImageElement;
+                      target.style.display = 'none';
+                      const fallback = target.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = 'block';
+                    }}
                   />
-                  <span className="text-xs text-green-600">Изображение Wger</span>
+                ) : null}
+                <div className="text-center" style={{display: exercise.images.length > 0 ? 'none' : 'block'}}>
+                  <Database className="w-12 h-12 mx-auto mb-2 text-green-500" />
+                  <span className="text-xs text-green-600">Wger API</span>
                   <p className="text-xs text-green-400 mt-1">ID: {exercise.id}</p>
                 </div>
               </div>
-              <CardTitle className="text-lg">{exercise.nameRu}</CardTitle>
-              <p className="text-sm text-gray-500">{exercise.name}</p>
+              <CardTitle className="text-lg">{exercise.name}</CardTitle>
               <div className="flex gap-2 flex-wrap">
-                <Badge variant="secondary">{exercise.categoryNameRu}</Badge>
-                {exercise.equipmentNamesRu.length > 0 && (
-                  <Badge variant="outline">{exercise.equipmentNamesRu[0]}</Badge>
+                <Badge variant="secondary">{categoryTranslations[exercise.categoryName] || exercise.categoryName}</Badge>
+                {exercise.equipmentNames.length > 0 && (
+                  <Badge variant="outline">{exercise.equipmentNames[0]}</Badge>
                 )}
                 {exercise.variations && (
                   <Badge variant="outline" className="text-xs">
@@ -184,11 +200,11 @@ export function WgerDemo() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-gray-600 mb-3">
-                <strong>Основные:</strong> {exercise.muscleNamesRu.join(", ")}
+                <strong>Основные:</strong> {exercise.muscleNames.join(", ")}
               </p>
-              {exercise.secondaryMuscleNamesRu.length > 0 && (
+              {exercise.secondaryMuscleNames.length > 0 && (
                 <p className="text-xs text-gray-500 mb-4">
-                  <strong>Вспомогательные:</strong> {exercise.secondaryMuscleNamesRu.join(", ")}
+                  <strong>Вспомогательные:</strong> {exercise.secondaryMuscleNames.join(", ")}
                 </p>
               )}
               <Button 
@@ -221,8 +237,7 @@ export function WgerDemo() {
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
-                  <CardTitle className="text-xl">{selectedExercise.nameRu}</CardTitle>
-                  <p className="text-gray-500">{selectedExercise.name}</p>
+                  <CardTitle className="text-xl">{selectedExercise.name}</CardTitle>
                   <div className="flex gap-2 mt-2">
                     <Badge>ID: {selectedExercise.id}</Badge>
                     <Badge variant="outline">UUID: {selectedExercise.uuid.slice(0, 8)}...</Badge>
@@ -240,22 +255,31 @@ export function WgerDemo() {
                 </Button>
               </div>
               <div className="flex gap-2 flex-wrap">
-                <Badge>{selectedExercise.categoryNameRu}</Badge>
-                {selectedExercise.equipmentNamesRu.map((eq, index) => (
+                <Badge>{categoryTranslations[selectedExercise.categoryName] || selectedExercise.categoryName}</Badge>
+                {selectedExercise.equipmentNames.map((eq, index) => (
                   <Badge key={index} variant="outline">{eq}</Badge>
                 ))}
               </div>
             </CardHeader>
             <CardContent>
               <div className="aspect-video bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center mb-6">
-                <div className="text-center">
+                {selectedExercise.images.length > 0 ? (
                   <img 
-                    src="/api/placeholder/300/200" 
-                    alt="Wger exercise demonstration"
-                    className="w-24 h-24 mx-auto mb-2 opacity-60"
+                    src={selectedExercise.images[0]}
+                    alt={selectedExercise.name}
+                    className="w-full h-full object-cover rounded-lg"
+                    onError={(e) => {
+                      const target = e.currentTarget as HTMLImageElement;
+                      target.style.display = 'none';
+                      const fallback = target.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = 'block';
+                    }}
                   />
-                  <span className="text-green-600 font-medium">Изображение упражнения Wger</span>
-                  <p className="text-xs text-green-400 mt-1">{selectedExercise.images[0] || 'Изображение доступно в API'}</p>
+                ) : null}
+                <div className="text-center" style={{display: selectedExercise.images.length > 0 ? 'none' : 'block'}}>
+                  <Database className="w-16 h-16 mx-auto mb-2 text-green-500" />
+                  <span className="text-green-600 font-medium">Wger API</span>
+                  <p className="text-xs text-green-400 mt-1">Изображения загружаются из API</p>
                 </div>
               </div>
 
@@ -269,17 +293,7 @@ export function WgerDemo() {
                 <TabsContent value="description" className="space-y-4">
                   <div>
                     <h4 className="font-semibold mb-3">Описание упражнения:</h4>
-                    <p className="text-gray-700 leading-relaxed mb-4">{selectedExercise.descriptionRu}</p>
-                    {selectedExercise.commentsRu.length > 0 && (
-                      <>
-                        <h4 className="font-semibold mb-2">Рекомендации:</h4>
-                        <ul className="list-disc list-inside space-y-1">
-                          {selectedExercise.commentsRu.map((comment, index) => (
-                            <li key={index} className="text-sm text-gray-700">{comment}</li>
-                          ))}
-                        </ul>
-                      </>
-                    )}
+                    <p className="text-gray-700 leading-relaxed mb-4">{selectedExercise.description}</p>
                   </div>
                 </TabsContent>
                 
@@ -287,25 +301,25 @@ export function WgerDemo() {
                   <div>
                     <h4 className="font-semibold mb-2">Основные мышцы:</h4>
                     <div className="flex gap-2 flex-wrap mb-4">
-                      {selectedExercise.muscleNamesRu.map((muscle, index) => (
+                      {selectedExercise.muscleNames.map((muscle, index) => (
                         <Badge key={index} variant="default">{muscle}</Badge>
                       ))}
                     </div>
-                    {selectedExercise.secondaryMuscleNamesRu.length > 0 && (
+                    {selectedExercise.secondaryMuscleNames.length > 0 && (
                       <>
                         <h4 className="font-semibold mb-2">Вспомогательные мышцы:</h4>
                         <div className="flex gap-2 flex-wrap mb-4">
-                          {selectedExercise.secondaryMuscleNamesRu.map((muscle, index) => (
+                          {selectedExercise.secondaryMuscleNames.map((muscle, index) => (
                             <Badge key={index} variant="outline">{muscle}</Badge>
                           ))}
                         </div>
                       </>
                     )}
-                    {selectedExercise.equipmentNamesRu.length > 0 && (
+                    {selectedExercise.equipmentNames.length > 0 && (
                       <>
                         <h4 className="font-semibold mb-2">Оборудование:</h4>
                         <div className="flex gap-2 flex-wrap">
-                          {selectedExercise.equipmentNamesRu.map((equipment, index) => (
+                          {selectedExercise.equipmentNames.map((equipment, index) => (
                             <Badge key={index} variant="secondary">{equipment}</Badge>
                           ))}
                         </div>
