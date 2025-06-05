@@ -1050,7 +1050,19 @@ export function TrainerSchedule() {
                                         }`}
                                         title={`Статус: ${session.status === 'confirmed' ? 'Подтверждено' : 'Ожидает'}. Нажмите для изменения`}
                                       ></button>
-                                      <span className="text-sm font-medium text-gray-800">{session.studentName}</span>
+                                      <button 
+                                        className="text-sm font-medium text-gray-800 hover:text-orange-600 hover:underline transition-colors cursor-pointer"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          const student = students.find(s => s.name === session.studentName);
+                                          if (student) {
+                                            openStudentProfile(student);
+                                          }
+                                        }}
+                                        title="Открыть профиль ученика"
+                                      >
+                                        {session.studentName}
+                                      </button>
                                       <Button 
                                         size="sm" 
                                         variant="ghost" 
