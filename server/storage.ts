@@ -2,6 +2,7 @@ import {
   users, 
   workoutPrograms, 
   workoutSessions, 
+  exercises,
   exerciseProgress,
   type User, 
   type InsertUser,
@@ -9,6 +10,8 @@ import {
   type InsertWorkoutProgram,
   type WorkoutSession,
   type InsertWorkoutSession,
+  type Exercise,
+  type InsertExercise,
   type ExerciseProgress,
   type InsertExerciseProgress
 } from "@shared/schema";
@@ -30,30 +33,41 @@ export interface IStorage {
   createWorkoutSession(session: InsertWorkoutSession): Promise<WorkoutSession>;
   updateWorkoutSession(id: number, updates: Partial<WorkoutSession>): Promise<WorkoutSession | undefined>;
   
+  // Exercise operations
+  getExercises(): Promise<Exercise[]>;
+  getExercisesByMuscleGroup(muscleGroup: string): Promise<Exercise[]>;
+  getExercisesByEquipment(equipment: string): Promise<Exercise[]>;
+  getExercise(id: number): Promise<Exercise | undefined>;
+  createExercise(exercise: InsertExercise): Promise<Exercise>;
+  
   // Exercise progress operations
   getExerciseProgress(userId: number): Promise<ExerciseProgress[]>;
   createExerciseProgress(progress: InsertExerciseProgress): Promise<ExerciseProgress>;
-  getExerciseProgressByName(userId: number, exerciseName: string): Promise<ExerciseProgress[]>;
+  getExerciseProgressByExerciseId(userId: number, exerciseId: number): Promise<ExerciseProgress[]>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private workoutPrograms: Map<number, WorkoutProgram>;
   private workoutSessions: Map<number, WorkoutSession>;
+  private exercises: Map<number, Exercise>;
   private exerciseProgress: Map<number, ExerciseProgress>;
   private currentUserId: number;
   private currentProgramId: number;
   private currentSessionId: number;
+  private currentExerciseId: number;
   private currentProgressId: number;
 
   constructor() {
     this.users = new Map();
     this.workoutPrograms = new Map();
     this.workoutSessions = new Map();
+    this.exercises = new Map();
     this.exerciseProgress = new Map();
     this.currentUserId = 1;
     this.currentProgramId = 1;
     this.currentSessionId = 1;
+    this.currentExerciseId = 1;
     this.currentProgressId = 1;
 
     // Initialize with sample data

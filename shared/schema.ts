@@ -33,10 +33,22 @@ export const workoutSessions = pgTable("workout_sessions", {
   completedAt: timestamp("completed_at"),
 });
 
+export const exercises = pgTable("exercises", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  muscleGroup: text("muscle_group").notNull(), // 'грудь', 'спина', 'ноги', 'руки', 'плечи', 'ягодичные', 'живот'
+  equipment: text("equipment").notNull(), // 'тренажер', 'гантели', 'резина', 'штанга', 'собственный_вес'
+  difficulty: text("difficulty").notNull(), // 'начинающий', 'средний', 'продвинутый'
+  description: text("description").notNull(),
+  instructions: text("instructions").array(), // пошаговые инструкции
+  tips: text("tips").array(), // советы по выполнению
+  createdBy: integer("created_by"), // кто создал упражнение (тренер)
+});
+
 export const exerciseProgress = pgTable("exercise_progress", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
-  exerciseName: text("exercise_name").notNull(),
+  exerciseId: integer("exercise_id").notNull(),
   weight: integer("weight"), // kg
   reps: integer("reps"),
   sets: integer("sets"),
@@ -56,6 +68,10 @@ export const insertWorkoutSessionSchema = createInsertSchema(workoutSessions).om
   id: true,
 });
 
+export const insertExerciseSchema = createInsertSchema(exercises).omit({
+  id: true,
+});
+
 export const insertExerciseProgressSchema = createInsertSchema(exerciseProgress).omit({
   id: true,
 });
@@ -66,5 +82,7 @@ export type WorkoutProgram = typeof workoutPrograms.$inferSelect;
 export type InsertWorkoutProgram = z.infer<typeof insertWorkoutProgramSchema>;
 export type WorkoutSession = typeof workoutSessions.$inferSelect;
 export type InsertWorkoutSession = z.infer<typeof insertWorkoutSessionSchema>;
+export type Exercise = typeof exercises.$inferSelect;
+export type InsertExercise = z.infer<typeof insertExerciseSchema>;
 export type ExerciseProgress = typeof exerciseProgress.$inferSelect;
 export type InsertExerciseProgress = z.infer<typeof insertExerciseProgressSchema>;
