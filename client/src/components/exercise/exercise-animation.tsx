@@ -598,126 +598,128 @@ export function ExerciseAnimation({ exerciseName, className = "w-32 h-32" }: Exe
 
       case 'жим в тренажёре сидя':
         return (
-          <svg viewBox="0 0 140 120" className={className}>
+          <svg viewBox="0 0 120 120" className={className}>
             <defs>
-              <linearGradient id="machineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#34495e" />
-                <stop offset="100%" stopColor="#2c3e50" />
-              </linearGradient>
-              <linearGradient id="seatGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#e74c3c" />
-                <stop offset="100%" stopColor="#c0392b" />
-              </linearGradient>
-              <linearGradient id="chestActiveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <linearGradient id="forceGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#ff6b6b" />
                 <stop offset="100%" stopColor="#ee5a52" />
               </linearGradient>
-              <filter id="machineGlow">
-                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+              <linearGradient id="muscleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#74b9ff" />
+                <stop offset="100%" stopColor="#0984e3" />
+              </linearGradient>
+              <linearGradient id="resistanceGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#fdcb6e" />
+                <stop offset="100%" stopColor="#e17055" />
+              </linearGradient>
+              <filter id="energyGlow">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
                 <feMerge> 
                   <feMergeNode in="coloredBlur"/>
                   <feMergeNode in="SourceGraphic"/>
                 </feMerge>
               </filter>
+              <pattern id="energyPattern" patternUnits="userSpaceOnUse" width="4" height="4">
+                <rect width="4" height="4" fill="none"/>
+                <circle cx="2" cy="2" r="1" fill="#fff" opacity="0.3"/>
+              </pattern>
             </defs>
             
-            {/* ТРЕНАЖЁР - основная рама */}
+            {/* Центральная точка - корпус */}
+            <circle cx="60" cy="60" r="8" fill="url(#muscleGradient)" stroke="#2c3e50" strokeWidth="2"/>
+            
+            {/* Грудные мышцы - активная зона */}
+            <ellipse cx="60" cy="55" rx="12" ry="8" fill="url(#forceGradient)" 
+                     filter={isAnimating ? "url(#energyGlow)" : "none"}
+                     transform={isAnimating ? "scale(1.2)" : "scale(1)"} 
+                     style={{ transition: "transform 1.2s ease-in-out", transformOrigin: "60px 55px" }}
+                     opacity={isAnimating ? "0.9" : "0.6"}/>
+            <ellipse cx="60" cy="55" rx="10" ry="6" fill="url(#energyPattern)" 
+                     opacity={isAnimating ? "0.8" : "0.3"}
+                     style={{ transition: "opacity 1.2s ease-in-out" }}/>
+            
+            {/* Силовые векторы рук */}
             <g>
-              {/* Основание тренажёра */}
-              <ellipse cx="70" cy="90" rx="35" ry="8" fill="#2c3e50" opacity="0.8"/>
+              {/* Левая рука */}
+              <path d="M 60 60 Q 35 50 20 45" stroke="url(#forceGradient)" strokeWidth="4" fill="none"
+                    transform={isAnimating ? "translate(8, 0)" : "translate(0, 0)"} 
+                    style={{ transition: "transform 1.2s ease-in-out" }}/>
+              <circle cx={isAnimating ? "28" : "20"} cy="45" r="4" fill="url(#resistanceGradient)"
+                      style={{ transition: "cx 1.2s ease-in-out" }}/>
               
-              {/* Вертикальные стойки */}
-              <rect x="20" y="40" width="8" height="50" fill="url(#machineGradient)" rx="2"/>
-              <rect x="112" y="40" width="8" height="50" fill="url(#machineGradient)" rx="2"/>
-              
-              {/* Спинка тренажёра */}
-              <rect x="15" y="45" width="18" height="35" fill="url(#seatGradient)" rx="4" opacity="0.9"/>
-              <rect x="17" y="47" width="14" height="31" fill="#c0392b" rx="3" opacity="0.6"/>
-              
-              {/* Сиденье */}
-              <ellipse cx="42" cy="70" rx="12" ry="6" fill="url(#seatGradient)"/>
-              <ellipse cx="42" cy="69" rx="10" ry="4" fill="#e74c3c" opacity="0.7"/>
-              
-              {/* Механизм тренажёра */}
-              <rect x="70" y="30" width="25" height="15" fill="url(#machineGradient)" rx="3"/>
-              <circle cx="82" cy="37" r="8" fill="#34495e" stroke="#2c3e50" strokeWidth="2"/>
-              <circle cx="82" cy="37" r="4" fill="#95a5a6"/>
-              
-              {/* Весовой стек */}
-              <rect x="100" y="50" width="15" height="25" fill="url(#machineGradient)" rx="2"/>
-              <rect x="102" y="52" width="11" height="3" fill="#7f8c8d" opacity="0.8"/>
-              <rect x="102" y="56" width="11" height="3" fill="#7f8c8d" opacity="0.8"/>
-              <rect x="102" y="60" width="11" height="3" fill="#7f8c8d" opacity="0.8"/>
-              <rect x="102" y="64" width="11" height="3" fill="#e74c3c"/>
-              <rect x="102" y="68" width="11" height="3" fill="#7f8c8d" opacity="0.8"/>
-              
-              {/* Рукоятки */}
-              <ellipse cx={isAnimating ? "62" : "55"} cy="50" rx="8" ry="3" fill="#95a5a6" 
-                       style={{ transition: "cx 1.2s ease-in-out" }}/>
-              <ellipse cx={isAnimating ? "62" : "55"} cy="55" rx="8" ry="3" fill="#95a5a6" 
-                       style={{ transition: "cx 1.2s ease-in-out" }}/>
-              
-              {/* Соединительные тросы */}
-              <path d={isAnimating ? "M 70 52 Q 85 40 100 55" : "M 63 52 Q 85 40 100 55"} 
-                    stroke="#34495e" strokeWidth="2" fill="none" opacity="0.7"
-                    style={{ transition: "d 1.2s ease-in-out" }}/>
+              {/* Правая рука */}
+              <path d="M 60 60 Q 85 50 100 45" stroke="url(#forceGradient)" strokeWidth="4" fill="none"
+                    transform={isAnimating ? "translate(-8, 0)" : "translate(0, 0)"} 
+                    style={{ transition: "transform 1.2s ease-in-out" }}/>
+              <circle cx={isAnimating ? "92" : "100"} cy="45" r="4" fill="url(#resistanceGradient)"
+                      style={{ transition: "cx 1.2s ease-in-out" }}/>
             </g>
             
-            {/* ПОЛЬЗОВАТЕЛЬ */}
-            <g>
-              {/* Голова */}
-              <circle cx="42" cy="35" r="5" fill="#f4c2a1" stroke="#e17055" strokeWidth="0.5"/>
-              
-              {/* Торс и грудные мышцы */}
-              <ellipse cx="42" cy="50" rx="8" ry="12" fill="#4a90e2" opacity="0.7"/>
-              
-              {/* Грудные мышцы с активацией */}
-              <ellipse cx="48" cy="48" rx="6" ry="8" fill="url(#chestActiveGradient)" 
-                       filter={isAnimating ? "url(#machineGlow)" : "none"}
-                       transform={isAnimating ? "scale(1.1)" : "scale(1)"} 
-                       style={{ transition: "transform 1.2s ease-in-out", transformOrigin: "48px 48px" }}/>
-              
-              {/* Передние дельты */}
-              <circle cx="35" cy="45" r="3" fill="#fdcb6e" 
-                      filter={isAnimating ? "url(#machineGlow)" : "none"}
-                      transform={isAnimating ? "scale(1.05)" : "scale(1)"} 
-                      style={{ transition: "transform 1.2s ease-in-out", transformOrigin: "35px 45px" }}/>
-              <circle cx="55" cy="45" r="3" fill="#fdcb6e" 
-                      filter={isAnimating ? "url(#machineGlow)" : "none"}
-                      transform={isAnimating ? "scale(1.05)" : "scale(1)"} 
-                      style={{ transition: "transform 1.2s ease-in-out", transformOrigin: "55px 45px" }}/>
-              
-              {/* Руки */}
-              <ellipse cx="50" cy="52" rx="3" ry="8" fill="url(#chestActiveGradient)" 
-                       transform={isAnimating ? "translate(7, 0)" : "translate(0, 0)"} 
-                       style={{ transition: "transform 1.2s ease-in-out" }}/>
-              <ellipse cx="35" cy="52" rx="3" ry="8" fill="url(#chestActiveGradient)" 
-                       transform={isAnimating ? "translate(7, 0)" : "translate(0, 0)"} 
-                       style={{ transition: "transform 1.2s ease-in-out" }}/>
-              
-              {/* Ноги */}
-              <ellipse cx="38" cy="75" rx="4" ry="8" fill="#4a90e2" opacity="0.8"/>
-              <ellipse cx="46" cy="75" rx="4" ry="8" fill="#4a90e2" opacity="0.8"/>
-            </g>
+            {/* Передние дельты */}
+            <circle cx="45" cy="50" r="5" fill="url(#resistanceGradient)" 
+                    filter={isAnimating ? "url(#energyGlow)" : "none"}
+                    transform={isAnimating ? "scale(1.1)" : "scale(1)"} 
+                    style={{ transition: "transform 1.2s ease-in-out", transformOrigin: "45px 50px" }}
+                    opacity={isAnimating ? "0.9" : "0.6"}/>
+            <circle cx="75" cy="50" r="5" fill="url(#resistanceGradient)" 
+                    filter={isAnimating ? "url(#energyGlow)" : "none"}
+                    transform={isAnimating ? "scale(1.1)" : "scale(1)"} 
+                    style={{ transition: "transform 1.2s ease-in-out", transformOrigin: "75px 50px" }}
+                    opacity={isAnimating ? "0.9" : "0.6"}/>
             
-            {/* Стрелки направления движения */}
-            {isAnimating ? (
+            {/* Трицепсы */}
+            <ellipse cx="35" cy="65" rx="3" ry="8" fill="url(#muscleGradient)" 
+                     filter={isAnimating ? "url(#energyGlow)" : "none"}
+                     transform={isAnimating ? "scale(1.05)" : "scale(1)"} 
+                     style={{ transition: "transform 1.2s ease-in-out", transformOrigin: "35px 65px" }}
+                     opacity={isAnimating ? "0.8" : "0.5"}/>
+            <ellipse cx="85" cy="65" rx="3" ry="8" fill="url(#muscleGradient)" 
+                     filter={isAnimating ? "url(#energyGlow)" : "none"}
+                     transform={isAnimating ? "scale(1.05)" : "scale(1)"} 
+                     style={{ transition: "transform 1.2s ease-in-out", transformOrigin: "85px 65px" }}
+                     opacity={isAnimating ? "0.8" : "0.5"}/>
+            
+            {/* Энергетические импульсы */}
+            {isAnimating && (
               <g>
-                <path d="M 60 35 L 75 35 M 70 30 L 75 35 L 70 40" stroke="#00b894" strokeWidth="2.5" fill="none" opacity="0.9"/>
-                <text x="77" y="38" fontSize="6" fill="#00b894" fontWeight="bold">ЖМЁМ</text>
-              </g>
-            ) : (
-              <g>
-                <path d="M 75 35 L 60 35 M 65 30 L 60 35 L 65 40" stroke="#e17055" strokeWidth="2.5" fill="none" opacity="0.9"/>
-                <text x="48" y="38" fontSize="6" fill="#e17055" fontWeight="bold">КОНТРОЛЬ</text>
+                <circle cx="60" cy="55" r="15" fill="none" stroke="url(#forceGradient)" strokeWidth="2" opacity="0.7">
+                  <animate attributeName="r" values="15;25;15" dur="1.2s" repeatCount="indefinite"/>
+                  <animate attributeName="opacity" values="0.7;0;0.7" dur="1.2s" repeatCount="indefinite"/>
+                </circle>
+                <circle cx="60" cy="55" r="20" fill="none" stroke="url(#forceGradient)" strokeWidth="1" opacity="0.4">
+                  <animate attributeName="r" values="20;30;20" dur="1.2s" repeatCount="indefinite"/>
+                  <animate attributeName="opacity" values="0.4;0;0.4" dur="1.2s" repeatCount="indefinite"/>
+                </circle>
               </g>
             )}
             
-            {/* Индикатор рабочего веса */}
-            <rect x="95" y="45" width="25" height="8" fill="#2c3e50" rx="2" opacity="0.8"/>
-            <text x="107" y="51" textAnchor="middle" fontSize="5" fill="#ecf0f1" fontWeight="bold">60 КГ</text>
+            {/* Стрелки усилий */}
+            {isAnimating ? (
+              <g>
+                <path d="M 30 40 L 15 35 M 20 32 L 15 35 L 20 38" stroke="#00b894" strokeWidth="3" fill="none"/>
+                <path d="M 90 40 L 105 35 M 100 32 L 105 35 L 100 38" stroke="#00b894" strokeWidth="3" fill="none"/>
+                <text x="60" y="25" textAnchor="middle" fontSize="7" fill="#00b894" fontWeight="bold">АКТИВАЦИЯ</text>
+              </g>
+            ) : (
+              <g>
+                <path d="M 15 35 L 30 40 M 25 37 L 30 40 L 25 43" stroke="#e17055" strokeWidth="3" fill="none"/>
+                <path d="M 105 35 L 90 40 M 95 37 L 90 40 L 95 43" stroke="#e17055" strokeWidth="3" fill="none"/>
+                <text x="60" y="25" textAnchor="middle" fontSize="7" fill="#e17055" fontWeight="bold">ВОЗВРАТ</text>
+              </g>
+            )}
             
-            <text x="70" y="115" textAnchor="middle" fontSize="8" fill="#2d3436" fontWeight="bold">Жим в тренажёре - 3D</text>
+            {/* Индикаторы работающих мышц */}
+            <g transform="translate(10, 80)">
+              <rect x="0" y="0" width="100" height="25" fill="#f8f9fa" rx="3" opacity="0.9"/>
+              <circle cx="8" cy="8" r="3" fill="url(#forceGradient)" opacity={isAnimating ? "1" : "0.5"}/>
+              <text x="15" y="11" fontSize="6" fill="#2d3436">Грудные</text>
+              <circle cx="45" cy="8" r="3" fill="url(#resistanceGradient)" opacity={isAnimating ? "1" : "0.5"}/>
+              <text x="52" y="11" fontSize="6" fill="#2d3436">Дельты</text>
+              <circle cx="8" cy="18" r="3" fill="url(#muscleGradient)" opacity={isAnimating ? "1" : "0.5"}/>
+              <text x="15" y="21" fontSize="6" fill="#2d3436">Трицепс</text>
+            </g>
+            
+            <text x="60" y="115" textAnchor="middle" fontSize="8" fill="#2d3436" fontWeight="bold">Жим сидя - Биомеханика</text>
           </svg>
         );
 
