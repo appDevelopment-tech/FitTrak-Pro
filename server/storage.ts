@@ -39,6 +39,8 @@ export interface IStorage {
   getExercisesByEquipment(equipment: string): Promise<Exercise[]>;
   getExercise(id: number): Promise<Exercise | undefined>;
   createExercise(exercise: InsertExercise): Promise<Exercise>;
+  updateExercise(id: number, updates: Partial<InsertExercise>): Promise<Exercise | undefined>;
+  deleteExercise(id: number): Promise<boolean>;
   
   // Exercise progress operations
   getExerciseProgress(userId: number): Promise<ExerciseProgress[]>;
@@ -352,4 +354,144 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  async getUser(id: number): Promise<User | undefined> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const { db } = await import("./db");
+    const [user] = await db.insert(users).values(insertUser).returning();
+    return user;
+  }
+
+  async getWorkoutPrograms(): Promise<WorkoutProgram[]> {
+    const { db } = await import("./db");
+    return await db.select().from(workoutPrograms);
+  }
+
+  async getWorkoutProgram(id: number): Promise<WorkoutProgram | undefined> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    const [program] = await db.select().from(workoutPrograms).where(eq(workoutPrograms.id, id));
+    return program || undefined;
+  }
+
+  async createWorkoutProgram(insertProgram: InsertWorkoutProgram): Promise<WorkoutProgram> {
+    const { db } = await import("./db");
+    const [program] = await db.insert(workoutPrograms).values(insertProgram).returning();
+    return program;
+  }
+
+  async getWorkoutSessions(userId: number): Promise<WorkoutSession[]> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    return await db.select().from(workoutSessions).where(eq(workoutSessions.userId, userId));
+  }
+
+  async getWorkoutSessionsByDate(userId: number, date: string): Promise<WorkoutSession[]> {
+    const { db } = await import("./db");
+    const { eq, and } = await import("drizzle-orm");
+    return await db.select().from(workoutSessions).where(
+      and(
+        eq(workoutSessions.userId, userId),
+        eq(workoutSessions.scheduledDate, new Date(date))
+      )
+    );
+  }
+
+  async createWorkoutSession(insertSession: InsertWorkoutSession): Promise<WorkoutSession> {
+    const { db } = await import("./db");
+    const [session] = await db.insert(workoutSessions).values(insertSession).returning();
+    return session;
+  }
+
+  async updateWorkoutSession(id: number, updates: Partial<WorkoutSession>): Promise<WorkoutSession | undefined> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    const [session] = await db.update(workoutSessions).set(updates).where(eq(workoutSessions.id, id)).returning();
+    return session || undefined;
+  }
+
+  async getExercises(): Promise<Exercise[]> {
+    const { db } = await import("./db");
+    return await db.select().from(exercises);
+  }
+
+  async getExercisesByMuscleGroup(muscleGroup: string): Promise<Exercise[]> {
+    const { db } = await import("./db");
+    const { arrayContains } = await import("drizzle-orm");
+    return await db.select().from(exercises).where(arrayContains(exercises.primaryMuscles, [muscleGroup]));
+  }
+
+  async getExercisesByEquipment(equipment: string): Promise<Exercise[]> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    return await db.select().from(exercises).where(eq(exercises.equipment, equipment));
+  }
+
+  async getExercise(id: number): Promise<Exercise | undefined> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    const [exercise] = await db.select().from(exercises).where(eq(exercises.id, id));
+    return exercise || undefined;
+  }
+
+  async createExercise(insertExercise: InsertExercise): Promise<Exercise> {
+    const { db } = await import("./db");
+    const [exercise] = await db.insert(exercises).values(insertExercise).returning();
+    return exercise;
+  }
+
+  async updateExercise(id: number, updates: Partial<InsertExercise>): Promise<Exercise | undefined> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    const [exercise] = await db.update(exercises).set({
+      ...updates,
+      updatedAt: new Date()
+    }).where(eq(exercises.id, id)).returning();
+    return exercise || undefined;
+  }
+
+  async deleteExercise(id: number): Promise<boolean> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    const result = await db.delete(exercises).where(eq(exercises.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getExerciseProgress(userId: number): Promise<ExerciseProgress[]> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    return await db.select().from(exerciseProgress).where(eq(exerciseProgress.userId, userId));
+  }
+
+  async createExerciseProgress(insertProgress: InsertExerciseProgress): Promise<ExerciseProgress> {
+    const { db } = await import("./db");
+    const [progress] = await db.insert(exerciseProgress).values(insertProgress).returning();
+    return progress;
+  }
+
+  async getExerciseProgressByExerciseId(userId: number, exerciseId: number): Promise<ExerciseProgress[]> {
+    const { db } = await import("./db");
+    const { eq, and } = await import("drizzle-orm");
+    return await db.select().from(exerciseProgress).where(
+      and(
+        eq(exerciseProgress.userId, userId),
+        eq(exerciseProgress.exerciseId, exerciseId)
+      )
+    );
+  }
+}
+
+export const storage = new DatabaseStorage();
