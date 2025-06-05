@@ -1,5 +1,5 @@
-// Wger API integration for real exercise data
-const WGER_BASE_URL = 'https://wger.de/api/v2';
+// Wger API integration through server proxy
+const WGER_BASE_URL = '/api/wger';
 
 export interface WgerExerciseRaw {
   id: number;
@@ -64,44 +64,44 @@ export interface ProcessedExercise {
   images: string[];
 }
 
-// Fetch functions for Wger API
+// Fetch functions for Wger API through server proxy
 export async function fetchWgerExercises(language = 2): Promise<WgerExerciseRaw[]> {
-  const response = await fetch(`${WGER_BASE_URL}/exercise/?language=${language}&limit=50`);
+  const response = await fetch(`${WGER_BASE_URL}/exercises?language=${language}&limit=50`);
   if (!response.ok) throw new Error('Failed to fetch exercises');
   const data = await response.json();
   return data.results;
 }
 
 export async function fetchWgerExerciseInfo(language = 2): Promise<WgerExerciseInfo[]> {
-  const response = await fetch(`${WGER_BASE_URL}/exerciseinfo/?language=${language}&limit=50`);
+  const response = await fetch(`${WGER_BASE_URL}/exerciseinfo?language=${language}&limit=50`);
   if (!response.ok) throw new Error('Failed to fetch exercise info');
   const data = await response.json();
   return data.results;
 }
 
 export async function fetchWgerCategories(language = 2): Promise<WgerCategory[]> {
-  const response = await fetch(`${WGER_BASE_URL}/exercisecategory/?language=${language}`);
+  const response = await fetch(`${WGER_BASE_URL}/categories?language=${language}`);
   if (!response.ok) throw new Error('Failed to fetch categories');
   const data = await response.json();
   return data.results;
 }
 
 export async function fetchWgerMuscles(language = 2): Promise<WgerMuscle[]> {
-  const response = await fetch(`${WGER_BASE_URL}/muscle/?language=${language}`);
+  const response = await fetch(`${WGER_BASE_URL}/muscles?language=${language}`);
   if (!response.ok) throw new Error('Failed to fetch muscles');
   const data = await response.json();
   return data.results;
 }
 
 export async function fetchWgerEquipment(language = 2): Promise<WgerEquipment[]> {
-  const response = await fetch(`${WGER_BASE_URL}/equipment/?language=${language}`);
+  const response = await fetch(`${WGER_BASE_URL}/equipment?language=${language}`);
   if (!response.ok) throw new Error('Failed to fetch equipment');
   const data = await response.json();
   return data.results;
 }
 
 export async function fetchWgerImages(): Promise<WgerImage[]> {
-  const response = await fetch(`${WGER_BASE_URL}/exerciseimage/?limit=100`);
+  const response = await fetch(`${WGER_BASE_URL}/images?limit=100`);
   if (!response.ok) throw new Error('Failed to fetch images');
   const data = await response.json();
   return data.results;
