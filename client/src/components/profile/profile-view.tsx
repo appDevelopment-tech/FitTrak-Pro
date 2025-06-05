@@ -9,13 +9,43 @@ import { Badge } from "@/components/ui/badge";
 import { User, Edit, Save, Camera, Plus, Trash2, Award, Clock, Users, Calendar, Eye } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import type { User as UserType } from "@shared/schema";
+import type { DetailedExercise } from "@/lib/types";
 import { ExerciseDetail } from "@/components/exercise/exercise-detail";
 
 export function ProfileView() {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string | null>(null);
-  const [selectedExercise, setSelectedExercise] = useState<any | null>(null);
-  const [exercises, setExercises] = useState([]);
+  const [selectedExercise, setSelectedExercise] = useState<DetailedExercise | null>(null);
+  const [exercises, setExercises] = useState<DetailedExercise[]>([
+    {
+      id: 1,
+      name: 'Жим в тренажёре сидя',
+      category: 'Грудь',
+      primaryMuscles: ['Большая грудная мышца'],
+      secondaryMuscles: ['Передние дельты', 'Трицепс'],
+      equipment: 'Тренажёр для жима сидя',
+      difficulty: 'Легкий',
+      description: 'Безопасное упражнение для развития грудных мышц на тренажёре',
+      technique: [
+        'Отрегулируйте высоту сиденья так, чтобы рукоятки были на уровне груди',
+        'Сядьте с прямой спиной, плотно прижмитесь к спинке',
+        'Возьмитесь за рукоятки нейтральным хватом',
+        'Медленно выжмите рукоятки вперёд, сводя лопатки',
+        'Плавно вернитесь в исходное положение, контролируя движение'
+      ],
+      commonMistakes: [
+        'Неправильная высота сиденья',
+        'Отрыв спины от спинки тренажёра',
+        'Слишком быстрое выполнение',
+        'Неполная амплитуда движения'
+      ],
+      tips: [
+        'Держите лопатки сведёнными',
+        'Контролируйте дыхание: выдох на усилии',
+        'Не блокируйте локти в верхней точке'
+      ]
+    }
+  ]);
   
   const [newExercise, setNewExercise] = useState({ 
     name: '', 

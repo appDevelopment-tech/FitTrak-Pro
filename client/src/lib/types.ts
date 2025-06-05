@@ -13,6 +13,20 @@ export interface Exercise {
   weight: number | null;
 }
 
+export interface DetailedExercise {
+  id: number;
+  name: string;
+  category: string;
+  primaryMuscles: string[];
+  secondaryMuscles: string[];
+  equipment: string;
+  difficulty: string;
+  description: string;
+  technique: string[];
+  commonMistakes: string[];
+  tips: string[];
+}
+
 export interface CalendarDay {
   date: number;
   isCurrentMonth: boolean;
