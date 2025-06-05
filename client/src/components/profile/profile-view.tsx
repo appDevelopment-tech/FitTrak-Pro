@@ -159,19 +159,15 @@ export function ProfileView() {
         <TabsContent value="exercises" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl font-semibold">Мои упражнения</CardTitle>
+              <CardTitle className="text-xl font-semibold">Упражнения</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-center py-12">
                 <div className="bg-orange-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <Plus className="h-8 w-8 text-orange-600" />
+                  <Award className="h-8 w-8 text-orange-600" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">Создайте базу упражнений</h3>
-                <p className="text-gray-500 mb-4">Добавляйте и настраивайте упражнения для ваших тренировочных программ</p>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Добавить упражнение
-                </Button>
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">Инструменты тренера</h3>
+                <p className="text-gray-500 mb-4">Здесь будут размещены инструменты для работы с упражнениями</p>
               </div>
             </CardContent>
           </Card>
