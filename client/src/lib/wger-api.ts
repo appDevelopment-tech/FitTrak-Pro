@@ -153,13 +153,22 @@ export async function fetchProcessedExercises(): Promise<ProcessedExercise[]> {
       imageMapSize: imageMap.size
     });
 
-    // Process exercises
-    const processedExercises = exercises
-      .filter(exercise => infoMap.has(exercise.id)) // Only include exercises with info
-      .map(exercise => {
-        const info = infoMap.get(exercise.id)!;
+    // Debug the mismatch
+    console.log('First few exercise IDs:', exercises.slice(0, 5).map(e => e.id));
+    console.log('First few exerciseInfo exercise IDs:', exerciseInfo.slice(0, 5).map(e => e.exercise));
+    
+    // Process exercises - use exerciseInfo as the base since it has the names
+    const processedExercises = exerciseInfo
+      .map(info => {
+        // Find matching exercise data
+        const exercise = exercises.find(ex => ex.id === info.exercise);
+        if (!exercise) {
+          console.log(`No exercise found for info ID: ${info.exercise}`);
+          return null;
+        }
+        
         return {
-          id: exercise.id,
+          id: info.exercise,
           uuid: exercise.uuid,
           name: info.name,
           description: info.description,
@@ -173,9 +182,10 @@ export async function fetchProcessedExercises(): Promise<ProcessedExercise[]> {
           equipmentNames: exercise.equipment.map(id => equipmentMap.get(id) || 'Unknown'),
           variations: exercise.variations,
           license_author: exercise.license_author,
-          images: imageMap.get(exercise.id) || []
+          images: imageMap.get(info.exercise) || []
         };
-      });
+      })
+      .filter(exercise => exercise !== null) as ProcessedExercise[];
 
     console.log('Processed exercises:', processedExercises.length);
     console.log('Sample exercise:', processedExercises[0]);
