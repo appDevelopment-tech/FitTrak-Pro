@@ -28,7 +28,7 @@ export function ProfileView() {
   // Фильтрация упражнений
   const filteredExercises = exercises.filter(exercise => {
     const matchesMuscleGroup = !selectedMuscleGroup || exercise.muscleGroup === selectedMuscleGroup;
-    const matchesEquipment = !selectedEquipment || exercise.equipment === selectedEquipment;
+    const matchesEquipment = !selectedEquipment || selectedEquipment === "все" || exercise.equipment === selectedEquipment;
     const matchesSearch = !searchTerm || exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesMuscleGroup && matchesEquipment && matchesSearch;
   });
@@ -44,7 +44,7 @@ export function ProfileView() {
 
   const handleMuscleGroupClick = (muscleGroup: string) => {
     setSelectedMuscleGroup(muscleGroup);
-    setSelectedEquipment(""); // Сброс фильтра оборудования при смене группы мышц
+    setSelectedEquipment("все"); // Сброс фильтра оборудования при смене группы мышц
   };
   
   return (
@@ -401,7 +401,7 @@ export function ProfileView() {
                         <SelectValue placeholder="Все виды оборудования" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Все виды оборудования</SelectItem>
+                        <SelectItem value="все">Все виды оборудования</SelectItem>
                         <SelectItem value="тренажер">Тренажеры</SelectItem>
                         <SelectItem value="гантели">Гантели</SelectItem>
                         <SelectItem value="резина">Резина/Эспандер</SelectItem>
