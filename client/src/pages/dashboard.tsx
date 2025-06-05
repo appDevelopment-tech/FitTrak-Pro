@@ -12,7 +12,7 @@ import { TodaySchedule } from "@/components/schedule/today-schedule";
 
 import { ProfileView } from "@/components/profile/profile-view";
 import { TrainerSchedule } from "@/components/schedule/trainer-schedule";
-import { Plus, BarChart3, Search, Flame, Trash2 } from "lucide-react";
+import { Plus, BarChart3, Search, Flame, Trash2, Users } from "lucide-react";
 import type { DashboardStats } from "@/lib/types";
 import type { WorkoutSession, WorkoutProgram } from "@shared/schema";
 
