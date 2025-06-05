@@ -158,15 +158,7 @@ export default function Dashboard() {
                 </h1>
               </div>
               <div className="flex items-center space-x-4">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => window.open('/exercises', '_blank')}
-                  className="text-green-600 border-green-200 hover:bg-green-50"
-                >
-                  <Search className="h-4 w-4 mr-2" />
-                  Библиотека упражнений
-                </Button>
+
                 <Button variant="ghost" size="sm" className="relative">
                   <Bell className="h-5 w-5 text-gray-500" />
                   <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
