@@ -213,7 +213,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="text-5xl font-bold mb-2 border-4 border-white rounded-full w-20 h-20 flex items-center justify-center">Г</div>
+                      <div className="text-4xl font-bold mb-2 w-20 h-20 flex items-center justify-center">▲</div>
                       <div className="text-lg font-semibold">ГРУДЬ</div>
                     </div>
                   </div>
@@ -234,7 +234,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="text-5xl font-bold mb-2 border-4 border-white rounded-full w-20 h-20 flex items-center justify-center">С</div>
+                      <div className="text-4xl font-bold mb-2 w-20 h-20 flex items-center justify-center">■</div>
                       <div className="text-lg font-semibold">СПИНА</div>
                     </div>
                   </div>
@@ -255,7 +255,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="text-5xl font-bold mb-2 border-4 border-white rounded-full w-20 h-20 flex items-center justify-center">Н</div>
+                      <div className="text-4xl font-bold mb-2 w-20 h-20 flex items-center justify-center">●</div>
                       <div className="text-lg font-semibold">НОГИ</div>
                     </div>
                   </div>
@@ -276,7 +276,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="text-5xl font-bold mb-2 border-4 border-white rounded-full w-20 h-20 flex items-center justify-center">Р</div>
+                      <div className="text-4xl font-bold mb-2 w-20 h-20 flex items-center justify-center">◆</div>
                       <div className="text-lg font-semibold">РУКИ</div>
                     </div>
                   </div>
@@ -297,7 +297,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="text-5xl font-bold mb-2 border-4 border-white rounded-full w-20 h-20 flex items-center justify-center">П</div>
+                      <div className="text-4xl font-bold mb-2 w-20 h-20 flex items-center justify-center">★</div>
                       <div className="text-lg font-semibold">ПЛЕЧИ</div>
                     </div>
                   </div>
@@ -318,7 +318,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="text-5xl font-bold mb-2 border-4 border-white rounded-full w-20 h-20 flex items-center justify-center">Я</div>
+                      <div className="text-4xl font-bold mb-2 w-20 h-20 flex items-center justify-center">♦</div>
                       <div className="text-lg font-semibold">ЯГОДИЧНЫЕ</div>
                     </div>
                   </div>
@@ -339,7 +339,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="text-5xl font-bold mb-2 border-4 border-white rounded-full w-20 h-20 flex items-center justify-center">Ж</div>
+                      <div className="text-4xl font-bold mb-2 w-20 h-20 flex items-center justify-center">◯</div>
                       <div className="text-lg font-semibold">ЖИВОТ</div>
                     </div>
                   </div>
