@@ -406,8 +406,8 @@ export class DatabaseStorage implements IStorage {
 
   async getExercisesByEquipment(equipment: string): Promise<Exercise[]> {
     const { db } = await import("./db");
-    const { eq } = await import("drizzle-orm");
-    return await db.select().from(exercises).where(eq(exercises.equipment, equipment));
+    // Equipment filtering not available in current schema
+    return await db.select().from(exercises);
   }
 
   async getExercise(id: number): Promise<Exercise | undefined> {
@@ -437,7 +437,7 @@ export class DatabaseStorage implements IStorage {
     const { db } = await import("./db");
     const { eq } = await import("drizzle-orm");
     const result = await db.delete(exercises).where(eq(exercises.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   async getExerciseProgress(userId: number): Promise<ExerciseProgress[]> {

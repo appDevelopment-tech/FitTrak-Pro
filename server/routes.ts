@@ -187,15 +187,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/exercises", async (req, res) => {
-    try {
-      const validatedData = insertExerciseSchema.parse(req.body);
-      const exercise = await storage.createExercise(validatedData);
-      res.status(201).json(exercise);
-    } catch (error) {
-      res.status(400).json({ message: "Invalid data" });
-    }
-  });
+
 
   // Dashboard stats
   app.get("/api/dashboard-stats/:userId", async (req, res) => {
