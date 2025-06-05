@@ -41,7 +41,8 @@ export function WgerDemo() {
 
 
 
-  const filteredExercises = exercises.filter((exercise: ProcessedExercise) => {
+  const filteredExercises = exercises.filter((exercise) => {
+    if (!exercise || !exercise.name) return false;
     const matchesSearch = exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 0 || exercise.category === selectedCategory;
     return matchesSearch && matchesCategory;
@@ -70,6 +71,10 @@ export function WgerDemo() {
       </div>
     );
   }
+
+  // Debug exercises data
+  console.log('Total exercises loaded:', exercises.length);
+  console.log('Filtered exercises:', filteredExercises.length);
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
