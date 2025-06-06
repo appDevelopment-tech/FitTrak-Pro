@@ -623,47 +623,53 @@ export function ProfileView() {
                             
                             <div className="p-4 pt-0">
                               <div className="flex justify-between items-start mb-2">
-                                <h4 className="font-medium text-gray-900">{exercise.name}</h4>
-                                <div className="flex items-center gap-2">
-                                  <Badge variant={exercise.difficulty === 'начинающий' ? 'secondary' : exercise.difficulty === 'средний' ? 'default' : 'destructive'}>
+                                <h4 className="font-medium text-gray-900 flex-1 mr-2">{exercise.name}</h4>
+                                <div className="flex items-center gap-1 flex-shrink-0">
+                                  <Badge variant={exercise.difficulty === 'начинающий' ? 'secondary' : exercise.difficulty === 'средний' ? 'default' : 'destructive'} className="text-xs">
                                     {exercise.difficulty}
                                   </Badge>
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setSelectedExerciseForImage(exercise);
-                                      setShowImageManager(true);
-                                    }}
-                                    className="h-6 w-6 p-0"
-                                    title="Управление изображениями"
-                                  >
-                                    <Camera className="h-3 w-3" />
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleEditExercise(exercise);
-                                    }}
-                                    className="h-6 w-6 p-0"
-                                  >
-                                    <Edit className="h-3 w-3" />
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleDeleteExercise(exercise.id);
-                                    }}
-                                    className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
-                                  >
-                                    <Trash2 className="h-3 w-3" />
-                                  </Button>
                                 </div>
+                              </div>
+                              
+                              {/* Кнопки управления */}
+                              <div className="flex justify-end gap-1 mb-3">
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedExerciseForImage(exercise);
+                                    setShowImageManager(true);
+                                  }}
+                                  className="h-7 w-7 p-0"
+                                  title="Управление изображениями"
+                                >
+                                  <Camera className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditExercise(exercise);
+                                  }}
+                                  className="h-7 w-7 p-0"
+                                  title="Редактировать упражнение"
+                                >
+                                  <Edit className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteExercise(exercise.id);
+                                  }}
+                                  className="h-7 w-7 p-0 text-red-500 hover:text-red-700"
+                                  title="Удалить упражнение"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
                               </div>
                               <p className="text-sm text-gray-600 mb-3">{exercise.overview}</p>
                               <div className="space-y-2">
