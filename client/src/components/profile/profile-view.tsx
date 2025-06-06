@@ -25,6 +25,8 @@ export function ProfileView() {
   const [muscleImages, setMuscleImages] = useState<Record<string, string>>({});
   const [isExerciseDialogOpen, setIsExerciseDialogOpen] = useState(false);
   const [editingExercise, setEditingExercise] = useState<Exercise | null>(null);
+  const [showImageManager, setShowImageManager] = useState(false);
+  const [selectedExerciseForImage, setSelectedExerciseForImage] = useState<Exercise | null>(null);
   const { toast } = useToast();
   
   const { data: user } = useQuery<UserType>({
@@ -612,6 +614,19 @@ export function ProfileView() {
                                   variant="ghost"
                                   onClick={(e) => {
                                     e.stopPropagation();
+                                    setSelectedExerciseForImage(exercise);
+                                    setShowImageManager(true);
+                                  }}
+                                  className="h-6 w-6 p-0"
+                                  title="Управление изображениями"
+                                >
+                                  <Camera className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
                                     handleEditExercise(exercise);
                                   }}
                                   className="h-6 w-6 p-0"
@@ -690,6 +705,26 @@ export function ProfileView() {
           />
         </DialogContent>
       </Dialog>
+
+      {/* Диалог управления изображениями */}
+      {showImageManager && selectedExerciseForImage && (
+        <Dialog open={showImageManager} onOpenChange={setShowImageManager}>
+          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Управление изображениями упражнения</DialogTitle>
+            </DialogHeader>
+            <ExerciseImageManager
+              exerciseId={selectedExerciseForImage.id}
+              exerciseName={selectedExerciseForImage.name}
+              currentImageUrl={selectedExerciseForImage.muscleImageUrl}
+              onClose={() => {
+                setShowImageManager(false);
+                setSelectedExerciseForImage(null);
+              }}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

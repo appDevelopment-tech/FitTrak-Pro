@@ -34,10 +34,12 @@ export function ExerciseImageManager({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: images, isLoading, error } = useQuery({
+  const { data: images, isLoading, error } = useQuery<ExerciseImage[]>({
     queryKey: ['exercise-images', exerciseId],
     queryFn: async (): Promise<ExerciseImage[]> => {
-      return await apiRequest(`/api/exercises/${exerciseId}/search-image`, 'GET');
+      const response = await fetch(`/api/exercises/${exerciseId}/search-image`);
+      if (!response.ok) throw new Error('Failed to fetch images');
+      return await response.json() as ExerciseImage[];
     },
     enabled: true
   });
@@ -110,10 +112,10 @@ export function ExerciseImageManager({
               <Skeleton key={i} className="h-48 w-full rounded-lg" />
             ))}
           </div>
-        ) : images.length > 0 ? (
+        ) : images && images.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-              {images.map((image) => (
+              {images.map((image: ExerciseImage) => (
                 <div
                   key={image.id}
                   className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
