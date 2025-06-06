@@ -334,7 +334,18 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-{getExercisePhoto('ноги', 'w-16 h-16')}
+                        {isEditingImages ? (
+                          <ImageUpload
+                            currentImage={muscleImages['ноги']}
+                            onImageChange={(file) => handleImageUpload('ноги', file)}
+                            className="w-16 h-16"
+                            placeholder="Ноги"
+                          />
+                        ) : muscleImages['ноги'] ? (
+                          <img src={muscleImages['ноги']} alt="Упражнения для ног" className="w-16 h-16 object-cover rounded" />
+                        ) : (
+                          getExercisePhoto('ноги', 'w-16 h-16')
+                        )}
                       </div>
                       <div className="text-lg font-semibold">НОГИ</div>
                     </div>
@@ -357,7 +368,18 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-{getExercisePhoto('руки', 'w-16 h-16')}
+                        {isEditingImages ? (
+                          <ImageUpload
+                            currentImage={muscleImages['руки']}
+                            onImageChange={(file) => handleImageUpload('руки', file)}
+                            className="w-16 h-16"
+                            placeholder="Руки"
+                          />
+                        ) : muscleImages['руки'] ? (
+                          <img src={muscleImages['руки']} alt="Упражнения для рук" className="w-16 h-16 object-cover rounded" />
+                        ) : (
+                          getExercisePhoto('руки', 'w-16 h-16')
+                        )}
                       </div>
                       <div className="text-lg font-semibold">РУКИ</div>
                     </div>
@@ -380,7 +402,18 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-{getExercisePhoto('плечи', 'w-16 h-16')}
+                        {isEditingImages ? (
+                          <ImageUpload
+                            currentImage={muscleImages['плечи']}
+                            onImageChange={(file) => handleImageUpload('плечи', file)}
+                            className="w-16 h-16"
+                            placeholder="Плечи"
+                          />
+                        ) : muscleImages['плечи'] ? (
+                          <img src={muscleImages['плечи']} alt="Упражнения для плеч" className="w-16 h-16 object-cover rounded" />
+                        ) : (
+                          getExercisePhoto('плечи', 'w-16 h-16')
+                        )}
                       </div>
                       <div className="text-lg font-semibold">ПЛЕЧИ</div>
                     </div>
@@ -403,7 +436,18 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-{getExercisePhoto('ягодичные', 'w-16 h-16')}
+                        {isEditingImages ? (
+                          <ImageUpload
+                            currentImage={muscleImages['ягодичные']}
+                            onImageChange={(file) => handleImageUpload('ягодичные', file)}
+                            className="w-16 h-16"
+                            placeholder="Ягодичные"
+                          />
+                        ) : muscleImages['ягодичные'] ? (
+                          <img src={muscleImages['ягодичные']} alt="Упражнения для ягодичных" className="w-16 h-16 object-cover rounded" />
+                        ) : (
+                          getExercisePhoto('ягодичные', 'w-16 h-16')
+                        )}
                       </div>
                       <div className="text-lg font-semibold">ЯГОДИЧНЫЕ</div>
                     </div>
@@ -426,7 +470,18 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-{getExercisePhoto('живот', 'w-16 h-16')}
+                        {isEditingImages ? (
+                          <ImageUpload
+                            currentImage={muscleImages['живот']}
+                            onImageChange={(file) => handleImageUpload('живот', file)}
+                            className="w-16 h-16"
+                            placeholder="Живот"
+                          />
+                        ) : muscleImages['живот'] ? (
+                          <img src={muscleImages['живот']} alt="Упражнения для живота" className="w-16 h-16 object-cover rounded" />
+                        ) : (
+                          getExercisePhoto('живот', 'w-16 h-16')
+                        )}
                       </div>
                       <div className="text-lg font-semibold">ЖИВОТ</div>
                     </div>
