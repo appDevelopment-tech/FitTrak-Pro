@@ -279,12 +279,9 @@ export function ProfileView() {
                           getExercisePhoto('грудь', 'w-16 h-16')
                         )}
                       </div>
+                      <div className="text-lg font-semibold">ГРУДЬ</div>
                     </div>
                   </div>
-                </div>
-                <div className="p-4 text-center">
-                  <h3 className="font-semibold text-gray-800 group-hover:text-orange-600 transition-colors">Грудь</h3>
-                  <p className="text-sm text-gray-500 mt-1">Упражнения для груди</p>
                 </div>
               </CardContent>
             </Card>
@@ -312,12 +309,9 @@ export function ProfileView() {
                           getExercisePhoto('спина', 'w-16 h-16')
                         )}
                       </div>
+                      <div className="text-lg font-semibold">СПИНА</div>
                     </div>
                   </div>
-                </div>
-                <div className="p-4 text-center">
-                  <h3 className="font-semibold text-gray-800 group-hover:text-orange-600 transition-colors">Спина</h3>
-                  <p className="text-sm text-gray-500 mt-1">Упражнения для спины</p>
                 </div>
               </CardContent>
             </Card>
@@ -345,12 +339,9 @@ export function ProfileView() {
                           getExercisePhoto('ноги', 'w-16 h-16')
                         )}
                       </div>
+                      <div className="text-lg font-semibold">НОГИ</div>
                     </div>
                   </div>
-                </div>
-                <div className="p-4 text-center">
-                  <h3 className="font-semibold text-gray-800 group-hover:text-orange-600 transition-colors">Ноги</h3>
-                  <p className="text-sm text-gray-500 mt-1">Упражнения для ног</p>
                 </div>
               </CardContent>
             </Card>
@@ -378,12 +369,9 @@ export function ProfileView() {
                           getExercisePhoto('руки', 'w-16 h-16')
                         )}
                       </div>
+                      <div className="text-lg font-semibold">РУКИ</div>
                     </div>
                   </div>
-                </div>
-                <div className="p-4 text-center">
-                  <h3 className="font-semibold text-gray-800 group-hover:text-orange-600 transition-colors">Руки</h3>
-                  <p className="text-sm text-gray-500 mt-1">Упражнения для рук</p>
                 </div>
               </CardContent>
             </Card>
@@ -411,12 +399,9 @@ export function ProfileView() {
                           getExercisePhoto('плечи', 'w-16 h-16')
                         )}
                       </div>
+                      <div className="text-lg font-semibold">ПЛЕЧИ</div>
                     </div>
                   </div>
-                </div>
-                <div className="p-4 text-center">
-                  <h3 className="font-semibold text-gray-800 group-hover:text-orange-600 transition-colors">Плечи</h3>
-                  <p className="text-sm text-gray-500 mt-1">Упражнения для плеч</p>
                 </div>
               </CardContent>
             </Card>
@@ -444,12 +429,9 @@ export function ProfileView() {
                           getExercisePhoto('ягодичные', 'w-16 h-16')
                         )}
                       </div>
+                      <div className="text-lg font-semibold">ЯГОДИЧНЫЕ</div>
                     </div>
                   </div>
-                </div>
-                <div className="p-4 text-center">
-                  <h3 className="font-semibold text-gray-800 group-hover:text-orange-600 transition-colors">Ягодичные</h3>
-                  <p className="text-sm text-gray-500 mt-1">Упражнения для ягодиц</p>
                 </div>
               </CardContent>
             </Card>
