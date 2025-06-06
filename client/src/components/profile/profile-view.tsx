@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,12 +11,14 @@ import { User, Edit, Save, Camera, Plus, Award, Clock, Users, Calendar, Filter, 
 import { useQuery } from "@tanstack/react-query";
 import type { User as UserType, Exercise } from "@shared/schema";
 import { getExercisePhoto } from "@/components/ui/exercise-photos";
+import { ImageUpload } from "@/components/ui/image-upload";
 
 export function ProfileView() {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string>("");
-
   const [searchTerm, setSearchTerm] = useState("");
+  const [isEditingImages, setIsEditingImages] = useState(false);
+  const [muscleImages, setMuscleImages] = useState<Record<string, string>>({});
   
   const { data: user } = useQuery<UserType>({
     queryKey: ['/api/user/1'],
@@ -47,6 +49,44 @@ export function ProfileView() {
       }
     }, 100);
   };
+
+  const handleImageUpload = (muscleGroup: string, file: File | null) => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
+        setMuscleImages(prev => ({
+          ...prev,
+          [muscleGroup]: imageUrl
+        }));
+        // Сохранение в localStorage для постоянного хранения
+        localStorage.setItem(`muscle-image-${muscleGroup}`, imageUrl);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setMuscleImages(prev => {
+        const updated = { ...prev };
+        delete updated[muscleGroup];
+        return updated;
+      });
+      localStorage.removeItem(`muscle-image-${muscleGroup}`);
+    }
+  };
+
+  // Загрузка сохраненных изображений при монтировании компонента
+  useEffect(() => {
+    const muscleGroups = ['грудь', 'спина', 'ноги', 'руки', 'плечи', 'ягодичные', 'живот'];
+    const savedImages: Record<string, string> = {};
+    
+    muscleGroups.forEach(group => {
+      const savedImage = localStorage.getItem(`muscle-image-${group}`);
+      if (savedImage) {
+        savedImages[group] = savedImage;
+      }
+    });
+    
+    setMuscleImages(savedImages);
+  }, []);
   
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -204,6 +244,17 @@ export function ProfileView() {
         </TabsContent>
 
         <TabsContent value="exercises" className="space-y-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-gray-800">Группы мышц</h2>
+            <Button
+              variant={isEditingImages ? "default" : "outline"}
+              onClick={() => setIsEditingImages(!isEditingImages)}
+              className="flex items-center space-x-2"
+            >
+              <Camera className="h-4 w-4" />
+              <span>{isEditingImages ? "Сохранить" : "Изменить изображения"}</span>
+            </Button>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {/* Грудь */}
             <Card 
@@ -215,7 +266,18 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-{getExercisePhoto('грудь', 'w-16 h-16')}
+                        {isEditingImages ? (
+                          <ImageUpload
+                            currentImage={muscleImages['грудь']}
+                            onImageChange={(file) => handleImageUpload('грудь', file)}
+                            className="w-16 h-16"
+                            placeholder="Грудь"
+                          />
+                        ) : muscleImages['грудь'] ? (
+                          <img src={muscleImages['грудь']} alt="Упражнения для груди" className="w-16 h-16 object-cover rounded" />
+                        ) : (
+                          getExercisePhoto('грудь', 'w-16 h-16')
+                        )}
                       </div>
                       <div className="text-lg font-semibold">ГРУДЬ</div>
                     </div>
@@ -238,7 +300,18 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-{getExercisePhoto('спина', 'w-16 h-16')}
+                        {isEditingImages ? (
+                          <ImageUpload
+                            currentImage={muscleImages['спина']}
+                            onImageChange={(file) => handleImageUpload('спина', file)}
+                            className="w-16 h-16"
+                            placeholder="Спина"
+                          />
+                        ) : muscleImages['спина'] ? (
+                          <img src={muscleImages['спина']} alt="Упражнения для спины" className="w-16 h-16 object-cover rounded" />
+                        ) : (
+                          getExercisePhoto('спина', 'w-16 h-16')
+                        )}
                       </div>
                       <div className="text-lg font-semibold">СПИНА</div>
                     </div>
