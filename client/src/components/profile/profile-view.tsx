@@ -622,35 +622,34 @@ export function ProfileView() {
                   {filteredExercises.length > 0 ? (
                     <div className="space-y-3">
                       {filteredExercises.map((exercise) => (
-                        <div key={exercise.id} className="flex items-center justify-between p-4 bg-white border rounded-lg hover:shadow-sm transition-shadow">
+                        <div key={exercise.id} className="flex items-center gap-4 p-4 bg-white border rounded-lg hover:shadow-sm transition-shadow">
+                          {/* Изображение */}
+                          <div className="w-16 h-16 flex-shrink-0">
+                            {exercise.muscleImageUrl ? (
+                              <img
+                                src={exercise.muscleImageUrl}
+                                alt={exercise.name}
+                                className="w-full h-full object-cover rounded-lg"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
+                                <span className="text-2xl">💪</span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Название и сложность */}
                           <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-1">
+                            <div className="flex items-center gap-3">
                               <h4 className="font-medium text-gray-900">{exercise.name}</h4>
                               <Badge variant={exercise.difficulty === 'начинающий' ? 'secondary' : exercise.difficulty === 'средний' ? 'default' : 'destructive'} className="text-xs">
                                 {exercise.difficulty}
                               </Badge>
                             </div>
-                            <p className="text-sm text-gray-600 mb-2">{exercise.overview}</p>
-                            <div className="flex gap-4 text-xs text-gray-500">
-                              <span><strong>Основные:</strong> {exercise.primaryMuscles.join(', ')}</span>
-                              {exercise.secondaryMuscles.length > 0 && (
-                                <span><strong>Вспомогательные:</strong> {exercise.secondaryMuscles.join(', ')}</span>
-                              )}
-                            </div>
                           </div>
                           
-                          <div className="flex items-center gap-2 ml-4">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setSelectedExerciseForImage(exercise);
-                                setShowImageManager(true);
-                              }}
-                              className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-blue-500 hover:bg-blue-600 text-white transition-colors"
-                              title="Управление изображениями"
-                            >
-                              <Camera className="h-4 w-4" />
-                            </button>
+                          {/* Кнопки управления */}
+                          <div className="flex items-center gap-2">
                             <button
                               type="button"
                               onClick={() => handleEditExercise(exercise)}
