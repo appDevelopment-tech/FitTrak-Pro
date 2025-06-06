@@ -279,7 +279,6 @@ export function ProfileView() {
                           getExercisePhoto('грудь', 'w-16 h-16')
                         )}
                       </div>
-                      <div className="text-lg font-semibold">ГРУДЬ</div>
                     </div>
                   </div>
                 </div>
@@ -313,7 +312,6 @@ export function ProfileView() {
                           getExercisePhoto('спина', 'w-16 h-16')
                         )}
                       </div>
-                      <div className="text-lg font-semibold">СПИНА</div>
                     </div>
                   </div>
                 </div>
@@ -347,7 +345,6 @@ export function ProfileView() {
                           getExercisePhoto('ноги', 'w-16 h-16')
                         )}
                       </div>
-                      <div className="text-lg font-semibold">НОГИ</div>
                     </div>
                   </div>
                 </div>
@@ -381,7 +378,6 @@ export function ProfileView() {
                           getExercisePhoto('руки', 'w-16 h-16')
                         )}
                       </div>
-                      <div className="text-lg font-semibold">РУКИ</div>
                     </div>
                   </div>
                 </div>
@@ -415,7 +411,6 @@ export function ProfileView() {
                           getExercisePhoto('плечи', 'w-16 h-16')
                         )}
                       </div>
-                      <div className="text-lg font-semibold">ПЛЕЧИ</div>
                     </div>
                   </div>
                 </div>
@@ -449,7 +444,6 @@ export function ProfileView() {
                           getExercisePhoto('ягодичные', 'w-16 h-16')
                         )}
                       </div>
-                      <div className="text-lg font-semibold">ЯГОДИЧНЫЕ</div>
                     </div>
                   </div>
                 </div>
@@ -483,7 +477,6 @@ export function ProfileView() {
                           getExercisePhoto('живот', 'w-16 h-16')
                         )}
                       </div>
-                      <div className="text-lg font-semibold">ЖИВОТ</div>
                     </div>
                   </div>
                 </div>
