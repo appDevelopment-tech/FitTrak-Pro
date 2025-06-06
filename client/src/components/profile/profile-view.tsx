@@ -620,86 +620,55 @@ export function ProfileView() {
                 {/* Список упражнений */}
                 <div className="space-y-4">
                   {filteredExercises.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="space-y-3">
                       {filteredExercises.map((exercise) => (
-                        <Card key={exercise.id} className="hover:shadow-md transition-shadow">
-                          <CardContent className="p-0">
-                            {/* Изображение упражнения */}
-                            <div className="mb-4">
-                              {exercise.muscleImageUrl ? (
-                                <img
-                                  src={exercise.muscleImageUrl}
-                                  alt={exercise.name}
-                                  className="w-full h-32 object-cover rounded-t-lg"
-                                />
-                              ) : (
-                                <ExerciseImagePlaceholder
-                                  exerciseName={exercise.name}
-                                  muscleGroup={exercise.primaryMuscles.join(', ')}
-                                  className="w-full h-32 rounded-t-lg"
-                                />
+                        <div key={exercise.id} className="flex items-center justify-between p-4 bg-white border rounded-lg hover:shadow-sm transition-shadow">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-1">
+                              <h4 className="font-medium text-gray-900">{exercise.name}</h4>
+                              <Badge variant={exercise.difficulty === 'начинающий' ? 'secondary' : exercise.difficulty === 'средний' ? 'default' : 'destructive'} className="text-xs">
+                                {exercise.difficulty}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-2">{exercise.overview}</p>
+                            <div className="flex gap-4 text-xs text-gray-500">
+                              <span><strong>Основные:</strong> {exercise.primaryMuscles.join(', ')}</span>
+                              {exercise.secondaryMuscles.length > 0 && (
+                                <span><strong>Вспомогательные:</strong> {exercise.secondaryMuscles.join(', ')}</span>
                               )}
                             </div>
-                            
-                            <div className="p-4 pt-0">
-                              <div className="flex justify-between items-start mb-2">
-                                <h4 className="font-medium text-gray-900 flex-1 mr-2">{exercise.name}</h4>
-                                <div className="flex items-center gap-1 flex-shrink-0">
-                                  <Badge variant={exercise.difficulty === 'начинающий' ? 'secondary' : exercise.difficulty === 'средний' ? 'default' : 'destructive'} className="text-xs">
-                                    {exercise.difficulty}
-                                  </Badge>
-                                </div>
-                              </div>
-                              
-                              {/* Кнопки управления */}
-                              <div className="flex justify-end gap-2 mb-3">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setSelectedExerciseForImage(exercise);
-                                    setShowImageManager(true);
-                                  }}
-                                  className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-blue-500 hover:bg-blue-600 text-white transition-colors"
-                                  title="Управление изображениями"
-                                >
-                                  <Camera className="h-4 w-4" />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleEditExercise(exercise)}
-                                  className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-gray-500 hover:bg-gray-600 text-white transition-colors"
-                                  title="Редактировать упражнение"
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteExercise(exercise.id)}
-                                  className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-red-500 hover:bg-red-600 text-white transition-colors"
-                                  title="Удалить упражнение"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
-                              </div>
-                              <p className="text-sm text-gray-600 mb-3">{exercise.overview}</p>
-                              <div className="space-y-2">
-                                <div className="text-xs text-gray-600">
-                                  <p className="font-medium">Основные группы мышц:</p>
-                                  <p>{exercise.primaryMuscles.join(', ')}</p>
-                                </div>
-                                {exercise.secondaryMuscles.length > 0 && (
-                                  <div className="text-xs text-gray-600">
-                                    <p className="font-medium">Вспомогательные группы мышц:</p>
-                                    <p>{exercise.secondaryMuscles.join(', ')}</p>
-                                  </div>
-                                )}
-                                <Button size="sm" className="w-full">
-                                  Добавить в программу
-                                </Button>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
+                          </div>
+                          
+                          <div className="flex items-center gap-2 ml-4">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedExerciseForImage(exercise);
+                                setShowImageManager(true);
+                              }}
+                              className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-blue-500 hover:bg-blue-600 text-white transition-colors"
+                              title="Управление изображениями"
+                            >
+                              <Camera className="h-4 w-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleEditExercise(exercise)}
+                              className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-gray-500 hover:bg-gray-600 text-white transition-colors"
+                              title="Редактировать упражнение"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteExercise(exercise.id)}
+                              className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-red-500 hover:bg-red-600 text-white transition-colors"
+                              title="Удалить упражнение"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
                       ))}
                     </div>
                   ) : (
