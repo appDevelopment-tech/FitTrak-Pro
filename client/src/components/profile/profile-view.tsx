@@ -54,26 +54,46 @@ export function ProfileView() {
 
   const updateExerciseMutation = useMutation({
     mutationFn: ({ id, data }: { id: number, data: Partial<InsertExercise> }) => 
-      apiRequest(`/api/exercises/${id}`, 'PATCH', data),
+      apiRequest(`/api/exercises/${id}`, 'PUT', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
       setIsExerciseDialogOpen(false);
       setEditingExercise(null);
       toast({ title: "Упражнение обновлено", description: "Изменения успешно сохранены" });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Update exercise error:', error);
       toast({ title: "Ошибка", description: "Не удалось обновить упражнение", variant: "destructive" });
     }
   });
 
   const deleteExerciseMutation = useMutation({
-    mutationFn: (id: number) => apiRequest(`/api/exercises/${id}`, 'DELETE'),
+    mutationFn: async (id: number) => {
+      const response = await fetch(`/api/exercises/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+      
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
       toast({ title: "Упражнение удалено", description: "Упражнение успешно удалено" });
     },
-    onError: () => {
-      toast({ title: "Ошибка", description: "Не удалось удалить упражнение", variant: "destructive" });
+    onError: (error: Error) => {
+      console.error('Delete exercise error:', error);
+      toast({ 
+        title: "Ошибка", 
+        description: `Не удалось удалить упражнение: ${error.message}`, 
+        variant: "destructive" 
+      });
     }
   });
 
