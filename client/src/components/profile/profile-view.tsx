@@ -563,10 +563,16 @@ export function ProfileView() {
           {selectedMuscleGroup && (
             <Card className="mt-8 border-2 border-orange-200 bg-orange-50/50 animate-in slide-in-from-top-5 duration-500" data-exercise-panel>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Filter className="h-5 w-5" />
-                  Упражнения для группы: {selectedMuscleGroup}
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Filter className="h-5 w-5" />
+                    Упражнения для группы: {selectedMuscleGroup}
+                  </CardTitle>
+                  <Button onClick={handleCreateExercise} className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    Добавить упражнение
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Фильтры */}
@@ -596,9 +602,33 @@ export function ProfileView() {
                           <CardContent className="p-4">
                             <div className="flex justify-between items-start mb-2">
                               <h4 className="font-medium text-gray-900">{exercise.name}</h4>
-                              <Badge variant={exercise.difficulty === 'начинающий' ? 'secondary' : exercise.difficulty === 'средний' ? 'default' : 'destructive'}>
-                                {exercise.difficulty}
-                              </Badge>
+                              <div className="flex items-center gap-2">
+                                <Badge variant={exercise.difficulty === 'начинающий' ? 'secondary' : exercise.difficulty === 'средний' ? 'default' : 'destructive'}>
+                                  {exercise.difficulty}
+                                </Badge>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditExercise(exercise);
+                                  }}
+                                  className="h-6 w-6 p-0"
+                                >
+                                  <Edit className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteExercise(exercise.id);
+                                  }}
+                                  className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </div>
                             </div>
                             <p className="text-sm text-gray-600 mb-3">{exercise.overview}</p>
                             <div className="space-y-2">
@@ -633,6 +663,281 @@ export function ProfileView() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Диалог создания/редактирования упражнения */}
+      <Dialog open={isExerciseDialogOpen} onOpenChange={setIsExerciseDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {editingExercise ? 'Редактировать упражнение' : 'Создать новое упражнение'}
+            </DialogTitle>
+          </DialogHeader>
+          <ExerciseForm
+            exercise={editingExercise}
+            onSubmit={(data) => {
+              if (editingExercise) {
+                updateExerciseMutation.mutate({ id: editingExercise.id, data });
+              } else {
+                createExerciseMutation.mutate(data);
+              }
+            }}
+            isLoading={createExerciseMutation.isPending || updateExerciseMutation.isPending}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+// Компонент формы упражнения
+interface ExerciseFormProps {
+  exercise?: Exercise | null;
+  onSubmit: (data: InsertExercise) => void;
+  isLoading: boolean;
+}
+
+function ExerciseForm({ exercise, onSubmit, isLoading }: ExerciseFormProps) {
+  const [formData, setFormData] = useState<InsertExercise>({
+    name: exercise?.name || '',
+    primaryMuscles: exercise?.primaryMuscles || [],
+    secondaryMuscles: exercise?.secondaryMuscles || [],
+    difficulty: exercise?.difficulty || 'начинающий',
+    overview: exercise?.overview || '',
+    technique: exercise?.technique || [''],
+    commonMistakes: exercise?.commonMistakes || [''],
+    contraindications: exercise?.contraindications || [],
+    muscleImageUrl: exercise?.muscleImageUrl || undefined,
+  });
+
+  const muscleGroups = ['грудь', 'спина', 'ноги', 'руки', 'плечи', 'ягодичные', 'живот', 'кардио'];
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Фильтруем пустые элементы из массивов
+    const cleanedData = {
+      ...formData,
+      technique: formData.technique.filter(step => step.trim() !== ''),
+      commonMistakes: formData.commonMistakes.filter(mistake => mistake.trim() !== ''),
+      contraindications: formData.contraindications.filter(contra => contra.trim() !== ''),
+    };
+
+    onSubmit(cleanedData);
+  };
+
+  const addTechniqueStep = () => {
+    setFormData(prev => ({
+      ...prev,
+      technique: [...prev.technique, '']
+    }));
+  };
+
+  const removeTechniqueStep = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      technique: prev.technique.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateTechniqueStep = (index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      technique: prev.technique.map((step, i) => i === index ? value : step)
+    }));
+  };
+
+  const addMistake = () => {
+    setFormData(prev => ({
+      ...prev,
+      commonMistakes: [...prev.commonMistakes, '']
+    }));
+  };
+
+  const removeMistake = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      commonMistakes: prev.commonMistakes.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateMistake = (index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      commonMistakes: prev.commonMistakes.map((mistake, i) => i === index ? value : mistake)
+    }));
+  };
+
+  const toggleMuscleGroup = (muscleGroup: string, type: 'primary' | 'secondary') => {
+    const field = type === 'primary' ? 'primaryMuscles' : 'secondaryMuscles';
+    setFormData(prev => ({
+      ...prev,
+      [field]: prev[field].includes(muscleGroup)
+        ? prev[field].filter(m => m !== muscleGroup)
+        : [...prev[field], muscleGroup]
+    }));
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Название упражнения */}
+      <div>
+        <Label htmlFor="name">Название упражнения *</Label>
+        <Input
+          id="name"
+          value={formData.name}
+          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+          placeholder="Введите название упражнения"
+          required
+        />
+      </div>
+
+      {/* Основные группы мышц */}
+      <div>
+        <Label>Основные группы мышц *</Label>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
+          {muscleGroups.map(muscle => (
+            <Button
+              key={muscle}
+              type="button"
+              variant={formData.primaryMuscles.includes(muscle) ? "default" : "outline"}
+              size="sm"
+              onClick={() => toggleMuscleGroup(muscle, 'primary')}
+              className="justify-start"
+            >
+              {muscle}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Вспомогательные группы мышц */}
+      <div>
+        <Label>Вспомогательные группы мышц</Label>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
+          {muscleGroups.map(muscle => (
+            <Button
+              key={muscle}
+              type="button"
+              variant={formData.secondaryMuscles.includes(muscle) ? "default" : "outline"}
+              size="sm"
+              onClick={() => toggleMuscleGroup(muscle, 'secondary')}
+              className="justify-start"
+            >
+              {muscle}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Сложность */}
+      <div>
+        <Label htmlFor="difficulty">Сложность *</Label>
+        <Select value={formData.difficulty} onValueChange={(value) => setFormData(prev => ({ ...prev, difficulty: value }))}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="начинающий">Начинающий</SelectItem>
+            <SelectItem value="средний">Средний</SelectItem>
+            <SelectItem value="продвинутый">Продвинутый</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Описание */}
+      <div>
+        <Label htmlFor="overview">Описание упражнения *</Label>
+        <Textarea
+          id="overview"
+          value={formData.overview}
+          onChange={(e) => setFormData(prev => ({ ...prev, overview: e.target.value }))}
+          placeholder="Краткое описание упражнения"
+          rows={3}
+          required
+        />
+      </div>
+
+      {/* Техника выполнения */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <Label>Техника выполнения *</Label>
+          <Button type="button" onClick={addTechniqueStep} size="sm" variant="outline">
+            <Plus className="h-4 w-4 mr-1" />
+            Добавить шаг
+          </Button>
+        </div>
+        <div className="space-y-2">
+          {formData.technique.map((step, index) => (
+            <div key={index} className="flex gap-2">
+              <div className="flex-1">
+                <Input
+                  value={step}
+                  onChange={(e) => updateTechniqueStep(index, e.target.value)}
+                  placeholder={`Шаг ${index + 1}`}
+                  required={index === 0}
+                />
+              </div>
+              {formData.technique.length > 1 && (
+                <Button
+                  type="button"
+                  onClick={() => removeTechniqueStep(index)}
+                  size="sm"
+                  variant="ghost"
+                  className="text-red-500"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Частые ошибки */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <Label>Частые ошибки *</Label>
+          <Button type="button" onClick={addMistake} size="sm" variant="outline">
+            <Plus className="h-4 w-4 mr-1" />
+            Добавить ошибку
+          </Button>
+        </div>
+        <div className="space-y-2">
+          {formData.commonMistakes.map((mistake, index) => (
+            <div key={index} className="flex gap-2">
+              <div className="flex-1">
+                <Input
+                  value={mistake}
+                  onChange={(e) => updateMistake(index, e.target.value)}
+                  placeholder={`Ошибка ${index + 1}`}
+                  required={index === 0}
+                />
+              </div>
+              {formData.commonMistakes.length > 1 && (
+                <Button
+                  type="button"
+                  onClick={() => removeMistake(index)}
+                  size="sm"
+                  variant="ghost"
+                  className="text-red-500"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Кнопки */}
+      <div className="flex justify-end gap-2 pt-4 border-t">
+        <Button type="button" variant="outline" onClick={() => setIsExerciseDialogOpen(false)}>
+          Отмена
+        </Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? 'Сохранение...' : (exercise ? 'Обновить' : 'Создать')}
+        </Button>
+      </div>
+    </form>
   );
 }
