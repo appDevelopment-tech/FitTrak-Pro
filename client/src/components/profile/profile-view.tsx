@@ -7,9 +7,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Edit, Save, Camera, Plus, Award, Clock, Users, Calendar, Filter, Search } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import type { User as UserType, Exercise } from "@shared/schema";
+import { User, Edit, Save, Camera, Plus, Award, Clock, Users, Calendar, Filter, Search, X, Trash2 } from "lucide-react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import type { User as UserType, Exercise, InsertExercise } from "@shared/schema";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 import { getExercisePhoto } from "@/components/ui/exercise-photos";
 import { ImageUpload } from "@/components/ui/image-upload";
 
@@ -19,6 +22,9 @@ export function ProfileView() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditingImages, setIsEditingImages] = useState(false);
   const [muscleImages, setMuscleImages] = useState<Record<string, string>>({});
+  const [isExerciseDialogOpen, setIsExerciseDialogOpen] = useState(false);
+  const [editingExercise, setEditingExercise] = useState<Exercise | null>(null);
+  const { toast } = useToast();
   
   const { data: user } = useQuery<UserType>({
     queryKey: ['/api/user/1'],
@@ -26,6 +32,45 @@ export function ProfileView() {
 
   const { data: exercises = [] } = useQuery<Exercise[]>({
     queryKey: ['/api/exercises'],
+  });
+
+  // Мутации для упражнений
+  const createExerciseMutation = useMutation({
+    mutationFn: (data: InsertExercise) => apiRequest('/api/exercises', 'POST', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
+      setIsExerciseDialogOpen(false);
+      setEditingExercise(null);
+      toast({ title: "Упражнение создано", description: "Новое упражнение успешно добавлено" });
+    },
+    onError: () => {
+      toast({ title: "Ошибка", description: "Не удалось создать упражнение", variant: "destructive" });
+    }
+  });
+
+  const updateExerciseMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number, data: Partial<InsertExercise> }) => 
+      apiRequest(`/api/exercises/${id}`, 'PATCH', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
+      setIsExerciseDialogOpen(false);
+      setEditingExercise(null);
+      toast({ title: "Упражнение обновлено", description: "Изменения успешно сохранены" });
+    },
+    onError: () => {
+      toast({ title: "Ошибка", description: "Не удалось обновить упражнение", variant: "destructive" });
+    }
+  });
+
+  const deleteExerciseMutation = useMutation({
+    mutationFn: (id: number) => apiRequest(`/api/exercises/${id}`, 'DELETE'),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
+      toast({ title: "Упражнение удалено", description: "Упражнение успешно удалено" });
+    },
+    onError: () => {
+      toast({ title: "Ошибка", description: "Не удалось удалить упражнение", variant: "destructive" });
+    }
   });
 
   // Фильтрация упражнений
@@ -70,6 +115,23 @@ export function ProfileView() {
         return updated;
       });
       localStorage.removeItem(`muscle-image-${muscleGroup}`);
+    }
+  };
+
+  // Функции для управления упражнениями
+  const handleCreateExercise = () => {
+    setEditingExercise(null);
+    setIsExerciseDialogOpen(true);
+  };
+
+  const handleEditExercise = (exercise: Exercise) => {
+    setEditingExercise(exercise);
+    setIsExerciseDialogOpen(true);
+  };
+
+  const handleDeleteExercise = (exerciseId: number) => {
+    if (confirm('Вы уверены, что хотите удалить это упражнение?')) {
+      deleteExerciseMutation.mutate(exerciseId);
     }
   };
 
