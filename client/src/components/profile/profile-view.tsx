@@ -352,7 +352,9 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="text-6xl font-bold mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">7</div>
+                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">
+                        {getMuscleIcon('живот', 'w-12 h-12 text-white')}
+                      </div>
                       <div className="text-lg font-semibold">ЖИВОТ</div>
                     </div>
                   </div>
