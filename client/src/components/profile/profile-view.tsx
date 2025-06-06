@@ -284,18 +284,7 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        <img 
-                          src="/arms-exercise.jpg" 
-                          alt="Упражнения для рук" 
-                          className="w-16 h-16 object-cover rounded"
-                          onError={(e) => {
-                            const target = e.currentTarget as HTMLImageElement;
-                            target.style.display = 'none';
-                            const fallback = target.nextElementSibling as HTMLElement;
-                            if (fallback) fallback.style.display = 'block';
-                          }}
-                        />
-                        <div className="text-white text-2xl font-bold hidden">Р</div>
+{getExercisePhoto('руки', 'w-16 h-16')}
                       </div>
                       <div className="text-lg font-semibold">РУКИ</div>
                     </div>
@@ -318,18 +307,7 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        <img 
-                          src="/shoulders-exercise.jpg" 
-                          alt="Упражнения для плеч" 
-                          className="w-16 h-16 object-cover rounded"
-                          onError={(e) => {
-                            const target = e.currentTarget as HTMLImageElement;
-                            target.style.display = 'none';
-                            const fallback = target.nextElementSibling as HTMLElement;
-                            if (fallback) fallback.style.display = 'block';
-                          }}
-                        />
-                        <div className="text-white text-2xl font-bold hidden">П</div>
+{getExercisePhoto('плечи', 'w-16 h-16')}
                       </div>
                       <div className="text-lg font-semibold">ПЛЕЧИ</div>
                     </div>
@@ -352,18 +330,7 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        <img 
-                          src="/glutes-exercise.jpg" 
-                          alt="Упражнения для ягодичных" 
-                          className="w-16 h-16 object-cover rounded"
-                          onError={(e) => {
-                            const target = e.currentTarget as HTMLImageElement;
-                            target.style.display = 'none';
-                            const fallback = target.nextElementSibling as HTMLElement;
-                            if (fallback) fallback.style.display = 'block';
-                          }}
-                        />
-                        <div className="text-white text-2xl font-bold hidden">Я</div>
+{getExercisePhoto('ягодичные', 'w-16 h-16')}
                       </div>
                       <div className="text-lg font-semibold">ЯГОДИЧНЫЕ</div>
                     </div>
@@ -386,18 +353,7 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        <img 
-                          src="/abs-exercise.jpg" 
-                          alt="Упражнения для живота" 
-                          className="w-16 h-16 object-cover rounded"
-                          onError={(e) => {
-                            const target = e.currentTarget as HTMLImageElement;
-                            target.style.display = 'none';
-                            const fallback = target.nextElementSibling as HTMLElement;
-                            if (fallback) fallback.style.display = 'block';
-                          }}
-                        />
-                        <div className="text-white text-2xl font-bold hidden">Ж</div>
+{getExercisePhoto('живот', 'w-16 h-16')}
                       </div>
                       <div className="text-lg font-semibold">ЖИВОТ</div>
                     </div>
