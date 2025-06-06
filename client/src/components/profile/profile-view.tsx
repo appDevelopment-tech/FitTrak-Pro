@@ -459,12 +459,9 @@ export function ProfileView() {
                           getExercisePhoto('живот', 'w-16 h-16')
                         )}
                       </div>
+                      <div className="text-lg font-semibold">ЖИВОТ</div>
                     </div>
                   </div>
-                </div>
-                <div className="p-4 text-center">
-                  <h3 className="font-semibold text-gray-800 group-hover:text-orange-600 transition-colors">Живот</h3>
-                  <p className="text-sm text-gray-500 mt-1">Упражнения для пресса</p>
                 </div>
               </CardContent>
             </Card>
