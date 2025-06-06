@@ -17,6 +17,7 @@ import { getExercisePhoto } from "@/components/ui/exercise-photos";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { ExerciseImageManager } from "@/components/exercise/exercise-image-manager";
 import { ExerciseImagePlaceholder } from "@/components/exercise/exercise-image-placeholder";
+import { MuscleImageUpload } from "@/components/ui/muscle-image-upload";
 
 export function ProfileView() {
   const [isEditing, setIsEditing] = useState(false);
@@ -158,6 +159,14 @@ export function ProfileView() {
     if (confirm('Вы уверены, что хотите удалить это упражнение?')) {
       deleteExerciseMutation.mutate(exerciseId);
     }
+  }
+
+  const handleMuscleImageSave = (muscleGroup: string, imageUrl: string) => {
+    setMuscleImages(prev => ({
+      ...prev,
+      [muscleGroup]: imageUrl
+    }));
+    setSelectedMuscleForImage(null);
   };
 
   // Загрузка сохраненных изображений при монтировании компонента
@@ -373,15 +382,14 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-lg">
                   <div className="h-32 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        {isEditingImages ? (
-                          <ImageUpload
-                            currentImage={muscleImages['спина']}
-                            onImageChange={(file) => handleImageUpload('спина', file)}
-                            className="w-16 h-16"
-                            placeholder="Спина"
-                          />
-                        ) : muscleImages['спина'] ? (
+                      <div 
+                        className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm cursor-pointer hover:bg-white/30 transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedMuscleForImage('спина');
+                        }}
+                      >
+                        {muscleImages['спина'] ? (
                           <img src={muscleImages['спина']} alt="Упражнения для спины" className="w-16 h-16 object-cover rounded" />
                         ) : (
                           getExercisePhoto('спина', 'w-16 h-16')
@@ -724,6 +732,17 @@ export function ProfileView() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Диалог для загрузки изображений мышечных групп */}
+      {selectedMuscleForImage && (
+        <MuscleImageUpload
+          isOpen={true}
+          onClose={() => setSelectedMuscleForImage(null)}
+          muscleGroup={selectedMuscleForImage}
+          currentImage={muscleImages[selectedMuscleForImage]}
+          onImageSave={(imageUrl) => handleMuscleImageSave(selectedMuscleForImage, imageUrl)}
+        />
+      )}
     </div>
   );
 }
