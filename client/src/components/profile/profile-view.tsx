@@ -467,18 +467,31 @@ export function ProfileView() {
             </Card>
 
             {/* Кардио */}
-            <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-orange-200">
+            <Card 
+              className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'кардио' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
+              onClick={() => handleMuscleGroupClick('кардио')}
+            >
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2ZM12 21.5C16.14 21.5 19.5 18.14 19.5 14C19.5 9.86 16.14 6.5 12 6.5C7.86 6.5 4.5 9.86 4.5 14C4.5 18.14 7.86 21.5 12 21.5ZM12 8.5C15.04 8.5 17.5 10.96 17.5 14C17.5 17.04 15.04 19.5 12 19.5C8.96 19.5 6.5 17.04 6.5 14C6.5 10.96 8.96 8.5 12 8.5Z"/>
-                    </svg>
+                    <div className="text-white text-center">
+                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
+                        {isEditingImages ? (
+                          <ImageUpload
+                            currentImage={muscleImages['кардио']}
+                            onImageChange={(file) => handleImageUpload('кардио', file)}
+                            className="w-16 h-16"
+                            placeholder="Кардио"
+                          />
+                        ) : muscleImages['кардио'] ? (
+                          <img src={muscleImages['кардио']} alt="Кардиотренировки" className="w-16 h-16 object-cover rounded" />
+                        ) : (
+                          getExercisePhoto('кардио', 'w-16 h-16')
+                        )}
+                      </div>
+                      <div className="text-lg font-semibold">КАРДИО</div>
+                    </div>
                   </div>
-                </div>
-                <div className="p-4 text-center">
-                  <h3 className="font-semibold text-gray-800 group-hover:text-orange-600 transition-colors">Кардио</h3>
-                  <p className="text-sm text-gray-500 mt-1">Кардиотренировки</p>
                 </div>
               </CardContent>
             </Card>
