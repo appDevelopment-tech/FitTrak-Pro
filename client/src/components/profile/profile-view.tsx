@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { User, Edit, Save, Camera, Plus, Award, Clock, Users, Calendar, Filter, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import type { User as UserType, Exercise } from "@shared/schema";
+import { getMuscleIcon } from "@/components/ui/muscle-icons";
 
 export function ProfileView() {
   const [isEditing, setIsEditing] = useState(false);
@@ -213,7 +214,9 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="text-6xl font-bold mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">1</div>
+                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">
+                        {getMuscleIcon('грудь', 'w-12 h-12 text-white')}
+                      </div>
                       <div className="text-lg font-semibold">ГРУДЬ</div>
                     </div>
                   </div>
@@ -234,7 +237,9 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="text-6xl font-bold mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">2</div>
+                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">
+                        {getMuscleIcon('спина', 'w-12 h-12 text-white')}
+                      </div>
                       <div className="text-lg font-semibold">СПИНА</div>
                     </div>
                   </div>
@@ -255,7 +260,9 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="text-6xl font-bold mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">3</div>
+                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">
+                        {getMuscleIcon('ноги', 'w-12 h-12 text-white')}
+                      </div>
                       <div className="text-lg font-semibold">НОГИ</div>
                     </div>
                   </div>
@@ -276,7 +283,9 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="text-6xl font-bold mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">4</div>
+                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">
+                        {getMuscleIcon('руки', 'w-12 h-12 text-white')}
+                      </div>
                       <div className="text-lg font-semibold">РУКИ</div>
                     </div>
                   </div>
@@ -297,7 +306,9 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="text-6xl font-bold mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">5</div>
+                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">
+                        {getMuscleIcon('плечи', 'w-12 h-12 text-white')}
+                      </div>
                       <div className="text-lg font-semibold">ПЛЕЧИ</div>
                     </div>
                   </div>
@@ -318,7 +329,9 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="text-6xl font-bold mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">6</div>
+                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">
+                        {getMuscleIcon('ягодичные', 'w-12 h-12 text-white')}
+                      </div>
                       <div className="text-lg font-semibold">ЯГОДИЧНЫЕ</div>
                     </div>
                   </div>
