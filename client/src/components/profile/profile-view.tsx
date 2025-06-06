@@ -17,6 +17,7 @@ import { getExercisePhoto } from "@/components/ui/exercise-photos";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { ExerciseImageManager } from "@/components/exercise/exercise-image-manager";
 import { ExerciseImagePlaceholder } from "@/components/exercise/exercise-image-placeholder";
+import { ExerciseDetail } from "@/components/exercise/exercise-detail";
 import { MuscleImageUpload } from "@/components/ui/muscle-image-upload";
 
 export function ProfileView() {
@@ -30,6 +31,7 @@ export function ProfileView() {
   const [showImageManager, setShowImageManager] = useState(false);
   const [selectedExerciseForImage, setSelectedExerciseForImage] = useState<Exercise | null>(null);
   const [selectedMuscleForImage, setSelectedMuscleForImage] = useState<string | null>(null);
+  const [selectedExerciseForDetail, setSelectedExerciseForDetail] = useState<Exercise | null>(null);
   const { toast } = useToast();
   
   const { data: user } = useQuery<UserType>({
@@ -643,7 +645,12 @@ export function ProfileView() {
                           {/* Название и сложность */}
                           <div className="flex-1">
                             <div className="flex items-center gap-3">
-                              <h4 className="font-medium text-gray-900">{exercise.name}</h4>
+                              <h4 
+                                className="font-medium text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
+                                onClick={() => setSelectedExerciseForDetail(exercise)}
+                              >
+                                {exercise.name}
+                              </h4>
                               <Badge variant={exercise.difficulty === 'начинающий' ? 'secondary' : exercise.difficulty === 'средний' ? 'default' : 'destructive'} className="text-xs">
                                 {exercise.difficulty}
                               </Badge>
@@ -743,6 +750,14 @@ export function ProfileView() {
           muscleGroup={selectedMuscleForImage}
           currentImage={muscleImages[selectedMuscleForImage]}
           onImageSave={(imageUrl) => handleMuscleImageSave(selectedMuscleForImage, imageUrl)}
+        />
+      )}
+
+      {/* Диалог для отображения полного обзора упражнения */}
+      {selectedExerciseForDetail && (
+        <ExerciseDetail
+          exercise={selectedExerciseForDetail}
+          onClose={() => setSelectedExerciseForDetail(null)}
         />
       )}
     </div>
