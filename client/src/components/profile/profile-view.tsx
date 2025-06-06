@@ -28,6 +28,7 @@ export function ProfileView() {
   const [editingExercise, setEditingExercise] = useState<Exercise | null>(null);
   const [showImageManager, setShowImageManager] = useState(false);
   const [selectedExerciseForImage, setSelectedExerciseForImage] = useState<Exercise | null>(null);
+  const [selectedMuscleForImage, setSelectedMuscleForImage] = useState<string | null>(null);
   const { toast } = useToast();
   
   const { data: user } = useQuery<UserType>({
@@ -332,14 +333,6 @@ export function ProfileView() {
         <TabsContent value="exercises" className="space-y-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold text-gray-800">Группы мышц</h2>
-            <Button
-              variant={isEditingImages ? "default" : "outline"}
-              onClick={() => setIsEditingImages(!isEditingImages)}
-              className="flex items-center space-x-2"
-            >
-              <Camera className="h-4 w-4" />
-              <span>{isEditingImages ? "Сохранить" : "Изменить изображения"}</span>
-            </Button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {/* Грудь */}
@@ -351,15 +344,14 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-lg">
                   <div className="h-32 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        {isEditingImages ? (
-                          <ImageUpload
-                            currentImage={muscleImages['грудь']}
-                            onImageChange={(file) => handleImageUpload('грудь', file)}
-                            className="w-16 h-16"
-                            placeholder="Грудь"
-                          />
-                        ) : muscleImages['грудь'] ? (
+                      <div 
+                        className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm cursor-pointer hover:bg-white/30 transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedMuscleForImage('грудь');
+                        }}
+                      >
+                        {muscleImages['грудь'] ? (
                           <img src={muscleImages['грудь']} alt="Упражнения для груди" className="w-16 h-16 object-cover rounded" />
                         ) : (
                           getExercisePhoto('грудь', 'w-16 h-16')
