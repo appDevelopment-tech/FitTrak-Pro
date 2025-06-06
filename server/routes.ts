@@ -237,57 +237,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Exercise not found" });
       }
 
-      // Specific exercise demonstration images from verified fitness sources
+      // High-quality fitness demonstration images from reliable CDNs
       const exerciseImageLibrary: Record<string, string[]> = {
         "Жим штанги лежа на скамье": [
-          "https://cdn.muscleandstrength.com/sites/default/files/barbell-bench-press.jpg",
-          "https://www.bodybuilding.com/images/2016/june/barbell-bench-press-exercise-guide-1.jpg",
-          "https://fitnessvolt.com/wp-content/uploads/2021/03/Barbell-Bench-Press.jpg",
           "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
           "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
           "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
           "https://images.unsplash.com/photo-1583500178690-f7c1730b3313?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
+          "https://images.unsplash.com/photo-1571019019973-2c0d02eaa67a?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
+          "https://images.unsplash.com/photo-1581009137042-c552e485697a?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
+          "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
           "https://images.unsplash.com/photo-1579952363873-27d3bfad9c0d?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center"
         ],
         "Жим гантелей лежа": [
-          "https://cdn.muscleandstrength.com/sites/default/files/dumbbell-bench-press.jpg",
-          "https://www.bodybuilding.com/images/2016/june/dumbbell-bench-press-exercise-guide.jpg",
           "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
           "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
           "https://images.unsplash.com/photo-1594736797933-d0e501ba2fe6?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
           "https://images.unsplash.com/photo-1517963628607-235ccdd5476c?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
           "https://images.unsplash.com/photo-1583500178690-f7c1730b3313?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
+          "https://images.unsplash.com/photo-1571019019973-2c0d02eaa67a?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
+          "https://images.unsplash.com/photo-1581009137042-c552e485697a?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
           "https://images.unsplash.com/photo-1579952363873-27d3bfad9c0d?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center"
         ],
         "Становая тяга": [
-          "https://cdn.muscleandstrength.com/sites/default/files/conventional-deadlift.jpg",
-          "https://www.bodybuilding.com/images/2016/june/deadlift-exercise-guide.jpg",
-          "https://fitnessvolt.com/wp-content/uploads/2021/03/Conventional-Deadlift.jpg",
           "https://images.unsplash.com/photo-1605296867304-46d5465a13f1?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
           "https://images.unsplash.com/photo-1574680096145-d05b474e2155?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
           "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
           "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1583500178690-f7c1730b3313?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center"
+          "https://images.unsplash.com/photo-1583500178690-f7c1730b3313?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
+          "https://images.unsplash.com/photo-1571019019973-2c0d02eaa67a?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
+          "https://images.unsplash.com/photo-1581009137042-c552e485697a?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
+          "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center"
         ],
         "Отжимания в упоре": [
-          "https://cdn.muscleandstrength.com/sites/default/files/push-up.jpg",
-          "https://www.bodybuilding.com/images/2016/june/push-up-exercise-guide.jpg",
           "https://images.unsplash.com/photo-1517963628607-235ccdd5476c?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
           "https://images.unsplash.com/photo-1594736797933-d0e501ba2fe6?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
           "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
           "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
           "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1583500178690-f7c1730b3313?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center"
+          "https://images.unsplash.com/photo-1583500178690-f7c1730b3313?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
+          "https://images.unsplash.com/photo-1571019019973-2c0d02eaa67a?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
+          "https://images.unsplash.com/photo-1581009137042-c552e485697a?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center"
         ],
         "Подтягивания широким хватом": [
-          "https://cdn.muscleandstrength.com/sites/default/files/wide-grip-pull-up.jpg",
-          "https://www.bodybuilding.com/images/2016/june/pull-up-exercise-guide.jpg",
           "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
           "https://images.unsplash.com/photo-1517963628607-235ccdd5476c?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
           "https://images.unsplash.com/photo-1594736797933-d0e501ba2fe6?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
           "https://images.unsplash.com/photo-1605296867304-46d5465a13f1?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
           "https://images.unsplash.com/photo-1574680096145-d05b474e2155?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center"
+          "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
+          "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
+          "https://images.unsplash.com/photo-1583500178690-f7c1730b3313?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center"
         ]
       };
       
