@@ -6,41 +6,41 @@ import { insertWorkoutProgramSchema, insertWorkoutSessionSchema, insertExerciseP
 function translateExerciseToEnglish(russianName: string): string {
   const translations: Record<string, string> = {
     // Упражнения для груди
-    "Жим штанги лежа на скамье": "bench press barbell",
-    "Сведение рук в тренажере": "chest fly machine",
-    "Жим гантелей лежа": "dumbbell bench press",
-    "Разведение гантелей лежа": "dumbbell flyes",
-    "Отжимания в упоре": "push ups",
-    "Отжимания с колен": "knee push ups",
-    "Жим штанги на скамье под углом 30 градусов": "incline barbell press",
-    "Жим гантелей на скамье под углом 30 градусов": "incline dumbbell press",
-    "Отжимания на брусьях для грудного отдела": "chest dips parallel bars",
-    "Перекрестная тяга стоя": "cable crossover standing",
-    "Перекрестная тяга лежа на скамье": "cable crossover lying",
-    "Жим штанги на скамье головой вниз": "decline barbell press",
-    "Пуловер с гантелью": "dumbbell pullover",
-    "Жим в тренажере Хаммер": "hammer strength chest press",
-    "Отжимания от пола широким хватом": "wide grip push ups",
-    "Отжимания на возвышении": "elevated push ups",
+    "Жим штанги лежа на скамье": "man bench press barbell gym workout",
+    "Сведение рук в тренажере": "man chest fly machine gym exercise",
+    "Жим гантелей лежа": "man dumbbell bench press workout gym",
+    "Разведение гантелей лежа": "man dumbbell flyes chest exercise gym",
+    "Отжимания в упоре": "man push ups exercise fitness",
+    "Отжимания с колен": "woman modified push ups exercise",
+    "Жим штанги на скамье под углом 30 градусов": "man incline barbell press gym workout",
+    "Жим гантелей на скамье под углом 30 градусов": "man incline dumbbell press gym exercise",
+    "Отжимания на брусьях для грудного отдела": "man chest dips parallel bars gym",
+    "Перекрестная тяга стоя": "man cable crossover standing gym workout",
+    "Перекрестная тяга лежа на скамье": "man cable crossover lying bench exercise",
+    "Жим штанги на скамье головой вниз": "man decline barbell press gym workout",
+    "Пуловер с гантелью": "man dumbbell pullover chest exercise gym",
+    "Жим в тренажере Хаммер": "man hammer strength chest press machine gym",
+    "Отжимания от пола широким хватом": "man wide grip push ups exercise",
+    "Отжимания на возвышении": "man elevated push ups exercise fitness",
     
     // Упражнения для спины
-    "Становая тяга": "deadlift barbell",
-    "Подтягивания широким хватом": "pull ups wide grip",
-    "Тяга штанги в наклоне": "barbell bent over row",
-    "Тяга гантели одной рукой": "single arm dumbbell row",
-    "Тяга верхнего блока": "lat pulldown machine",
-    "Горизонтальная тяга": "seated cable row",
-    "Подтягивания узким хватом": "pull ups close grip",
-    "Гиперэкстензия": "hyperextension back exercise",
-    "Тяга Т-грифа": "t bar row",
-    "Шраги со штангой": "barbell shrugs",
-    "Шраги с гантелями": "dumbbell shrugs",
-    "Обратные разведения с гантелями": "reverse fly dumbbells",
-    "Тяга штанги к подбородку": "upright row barbell",
-    "Пуловер со штангой лежа": "barbell pullover lying"
+    "Становая тяга": "man deadlift barbell gym workout powerlifting",
+    "Подтягивания широким хватом": "man pull ups wide grip gym exercise",
+    "Тяга штанги в наклоне": "man barbell bent over row gym workout",
+    "Тяга гантели одной рукой": "man single arm dumbbell row gym exercise",
+    "Тяга верхнего блока": "man lat pulldown machine gym workout",
+    "Горизонтальная тяга": "man seated cable row gym exercise",
+    "Подтягивания узким хватом": "man pull ups close grip gym workout",
+    "Гиперэкстензия": "man hyperextension back exercise gym",
+    "Тяга Т-грифа": "man t bar row gym workout",
+    "Шраги со штангой": "man barbell shrugs gym exercise",
+    "Шраги с гантелями": "man dumbbell shrugs gym workout",
+    "Обратные разведения с гантелями": "man reverse fly dumbbells gym exercise",
+    "Тяга штанги к подбородку": "man upright row barbell gym workout",
+    "Пуловер со штангой лежа": "man barbell pullover lying gym exercise"
   };
   
-  return translations[russianName] || `exercise workout ${russianName}`;
+  return translations[russianName] || `man gym exercise workout ${russianName}`;
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -246,7 +246,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const searchQuery = translateExerciseToEnglish(exercise.name);
       
       const response = await fetch(
-        `https://api.unsplash.com/search/photos?query=${encodeURIComponent(searchQuery)}&page=1&per_page=5&orientation=landscape`,
+        `https://api.unsplash.com/search/photos?query=${encodeURIComponent(searchQuery)}&page=1&per_page=8&orientation=landscape&content_filter=high`,
         {
           headers: {
             'Authorization': `Client-ID ${accessKey}`
