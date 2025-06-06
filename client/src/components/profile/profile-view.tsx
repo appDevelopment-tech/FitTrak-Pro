@@ -342,6 +342,14 @@ export function ProfileView() {
         <TabsContent value="exercises" className="space-y-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold text-gray-800">Группы мышц</h2>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditingImages(!isEditingImages)}
+              className="flex items-center space-x-2"
+            >
+              <Camera className="h-4 w-4" />
+              <span>{isEditingImages ? "Завершить редактирование" : "Редактировать изображения"}</span>
+            </Button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {/* Грудь */}
@@ -354,11 +362,11 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div 
-                        className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm cursor-pointer hover:bg-white/30 transition-colors"
-                        onClick={(e) => {
+                        className={`mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm transition-colors ${isEditingImages ? 'cursor-pointer hover:bg-white/30' : ''}`}
+                        onClick={isEditingImages ? (e) => {
                           e.stopPropagation();
                           setSelectedMuscleForImage('грудь');
-                        }}
+                        } : undefined}
                       >
                         {muscleImages['грудь'] ? (
                           <img src={muscleImages['грудь']} alt="Упражнения для груди" className="w-16 h-16 object-cover rounded" />
@@ -383,11 +391,11 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div 
-                        className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm cursor-pointer hover:bg-white/30 transition-colors"
-                        onClick={(e) => {
+                        className={`mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm transition-colors ${isEditingImages ? 'cursor-pointer hover:bg-white/30' : ''}`}
+                        onClick={isEditingImages ? (e) => {
                           e.stopPropagation();
                           setSelectedMuscleForImage('спина');
-                        }}
+                        } : undefined}
                       >
                         {muscleImages['спина'] ? (
                           <img src={muscleImages['спина']} alt="Упражнения для спины" className="w-16 h-16 object-cover rounded" />
@@ -412,11 +420,11 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div 
-                        className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm cursor-pointer hover:bg-white/30 transition-colors"
-                        onClick={(e) => {
+                        className={`mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm transition-colors ${isEditingImages ? 'cursor-pointer hover:bg-white/30' : ''}`}
+                        onClick={isEditingImages ? (e) => {
                           e.stopPropagation();
                           setSelectedMuscleForImage('ноги');
-                        }}
+                        } : undefined}
                       >
                         {muscleImages['ноги'] ? (
                           <img src={muscleImages['ноги']} alt="Упражнения для ног" className="w-16 h-16 object-cover rounded" />
@@ -441,11 +449,11 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div 
-                        className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm cursor-pointer hover:bg-white/30 transition-colors"
-                        onClick={(e) => {
+                        className={`mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm transition-colors ${isEditingImages ? 'cursor-pointer hover:bg-white/30' : ''}`}
+                        onClick={isEditingImages ? (e) => {
                           e.stopPropagation();
                           setSelectedMuscleForImage('руки');
-                        }}
+                        } : undefined}
                       >
                         {muscleImages['руки'] ? (
                           <img src={muscleImages['руки']} alt="Упражнения для рук" className="w-16 h-16 object-cover rounded" />
@@ -470,11 +478,11 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div 
-                        className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm cursor-pointer hover:bg-white/30 transition-colors"
-                        onClick={(e) => {
+                        className={`mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm transition-colors ${isEditingImages ? 'cursor-pointer hover:bg-white/30' : ''}`}
+                        onClick={isEditingImages ? (e) => {
                           e.stopPropagation();
                           setSelectedMuscleForImage('плечи');
-                        }}
+                        } : undefined}
                       >
                         {muscleImages['плечи'] ? (
                           <img src={muscleImages['плечи']} alt="Упражнения для плеч" className="w-16 h-16 object-cover rounded" />
@@ -529,11 +537,11 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div 
-                        className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm cursor-pointer hover:bg-white/30 transition-colors"
-                        onClick={(e) => {
+                        className={`mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm transition-colors ${isEditingImages ? 'cursor-pointer hover:bg-white/30' : ''}`}
+                        onClick={isEditingImages ? (e) => {
                           e.stopPropagation();
                           setSelectedMuscleForImage('живот');
-                        }}
+                        } : undefined}
                       >
                         {muscleImages['живот'] ? (
                           <img src={muscleImages['живот']} alt="Упражнения для живота" className="w-16 h-16 object-cover rounded" />
@@ -558,11 +566,11 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div 
-                        className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm cursor-pointer hover:bg-white/30 transition-colors"
-                        onClick={(e) => {
+                        className={`mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm transition-colors ${isEditingImages ? 'cursor-pointer hover:bg-white/30' : ''}`}
+                        onClick={isEditingImages ? (e) => {
                           e.stopPropagation();
                           setSelectedMuscleForImage('кардио');
-                        }}
+                        } : undefined}
                       >
                         {muscleImages['кардио'] ? (
                           <img src={muscleImages['кардио']} alt="Кардиотренировки" className="w-16 h-16 object-cover rounded" />
