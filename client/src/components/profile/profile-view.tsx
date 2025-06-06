@@ -652,39 +652,36 @@ export function ProfileView() {
                               </div>
                               
                               {/* Кнопки управления */}
-                              <div className="flex justify-end gap-1 mb-3" onClick={(e) => e.stopPropagation()}>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
+                              <div className="flex justify-end gap-2 mb-3">
+                                <button
+                                  type="button"
                                   onClick={() => {
                                     console.log('Camera button clicked for exercise:', exercise.name);
                                     setSelectedExerciseForImage(exercise);
                                     setShowImageManager(true);
-                                    console.log('showImageManager set to true');
+                                    console.log('showImageManager set to true, selectedExercise:', exercise);
                                   }}
-                                  className="h-7 w-7 p-0"
+                                  className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-blue-500 hover:bg-blue-600 text-white transition-colors"
                                   title="Управление изображениями"
                                 >
-                                  <Camera className="h-3 w-3" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
+                                  <Camera className="h-4 w-4" />
+                                </button>
+                                <button
+                                  type="button"
                                   onClick={() => handleEditExercise(exercise)}
-                                  className="h-7 w-7 p-0"
+                                  className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-gray-500 hover:bg-gray-600 text-white transition-colors"
                                   title="Редактировать упражнение"
                                 >
-                                  <Edit className="h-3 w-3" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
+                                  <Edit className="h-4 w-4" />
+                                </button>
+                                <button
+                                  type="button"
                                   onClick={() => handleDeleteExercise(exercise.id)}
-                                  className="h-7 w-7 p-0 text-red-500 hover:text-red-700"
+                                  className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-red-500 hover:bg-red-600 text-white transition-colors"
                                   title="Удалить упражнение"
                                 >
-                                  <Trash2 className="h-3 w-3" />
-                                </Button>
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
                               </div>
                               <p className="text-sm text-gray-600 mb-3">{exercise.overview}</p>
                               <div className="space-y-2">
