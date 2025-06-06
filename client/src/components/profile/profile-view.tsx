@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { User, Edit, Save, Camera, Plus, Award, Clock, Users, Calendar, Filter, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import type { User as UserType, Exercise } from "@shared/schema";
-import { getMuscleImage } from "@/components/ui/muscle-images";
+// Удалены анатомические изображения
 
 export function ProfileView() {
   const [isEditing, setIsEditing] = useState(false);
