@@ -3,6 +3,29 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertWorkoutProgramSchema, insertWorkoutSessionSchema, insertExerciseProgressSchema, insertExerciseSchema } from "@shared/schema";
 
+function translateExerciseToEnglish(russianName: string): string {
+  const translations: Record<string, string> = {
+    "Жим штанги лежа на скамье": "bench press barbell",
+    "Сведение рук в тренажере": "chest fly machine",
+    "Жим гантелей лежа": "dumbbell bench press",
+    "Разведение гантелей лежа": "dumbbell flyes",
+    "Отжимания в упоре": "push ups",
+    "Отжимания с колен": "knee push ups",
+    "Жим штанги на скамье под углом 30 градусов": "incline barbell press",
+    "Жим гантелей на скамье под углом 30 градусов": "incline dumbbell press",
+    "Отжимания на брусьях для грудного отдела": "chest dips parallel bars",
+    "Перекрестная тяга стоя": "cable crossover standing",
+    "Перекрестная тяга лежа на скамье": "cable crossover lying",
+    "Жим штанги на скамье головой вниз": "decline barbell press",
+    "Пуловер с гантелью": "dumbbell pullover",
+    "Жим в тренажере Хаммер": "hammer strength chest press",
+    "Отжимания от пола широким хватом": "wide grip push ups",
+    "Отжимания на возвышении": "elevated push ups"
+  };
+  
+  return translations[russianName] || `chest exercise workout ${russianName}`;
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // User routes
   app.get("/api/user/:id", async (req, res) => {
@@ -187,7 +210,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Exercise image search
+  app.get("/api/exercises/:id/search-image", async (req, res) => {
+    try {
+      const exerciseId = parseInt(req.params.id);
+      const exercise = await storage.getExercise(exerciseId);
+      
+      if (!exercise) {
+        return res.status(404).json({ message: "Exercise not found" });
+      }
 
+      const accessKey = process.env.UNSPLASH_ACCESS_KEY;
+      if (!accessKey) {
+        return res.status(500).json({ message: "Unsplash API key not configured" });
+      }
+
+      // Create search query based on exercise name
+      const searchQuery = translateExerciseToEnglish(exercise.name);
+      
+      const response = await fetch(
+        `https://api.unsplash.com/search/photos?query=${encodeURIComponent(searchQuery)}&page=1&per_page=5&orientation=landscape`,
+        {
+          headers: {
+            'Authorization': `Client-ID ${accessKey}`
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Unsplash API request failed');
+      }
+
+      const data = await response.json();
+      const images = data.results.map((photo: any) => ({
+        id: photo.id,
+        url: photo.urls.regular,
+        thumb: photo.urls.thumb,
+        description: photo.description || photo.alt_description,
+        photographer: photo.user.name,
+        downloadUrl: photo.links.download_location
+      }));
+
+      res.json(images);
+    } catch (error) {
+      console.error('Image search error:', error);
+      res.status(500).json({ message: "Failed to search images" });
+    }
+  });
+
+  // Update exercise image
+  app.patch("/api/exercises/:id/image", async (req, res) => {
+    try {
+      const exerciseId = parseInt(req.params.id);
+      const { imageUrl } = req.body;
+      
+      const exercise = await storage.updateExercise(exerciseId, { 
+        muscleImageUrl: imageUrl 
+      });
+      
+      if (!exercise) {
+        return res.status(404).json({ message: "Exercise not found" });
+      }
+      
+      res.json(exercise);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to update exercise image" });
+    }
+  });
 
   // Dashboard stats
   app.get("/api/dashboard-stats/:userId", async (req, res) => {

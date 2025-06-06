@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { useToast } from "@/hooks/use-toast";
 import { getExercisePhoto } from "@/components/ui/exercise-photos";
 import { ImageUpload } from "@/components/ui/image-upload";
+import { ExerciseImageManager } from "@/components/exercise/exercise-image-manager";
 
 export function ProfileView() {
   const [isEditing, setIsEditing] = useState(false);
