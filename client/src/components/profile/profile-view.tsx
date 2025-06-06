@@ -11,7 +11,7 @@ import { User, Edit, Save, Camera, Plus, Award, Clock, Users, Calendar, Filter, 
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { User as UserType, Exercise, InsertExercise } from "@shared/schema";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { getExercisePhoto } from "@/components/ui/exercise-photos";
 import { ImageUpload } from "@/components/ui/image-upload";
@@ -671,6 +671,9 @@ export function ProfileView() {
             <DialogTitle>
               {editingExercise ? 'Редактировать упражнение' : 'Создать новое упражнение'}
             </DialogTitle>
+            <DialogDescription>
+              Заполните информацию об упражнении. Обязательные поля отмечены звездочкой (*).
+            </DialogDescription>
           </DialogHeader>
           <ExerciseForm
             exercise={editingExercise}
@@ -681,6 +684,7 @@ export function ProfileView() {
                 createExerciseMutation.mutate(data);
               }
             }}
+            onClose={() => setIsExerciseDialogOpen(false)}
             isLoading={createExerciseMutation.isPending || updateExerciseMutation.isPending}
           />
         </DialogContent>
@@ -693,10 +697,11 @@ export function ProfileView() {
 interface ExerciseFormProps {
   exercise?: Exercise | null;
   onSubmit: (data: InsertExercise) => void;
+  onClose: () => void;
   isLoading: boolean;
 }
 
-function ExerciseForm({ exercise, onSubmit, isLoading }: ExerciseFormProps) {
+function ExerciseForm({ exercise, onSubmit, onClose, isLoading }: ExerciseFormProps) {
   const [formData, setFormData] = useState<InsertExercise>({
     name: exercise?.name || '',
     primaryMuscles: exercise?.primaryMuscles || [],
@@ -709,20 +714,64 @@ function ExerciseForm({ exercise, onSubmit, isLoading }: ExerciseFormProps) {
     muscleImageUrl: exercise?.muscleImageUrl || undefined,
   });
 
-  const muscleGroups = ['грудь', 'спина', 'ноги', 'руки', 'плечи', 'ягодичные', 'живот', 'кардио'];
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     // Фильтруем пустые элементы из массивов
     const cleanedData = {
       ...formData,
+      primaryMuscles: formData.primaryMuscles.filter(muscle => muscle.trim() !== ''),
+      secondaryMuscles: formData.secondaryMuscles.filter(muscle => muscle.trim() !== ''),
       technique: formData.technique.filter(step => step.trim() !== ''),
       commonMistakes: formData.commonMistakes.filter(mistake => mistake.trim() !== ''),
       contraindications: formData.contraindications.filter(contra => contra.trim() !== ''),
     };
 
     onSubmit(cleanedData);
+  };
+
+  // Функции для основных групп мышц
+  const addPrimaryMuscle = () => {
+    setFormData(prev => ({
+      ...prev,
+      primaryMuscles: [...prev.primaryMuscles, '']
+    }));
+  };
+
+  const removePrimaryMuscle = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      primaryMuscles: prev.primaryMuscles.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updatePrimaryMuscle = (index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      primaryMuscles: prev.primaryMuscles.map((muscle, i) => i === index ? value : muscle)
+    }));
+  };
+
+  // Функции для вспомогательных групп мышц
+  const addSecondaryMuscle = () => {
+    setFormData(prev => ({
+      ...prev,
+      secondaryMuscles: [...prev.secondaryMuscles, '']
+    }));
+  };
+
+  const removeSecondaryMuscle = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      secondaryMuscles: prev.secondaryMuscles.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateSecondaryMuscle = (index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      secondaryMuscles: prev.secondaryMuscles.map((muscle, i) => i === index ? value : muscle)
+    }));
   };
 
   const addTechniqueStep = () => {
@@ -767,16 +816,6 @@ function ExerciseForm({ exercise, onSubmit, isLoading }: ExerciseFormProps) {
     }));
   };
 
-  const toggleMuscleGroup = (muscleGroup: string, type: 'primary' | 'secondary') => {
-    const field = type === 'primary' ? 'primaryMuscles' : 'secondaryMuscles';
-    setFormData(prev => ({
-      ...prev,
-      [field]: prev[field].includes(muscleGroup)
-        ? prev[field].filter(m => m !== muscleGroup)
-        : [...prev[field], muscleGroup]
-    }));
-  };
-
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Название упражнения */}
@@ -793,38 +832,69 @@ function ExerciseForm({ exercise, onSubmit, isLoading }: ExerciseFormProps) {
 
       {/* Основные группы мышц */}
       <div>
-        <Label>Основные группы мышц *</Label>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
-          {muscleGroups.map(muscle => (
-            <Button
-              key={muscle}
-              type="button"
-              variant={formData.primaryMuscles.includes(muscle) ? "default" : "outline"}
-              size="sm"
-              onClick={() => toggleMuscleGroup(muscle, 'primary')}
-              className="justify-start"
-            >
-              {muscle}
-            </Button>
+        <div className="flex items-center justify-between mb-2">
+          <Label>Основные группы мышц *</Label>
+          <Button type="button" onClick={addPrimaryMuscle} size="sm" variant="outline">
+            <Plus className="h-4 w-4 mr-1" />
+            Добавить группу
+          </Button>
+        </div>
+        <div className="space-y-2">
+          {formData.primaryMuscles.map((muscle, index) => (
+            <div key={index} className="flex gap-2">
+              <div className="flex-1">
+                <Input
+                  value={muscle}
+                  onChange={(e) => updatePrimaryMuscle(index, e.target.value)}
+                  placeholder={`Группа мышц ${index + 1}`}
+                  required={index === 0}
+                />
+              </div>
+              {formData.primaryMuscles.length > 1 && (
+                <Button
+                  type="button"
+                  onClick={() => removePrimaryMuscle(index)}
+                  size="sm"
+                  variant="ghost"
+                  className="text-red-500"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           ))}
         </div>
       </div>
 
       {/* Вспомогательные группы мышц */}
       <div>
-        <Label>Вспомогательные группы мышц</Label>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
-          {muscleGroups.map(muscle => (
-            <Button
-              key={muscle}
-              type="button"
-              variant={formData.secondaryMuscles.includes(muscle) ? "default" : "outline"}
-              size="sm"
-              onClick={() => toggleMuscleGroup(muscle, 'secondary')}
-              className="justify-start"
-            >
-              {muscle}
-            </Button>
+        <div className="flex items-center justify-between mb-2">
+          <Label>Вспомогательные группы мышц</Label>
+          <Button type="button" onClick={addSecondaryMuscle} size="sm" variant="outline">
+            <Plus className="h-4 w-4 mr-1" />
+            Добавить группу
+          </Button>
+        </div>
+        <div className="space-y-2">
+          {formData.secondaryMuscles.map((muscle, index) => (
+            <div key={index} className="flex gap-2">
+              <div className="flex-1">
+                <Input
+                  value={muscle}
+                  onChange={(e) => updateSecondaryMuscle(index, e.target.value)}
+                  placeholder={`Вспомогательная группа ${index + 1}`}
+                />
+              </div>
+              <Button
+                type="button"
+                onClick={() => removeSecondaryMuscle(index)}
+                size="sm"
+                variant="ghost"
+                className="text-red-500"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           ))}
         </div>
       </div>
@@ -931,7 +1001,7 @@ function ExerciseForm({ exercise, onSubmit, isLoading }: ExerciseFormProps) {
 
       {/* Кнопки */}
       <div className="flex justify-end gap-2 pt-4 border-t">
-        <Button type="button" variant="outline" onClick={() => setIsExerciseDialogOpen(false)}>
+        <Button type="button" variant="outline" onClick={onClose}>
           Отмена
         </Button>
         <Button type="submit" disabled={isLoading}>
