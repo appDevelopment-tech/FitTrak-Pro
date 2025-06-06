@@ -227,7 +227,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Exercise image library - curated fitness images
+  // Manual image upload for exercises
   app.get("/api/exercises/:id/search-image", async (req, res) => {
     try {
       const exerciseId = parseInt(req.params.id);
@@ -237,109 +237,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Exercise not found" });
       }
 
-      // High-quality fitness demonstration images from reliable CDNs
-      const exerciseImageLibrary: Record<string, string[]> = {
-        "Жим штанги лежа на скамье": [
-          "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1583500178690-f7c1730b3313?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1571019019973-2c0d02eaa67a?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1581009137042-c552e485697a?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1579952363873-27d3bfad9c0d?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center"
-        ],
-        "Жим гантелей лежа": [
-          "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1594736797933-d0e501ba2fe6?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1517963628607-235ccdd5476c?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1583500178690-f7c1730b3313?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1571019019973-2c0d02eaa67a?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1581009137042-c552e485697a?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1579952363873-27d3bfad9c0d?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center"
-        ],
-        "Становая тяга": [
-          "https://images.unsplash.com/photo-1605296867304-46d5465a13f1?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1574680096145-d05b474e2155?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1583500178690-f7c1730b3313?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1571019019973-2c0d02eaa67a?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1581009137042-c552e485697a?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center"
-        ],
-        "Отжимания в упоре": [
-          "https://images.unsplash.com/photo-1517963628607-235ccdd5476c?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1594736797933-d0e501ba2fe6?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1583500178690-f7c1730b3313?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1571019019973-2c0d02eaa67a?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1581009137042-c552e485697a?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center"
-        ],
-        "Подтягивания широким хватом": [
-          "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1517963628607-235ccdd5476c?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1594736797933-d0e501ba2fe6?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1605296867304-46d5465a13f1?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1574680096145-d05b474e2155?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-          "https://images.unsplash.com/photo-1583500178690-f7c1730b3313?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center"
-        ]
-      };
-      
-      const defaultFitnessImages = [
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-        "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-        "https://images.unsplash.com/photo-1583500178690-f7c1730b3313?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-        "https://images.unsplash.com/photo-1579952363873-27d3bfad9c0d?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-        "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-        "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-        "https://images.unsplash.com/photo-1594736797933-d0e501ba2fe6?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-        "https://images.unsplash.com/photo-1605296867304-46d5465a13f1?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center"
-      ];
-      
-      const exerciseImages = exerciseImageLibrary[exercise.name] || defaultFitnessImages;
-
-      // Format images for the frontend
-      const images = exerciseImages.map((url: string, index: number) => ({
-        id: `${exercise.id}-${index}`,
-        url: url,
-        thumb: url.replace('w=500&h=300', 'w=200&h=120'),
-        description: `${exercise.name} - фитнес упражнение`,
-        photographer: "Fitness Stock Photos",
-        downloadUrl: url
-      }));
-
-      res.json(images);
+      // Return empty array - user will add images manually
+      res.json([]);
     } catch (error) {
-      console.error('Image library error:', error);
-      
-      // Fallback to default fitness images
-      const defaultImages = [
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-        "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-        "https://images.unsplash.com/photo-1583500178690-f7c1730b3313?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-        "https://images.unsplash.com/photo-1579952363873-27d3bfad9c0d?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-        "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-        "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-        "https://images.unsplash.com/photo-1594736797933-d0e501ba2fe6?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center",
-        "https://images.unsplash.com/photo-1605296867304-46d5465a13f1?ixlib=rb-4.0.3&w=500&h=300&fit=crop&crop=center"
-      ];
-      
-      const images = defaultImages.map((url, index) => ({
-        id: `default-${index}`,
-        url: url,
-        thumb: url.replace('w=500&h=300', 'w=200&h=120'),
-        description: "Фитнес упражнение",
-        photographer: "Fitness Stock Photos",
-        downloadUrl: url
-      }));
-
-      res.json(images);
+      console.error('Image search error:', error);
+      res.status(500).json({ message: "Failed to search images" });
     }
   });
 
