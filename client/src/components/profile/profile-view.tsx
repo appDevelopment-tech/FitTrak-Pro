@@ -633,7 +633,7 @@ export function ProfileView() {
                               />
                             ) : (
                               <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
-                                <span className="text-2xl">💪</span>
+                                <span className="text-2xl leading-none">💪</span>
                               </div>
                             )}
                           </div>

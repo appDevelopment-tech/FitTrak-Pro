@@ -154,27 +154,27 @@ export const ShouldersExercisePhoto: React.FC<ExercisePhotoProps> = ({ className
 // Фото упражнения для ягодичных - выпады
 export const GlutesExercisePhoto: React.FC<ExercisePhotoProps> = ({ className = "w-16 h-16" }) => (
   <svg viewBox="0 0 200 150" className={className} fill="none">
-    {/* Человек в выпаде */}
-    <ellipse cx="100" cy="35" rx="8" ry="6" fill="#FDBCB4"/> {/* Голова */}
-    <rect x="85" y="41" width="30" height="30" fill="#E91E63" rx="3"/> {/* Торс */}
+    {/* Человек в выпаде - центрирован */}
+    <ellipse cx="100" cy="40" rx="8" ry="6" fill="#FDBCB4"/> {/* Голова */}
+    <rect x="85" y="46" width="30" height="28" fill="#E91E63" rx="3"/> {/* Торс */}
     
-    {/* Ноги в выпаде */}
-    <rect x="85" y="71" width="12" height="25" fill="#E74C3C" rx="2"/> {/* Переднее бедро */}
-    <rect x="85" y="95" width="12" height="20" fill="#2C5282" rx="2"/> {/* Передняя голень */}
+    {/* Ноги в выпаде - симметрично расположены */}
+    <rect x="88" y="74" width="12" height="22" fill="#E74C3C" rx="2"/> {/* Переднее бедро */}
+    <rect x="88" y="95" width="12" height="18" fill="#2C5282" rx="2"/> {/* Передняя голень */}
     
-    <rect x="110" y="75" width="12" height="20" fill="#E74C3C" rx="2" transform="rotate(-30 116 85)"/> {/* Заднее бедро */}
-    <rect x="125" y="90" width="12" height="15" fill="#2C5282" rx="2" transform="rotate(-60 131 97)"/> {/* Задняя голень */}
+    <rect x="100" y="78" width="12" height="18" fill="#E74C3C" rx="2" transform="rotate(-25 106 87)"/> {/* Заднее бедро */}
+    <rect x="112" y="92" width="12" height="15" fill="#2C5282" rx="2" transform="rotate(-50 118 99)"/> {/* Задняя голень */}
     
-    {/* Руки на поясе */}
-    <rect x="70" y="45" width="15" height="6" fill="#FDBCB4" rx="2"/> {/* Левая рука */}
-    <rect x="115" y="45" width="15" height="6" fill="#FDBCB4" rx="2"/> {/* Правая рука */}
+    {/* Руки на поясе - симметрично */}
+    <rect x="72" y="50" width="13" height="6" fill="#FDBCB4" rx="2"/> {/* Левая рука */}
+    <rect x="115" y="50" width="13" height="6" fill="#FDBCB4" rx="2"/> {/* Правая рука */}
     
-    {/* Подчеркнутые ягодицы */}
-    <ellipse cx="100" cy="75" rx="8" ry="5" fill="#F39C12" opacity="0.8"/>
+    {/* Подчеркнутые ягодицы - центрированы */}
+    <ellipse cx="100" cy="70" rx="8" ry="5" fill="#F39C12" opacity="0.8"/>
     
-    {/* Стопы */}
-    <ellipse cx="91" cy="117" rx="8" ry="4" fill="#8B4513"/>
-    <ellipse cx="135" cy="105" rx="6" ry="3" fill="#8B4513" transform="rotate(-30 135 105)"/>
+    {/* Стопы - выровнены */}
+    <ellipse cx="94" cy="115" rx="7" ry="4" fill="#8B4513"/>
+    <ellipse cx="120" cy="108" rx="6" ry="3" fill="#8B4513" transform="rotate(-25 120 108)"/>
   </svg>
 );
 
