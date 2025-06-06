@@ -1,0 +1,352 @@
+1009-b31887f0fb2f3af2.js:1 Replit version a4a7eb4c, pid2 version 0.0.1373
+_app-59d4b8b10da893ae.js:37 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+_app-59d4b8b10da893ae.js:37 [LaunchDarkly] LaunchDarkly client initialized
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+framework-e5ff3ac173b1d6d8.js:1 Unrecognized feature: 'ambient-light-sensor'.
+_ @ framework-e5ff3ac173b1d6d8.js:1
+framework-e5ff3ac173b1d6d8.js:1 Unrecognized feature: 'battery'.
+_ @ framework-e5ff3ac173b1d6d8.js:1
+framework-e5ff3ac173b1d6d8.js:1 Unrecognized feature: 'execution-while-not-rendered'.
+_ @ framework-e5ff3ac173b1d6d8.js:1
+framework-e5ff3ac173b1d6d8.js:1 Unrecognized feature: 'execution-while-out-of-viewport'.
+_ @ framework-e5ff3ac173b1d6d8.js:1
+framework-e5ff3ac173b1d6d8.js:1 Unrecognized feature: 'layout-animations'.
+_ @ framework-e5ff3ac173b1d6d8.js:1
+framework-e5ff3ac173b1d6d8.js:1 Unrecognized feature: 'legacy-image-formats'.
+_ @ framework-e5ff3ac173b1d6d8.js:1
+framework-e5ff3ac173b1d6d8.js:1 Unrecognized feature: 'navigation-override'.
+_ @ framework-e5ff3ac173b1d6d8.js:1
+framework-e5ff3ac173b1d6d8.js:1 Unrecognized feature: 'oversized-images'.
+_ @ framework-e5ff3ac173b1d6d8.js:1
+framework-e5ff3ac173b1d6d8.js:1 Unrecognized feature: 'publickey-credentials'.
+_ @ framework-e5ff3ac173b1d6d8.js:1
+framework-e5ff3ac173b1d6d8.js:1 Unrecognized feature: 'speaker-selection'.
+_ @ framework-e5ff3ac173b1d6d8.js:1
+framework-e5ff3ac173b1d6d8.js:1 Unrecognized feature: 'unoptimized-images'.
+_ @ framework-e5ff3ac173b1d6d8.js:1
+framework-e5ff3ac173b1d6d8.js:1 Unrecognized feature: 'unsized-media'.
+_ @ framework-e5ff3ac173b1d6d8.js:1
+framework-e5ff3ac173b1d6d8.js:1 Unrecognized feature: 'pointer-lock'.
+_ @ framework-e5ff3ac173b1d6d8.js:1
+framework-e5ff3ac173b1d6d8.js:1 Allow attribute will take precedence over 'allowfullscreen'.
+_ @ framework-e5ff3ac173b1d6d8.js:1
+framework-e5ff3ac173b1d6d8.js:1 Allow attribute will take precedence over 'allowpaymentrequest'.
+_ @ framework-e5ff3ac173b1d6d8.js:1
+googleads.g.doubleclick.net/pagead/viewthroughconversion/11411994397/?random=1749198800558&cv=11&fst=1749198800558&bg=ffffff&guid=ON&async=1&gtm=45be5641v9171242957za200&gcd=13l3l3l3l1l1&dma=0&tag_exp=101509157~103116026~103200004~103233427~103351869~103351871~104617979~104617981~104651276~104651278~104653070~104653072~104661466~104661468~104698127~104698129&u_w=1920&u_h=1080&url=https%3A%2F%2Freplit.com%2F%40maxpetrusenkotu%2FFitTrak-Pro&ref=https%3A%2F%2Freplit.com%2F~&hn=www.googleadservices.com&frm=0&tiba=-%20Replit&npa=0&pscdl=noapi&auid=732649841.1748622752&fledge=1&data=event%3Dgtag.config&rfmt=3&fmt=4:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1478790690&gjid=937115875&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=896415665:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/g/collect?v=2&tid=G-MPJY3F1YEL&cid=1928723166.1748622770&gtm=45je5641v9135634466za200&aip=1&dma=0&gcd=13l3l3l3l2l1&npa=0&frm=0&tag_exp=101509157~103116026~103200004~103233427~103351869~103351871~104653070~104653072~104661466~104661468~104698127~104698129:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=717588924&gjid=1857491608&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=221679604:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+/graphql:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+/graphql:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+/graphql:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+/graphql:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1500341798&gjid=2104737804&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=1583397207:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+/graphql:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+_app-59d4b8b10da893ae.js:1 Uncaught (in promise) ApolloError: Failed to fetch
+    at new t (_app-59d4b8b10da893ae.js:1:233919)
+    at Object.error (_app-59d4b8b10da893ae.js:6:176226)
+    at b (_app-59d4b8b10da893ae.js:9:38061)
+    at y (_app-59d4b8b10da893ae.js:9:38543)
+    at t.error (_app-59d4b8b10da893ae.js:9:39096)
+    at Object.error (_app-59d4b8b10da893ae.js:6:159800)
+    at b (_app-59d4b8b10da893ae.js:9:38061)
+    at y (_app-59d4b8b10da893ae.js:9:38543)
+    at t.error (_app-59d4b8b10da893ae.js:9:39096)
+    at _app-59d4b8b10da893ae.js:9:723478
+    at Array.forEach (<anonymous>)
+    at r (_app-59d4b8b10da893ae.js:9:723447)
+    at Object.error (_app-59d4b8b10da893ae.js:6:160948)
+    at b (_app-59d4b8b10da893ae.js:9:38061)
+    at y (_app-59d4b8b10da893ae.js:9:38543)
+    at t.error (_app-59d4b8b10da893ae.js:9:39096)
+    at e.<anonymous> (_app-59d4b8b10da893ae.js:9:557385)
+    at Object.next (_app-59d4b8b10da893ae.js:6:39047)
+    at a (_app-59d4b8b10da893ae.js:6:37885)
+/graphql:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+_app-59d4b8b10da893ae.js:1 Uncaught (in promise) ApolloError: Failed to fetch
+    at new t (_app-59d4b8b10da893ae.js:1:233919)
+    at Object.error (_app-59d4b8b10da893ae.js:6:176226)
+    at b (_app-59d4b8b10da893ae.js:9:38061)
+    at y (_app-59d4b8b10da893ae.js:9:38543)
+    at t.error (_app-59d4b8b10da893ae.js:9:39096)
+    at Object.error (_app-59d4b8b10da893ae.js:6:159800)
+    at b (_app-59d4b8b10da893ae.js:9:38061)
+    at y (_app-59d4b8b10da893ae.js:9:38543)
+    at t.error (_app-59d4b8b10da893ae.js:9:39096)
+    at _app-59d4b8b10da893ae.js:9:723478
+    at Array.forEach (<anonymous>)
+    at r (_app-59d4b8b10da893ae.js:9:723447)
+    at Object.error (_app-59d4b8b10da893ae.js:6:160948)
+    at b (_app-59d4b8b10da893ae.js:9:38061)
+    at y (_app-59d4b8b10da893ae.js:9:38543)
+    at t.error (_app-59d4b8b10da893ae.js:9:39096)
+    at e.<anonymous> (_app-59d4b8b10da893ae.js:9:557385)
+    at Object.next (_app-59d4b8b10da893ae.js:6:39047)
+    at a (_app-59d4b8b10da893ae.js:6:37885)
+_app-59d4b8b10da893ae.js:1 Uncaught (in promise) ApolloError: Failed to fetch
+    at new t (_app-59d4b8b10da893ae.js:1:233919)
+    at Object.error (_app-59d4b8b10da893ae.js:6:176226)
+    at b (_app-59d4b8b10da893ae.js:9:38061)
+    at y (_app-59d4b8b10da893ae.js:9:38543)
+    at t.error (_app-59d4b8b10da893ae.js:9:39096)
+    at Object.error (_app-59d4b8b10da893ae.js:6:159800)
+    at b (_app-59d4b8b10da893ae.js:9:38061)
+    at y (_app-59d4b8b10da893ae.js:9:38543)
+    at t.error (_app-59d4b8b10da893ae.js:9:39096)
+    at _app-59d4b8b10da893ae.js:9:723478
+    at Array.forEach (<anonymous>)
+    at r (_app-59d4b8b10da893ae.js:9:723447)
+    at Object.error (_app-59d4b8b10da893ae.js:6:160948)
+    at b (_app-59d4b8b10da893ae.js:9:38061)
+    at y (_app-59d4b8b10da893ae.js:9:38543)
+    at t.error (_app-59d4b8b10da893ae.js:9:39096)
+    at e.<anonymous> (_app-59d4b8b10da893ae.js:9:557385)
+    at Object.next (_app-59d4b8b10da893ae.js:6:39047)
+    at a (_app-59d4b8b10da893ae.js:6:37885)
+/graphql:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1206071642&gjid=1886928248&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=623093303:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+/graphql:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1882802300&gjid=744798278&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=822804021:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1147660474&gjid=795879671&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=437493669:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=785021613&gjid=1472272955&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=1933931919:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1972699928&gjid=2129794775&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=1367172713:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=266394381&gjid=1606687003&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=463833689:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1239682561&gjid=53017906&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=2119669115:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1342801389&gjid=1659259012&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=971927078:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1218488660&gjid=1884999373&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=1157064444:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1197514151&gjid=1238795739&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=186157080:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stallwart.build.js:1 stallwart: failed ping 1
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=289784942&gjid=1449043950&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=1322591423:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=513755971&gjid=1306729080&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=2031975290:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1117685465&gjid=493990930&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=1046505306:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=2080302238&gjid=1391252597&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=1735003081:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1938087569&gjid=1825774761&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=1864110545:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=263172113&gjid=720222529&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=381956272:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=790911304&gjid=1165610216&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=764321532:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1755982569&gjid=603815694&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=1205811690:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1160542306&gjid=1793466747&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=1854816192:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=85128485&gjid=1535587535&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=2093549107:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1257110338&gjid=181337685&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=1240103291:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=132297926&gjid=562529906&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=655591905:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/g/collect?v=2&tid=G-MPJY3F1YEL&cid=1928723166.1748622770&gtm=45je5641v9135634466za200&aip=1&dma=0&gcd=13l3l3l3l2l1&npa=0&frm=0&tag_exp=101509157~103116026~103200004~103233427~103351869~103351871~104653070~104653072~104661466~104661468~104698127~104698129:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1947965139&gjid=470566271&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=1953348386:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1202970203&gjid=1875298414&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=208831129:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1245603739&gjid=204390193&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=1252740389:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=140940694&gjid=1542968159&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=2136358586:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+[Report Only] Refused to frame 'https://www.google.com/' because an ancestor violates the following Content Security Policy directive: "frame-ancestors 'self'".
+
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=534448777&gjid=1528134378&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=1951211808:1 
+            
+            
+           Failed to load resource: net::ERR_TIMED_OUT
+stats.g.doubleclick.net/g/collect?v=2&tid=G-MPJY3F1YEL&cid=1928723166.1748622770&gtm=45je5641v9135634466za200&aip=1&dma=0&gcd=13l3l3l3l2l1&npa=0&frm=0&tag_exp=101509157~103116026~103200004~103233427~103351869~103351871~104653070~104653072~104661466~104661468~104698127~104698129:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1648906679&gjid=104772904&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=2044629976:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1425542304&gjid=1506845881&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=588735994:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=555284480&gjid=1661087343&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=278897830:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=609687381&gjid=1468215861&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=1997076146:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=274251088&gjid=1832135776&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=622986105:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+stallwart.build.js:1 stallwart: failed ping 1
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1928723166.1748622770&jid=1947616063&gjid=171182162&_gid=1240906866.1748941419&_u=SCCAgEAjQAAAAGgCIAD~&z=879492303:1 
+            
+            
+           Failed to load resource: net::ERR_CONNECTION_RESET
+workspace_iframe.html:32 Unrecognized feature: 'ambient-light-sensor'.
+workspace_iframe.html:32 Unrecognized feature: 'battery'.
+workspace_iframe.html:32 Unrecognized feature: 'execution-while-not-rendered'.
+workspace_iframe.html:32 Unrecognized feature: 'execution-while-out-of-viewport'.
+workspace_iframe.html:32 Unrecognized feature: 'layout-animations'.
+workspace_iframe.html:32 Unrecognized feature: 'legacy-image-formats'.
+workspace_iframe.html:32 Unrecognized feature: 'navigation-override'.
+workspace_iframe.html:32 Unrecognized feature: 'oversized-images'.
+workspace_iframe.html:32 Unrecognized feature: 'publickey-credentials'.
+workspace_iframe.html:32 Unrecognized feature: 'speaker-selection'.
+workspace_iframe.html:32 Unrecognized feature: 'unoptimized-images'.
+workspace_iframe.html:32 Unrecognized feature: 'unsized-media'.
+workspace_iframe.html:32 Allow attribute will take precedence over 'allowfullscreen'.
+workspace_iframe.html:32 Allow attribute will take precedence over 'allowpaymentrequest'.

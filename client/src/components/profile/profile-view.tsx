@@ -622,7 +622,7 @@ export function ProfileView() {
                   {filteredExercises.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {filteredExercises.map((exercise) => (
-                        <Card key={exercise.id} className="hover:shadow-md transition-shadow cursor-pointer">
+                        <Card key={exercise.id} className="hover:shadow-md transition-shadow">
                           <CardContent className="p-0">
                             {/* Изображение упражнения */}
                             <div className="mb-4">
@@ -652,12 +652,11 @@ export function ProfileView() {
                               </div>
                               
                               {/* Кнопки управления */}
-                              <div className="flex justify-end gap-1 mb-3">
+                              <div className="flex justify-end gap-1 mb-3" onClick={(e) => e.stopPropagation()}>
                                 <Button
                                   size="sm"
                                   variant="ghost"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
+                                  onClick={() => {
                                     console.log('Camera button clicked for exercise:', exercise.name);
                                     setSelectedExerciseForImage(exercise);
                                     setShowImageManager(true);
@@ -671,10 +670,7 @@ export function ProfileView() {
                                 <Button
                                   size="sm"
                                   variant="ghost"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleEditExercise(exercise);
-                                  }}
+                                  onClick={() => handleEditExercise(exercise)}
                                   className="h-7 w-7 p-0"
                                   title="Редактировать упражнение"
                                 >
@@ -683,10 +679,7 @@ export function ProfileView() {
                                 <Button
                                   size="sm"
                                   variant="ghost"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeleteExercise(exercise.id);
-                                  }}
+                                  onClick={() => handleDeleteExercise(exercise.id)}
                                   className="h-7 w-7 p-0 text-red-500 hover:text-red-700"
                                   title="Удалить упражнение"
                                 >
