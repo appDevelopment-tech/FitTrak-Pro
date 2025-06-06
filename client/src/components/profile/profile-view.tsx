@@ -656,10 +656,8 @@ export function ProfileView() {
                                 <button
                                   type="button"
                                   onClick={() => {
-                                    console.log('Camera button clicked for exercise:', exercise.name);
                                     setSelectedExerciseForImage(exercise);
                                     setShowImageManager(true);
-                                    console.log('showImageManager set to true, selectedExercise:', exercise);
                                   }}
                                   className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-blue-500 hover:bg-blue-600 text-white transition-colors"
                                   title="Управление изображениями"
@@ -749,8 +747,11 @@ export function ProfileView() {
         <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Управление изображениями упражнения</DialogTitle>
+            <DialogDescription>
+              Выберите изображение из галереи качественных фотографий упражнений
+            </DialogDescription>
           </DialogHeader>
-          {showImageManager && selectedExerciseForImage ? (
+          {showImageManager && selectedExerciseForImage && (
             <ExerciseImageManager
               exerciseId={selectedExerciseForImage.id}
               exerciseName={selectedExerciseForImage.name}
@@ -760,12 +761,6 @@ export function ProfileView() {
                 setSelectedExerciseForImage(null);
               }}
             />
-          ) : (
-            <div className="p-4">
-              <p>Загрузка...</p>
-              <p>showImageManager: {showImageManager.toString()}</p>
-              <p>selectedExerciseForImage: {selectedExerciseForImage ? 'есть' : 'нет'}</p>
-            </div>
           )}
         </DialogContent>
       </Dialog>
