@@ -658,8 +658,10 @@ export function ProfileView() {
                                   variant="ghost"
                                   onClick={(e) => {
                                     e.stopPropagation();
+                                    console.log('Camera button clicked for exercise:', exercise.name);
                                     setSelectedExerciseForImage(exercise);
                                     setShowImageManager(true);
+                                    console.log('showImageManager set to true');
                                   }}
                                   className="h-7 w-7 p-0"
                                   title="Управление изображениями"
@@ -753,12 +755,12 @@ export function ProfileView() {
       </Dialog>
 
       {/* Диалог управления изображениями */}
-      {showImageManager && selectedExerciseForImage && (
-        <Dialog open={showImageManager} onOpenChange={setShowImageManager}>
-          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Управление изображениями упражнения</DialogTitle>
-            </DialogHeader>
+      <Dialog open={showImageManager} onOpenChange={setShowImageManager}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Управление изображениями упражнения</DialogTitle>
+          </DialogHeader>
+          {showImageManager && selectedExerciseForImage ? (
             <ExerciseImageManager
               exerciseId={selectedExerciseForImage.id}
               exerciseName={selectedExerciseForImage.name}
@@ -768,9 +770,15 @@ export function ProfileView() {
                 setSelectedExerciseForImage(null);
               }}
             />
-          </DialogContent>
-        </Dialog>
-      )}
+          ) : (
+            <div className="p-4">
+              <p>Загрузка...</p>
+              <p>showImageManager: {showImageManager.toString()}</p>
+              <p>selectedExerciseForImage: {selectedExerciseForImage ? 'есть' : 'нет'}</p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
