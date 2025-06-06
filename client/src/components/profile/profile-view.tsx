@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getExercisePhoto } from "@/components/ui/exercise-photos";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { ExerciseImageManager } from "@/components/exercise/exercise-image-manager";
+import { ExerciseImagePlaceholder } from "@/components/exercise/exercise-image-placeholder";
 
 export function ProfileView() {
   const [isEditing, setIsEditing] = useState(false);
@@ -602,65 +603,84 @@ export function ProfileView() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {filteredExercises.map((exercise) => (
                         <Card key={exercise.id} className="hover:shadow-md transition-shadow cursor-pointer">
-                          <CardContent className="p-4">
-                            <div className="flex justify-between items-start mb-2">
-                              <h4 className="font-medium text-gray-900">{exercise.name}</h4>
-                              <div className="flex items-center gap-2">
-                                <Badge variant={exercise.difficulty === 'начинающий' ? 'secondary' : exercise.difficulty === 'средний' ? 'default' : 'destructive'}>
-                                  {exercise.difficulty}
-                                </Badge>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedExerciseForImage(exercise);
-                                    setShowImageManager(true);
-                                  }}
-                                  className="h-6 w-6 p-0"
-                                  title="Управление изображениями"
-                                >
-                                  <Camera className="h-3 w-3" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleEditExercise(exercise);
-                                  }}
-                                  className="h-6 w-6 p-0"
-                                >
-                                  <Edit className="h-3 w-3" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeleteExercise(exercise.id);
-                                  }}
-                                  className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
-                                >
-                                  <Trash2 className="h-3 w-3" />
-                                </Button>
-                              </div>
-                            </div>
-                            <p className="text-sm text-gray-600 mb-3">{exercise.overview}</p>
-                            <div className="space-y-2">
-                              <div className="text-xs text-gray-600">
-                                <p className="font-medium">Основные группы мышц:</p>
-                                <p>{exercise.primaryMuscles.join(', ')}</p>
-                              </div>
-                              {exercise.secondaryMuscles.length > 0 && (
-                                <div className="text-xs text-gray-600">
-                                  <p className="font-medium">Вспомогательные группы мышц:</p>
-                                  <p>{exercise.secondaryMuscles.join(', ')}</p>
-                                </div>
+                          <CardContent className="p-0">
+                            {/* Изображение упражнения */}
+                            <div className="mb-4">
+                              {exercise.muscleImageUrl ? (
+                                <img
+                                  src={exercise.muscleImageUrl}
+                                  alt={exercise.name}
+                                  className="w-full h-32 object-cover rounded-t-lg"
+                                />
+                              ) : (
+                                <ExerciseImagePlaceholder
+                                  exerciseName={exercise.name}
+                                  muscleGroup={exercise.primaryMuscles.join(', ')}
+                                  className="w-full h-32 rounded-t-lg"
+                                />
                               )}
-                              <Button size="sm" className="w-full">
-                                Добавить в программу
-                              </Button>
+                            </div>
+                            
+                            <div className="p-4 pt-0">
+                              <div className="flex justify-between items-start mb-2">
+                                <h4 className="font-medium text-gray-900">{exercise.name}</h4>
+                                <div className="flex items-center gap-2">
+                                  <Badge variant={exercise.difficulty === 'начинающий' ? 'secondary' : exercise.difficulty === 'средний' ? 'default' : 'destructive'}>
+                                    {exercise.difficulty}
+                                  </Badge>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedExerciseForImage(exercise);
+                                      setShowImageManager(true);
+                                    }}
+                                    className="h-6 w-6 p-0"
+                                    title="Управление изображениями"
+                                  >
+                                    <Camera className="h-3 w-3" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleEditExercise(exercise);
+                                    }}
+                                    className="h-6 w-6 p-0"
+                                  >
+                                    <Edit className="h-3 w-3" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteExercise(exercise.id);
+                                    }}
+                                    className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              </div>
+                              <p className="text-sm text-gray-600 mb-3">{exercise.overview}</p>
+                              <div className="space-y-2">
+                                <div className="text-xs text-gray-600">
+                                  <p className="font-medium">Основные группы мышц:</p>
+                                  <p>{exercise.primaryMuscles.join(', ')}</p>
+                                </div>
+                                {exercise.secondaryMuscles.length > 0 && (
+                                  <div className="text-xs text-gray-600">
+                                    <p className="font-medium">Вспомогательные группы мышц:</p>
+                                    <p>{exercise.secondaryMuscles.join(', ')}</p>
+                                  </div>
+                                )}
+                                <Button size="sm" className="w-full">
+                                  Добавить в программу
+                                </Button>
+                              </div>
                             </div>
                           </CardContent>
                         </Card>
