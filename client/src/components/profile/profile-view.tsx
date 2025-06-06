@@ -561,7 +561,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-lg">
                   <div className="h-32 bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
+                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
                         {isEditingImages ? (
                           <ImageUpload
                             currentImage={muscleImages['кардио']}
