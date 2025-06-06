@@ -214,8 +214,17 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">
-                        {getMuscleImage('грудь', 'w-16 h-16')}
+                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
+                        <img 
+                          src="/chest-exercise.jpg" 
+                          alt="Упражнения для груди" 
+                          className="w-16 h-16 object-cover rounded"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.nextElementSibling.style.display = 'block';
+                          }}
+                        />
+                        <div className="text-white text-2xl font-bold hidden">Г</div>
                       </div>
                       <div className="text-lg font-semibold">ГРУДЬ</div>
                     </div>
@@ -237,8 +246,17 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">
-                        {getMuscleImage('спина', 'w-16 h-16')}
+                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
+                        <img 
+                          src="/back-exercise.jpg" 
+                          alt="Упражнения для спины" 
+                          className="w-16 h-16 object-cover rounded"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.nextElementSibling.style.display = 'block';
+                          }}
+                        />
+                        <div className="text-white text-2xl font-bold hidden">С</div>
                       </div>
                       <div className="text-lg font-semibold">СПИНА</div>
                     </div>
@@ -260,8 +278,19 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">
-                        {getMuscleImage('ноги', 'w-16 h-16')}
+                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
+                        <img 
+                          src="/legs-exercise.jpg" 
+                          alt="Упражнения для ног" 
+                          className="w-16 h-16 object-cover rounded"
+                          onError={(e) => {
+                            const target = e.currentTarget as HTMLImageElement;
+                            target.style.display = 'none';
+                            const fallback = target.nextElementSibling as HTMLElement;
+                            if (fallback) fallback.style.display = 'block';
+                          }}
+                        />
+                        <div className="text-white text-2xl font-bold hidden">Н</div>
                       </div>
                       <div className="text-lg font-semibold">НОГИ</div>
                     </div>
@@ -283,8 +312,19 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">
-                        {getMuscleImage('руки', 'w-16 h-16')}
+                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
+                        <img 
+                          src="/arms-exercise.jpg" 
+                          alt="Упражнения для рук" 
+                          className="w-16 h-16 object-cover rounded"
+                          onError={(e) => {
+                            const target = e.currentTarget as HTMLImageElement;
+                            target.style.display = 'none';
+                            const fallback = target.nextElementSibling as HTMLElement;
+                            if (fallback) fallback.style.display = 'block';
+                          }}
+                        />
+                        <div className="text-white text-2xl font-bold hidden">Р</div>
                       </div>
                       <div className="text-lg font-semibold">РУКИ</div>
                     </div>
@@ -306,8 +346,19 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">
-                        {getMuscleImage('плечи', 'w-16 h-16')}
+                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
+                        <img 
+                          src="/shoulders-exercise.jpg" 
+                          alt="Упражнения для плеч" 
+                          className="w-16 h-16 object-cover rounded"
+                          onError={(e) => {
+                            const target = e.currentTarget as HTMLImageElement;
+                            target.style.display = 'none';
+                            const fallback = target.nextElementSibling as HTMLElement;
+                            if (fallback) fallback.style.display = 'block';
+                          }}
+                        />
+                        <div className="text-white text-2xl font-bold hidden">П</div>
                       </div>
                       <div className="text-lg font-semibold">ПЛЕЧИ</div>
                     </div>
@@ -329,8 +380,19 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">
-                        {getMuscleImage('ягодичные', 'w-16 h-16')}
+                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
+                        <img 
+                          src="/glutes-exercise.jpg" 
+                          alt="Упражнения для ягодичных" 
+                          className="w-16 h-16 object-cover rounded"
+                          onError={(e) => {
+                            const target = e.currentTarget as HTMLImageElement;
+                            target.style.display = 'none';
+                            const fallback = target.nextElementSibling as HTMLElement;
+                            if (fallback) fallback.style.display = 'block';
+                          }}
+                        />
+                        <div className="text-white text-2xl font-bold hidden">Я</div>
                       </div>
                       <div className="text-lg font-semibold">ЯГОДИЧНЫЕ</div>
                     </div>
@@ -352,8 +414,19 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-t-lg">
                   <div className="h-32 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg">
-                        {getMuscleImage('живот', 'w-16 h-16')}
+                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
+                        <img 
+                          src="/abs-exercise.jpg" 
+                          alt="Упражнения для живота" 
+                          className="w-16 h-16 object-cover rounded"
+                          onError={(e) => {
+                            const target = e.currentTarget as HTMLImageElement;
+                            target.style.display = 'none';
+                            const fallback = target.nextElementSibling as HTMLElement;
+                            if (fallback) fallback.style.display = 'block';
+                          }}
+                        />
+                        <div className="text-white text-2xl font-bold hidden">Ж</div>
                       </div>
                       <div className="text-lg font-semibold">ЖИВОТ</div>
                     </div>
