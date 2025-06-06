@@ -351,7 +351,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-lg">
                   <div className="h-32 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
+                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
                         {isEditingImages ? (
                           <ImageUpload
                             currentImage={muscleImages['грудь']}
@@ -381,7 +381,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-lg">
                   <div className="h-32 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
+                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
                         {isEditingImages ? (
                           <ImageUpload
                             currentImage={muscleImages['спина']}
@@ -411,7 +411,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-lg">
                   <div className="h-32 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
+                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
                         {isEditingImages ? (
                           <ImageUpload
                             currentImage={muscleImages['ноги']}
@@ -441,7 +441,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-lg">
                   <div className="h-32 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
+                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
                         {isEditingImages ? (
                           <ImageUpload
                             currentImage={muscleImages['руки']}
@@ -471,7 +471,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-lg">
                   <div className="h-32 bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
+                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
                         {isEditingImages ? (
                           <ImageUpload
                             currentImage={muscleImages['плечи']}
@@ -501,7 +501,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-lg">
                   <div className="h-32 bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
+                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
                         {isEditingImages ? (
                           <ImageUpload
                             currentImage={muscleImages['ягодичные']}
@@ -531,7 +531,7 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-lg">
                   <div className="h-32 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
+                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
                         {isEditingImages ? (
                           <ImageUpload
                             currentImage={muscleImages['живот']}
