@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { User, Edit, Save, Camera, Plus, Award, Clock, Users, Calendar, Filter, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import type { User as UserType, Exercise } from "@shared/schema";
-// Удалены анатомические изображения
+import { getExercisePhoto } from "@/components/ui/exercise-photos";
 
 export function ProfileView() {
   const [isEditing, setIsEditing] = useState(false);
@@ -215,16 +215,7 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        <img 
-                          src="/chest-exercise.jpg" 
-                          alt="Упражнения для груди" 
-                          className="w-16 h-16 object-cover rounded"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            e.currentTarget.nextElementSibling.style.display = 'block';
-                          }}
-                        />
-                        <div className="text-white text-2xl font-bold hidden">Г</div>
+{getExercisePhoto('грудь', 'w-16 h-16')}
                       </div>
                       <div className="text-lg font-semibold">ГРУДЬ</div>
                     </div>
@@ -247,16 +238,7 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        <img 
-                          src="/back-exercise.jpg" 
-                          alt="Упражнения для спины" 
-                          className="w-16 h-16 object-cover rounded"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            e.currentTarget.nextElementSibling.style.display = 'block';
-                          }}
-                        />
-                        <div className="text-white text-2xl font-bold hidden">С</div>
+{getExercisePhoto('спина', 'w-16 h-16')}
                       </div>
                       <div className="text-lg font-semibold">СПИНА</div>
                     </div>
@@ -279,18 +261,7 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        <img 
-                          src="/legs-exercise.jpg" 
-                          alt="Упражнения для ног" 
-                          className="w-16 h-16 object-cover rounded"
-                          onError={(e) => {
-                            const target = e.currentTarget as HTMLImageElement;
-                            target.style.display = 'none';
-                            const fallback = target.nextElementSibling as HTMLElement;
-                            if (fallback) fallback.style.display = 'block';
-                          }}
-                        />
-                        <div className="text-white text-2xl font-bold hidden">Н</div>
+{getExercisePhoto('ноги', 'w-16 h-16')}
                       </div>
                       <div className="text-lg font-semibold">НОГИ</div>
                     </div>
