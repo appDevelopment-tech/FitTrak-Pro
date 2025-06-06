@@ -227,7 +227,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Exercise image search
+  // Exercise image search with multiple strategies
   app.get("/api/exercises/:id/search-image", async (req, res) => {
     try {
       const exerciseId = parseInt(req.params.id);
@@ -242,24 +242,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ message: "Unsplash API key not configured" });
       }
 
-      // Create search query based on exercise name
-      const searchQuery = translateExerciseToEnglish(exercise.name);
-      
-      const response = await fetch(
-        `https://api.unsplash.com/search/photos?query=${encodeURIComponent(searchQuery)}&page=1&per_page=8&orientation=landscape&content_filter=high`,
-        {
-          headers: {
-            'Authorization': `Client-ID ${accessKey}`
-          }
-        }
-      );
+      // Multiple search strategies for better results
+      const primaryQuery = translateExerciseToEnglish(exercise.name);
+      const fallbackQueries = [
+        "gym workout fitness training",
+        "strength training exercise",
+        "fitness workout gym",
+        "bodybuilding exercise training"
+      ];
 
-      if (!response.ok) {
-        throw new Error('Unsplash API request failed');
+      let allImages: any[] = [];
+
+      // Try primary search first
+      try {
+        const primaryResponse = await fetch(
+          `https://api.unsplash.com/search/photos?query=${encodeURIComponent(primaryQuery)}&page=1&per_page=4&orientation=landscape&content_filter=high`,
+          {
+            headers: {
+              'Authorization': `Client-ID ${accessKey}`
+            }
+          }
+        );
+
+        if (primaryResponse.ok) {
+          const primaryData = await primaryResponse.json();
+          allImages.push(...primaryData.results);
+        }
+      } catch (error) {
+        console.log('Primary search failed, trying fallback');
       }
 
-      const data = await response.json();
-      const images = data.results.map((photo: any) => ({
+      // If we don't have enough images, try fallback searches
+      if (allImages.length < 4) {
+        for (const fallbackQuery of fallbackQueries) {
+          if (allImages.length >= 8) break;
+          
+          try {
+            const fallbackResponse = await fetch(
+              `https://api.unsplash.com/search/photos?query=${encodeURIComponent(fallbackQuery)}&page=1&per_page=${4 - allImages.length}&orientation=landscape&content_filter=high`,
+              {
+                headers: {
+                  'Authorization': `Client-ID ${accessKey}`
+                }
+              }
+            );
+
+            if (fallbackResponse.ok) {
+              const fallbackData = await fallbackResponse.json();
+              allImages.push(...fallbackData.results);
+            }
+          } catch (error) {
+            console.log(`Fallback search failed for: ${fallbackQuery}`);
+          }
+        }
+      }
+
+      // Remove duplicates and format response
+      const uniqueImages = Array.from(new Map(allImages.map(img => [img.id, img])).values());
+      const images = uniqueImages.slice(0, 8).map((photo: any) => ({
         id: photo.id,
         url: photo.urls.regular,
         thumb: photo.urls.thumb,
