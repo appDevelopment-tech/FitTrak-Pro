@@ -121,14 +121,170 @@ export class MemStorage implements IStorage {
     this.workoutPrograms.set(2, cardioProgram);
     this.currentProgramId = 3;
 
-    // Create sample exercises database
-    // Удаляем примерные данные - теперь база данных пустая
-    const sampleExercises: Exercise[] = [];
+    // Create sample exercises database - упражнения для грудных мышц
+    const chestExercises: Exercise[] = [
+      {
+        id: 1,
+        name: "Жим штанги лежа на скамье",
+        primaryMuscles: ["грудь"],
+        secondaryMuscles: ["плечи", "руки"],
+        difficulty: "средний",
+        overview: "Базовое упражнение для развития мышц груди, выполняется лежа на горизонтальной скамье",
+        technique: [
+          "Лягте на скамью, стопы упираются в пол",
+          "Возьмите штангу широким хватом",
+          "Снимите штангу со стоек и держите над грудью",
+          "Медленно опустите штангу к груди",
+          "Мощно выжмите штангу вверх"
+        ],
+        commonMistakes: [
+          "Отрыв таза от скамьи",
+          "Слишком широкий или узкий хват",
+          "Неполная амплитуда движения",
+          "Резкое опускание штанги"
+        ],
+        contraindications: ["травмы плечевого сустава", "боли в спине"],
+        muscleImageUrl: null,
+        createdBy: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: 2,
+        name: "Сведение рук в тренажере",
+        primaryMuscles: ["грудь"],
+        secondaryMuscles: [],
+        difficulty: "начинающий",
+        overview: "Изолирующее упражнение для грудных мышц в специальном тренажере",
+        technique: [
+          "Сядьте в тренажер, спина прижата к спинке",
+          "Возьмитесь за рукояти тренажера",
+          "Медленно сведите руки перед собой",
+          "Задержитесь на секунду в сокращенном положении",
+          "Медленно вернитесь в исходное положение"
+        ],
+        commonMistakes: [
+          "Слишком быстрое выполнение",
+          "Использование слишком большого веса",
+          "Неполное сведение рук",
+          "Отрыв спины от спинки"
+        ],
+        contraindications: ["травмы плечевого сустава"],
+        muscleImageUrl: null,
+        createdBy: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: 3,
+        name: "Жим гантелей лежа",
+        primaryMuscles: ["грудь"],
+        secondaryMuscles: ["плечи", "руки"],
+        difficulty: "средний",
+        overview: "Упражнение с гантелями для развития грудных мышц с большей амплитудой движения",
+        technique: [
+          "Лягте на скамью с гантелями в руках",
+          "Поднимите гантели над грудью",
+          "Медленно опустите гантели по сторонам от груди",
+          "Мощно выжмите гантели вверх",
+          "Сведите гантели в верхней точке"
+        ],
+        commonMistakes: [
+          "Слишком глубокое опускание гантелей",
+          "Неконтролируемое движение",
+          "Использование слишком тяжелых гантелей",
+          "Неправильное положение локтей"
+        ],
+        contraindications: ["травмы плечевого сустава", "боли в спине"],
+        muscleImageUrl: null,
+        createdBy: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: 4,
+        name: "Разведение гантелей лежа",
+        primaryMuscles: ["грудь"],
+        secondaryMuscles: ["плечи"],
+        difficulty: "средний",
+        overview: "Изолирующее упражнение для растяжения и проработки грудных мышц",
+        technique: [
+          "Лягте на скамью с гантелями в руках",
+          "Поднимите гантели над грудью, слегка согнув локти",
+          "Медленно разведите гантели в стороны",
+          "Почувствуйте растяжение в грудных мышцах",
+          "Сведите гантели по дуге в исходное положение"
+        ],
+        commonMistakes: [
+          "Слишком большой вес гантелей",
+          "Полное выпрямление рук",
+          "Слишком глубокое разведение",
+          "Резкие движения"
+        ],
+        contraindications: ["травмы плечевого сустава"],
+        muscleImageUrl: null,
+        createdBy: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: 5,
+        name: "Отжимания в упоре",
+        primaryMuscles: ["грудь"],
+        secondaryMuscles: ["плечи", "руки", "живот"],
+        difficulty: "начинающий",
+        overview: "Базовое упражнение с собственным весом для развития грудных мышц",
+        technique: [
+          "Примите упор лежа, руки на ширине плеч",
+          "Тело должно составлять прямую линию",
+          "Медленно опуститесь вниз до касания грудью пола",
+          "Мощно оттолкнитесь и вернитесь в исходное положение",
+          "Сохраняйте напряжение в корпусе"
+        ],
+        commonMistakes: [
+          "Прогиб в пояснице",
+          "Неполная амплитуда движения",
+          "Слишком широкая постановка рук",
+          "Опускание головы вниз"
+        ],
+        contraindications: ["травмы запястий", "боли в пояснице"],
+        muscleImageUrl: null,
+        createdBy: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: 6,
+        name: "Отжимания с колен",
+        primaryMuscles: ["грудь"],
+        secondaryMuscles: ["плечи", "руки"],
+        difficulty: "начинающий",
+        overview: "Облегченная версия отжиманий для начинающих",
+        technique: [
+          "Встаньте на колени, руки поставьте на ширине плеч",
+          "Наклонитесь вперед в упор на руки",
+          "Медленно опуститесь грудью к полу",
+          "Оттолкнитесь и вернитесь в исходное положение",
+          "Держите спину прямо"
+        ],
+        commonMistakes: [
+          "Слишком высокое положение таза",
+          "Неполная амплитуда движения",
+          "Сгибание в тазобедренных суставах",
+          "Слишком быстрое выполнение"
+        ],
+        contraindications: ["травмы коленей", "травмы запястий"],
+        muscleImageUrl: null,
+        createdBy: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ];
 
-    sampleExercises.forEach(exercise => {
+    chestExercises.forEach(exercise => {
       this.exercises.set(exercise.id, exercise);
     });
-    this.currentExerciseId = sampleExercises.length + 1;
+    this.currentExerciseId = chestExercises.length + 1;
 
     // Create sample workout sessions
     const today = new Date();
