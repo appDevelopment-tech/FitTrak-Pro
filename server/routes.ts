@@ -5,6 +5,7 @@ import { insertWorkoutProgramSchema, insertWorkoutSessionSchema, insertExerciseP
 
 function translateExerciseToEnglish(russianName: string): string {
   const translations: Record<string, string> = {
+    // Упражнения для груди
     "Жим штанги лежа на скамье": "bench press barbell",
     "Сведение рук в тренажере": "chest fly machine",
     "Жим гантелей лежа": "dumbbell bench press",
@@ -20,10 +21,26 @@ function translateExerciseToEnglish(russianName: string): string {
     "Пуловер с гантелью": "dumbbell pullover",
     "Жим в тренажере Хаммер": "hammer strength chest press",
     "Отжимания от пола широким хватом": "wide grip push ups",
-    "Отжимания на возвышении": "elevated push ups"
+    "Отжимания на возвышении": "elevated push ups",
+    
+    // Упражнения для спины
+    "Становая тяга": "deadlift barbell",
+    "Подтягивания широким хватом": "pull ups wide grip",
+    "Тяга штанги в наклоне": "barbell bent over row",
+    "Тяга гантели одной рукой": "single arm dumbbell row",
+    "Тяга верхнего блока": "lat pulldown machine",
+    "Горизонтальная тяга": "seated cable row",
+    "Подтягивания узким хватом": "pull ups close grip",
+    "Гиперэкстензия": "hyperextension back exercise",
+    "Тяга Т-грифа": "t bar row",
+    "Шраги со штангой": "barbell shrugs",
+    "Шраги с гантелями": "dumbbell shrugs",
+    "Обратные разведения с гантелями": "reverse fly dumbbells",
+    "Тяга штанги к подбородку": "upright row barbell",
+    "Пуловер со штангой лежа": "barbell pullover lying"
   };
   
-  return translations[russianName] || `chest exercise workout ${russianName}`;
+  return translations[russianName] || `exercise workout ${russianName}`;
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
