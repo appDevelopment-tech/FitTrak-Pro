@@ -506,15 +506,14 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-lg">
                   <div className="h-32 bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        {isEditingImages ? (
-                          <ImageUpload
-                            currentImage={muscleImages['ягодичные']}
-                            onImageChange={(file) => handleImageUpload('ягодичные', file)}
-                            className="w-16 h-16"
-                            placeholder="Ягодичные"
-                          />
-                        ) : muscleImages['ягодичные'] ? (
+                      <div 
+                        className={`mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm transition-colors ${isEditingImages ? 'cursor-pointer hover:bg-white/30' : ''}`}
+                        onClick={isEditingImages ? (e) => {
+                          e.stopPropagation();
+                          setSelectedMuscleForImage('ягодичные');
+                        } : undefined}
+                      >
+                        {muscleImages['ягодичные'] ? (
                           <img src={muscleImages['ягодичные']} alt="Упражнения для ягодичных" className="w-16 h-16 object-cover rounded" />
                         ) : (
                           getExercisePhoto('ягодичные', 'w-16 h-16')
