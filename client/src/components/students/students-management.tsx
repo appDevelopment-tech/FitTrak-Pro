@@ -88,7 +88,8 @@ export function StudentsManagement() {
     return `${student.firstName} ${student.lastName}${student.middleName ? ` ${student.middleName}` : ''}`;
   };
 
-  const calculateAge = (birthDate: string) => {
+  const calculateAge = (birthDate: string | null) => {
+    if (!birthDate) return null;
     const today = new Date();
     const birth = new Date(birthDate);
     let age = today.getFullYear() - birth.getFullYear();
@@ -131,16 +132,18 @@ export function StudentsManagement() {
     }
   };
 
+  const handleNewStudentChange = (field: keyof InsertStudent, value: string | number) => {
+    setNewStudent(prev => ({ ...prev, [field]: value }));
+  };
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && editingStudent) {
-      // Проверяем тип файла
       if (!file.type.startsWith('image/')) {
         alert('Пожалуйста, выберите файл изображения');
         return;
       }
 
-      // Создаем URL для предварительного просмотра
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
@@ -154,16 +157,27 @@ export function StudentsManagement() {
     fileInputRef.current?.click();
   };
 
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center">Загрузка...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Ученики</h1>
-          <p className="text-gray-600">Управление базой учеников</p>
+          <h1 className="text-3xl font-bold text-gray-900">Ученики</h1>
+          <p className="text-gray-500 mt-1">Управление учениками и их профилями</p>
         </div>
-        <Button onClick={() => setShowAddForm(true)} className="bg-blue-600 hover:bg-blue-700">
-          <Plus className="w-4 h-4 mr-2" />
+        <Button
+          onClick={() => setShowAddForm(true)}
+          className="bg-green-600 hover:bg-green-700"
+        >
+          <Plus className="h-4 w-4 mr-2" />
           Добавить ученика
         </Button>
       </div>
@@ -171,7 +185,7 @@ export function StudentsManagement() {
       {/* Search */}
       <div className="mb-6">
         <div className="relative">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
             placeholder="Поиск по имени, email или телефону..."
             value={searchTerm}
@@ -223,73 +237,179 @@ export function StudentsManagement() {
                       </h3>
                     </div>
                   </div>
-                  
-                  {/* Status */}
-                  <div className="flex items-center">
-                    <Badge variant={student.status === 'active' ? 'default' : 'secondary'}>
-                      {student.status === 'active' ? 'Активен' : 'Неактивен'}
-                    </Badge>
-                  </div>
+
+                  {/* Status Badge */}
+                  <Badge variant={student.status === 'active' ? 'default' : 'secondary'}>
+                    {student.status === 'active' ? 'Активен' : 'Неактивен'}
+                  </Badge>
                 </div>
               </div>
             ))}
+            
+            {filteredStudents.length === 0 && (
+              <div className="p-8 text-center text-gray-500">
+                {searchTerm ? "Ученики не найдены" : "Нет учеников"}
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
 
-      {filteredStudents.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500">Ученики не найдены</p>
-          {searchTerm && (
-            <Button
-              variant="ghost"
-              onClick={() => setSearchTerm("")}
-              className="mt-2"
-            >
-              Очистить поиск
-            </Button>
-          )}
-        </div>
-      )}
-
-      {/* Add Student Form Placeholder */}
+      {/* Add Student Dialog */}
       {showAddForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-md">
-            <CardHeader>
-              <CardTitle>Добавить ученика</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 mb-4">Форма добавления ученика в разработке</p>
-              <Button
-                onClick={() => setShowAddForm(false)}
-                variant="outline"
-                className="w-full"
-              >
-                Закрыть
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Student Edit Form */}
-      {editingStudent && (
-        <Dialog open={true} onOpenChange={() => setEditingStudent(null)}>
+        <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                Редактирование профиля ученика
-              </DialogTitle>
+              <DialogTitle>Добавить нового ученика</DialogTitle>
             </DialogHeader>
             
-            <div className="space-y-6 py-4">
-              {/* Photo and Basic Info */}
-              <div className="space-y-4">
-                <div className="flex items-start space-x-6">
+            <div className="space-y-6">
+              {/* Basic Info */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="firstName">Имя*</Label>
+                  <Input
+                    id="firstName"
+                    value={newStudent.firstName}
+                    onChange={(e) => handleNewStudentChange('firstName', e.target.value)}
+                    placeholder="Введите имя"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="lastName">Фамилия*</Label>
+                  <Input
+                    id="lastName"
+                    value={newStudent.lastName}
+                    onChange={(e) => handleNewStudentChange('lastName', e.target.value)}
+                    placeholder="Введите фамилию"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="middleName">Отчество</Label>
+                  <Input
+                    id="middleName"
+                    value={newStudent.middleName || ''}
+                    onChange={(e) => handleNewStudentChange('middleName', e.target.value)}
+                    placeholder="Введите отчество"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="phone">Телефон*</Label>
+                  <Input
+                    id="phone"
+                    value={newStudent.phone}
+                    onChange={(e) => handleNewStudentChange('phone', e.target.value)}
+                    placeholder="+7 (999) 123-45-67"
+                    required
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <Label htmlFor="email">Email*</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={newStudent.email}
+                    onChange={(e) => handleNewStudentChange('email', e.target.value)}
+                    placeholder="example@email.com"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Additional Info */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="birthDate">Дата рождения</Label>
+                  <Input
+                    id="birthDate"
+                    type="date"
+                    value={newStudent.birthDate || ''}
+                    onChange={(e) => handleNewStudentChange('birthDate', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="weight">Вес (кг)</Label>
+                  <Input
+                    id="weight"
+                    type="number"
+                    value={newStudent.weight || ''}
+                    onChange={(e) => handleNewStudentChange('weight', parseInt(e.target.value) || 0)}
+                    placeholder="65"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="height">Рост (см)</Label>
+                  <Input
+                    id="height"
+                    type="number"
+                    value={newStudent.height || ''}
+                    onChange={(e) => handleNewStudentChange('height', parseInt(e.target.value) || 0)}
+                    placeholder="170"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="goal">Цель тренировок</Label>
+                <Textarea
+                  id="goal"
+                  value={newStudent.goal || ''}
+                  onChange={(e) => handleNewStudentChange('goal', e.target.value)}
+                  placeholder="Похудение, набор массы, общая физическая подготовка..."
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="medicalNotes">Медицинские заметки</Label>
+                <Textarea
+                  id="medicalNotes"
+                  value={newStudent.medicalNotes || ''}
+                  onChange={(e) => handleNewStudentChange('medicalNotes', e.target.value)}
+                  placeholder="Травмы, противопоказания, особенности..."
+                  rows={3}
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end space-x-2 pt-4 border-t">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowAddForm(false)}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Отмена
+                </Button>
+                <Button
+                  onClick={handleAddStudent}
+                  className="bg-green-600 hover:bg-green-700"
+                  disabled={createStudentMutation.isPending}
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {createStudentMutation.isPending ? "Сохранение..." : "Добавить"}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Edit Student Dialog */}
+      {editingStudent && (
+        <Dialog open={!!editingStudent} onOpenChange={() => setEditingStudent(null)}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Профиль ученика</DialogTitle>
+            </DialogHeader>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Photo Section */}
+              <div className="lg:col-span-1">
+                <div className="text-center">
                   <div 
-                    className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors border-2 border-dashed border-gray-400 hover:border-gray-500 flex-shrink-0"
+                    className="w-32 h-32 mx-auto rounded-full overflow-hidden bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors"
                     onClick={triggerFileUpload}
                   >
                     {editingStudent.photo ? (
@@ -300,151 +420,137 @@ export function StudentsManagement() {
                       />
                     ) : (
                       <div className="text-center">
-                        <Camera className="h-8 w-8 text-gray-500 mx-auto mb-1" />
-                        <span className="text-xs text-gray-500">Добавить фото</span>
+                        <Camera className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                        <span className="text-sm text-gray-500">Добавить фото</span>
                       </div>
                     )}
                   </div>
-                  <div className="flex-1 space-y-4">
-                    <h3 className="text-lg font-medium">Основная информация</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="firstName">Имя</Label>
-                        <Input
-                          id="firstName"
-                          value={editingStudent.firstName}
-                          onChange={(e) => handleInputChange('firstName', e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="lastName">Фамилия</Label>
-                        <Input
-                          id="lastName"
-                          value={editingStudent.lastName}
-                          onChange={(e) => handleInputChange('lastName', e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="middleName">Отчество</Label>
-                        <Input
-                          id="middleName"
-                          value={editingStudent.middleName || ''}
-                          onChange={(e) => handleInputChange('middleName', e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="birthDate">Дата рождения</Label>
-                        <Input
-                          id="birthDate"
-                          type="date"
-                          value={editingStudent.birthDate || ''}
-                          onChange={(e) => handleInputChange('birthDate', e.target.value)}
-                        />
-                      </div>
-                    </div>
-                  </div>
                   <input
-                    ref={fileInputRef}
                     type="file"
-                    accept="image/*"
+                    ref={fileInputRef}
                     onChange={handleFileUpload}
+                    accept="image/*"
                     className="hidden"
                   />
+                  <p className="text-sm text-gray-500 mt-2">Нажмите для изменения фото</p>
                 </div>
               </div>
 
-              {/* Contact Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Контактная информация</h3>
+              {/* Info Section */}
+              <div className="lg:col-span-2 space-y-6">
+                {/* Basic Info */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="phone">Телефон</Label>
+                    <Label htmlFor="editFirstName">Имя</Label>
                     <Input
-                      id="phone"
+                      id="editFirstName"
+                      value={editingStudent.firstName}
+                      onChange={(e) => handleInputChange('firstName', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="editLastName">Фамилия</Label>
+                    <Input
+                      id="editLastName"
+                      value={editingStudent.lastName}
+                      onChange={(e) => handleInputChange('lastName', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="editMiddleName">Отчество</Label>
+                    <Input
+                      id="editMiddleName"
+                      value={editingStudent.middleName || ''}
+                      onChange={(e) => handleInputChange('middleName', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="editPhone">Телефон</Label>
+                    <Input
+                      id="editPhone"
                       value={editingStudent.phone}
                       onChange={(e) => handleInputChange('phone', e.target.value)}
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="email">Email</Label>
+                  <div className="md:col-span-2">
+                    <Label htmlFor="editEmail">Email</Label>
                     <Input
-                      id="email"
+                      id="editEmail"
                       type="email"
                       value={editingStudent.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
                     />
                   </div>
                 </div>
-              </div>
 
-              {/* Physical Parameters */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Физические параметры</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Physical Info */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="height">Рост (см)</Label>
+                    <Label htmlFor="editBirthDate">Дата рождения</Label>
                     <Input
-                      id="height"
+                      id="editBirthDate"
+                      type="date"
+                      value={editingStudent.birthDate || ''}
+                      onChange={(e) => handleInputChange('birthDate', e.target.value)}
+                    />
+                    {editingStudent.birthDate && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        Возраст: {calculateAge(editingStudent.birthDate)} лет
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <Label htmlFor="editWeight">Вес (кг)</Label>
+                    <Input
+                      id="editWeight"
                       type="number"
-                      value={editingStudent.height || ''}
-                      onChange={(e) => handleInputChange('height', parseInt(e.target.value))}
+                      value={editingStudent.weight || ''}
+                      onChange={(e) => handleInputChange('weight', parseInt(e.target.value) || 0)}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="weight">Вес (кг)</Label>
+                    <Label htmlFor="editHeight">Рост (см)</Label>
                     <Input
-                      id="weight"
+                      id="editHeight"
                       type="number"
-                      value={editingStudent.weight || ''}
-                      onChange={(e) => handleInputChange('weight', parseInt(e.target.value))}
+                      value={editingStudent.height || ''}
+                      onChange={(e) => handleInputChange('height', parseInt(e.target.value) || 0)}
                     />
                   </div>
                 </div>
-              </div>
 
-              {/* Training Goals */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium flex items-center gap-2">
-                  <Target className="h-4 w-4" />
-                  Цели тренировок
-                </h3>
-                <Textarea
-                  value={editingStudent.goal || ''}
-                  onChange={(e) => handleInputChange('goal', e.target.value)}
-                  placeholder="Опишите цели ученика..."
-                  className="min-h-[80px]"
-                />
-              </div>
+                <div>
+                  <Label htmlFor="editGoal">Цель тренировок</Label>
+                  <Textarea
+                    id="editGoal"
+                    value={editingStudent.goal || ''}
+                    onChange={(e) => handleInputChange('goal', e.target.value)}
+                    rows={3}
+                  />
+                </div>
 
-              {/* Medical Notes */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4" />
-                  Медицинские заметки
-                </h3>
-                <Textarea
-                  value={editingStudent.medicalNotes || ''}
-                  onChange={(e) => handleInputChange('medicalNotes', e.target.value)}
-                  placeholder="Противопоказания, особенности здоровья..."
-                  className="min-h-[80px]"
-                />
-              </div>
+                <div>
+                  <Label htmlFor="editMedicalNotes">Медицинские заметки</Label>
+                  <Textarea
+                    id="editMedicalNotes"
+                    value={editingStudent.medicalNotes || ''}
+                    onChange={(e) => handleInputChange('medicalNotes', e.target.value)}
+                    rows={3}
+                  />
+                </div>
 
-              {/* Status */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Статус</h3>
-                <Select
-                  value={editingStudent.status}
-                  onValueChange={(value: 'active' | 'inactive') => handleInputChange('status', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Активен</SelectItem>
-                    <SelectItem value="inactive">Неактивен</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div>
+                  <Label htmlFor="editStatus">Статус</Label>
+                  <Select value={editingStudent.status} onValueChange={(value) => handleInputChange('status', value)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Активен</SelectItem>
+                      <SelectItem value="inactive">Неактивен</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
 
@@ -463,9 +569,10 @@ export function StudentsManagement() {
                 <Button
                   onClick={handleSaveStudent}
                   className="bg-blue-600 hover:bg-blue-700"
+                  disabled={updateStudentMutation.isPending}
                 >
                   <Save className="h-4 w-4 mr-2" />
-                  Сохранить
+                  {updateStudentMutation.isPending ? "Сохранение..." : "Сохранить"}
                 </Button>
               </div>
             </div>
