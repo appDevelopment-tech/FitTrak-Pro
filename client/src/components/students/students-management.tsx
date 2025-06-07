@@ -170,8 +170,7 @@ export function StudentsManagement() {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Ученики</h1>
-          <p className="text-gray-500 mt-1">Управление учениками и их профилями</p>
+          <h1 className="text-3xl font-bold text-gray-900">Список учеников</h1>
         </div>
         <Button
           onClick={() => setShowAddForm(true)}
