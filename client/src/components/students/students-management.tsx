@@ -1,9 +1,13 @@
 import { useState } from "react";
-import { Plus, Search, Edit, Trash2, Phone, Mail } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Phone, Mail, X, Save, User, Calendar, Target, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface Student {
   id: number;
@@ -26,9 +30,8 @@ export function StudentsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
-
-  // Sample students data
-  const [students] = useState<Student[]>([
+  const [editingStudent, setEditingStudent] = useState<Student | null>(null);
+  const [students, setStudents] = useState<Student[]>([
     {
       id: 1,
       firstName: "Анна",
@@ -94,6 +97,27 @@ export function StudentsManagement() {
     return age;
   };
 
+  const handleStudentClick = (student: Student) => {
+    setEditingStudent({ ...student });
+  };
+
+  const handleSaveStudent = () => {
+    if (editingStudent) {
+      setStudents(prev => 
+        prev.map(student => 
+          student.id === editingStudent.id ? editingStudent : student
+        )
+      );
+      setEditingStudent(null);
+    }
+  };
+
+  const handleInputChange = (field: keyof Student, value: string | number) => {
+    if (editingStudent) {
+      setEditingStudent(prev => prev ? { ...prev, [field]: value } : null);
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
@@ -121,65 +145,69 @@ export function StudentsManagement() {
         </div>
       </div>
 
-      {/* Students Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredStudents.map((student) => (
-          <Card key={student.id} className="hover:shadow-lg transition-shadow cursor-pointer">
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="text-lg">{getStudentFullName(student)}</CardTitle>
-                  {student.birthDate && (
-                    <p className="text-sm text-gray-600">{calculateAge(student.birthDate)} лет</p>
-                  )}
-                </div>
-                <Badge variant={student.status === 'active' ? 'default' : 'secondary'}>
-                  {student.status === 'active' ? 'Активен' : 'Неактивен'}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex items-center text-sm text-gray-600">
-                  <Phone className="w-4 h-4 mr-2" />
-                  {student.phone}
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Mail className="w-4 h-4 mr-2" />
-                  {student.email}
-                </div>
-                {student.goal && (
-                  <div className="text-sm">
-                    <span className="font-medium">Цель:</span> {student.goal}
+      {/* Students List */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Список учеников ({filteredStudents.length})</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="divide-y divide-gray-200">
+            {filteredStudents.map((student) => (
+              <div
+                key={student.id}
+                className="p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+                onClick={() => handleStudentClick(student)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    {/* Avatar placeholder */}
+                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                      <span className="text-gray-600 font-medium">
+                        {student.firstName.charAt(0)}{student.lastName.charAt(0)}
+                      </span>
+                    </div>
+                    
+                    {/* Student Info */}
+                    <div>
+                      <h3 className="text-lg font-medium text-gray-900">
+                        {getStudentFullName(student)}
+                      </h3>
+                      <div className="flex items-center space-x-4 text-sm text-gray-600">
+                        <span className="flex items-center">
+                          <Phone className="w-3 h-3 mr-1" />
+                          {student.phone}
+                        </span>
+                        <span className="flex items-center">
+                          <Mail className="w-3 h-3 mr-1" />
+                          {student.email}
+                        </span>
+                        {student.birthDate && (
+                          <span>{calculateAge(student.birthDate)} лет</span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                )}
-                {student.weight && student.height && (
-                  <div className="text-sm text-gray-600">
-                    {student.height} см / {student.weight} кг
+                  
+                  {/* Status and Actions */}
+                  <div className="flex items-center space-x-3">
+                    {student.goal && (
+                      <div className="text-sm text-gray-600 max-w-xs truncate">
+                        {student.goal}
+                      </div>
+                    )}
+                    <Badge variant={student.status === 'active' ? 'default' : 'secondary'}>
+                      {student.status === 'active' ? 'Активен' : 'Неактивен'}
+                    </Badge>
+                    <div className="text-xs text-gray-500">
+                      С {new Date(student.joinDate).toLocaleDateString('ru-RU')}
+                    </div>
                   </div>
-                )}
-              </div>
-              <div className="flex justify-between items-center mt-4 pt-4 border-t">
-                <span className="text-xs text-gray-500">
-                  С {new Date(student.joinDate).toLocaleDateString('ru-RU')}
-                </span>
-                <div className="flex space-x-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSelectedStudent(student)}
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {filteredStudents.length === 0 && (
         <div className="text-center py-12">
@@ -217,25 +245,172 @@ export function StudentsManagement() {
         </div>
       )}
 
-      {/* Student Details Modal Placeholder */}
-      {selectedStudent && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-lg">
-            <CardHeader>
-              <CardTitle>{getStudentFullName(selectedStudent)}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 mb-4">Детальная информация об ученике в разработке</p>
+      {/* Student Edit Form */}
+      {editingStudent && (
+        <Dialog open={true} onOpenChange={() => setEditingStudent(null)}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                Редактирование профиля ученика
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-6 py-4">
+              {/* Personal Information */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Личная информация</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="firstName">Имя</Label>
+                    <Input
+                      id="firstName"
+                      value={editingStudent.firstName}
+                      onChange={(e) => handleInputChange('firstName', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="lastName">Фамилия</Label>
+                    <Input
+                      id="lastName"
+                      value={editingStudent.lastName}
+                      onChange={(e) => handleInputChange('lastName', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="middleName">Отчество</Label>
+                    <Input
+                      id="middleName"
+                      value={editingStudent.middleName || ''}
+                      onChange={(e) => handleInputChange('middleName', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="birthDate">Дата рождения</Label>
+                    <Input
+                      id="birthDate"
+                      type="date"
+                      value={editingStudent.birthDate || ''}
+                      onChange={(e) => handleInputChange('birthDate', e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact Information */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Контактная информация</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="phone">Телефон</Label>
+                    <Input
+                      id="phone"
+                      value={editingStudent.phone}
+                      onChange={(e) => handleInputChange('phone', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={editingStudent.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Physical Parameters */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Физические параметры</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="height">Рост (см)</Label>
+                    <Input
+                      id="height"
+                      type="number"
+                      value={editingStudent.height || ''}
+                      onChange={(e) => handleInputChange('height', parseInt(e.target.value))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="weight">Вес (кг)</Label>
+                    <Input
+                      id="weight"
+                      type="number"
+                      value={editingStudent.weight || ''}
+                      onChange={(e) => handleInputChange('weight', parseInt(e.target.value))}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Training Goals */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium flex items-center gap-2">
+                  <Target className="h-4 w-4" />
+                  Цели тренировок
+                </h3>
+                <Textarea
+                  value={editingStudent.goal || ''}
+                  onChange={(e) => handleInputChange('goal', e.target.value)}
+                  placeholder="Опишите цели ученика..."
+                  className="min-h-[80px]"
+                />
+              </div>
+
+              {/* Medical Notes */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4" />
+                  Медицинские заметки
+                </h3>
+                <Textarea
+                  value={editingStudent.medicalNotes || ''}
+                  onChange={(e) => handleInputChange('medicalNotes', e.target.value)}
+                  placeholder="Противопоказания, особенности здоровья..."
+                  className="min-h-[80px]"
+                />
+              </div>
+
+              {/* Status */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Статус</h3>
+                <Select
+                  value={editingStudent.status}
+                  onValueChange={(value: 'active' | 'inactive') => handleInputChange('status', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Активен</SelectItem>
+                    <SelectItem value="inactive">Неактивен</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-end space-x-2 pt-4 border-t">
               <Button
-                onClick={() => setSelectedStudent(null)}
                 variant="outline"
-                className="w-full"
+                onClick={() => setEditingStudent(null)}
               >
-                Закрыть
+                <X className="h-4 w-4 mr-2" />
+                Отмена
               </Button>
-            </CardContent>
-          </Card>
-        </div>
+              <Button
+                onClick={handleSaveStudent}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                Сохранить
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );
