@@ -95,14 +95,14 @@ export function ExerciseDetail({ exercise, onClose }: ExerciseDetailProps) {
             </CardHeader>
             <CardContent>
               <ol className="space-y-2">
-                {exercise.technique.map((step, index) => (
+                {exercise.technique?.map((step, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <span className="flex-shrink-0 w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
                       {index + 1}
                     </span>
                     <span className="text-gray-700">{step}</span>
                   </li>
-                ))}
+                )) || <span className="text-gray-500">Техника выполнения не указана</span>}
               </ol>
             </CardContent>
           </Card>
@@ -117,12 +117,12 @@ export function ExerciseDetail({ exercise, onClose }: ExerciseDetailProps) {
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
-                {exercise.commonMistakes.map((mistake, index) => (
+                {exercise.commonMistakes?.map((mistake, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <X className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
                     <span className="text-gray-700">{mistake}</span>
                   </li>
-                ))}
+                )) || <span className="text-gray-500">Частые ошибки не указаны</span>}
               </ul>
             </CardContent>
           </Card>
