@@ -325,8 +325,8 @@ export function StudentsManagement() {
                   <Input
                     id="birthDate"
                     type="date"
-                    value={newStudent.birthDate || ''}
-                    onChange={(e) => handleNewStudentChange('birthDate', e.target.value)}
+                    value={newPupil.birthDate || ''}
+                    onChange={(e) => handleNewPupilChange('birthDate', e.target.value)}
                   />
                 </div>
                 <div>
@@ -334,8 +334,8 @@ export function StudentsManagement() {
                   <Input
                     id="weight"
                     type="number"
-                    value={newStudent.weight || ''}
-                    onChange={(e) => handleNewStudentChange('weight', parseInt(e.target.value) || 0)}
+                    value={newPupil.weight || ''}
+                    onChange={(e) => handleNewPupilChange('weight', parseInt(e.target.value) || 0)}
                     placeholder="65"
                   />
                 </div>
@@ -344,8 +344,8 @@ export function StudentsManagement() {
                   <Input
                     id="height"
                     type="number"
-                    value={newStudent.height || ''}
-                    onChange={(e) => handleNewStudentChange('height', parseInt(e.target.value) || 0)}
+                    value={newPupil.height || ''}
+                    onChange={(e) => handleNewPupilChange('height', parseInt(e.target.value) || 0)}
                     placeholder="170"
                   />
                 </div>
@@ -355,8 +355,8 @@ export function StudentsManagement() {
                 <Label htmlFor="goal">Цель тренировок</Label>
                 <Textarea
                   id="goal"
-                  value={newStudent.goal || ''}
-                  onChange={(e) => handleNewStudentChange('goal', e.target.value)}
+                  value={newPupil.goal || ''}
+                  onChange={(e) => handleNewPupilChange('goal', e.target.value)}
                   placeholder="Похудение, набор массы, общая физическая подготовка..."
                   rows={3}
                 />
@@ -366,8 +366,8 @@ export function StudentsManagement() {
                 <Label htmlFor="medicalNotes">Медицинские заметки</Label>
                 <Textarea
                   id="medicalNotes"
-                  value={newStudent.medicalNotes || ''}
-                  onChange={(e) => handleNewStudentChange('medicalNotes', e.target.value)}
+                  value={newPupil.medicalNotes || ''}
+                  onChange={(e) => handleNewPupilChange('medicalNotes', e.target.value)}
                   placeholder="Травмы, противопоказания, особенности..."
                   rows={3}
                 />
@@ -383,12 +383,12 @@ export function StudentsManagement() {
                   Отмена
                 </Button>
                 <Button
-                  onClick={handleAddStudent}
+                  onClick={handleAddPupil}
                   className="bg-green-600 hover:bg-green-700"
-                  disabled={createStudentMutation.isPending}
+                  disabled={createPupilMutation.isPending}
                 >
                   <Save className="h-4 w-4 mr-2" />
-                  {createStudentMutation.isPending ? "Сохранение..." : "Добавить"}
+                  {createPupilMutation.isPending ? "Сохранение..." : "Добавить"}
                 </Button>
               </div>
             </div>
@@ -396,9 +396,9 @@ export function StudentsManagement() {
         </Dialog>
       )}
 
-      {/* Edit Student Dialog */}
-      {editingStudent && (
-        <Dialog open={!!editingStudent} onOpenChange={() => setEditingStudent(null)}>
+      {/* Edit Pupil Dialog */}
+      {editingPupil && (
+        <Dialog open={!!editingPupil} onOpenChange={() => setEditingPupil(null)}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Профиль ученика</DialogTitle>
@@ -412,10 +412,10 @@ export function StudentsManagement() {
                     className="w-32 h-32 mx-auto rounded-full overflow-hidden bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors"
                     onClick={triggerFileUpload}
                   >
-                    {editingStudent.photo ? (
+                    {editingPupil.photo ? (
                       <img 
-                        src={editingStudent.photo} 
-                        alt={getStudentFullName(editingStudent)}
+                        src={editingPupil.photo} 
+                        alt={getPupilFullName(editingPupil)}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -444,7 +444,7 @@ export function StudentsManagement() {
                     <Label htmlFor="editFirstName">Имя</Label>
                     <Input
                       id="editFirstName"
-                      value={editingStudent.firstName}
+                      value={editingPupil.firstName}
                       onChange={(e) => handleInputChange('firstName', e.target.value)}
                     />
                   </div>
@@ -452,7 +452,7 @@ export function StudentsManagement() {
                     <Label htmlFor="editLastName">Фамилия</Label>
                     <Input
                       id="editLastName"
-                      value={editingStudent.lastName}
+                      value={editingPupil.lastName}
                       onChange={(e) => handleInputChange('lastName', e.target.value)}
                     />
                   </div>
@@ -460,7 +460,7 @@ export function StudentsManagement() {
                     <Label htmlFor="editMiddleName">Отчество</Label>
                     <Input
                       id="editMiddleName"
-                      value={editingStudent.middleName || ''}
+                      value={editingPupil.middleName || ''}
                       onChange={(e) => handleInputChange('middleName', e.target.value)}
                     />
                   </div>
@@ -468,7 +468,7 @@ export function StudentsManagement() {
                     <Label htmlFor="editPhone">Телефон</Label>
                     <Input
                       id="editPhone"
-                      value={editingStudent.phone}
+                      value={editingPupil.phone}
                       onChange={(e) => handleInputChange('phone', e.target.value)}
                     />
                   </div>
@@ -477,7 +477,7 @@ export function StudentsManagement() {
                     <Input
                       id="editEmail"
                       type="email"
-                      value={editingStudent.email}
+                      value={editingPupil.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
                     />
                   </div>
@@ -490,12 +490,12 @@ export function StudentsManagement() {
                     <Input
                       id="editBirthDate"
                       type="date"
-                      value={editingStudent.birthDate || ''}
+                      value={editingPupil.birthDate || ''}
                       onChange={(e) => handleInputChange('birthDate', e.target.value)}
                     />
-                    {editingStudent.birthDate && (
+                    {editingPupil.birthDate && (
                       <p className="text-sm text-gray-500 mt-1">
-                        Возраст: {calculateAge(editingStudent.birthDate)} лет
+                        Возраст: {calculateAge(editingPupil.birthDate)} лет
                       </p>
                     )}
                   </div>
@@ -504,7 +504,7 @@ export function StudentsManagement() {
                     <Input
                       id="editWeight"
                       type="number"
-                      value={editingStudent.weight || ''}
+                      value={editingPupil.weight || ''}
                       onChange={(e) => handleInputChange('weight', parseInt(e.target.value) || 0)}
                     />
                   </div>
@@ -513,7 +513,7 @@ export function StudentsManagement() {
                     <Input
                       id="editHeight"
                       type="number"
-                      value={editingStudent.height || ''}
+                      value={editingPupil.height || ''}
                       onChange={(e) => handleInputChange('height', parseInt(e.target.value) || 0)}
                     />
                   </div>
@@ -523,7 +523,7 @@ export function StudentsManagement() {
                   <Label htmlFor="editGoal">Цель тренировок</Label>
                   <Textarea
                     id="editGoal"
-                    value={editingStudent.goal || ''}
+                    value={editingPupil.goal || ''}
                     onChange={(e) => handleInputChange('goal', e.target.value)}
                     rows={3}
                   />
@@ -533,7 +533,7 @@ export function StudentsManagement() {
                   <Label htmlFor="editMedicalNotes">Медицинские заметки</Label>
                   <Textarea
                     id="editMedicalNotes"
-                    value={editingStudent.medicalNotes || ''}
+                    value={editingPupil.medicalNotes || ''}
                     onChange={(e) => handleInputChange('medicalNotes', e.target.value)}
                     rows={3}
                   />
@@ -541,7 +541,7 @@ export function StudentsManagement() {
 
                 <div>
                   <Label htmlFor="editStatus">Статус</Label>
-                  <Select value={editingStudent.status} onValueChange={(value) => handleInputChange('status', value)}>
+                  <Select value={editingPupil.status} onValueChange={(value) => handleInputChange('status', value)}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -556,23 +556,23 @@ export function StudentsManagement() {
 
             {/* Action Buttons */}
             <div className="flex justify-between items-center pt-4 border-t">
-              <TrainingPlanButton studentId={editingStudent.id} />
+              <TrainingPlanButton pupilId={editingPupil.id} />
               
               <div className="flex space-x-2">
                 <Button
                   variant="outline"
-                  onClick={() => setEditingStudent(null)}
+                  onClick={() => setEditingPupil(null)}
                 >
                   <X className="h-4 w-4 mr-2" />
                   Отмена
                 </Button>
                 <Button
-                  onClick={handleSaveStudent}
+                  onClick={handleSavePupil}
                   className="bg-blue-600 hover:bg-blue-700"
-                  disabled={updateStudentMutation.isPending}
+                  disabled={updatePupilMutation.isPending}
                 >
                   <Save className="h-4 w-4 mr-2" />
-                  {updateStudentMutation.isPending ? "Сохранение..." : "Сохранить"}
+                  {updatePupilMutation.isPending ? "Сохранение..." : "Сохранить"}
                 </Button>
               </div>
             </div>
