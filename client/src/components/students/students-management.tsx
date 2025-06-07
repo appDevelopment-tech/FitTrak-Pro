@@ -440,14 +440,14 @@ export function StudentsManagement() {
             <div className="flex justify-between items-center pt-4 border-t">
               <Button
                 onClick={() => {
-                  // Переход на тренировку с данным учеником
-                  console.log('Начать тренировку с учеником:', editingStudent.firstName, editingStudent.lastName);
-                  // Здесь можно добавить логику перехода на страницу тренировки
+                  // Создание тренировки для данного ученика
+                  console.log('Создать тренировку для ученика:', editingStudent.firstName, editingStudent.lastName);
+                  // Здесь можно добавить логику создания новой тренировки
                 }}
                 className="bg-green-600 hover:bg-green-700"
               >
                 <Dumbbell className="h-4 w-4 mr-2" />
-                На тренировку
+                Создать тренировку
               </Button>
               
               <div className="flex space-x-2">
