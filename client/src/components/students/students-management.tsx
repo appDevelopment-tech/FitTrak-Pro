@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Plus, Search, X, Save, User, Target, AlertCircle, Camera } from "lucide-react";
+import { Plus, Search, X, Save, User, Target, AlertCircle, Camera, Dumbbell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -437,21 +437,35 @@ export function StudentsManagement() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex justify-end space-x-2 pt-4 border-t">
+            <div className="flex justify-between items-center pt-4 border-t">
               <Button
-                variant="outline"
-                onClick={() => setEditingStudent(null)}
+                onClick={() => {
+                  // Переход на тренировку с данным учеником
+                  console.log('Начать тренировку с учеником:', editingStudent.firstName, editingStudent.lastName);
+                  // Здесь можно добавить логику перехода на страницу тренировки
+                }}
+                className="bg-green-600 hover:bg-green-700"
               >
-                <X className="h-4 w-4 mr-2" />
-                Отмена
+                <Dumbbell className="h-4 w-4 mr-2" />
+                На тренировку
               </Button>
-              <Button
-                onClick={handleSaveStudent}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                <Save className="h-4 w-4 mr-2" />
-                Сохранить
-              </Button>
+              
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setEditingStudent(null)}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Отмена
+                </Button>
+                <Button
+                  onClick={handleSaveStudent}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  Сохранить
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
