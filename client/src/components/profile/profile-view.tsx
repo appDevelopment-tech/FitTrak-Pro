@@ -197,7 +197,7 @@ export function ProfileView() {
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="profile">Личные данные</TabsTrigger>
           <TabsTrigger value="exercises">Упражнения</TabsTrigger>
-          <TabsTrigger value="programs">Программы</TabsTrigger>
+          <TabsTrigger value="programs">Тренировки</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="space-y-6">
@@ -325,16 +325,16 @@ export function ProfileView() {
         <TabsContent value="programs" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl font-semibold">Программы тренировок</CardTitle>
+              <CardTitle className="text-xl font-semibold">Тренировки</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-center py-12">
                 <Award className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">Создайте свою первую программу</h3>
-                <p className="text-gray-500 mb-4">Объединяйте упражнения в полноценные тренировочные программы</p>
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">Создайте свою первую тренировку</h3>
+                <p className="text-gray-500 mb-4">Объединяйте упражнения в полноценные тренировки</p>
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
-                  Создать программу
+                  Создать тренировку
                 </Button>
               </div>
             </CardContent>
