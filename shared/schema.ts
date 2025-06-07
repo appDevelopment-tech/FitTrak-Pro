@@ -12,6 +12,26 @@ export const users = pgTable("users", {
   isTrainer: boolean("is_trainer").default(false),
 });
 
+export const students = pgTable("students", {
+  id: serial("id").primaryKey(),
+  trainerId: integer("trainer_id").notNull(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  middleName: text("middle_name"),
+  phone: text("phone").notNull(),
+  email: text("email").notNull(),
+  birthDate: text("birth_date"),
+  weight: integer("weight"), // kg
+  height: integer("height"), // cm
+  goal: text("goal"),
+  medicalNotes: text("medical_notes"),
+  photo: text("photo"), // URL или путь к фото
+  status: text("status").notNull().default("active"), // 'active', 'inactive'
+  joinDate: text("join_date").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const workoutPrograms = pgTable("workout_programs", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
@@ -91,12 +111,18 @@ export const insertExerciseProgressSchema = createInsertSchema(exerciseProgress)
   id: true,
 });
 
+export const insertStudentSchema = createInsertSchema(students).omit({
+  id: true,
+});
+
 export const insertStudentTrainingPlanSchema = createInsertSchema(studentTrainingPlans).omit({
   id: true,
 });
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type Student = typeof students.$inferSelect;
+export type InsertStudent = z.infer<typeof insertStudentSchema>;
 export type WorkoutProgram = typeof workoutPrograms.$inferSelect;
 export type InsertWorkoutProgram = z.infer<typeof insertWorkoutProgramSchema>;
 export type WorkoutSession = typeof workoutSessions.$inferSelect;

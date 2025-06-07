@@ -1,5 +1,6 @@
 import { 
   users, 
+  students,
   workoutPrograms, 
   workoutSessions, 
   exercises,
@@ -7,6 +8,8 @@ import {
   studentTrainingPlans,
   type User, 
   type InsertUser,
+  type Student,
+  type InsertStudent,
   type WorkoutProgram,
   type InsertWorkoutProgram,
   type WorkoutSession,
@@ -24,6 +27,13 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  
+  // Student operations
+  getStudents(trainerId: number): Promise<Student[]>;
+  getStudent(id: number): Promise<Student | undefined>;
+  createStudent(student: InsertStudent): Promise<Student>;
+  updateStudent(id: number, updates: Partial<InsertStudent>): Promise<Student | undefined>;
+  deleteStudent(id: number): Promise<boolean>;
   
   // Workout program operations
   getWorkoutPrograms(): Promise<WorkoutProgram[]>;
@@ -59,12 +69,14 @@ export interface IStorage {
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
+  private students: Map<number, Student>;
   private workoutPrograms: Map<number, WorkoutProgram>;
   private workoutSessions: Map<number, WorkoutSession>;
   private exercises: Map<number, Exercise>;
   private exerciseProgress: Map<number, ExerciseProgress>;
   private studentTrainingPlans: Map<number, StudentTrainingPlan>;
   private currentUserId: number;
+  private currentStudentId: number;
   private currentProgramId: number;
   private currentSessionId: number;
   private currentExerciseId: number;
@@ -73,12 +85,14 @@ export class MemStorage implements IStorage {
 
   constructor() {
     this.users = new Map();
+    this.students = new Map();
     this.workoutPrograms = new Map();
     this.workoutSessions = new Map();
     this.exercises = new Map();
     this.exerciseProgress = new Map();
     this.studentTrainingPlans = new Map();
     this.currentUserId = 1;
+    this.currentStudentId = 1;
     this.currentProgramId = 1;
     this.currentSessionId = 1;
     this.currentExerciseId = 1;
@@ -102,6 +116,53 @@ export class MemStorage implements IStorage {
     };
     this.users.set(1, sampleUser);
     this.currentUserId = 2;
+
+    // Create sample students
+    const sampleStudents: Student[] = [
+      {
+        id: 1,
+        trainerId: 1,
+        firstName: "Анна",
+        lastName: "Петрова",
+        middleName: "Сергеевна",
+        phone: "+7 (999) 123-45-67",
+        email: "anna.petrova@email.com",
+        birthDate: "1990-05-15",
+        weight: 65,
+        height: 170,
+        goal: "Похудение и поддержание формы",
+        medicalNotes: null,
+        photo: null,
+        status: "active",
+        joinDate: "2024-01-15",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: 2,
+        trainerId: 1,
+        firstName: "Иван",
+        lastName: "Сидоров",
+        middleName: "Петрович",
+        phone: "+7 (888) 987-65-43",
+        email: "ivan.sidorov@email.com",
+        birthDate: "1985-03-20",
+        weight: 80,
+        height: 175,
+        goal: "Набор мышечной массы",
+        medicalNotes: "Проблемы со спиной",
+        photo: null,
+        status: "active",
+        joinDate: "2024-02-01",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ];
+
+    sampleStudents.forEach(student => {
+      this.students.set(student.id, student);
+    });
+    this.currentStudentId = 3;
 
     // Create sample workout programs
     const strengthProgram: WorkoutProgram = {
@@ -1150,6 +1211,52 @@ export class MemStorage implements IStorage {
 
   async deleteExercise(id: number): Promise<boolean> {
     return this.exercises.delete(id);
+  }
+
+  // Student methods
+  async getStudents(trainerId: number): Promise<Student[]> {
+    return Array.from(this.students.values()).filter(student => student.trainerId === trainerId);
+  }
+
+  async getStudent(id: number): Promise<Student | undefined> {
+    return this.students.get(id);
+  }
+
+  async createStudent(insertStudent: InsertStudent): Promise<Student> {
+    const id = this.currentStudentId++;
+    const student: Student = { 
+      ...insertStudent, 
+      id,
+      medicalNotes: insertStudent.medicalNotes ?? null,
+      photo: insertStudent.photo ?? null,
+      middleName: insertStudent.middleName ?? null,
+      birthDate: insertStudent.birthDate ?? null,
+      weight: insertStudent.weight ?? null,
+      height: insertStudent.height ?? null,
+      goal: insertStudent.goal ?? null,
+      status: insertStudent.status ?? "active",
+      createdAt: insertStudent.createdAt ?? new Date(),
+      updatedAt: insertStudent.updatedAt ?? new Date()
+    };
+    this.students.set(id, student);
+    return student;
+  }
+
+  async updateStudent(id: number, updates: Partial<InsertStudent>): Promise<Student | undefined> {
+    const student = this.students.get(id);
+    if (!student) return undefined;
+    
+    const updatedStudent = { 
+      ...student, 
+      ...updates, 
+      updatedAt: new Date() 
+    };
+    this.students.set(id, updatedStudent);
+    return updatedStudent;
+  }
+
+  async deleteStudent(id: number): Promise<boolean> {
+    return this.students.delete(id);
   }
 
   // Student training plan methods
