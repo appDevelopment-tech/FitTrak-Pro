@@ -13,7 +13,7 @@ import { apiRequest } from "@/lib/queryClient";
 import type { PupilTrainingPlan, Pupil, InsertPupil } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
-export function PupilsManagement() {
+export function StudentsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPupil, setSelectedPupil] = useState<Pupil | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -68,7 +68,7 @@ export function PupilsManagement() {
     },
   });
 
-  const [newStudent, setNewStudent] = useState<Partial<InsertStudent>>({
+  const [newPupil, setNewPupil] = useState<Partial<InsertPupil>>({
     firstName: "",
     lastName: "",
     phone: "",
@@ -76,16 +76,16 @@ export function PupilsManagement() {
     trainerId: 1
   });
 
-  const filteredStudents = students.filter(student =>
-    `${student.firstName} ${student.lastName} ${student.middleName || ''}`
+  const filteredPupils = pupils.filter(pupil =>
+    `${pupil.firstName} ${pupil.lastName} ${pupil.middleName || ''}`
       .toLowerCase()
       .includes(searchTerm.toLowerCase()) ||
-    student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.phone.includes(searchTerm)
+    pupil.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    pupil.phone.includes(searchTerm)
   );
 
-  const getStudentFullName = (student: Student) => {
-    return `${student.firstName} ${student.lastName}${student.middleName ? ` ${student.middleName}` : ''}`;
+  const getPupilFullName = (pupil: Pupil) => {
+    return `${pupil.firstName} ${pupil.lastName}${pupil.middleName ? ` ${pupil.middleName}` : ''}`;
   };
 
   const calculateAge = (birthDate: string | null) => {
@@ -100,23 +100,23 @@ export function PupilsManagement() {
     return age;
   };
 
-  const handleStudentClick = (student: Student) => {
-    setEditingStudent({ ...student });
+  const handlePupilClick = (pupil: Pupil) => {
+    setEditingPupil({ ...pupil });
   };
 
-  const handleSaveStudent = () => {
-    if (editingStudent) {
-      updateStudentMutation.mutate({
-        id: editingStudent.id,
-        updates: editingStudent
+  const handleSavePupil = () => {
+    if (editingPupil) {
+      updatePupilMutation.mutate({
+        id: editingPupil.id,
+        updates: editingPupil
       });
     }
   };
 
-  const handleAddStudent = () => {
-    if (newStudent.firstName && newStudent.lastName && newStudent.phone && newStudent.email) {
-      createStudentMutation.mutate(newStudent as InsertStudent);
-      setNewStudent({
+  const handleAddPupil = () => {
+    if (newPupil.firstName && newPupil.lastName && newPupil.phone && newPupil.email) {
+      createPupilMutation.mutate(newPupil as InsertPupil);
+      setNewPupil({
         firstName: "",
         lastName: "",
         phone: "",
@@ -126,14 +126,14 @@ export function PupilsManagement() {
     }
   };
 
-  const handleInputChange = (field: keyof Student, value: string | number) => {
-    if (editingStudent) {
-      setEditingStudent(prev => prev ? { ...prev, [field]: value } : null);
+  const handleInputChange = (field: keyof Pupil, value: string | number) => {
+    if (editingPupil) {
+      setEditingPupil(prev => prev ? { ...prev, [field]: value } : null);
     }
   };
 
-  const handleNewStudentChange = (field: keyof InsertStudent, value: string | number) => {
-    setNewStudent(prev => ({ ...prev, [field]: value }));
+  const handleNewPupilChange = (field: keyof InsertPupil, value: string | number) => {
+    setNewPupil(prev => ({ ...prev, [field]: value }));
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -198,55 +198,55 @@ export function PupilsManagement() {
       {/* Students List */}
       <Card>
         <CardHeader>
-          <CardTitle>Список учеников ({filteredStudents.length})</CardTitle>
+          <CardTitle>Список учеников ({filteredPupils.length})</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <div className="divide-y divide-gray-200">
-            {filteredStudents.map((student, index) => (
+            {filteredPupils.map((pupil, index) => (
               <div
-                key={student.id}
+                key={pupil.id}
                 className="p-4 hover:bg-gray-50 cursor-pointer transition-colors"
-                onClick={() => handleStudentClick(student)}
+                onClick={() => handlePupilClick(pupil)}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    {/* Student Number */}
+                    {/* Pupil Number */}
                     <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-semibold text-sm">
                       {index + 1}
                     </div>
                     
-                    {/* Student Photo */}
+                    {/* Pupil Photo */}
                     <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-                      {student.photo ? (
+                      {pupil.photo ? (
                         <img 
-                          src={student.photo} 
-                          alt={getStudentFullName(student)}
+                          src={pupil.photo} 
+                          alt={getPupilFullName(pupil)}
                           className="w-full h-full object-cover"
                         />
                       ) : (
                         <span className="text-gray-600 font-medium text-lg">
-                          {student.firstName.charAt(0)}{student.lastName.charAt(0)}
+                          {pupil.firstName.charAt(0)}{pupil.lastName.charAt(0)}
                         </span>
                       )}
                     </div>
                     
-                    {/* Student Name */}
+                    {/* Pupil Name */}
                     <div>
                       <h3 className="text-xl font-medium text-gray-900">
-                        {student.lastName} {student.firstName}
+                        {pupil.lastName} {pupil.firstName}
                       </h3>
                     </div>
                   </div>
 
                   {/* Status Badge */}
-                  <Badge variant={student.status === 'active' ? 'default' : 'secondary'}>
-                    {student.status === 'active' ? 'Активен' : 'Неактивен'}
+                  <Badge variant={pupil.status === 'active' ? 'default' : 'secondary'}>
+                    {pupil.status === 'active' ? 'Активен' : 'Неактивен'}
                   </Badge>
                 </div>
               </div>
             ))}
             
-            {filteredStudents.length === 0 && (
+            {filteredPupils.length === 0 && (
               <div className="p-8 text-center text-gray-500">
                 {searchTerm ? "Ученики не найдены" : "Нет учеников"}
               </div>
@@ -270,8 +270,8 @@ export function PupilsManagement() {
                   <Label htmlFor="firstName">Имя*</Label>
                   <Input
                     id="firstName"
-                    value={newStudent.firstName}
-                    onChange={(e) => handleNewStudentChange('firstName', e.target.value)}
+                    value={newPupil.firstName}
+                    onChange={(e) => handleNewPupilChange('firstName', e.target.value)}
                     placeholder="Введите имя"
                     required
                   />
@@ -280,8 +280,8 @@ export function PupilsManagement() {
                   <Label htmlFor="lastName">Фамилия*</Label>
                   <Input
                     id="lastName"
-                    value={newStudent.lastName}
-                    onChange={(e) => handleNewStudentChange('lastName', e.target.value)}
+                    value={newPupil.lastName}
+                    onChange={(e) => handleNewPupilChange('lastName', e.target.value)}
                     placeholder="Введите фамилию"
                     required
                   />
@@ -290,8 +290,8 @@ export function PupilsManagement() {
                   <Label htmlFor="middleName">Отчество</Label>
                   <Input
                     id="middleName"
-                    value={newStudent.middleName || ''}
-                    onChange={(e) => handleNewStudentChange('middleName', e.target.value)}
+                    value={newPupil.middleName || ''}
+                    onChange={(e) => handleNewPupilChange('middleName', e.target.value)}
                     placeholder="Введите отчество"
                   />
                 </div>
@@ -299,8 +299,8 @@ export function PupilsManagement() {
                   <Label htmlFor="phone">Телефон*</Label>
                   <Input
                     id="phone"
-                    value={newStudent.phone}
-                    onChange={(e) => handleNewStudentChange('phone', e.target.value)}
+                    value={newPupil.phone}
+                    onChange={(e) => handleNewPupilChange('phone', e.target.value)}
                     placeholder="+7 (999) 123-45-67"
                     required
                   />
@@ -310,8 +310,8 @@ export function PupilsManagement() {
                   <Input
                     id="email"
                     type="email"
-                    value={newStudent.email}
-                    onChange={(e) => handleNewStudentChange('email', e.target.value)}
+                    value={newPupil.email}
+                    onChange={(e) => handleNewPupilChange('email', e.target.value)}
                     placeholder="example@email.com"
                     required
                   />
