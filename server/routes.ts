@@ -227,6 +227,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/exercises/sort", async (req, res) => {
+    try {
+      const sortedExercises = await storage.sortExercisesAlphabetically();
+      res.json(sortedExercises);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to sort exercises" });
+    }
+  });
+
   // Manual image upload for exercises
   app.get("/api/exercises/:id/search-image", async (req, res) => {
     try {
