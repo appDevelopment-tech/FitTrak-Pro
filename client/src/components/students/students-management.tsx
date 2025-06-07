@@ -465,3 +465,47 @@ export function StudentsManagement() {
     </div>
   );
 }
+
+// Компонент кнопки для работы с планами тренировок
+function TrainingPlanButton({ studentId }: { studentId: number }) {
+  const { data: activePlan, isLoading } = useQuery<StudentTrainingPlan | null>({
+    queryKey: [`/api/students/${studentId}/active-training-plan`],
+  });
+
+  if (isLoading) {
+    return (
+      <Button disabled className="bg-gray-400">
+        <Dumbbell className="h-4 w-4 mr-2" />
+        Загрузка...
+      </Button>
+    );
+  }
+
+  if (activePlan) {
+    return (
+      <Button
+        onClick={() => {
+          console.log('Начать тренировку с планом:', activePlan.name);
+          // Здесь будет логика перехода на активную тренировку
+        }}
+        className="bg-blue-600 hover:bg-blue-700"
+      >
+        <Dumbbell className="h-4 w-4 mr-2" />
+        На тренировку
+      </Button>
+    );
+  }
+
+  return (
+    <Button
+      onClick={() => {
+        console.log('Создать новый план тренировки для ученика:', studentId);
+        // Здесь будет логика создания нового плана тренировки
+      }}
+      className="bg-green-600 hover:bg-green-700"
+    >
+      <Dumbbell className="h-4 w-4 mr-2" />
+      Создать тренировку
+    </Button>
+  );
+}
