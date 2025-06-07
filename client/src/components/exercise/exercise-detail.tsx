@@ -7,15 +7,14 @@ import { X, AlertTriangle, CheckCircle, Info } from "lucide-react";
 interface Exercise {
   id: number;
   name: string;
-  category: string;
   primaryMuscles: string[];
   secondaryMuscles: string[];
-  equipment: string;
   difficulty: string;
-  description: string;
+  overview: string;
   technique: string[];
   commonMistakes: string[];
-  tips: string[];
+  contraindications: string[];
+  muscleImageUrl?: string | null;
 }
 
 interface ExerciseDetailProps {
@@ -40,11 +39,9 @@ export function ExerciseDetail({ exercise, onClose }: ExerciseDetailProps) {
           <div>
             <h2 className="text-2xl font-bold text-gray-900">{exercise.name}</h2>
             <div className="flex items-center gap-2 mt-2">
-              <Badge variant="secondary">{exercise.category}</Badge>
               <Badge className={getDifficultyColor(exercise.difficulty)}>
                 {exercise.difficulty}
               </Badge>
-              <Badge variant="outline">{exercise.equipment}</Badge>
             </div>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose}>
@@ -59,21 +56,21 @@ export function ExerciseDetail({ exercise, onClose }: ExerciseDetailProps) {
               <ExerciseAnimation exerciseName={exercise.name} className="w-48 h-48" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-3">Описание</h3>
-              <p className="text-gray-700 leading-relaxed">{exercise.description}</p>
+              <h3 className="text-lg font-semibold mb-3">Обзор упражнения</h3>
+              <p className="text-gray-700 leading-relaxed">{exercise.overview}</p>
               
               <div className="mt-4">
                 <h4 className="font-medium text-gray-900 mb-2">Основные мышцы:</h4>
                 <div className="flex flex-wrap gap-2">
-                  {exercise.primaryMuscles.map((muscle, index) => (
+                  {exercise.primaryMuscles?.map((muscle, index) => (
                     <Badge key={index} className="bg-red-100 text-red-800">
                       {muscle}
                     </Badge>
-                  ))}
+                  )) || <span className="text-gray-500">Не указано</span>}
                 </div>
               </div>
 
-              {exercise.secondaryMuscles.length > 0 && (
+              {exercise.secondaryMuscles && exercise.secondaryMuscles.length > 0 && (
                 <div className="mt-3">
                   <h4 className="font-medium text-gray-900 mb-2">Вспомогательные мышцы:</h4>
                   <div className="flex flex-wrap gap-2">
@@ -130,22 +127,22 @@ export function ExerciseDetail({ exercise, onClose }: ExerciseDetailProps) {
             </CardContent>
           </Card>
 
-          {/* Tips */}
+          {/* Contraindications */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Info className="h-5 w-5 text-blue-500" />
-                Полезные советы
+                <Info className="h-5 w-5 text-orange-500" />
+                Противопоказания
               </CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
-                {exercise.tips.map((tip, index) => (
+                {exercise.contraindications?.map((contraindication, index) => (
                   <li key={index} className="flex items-start gap-3">
-                    <CheckCircle className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700">{tip}</span>
+                    <AlertTriangle className="h-4 w-4 text-orange-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-700">{contraindication}</span>
                   </li>
-                ))}
+                )) || <span className="text-gray-500">Противопоказания не указаны</span>}
               </ul>
             </CardContent>
           </Card>
