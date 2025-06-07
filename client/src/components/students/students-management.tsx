@@ -113,6 +113,12 @@ export function StudentsManagement() {
     }
   };
 
+  const handleInputChange = (field: keyof Pupil, value: string | number) => {
+    if (editingPupil) {
+      setEditingPupil(prev => prev ? { ...prev, [field]: value } : null);
+    }
+  };
+
   const handleAddPupil = () => {
     if (newPupil.firstName && newPupil.lastName && newPupil.phone && newPupil.email) {
       createPupilMutation.mutate(newPupil as InsertPupil);
@@ -126,19 +132,13 @@ export function StudentsManagement() {
     }
   };
 
-  const handleInputChange = (field: keyof Pupil, value: string | number) => {
-    if (editingPupil) {
-      setEditingPupil(prev => prev ? { ...prev, [field]: value } : null);
-    }
-  };
-
   const handleNewPupilChange = (field: keyof InsertPupil, value: string | number) => {
     setNewPupil(prev => ({ ...prev, [field]: value }));
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file && editingStudent) {
+    if (file && editingPupil) {
       if (!file.type.startsWith('image/')) {
         alert('Пожалуйста, выберите файл изображения');
         return;
@@ -147,7 +147,7 @@ export function StudentsManagement() {
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
-        setEditingStudent(prev => prev ? { ...prev, photo: result } : null);
+        setEditingPupil(prev => prev ? { ...prev, photo: result } : null);
       };
       reader.readAsDataURL(file);
     }
@@ -584,9 +584,9 @@ export function StudentsManagement() {
 }
 
 // Компонент кнопки для работы с планами тренировок
-function TrainingPlanButton({ studentId }: { studentId: number }) {
-  const { data: activePlan, isLoading } = useQuery<StudentTrainingPlan | null>({
-    queryKey: [`/api/students/${studentId}/active-training-plan`],
+function TrainingPlanButton({ pupilId }: { pupilId: number }) {
+  const { data: activePlan, isLoading } = useQuery<PupilTrainingPlan | null>({
+    queryKey: [`/api/pupils/${pupilId}/active-training-plan`],
   });
 
   if (isLoading) {
@@ -616,7 +616,7 @@ function TrainingPlanButton({ studentId }: { studentId: number }) {
   return (
     <Button
       onClick={() => {
-        console.log('Создать новый план тренировки для ученика:', studentId);
+        console.log('Создать новый план тренировки для ученика:', pupilId);
         // Здесь будет логика создания нового плана тренировки
       }}
       className="bg-green-600 hover:bg-green-700"
