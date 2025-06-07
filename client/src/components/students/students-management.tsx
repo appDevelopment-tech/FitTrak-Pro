@@ -608,7 +608,7 @@ function TrainingPlanButton({ pupilId }: { pupilId: number }) {
         className="bg-blue-600 hover:bg-blue-700"
       >
         <Dumbbell className="h-4 w-4 mr-2" />
-        На тренировку
+        Создать тренировку
       </Button>
     );
   }
