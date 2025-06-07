@@ -160,47 +160,34 @@ export function StudentsManagement() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    {/* Avatar placeholder */}
-                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                      <span className="text-gray-600 font-medium">
-                        {student.firstName.charAt(0)}{student.lastName.charAt(0)}
-                      </span>
+                    {/* Student Photo */}
+                    <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                      {student.photo ? (
+                        <img 
+                          src={student.photo} 
+                          alt={getStudentFullName(student)}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-gray-600 font-medium text-lg">
+                          {student.firstName.charAt(0)}{student.lastName.charAt(0)}
+                        </span>
+                      )}
                     </div>
                     
-                    {/* Student Info */}
+                    {/* Student Name */}
                     <div>
-                      <h3 className="text-lg font-medium text-gray-900">
-                        {getStudentFullName(student)}
+                      <h3 className="text-xl font-medium text-gray-900">
+                        {student.lastName} {student.firstName}
                       </h3>
-                      <div className="flex items-center space-x-4 text-sm text-gray-600">
-                        <span className="flex items-center">
-                          <Phone className="w-3 h-3 mr-1" />
-                          {student.phone}
-                        </span>
-                        <span className="flex items-center">
-                          <Mail className="w-3 h-3 mr-1" />
-                          {student.email}
-                        </span>
-                        {student.birthDate && (
-                          <span>{calculateAge(student.birthDate)} лет</span>
-                        )}
-                      </div>
                     </div>
                   </div>
                   
-                  {/* Status and Actions */}
-                  <div className="flex items-center space-x-3">
-                    {student.goal && (
-                      <div className="text-sm text-gray-600 max-w-xs truncate">
-                        {student.goal}
-                      </div>
-                    )}
+                  {/* Status */}
+                  <div className="flex items-center">
                     <Badge variant={student.status === 'active' ? 'default' : 'secondary'}>
                       {student.status === 'active' ? 'Активен' : 'Неактивен'}
                     </Badge>
-                    <div className="text-xs text-gray-500">
-                      С {new Date(student.joinDate).toLocaleDateString('ru-RU')}
-                    </div>
                   </div>
                 </div>
               </div>
@@ -257,6 +244,36 @@ export function StudentsManagement() {
             </DialogHeader>
             
             <div className="space-y-6 py-4">
+              {/* Photo Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Фотография</h3>
+                <div className="flex items-center space-x-4">
+                  <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                    {editingStudent.photo ? (
+                      <img 
+                        src={editingStudent.photo} 
+                        alt={getStudentFullName(editingStudent)}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-gray-600 font-medium text-xl">
+                        {editingStudent.firstName.charAt(0)}{editingStudent.lastName.charAt(0)}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <Label htmlFor="photo">URL фотографии</Label>
+                    <Input
+                      id="photo"
+                      type="url"
+                      value={editingStudent.photo || ''}
+                      onChange={(e) => handleInputChange('photo', e.target.value)}
+                      placeholder="https://example.com/photo.jpg"
+                    />
+                  </div>
+                </div>
+              </div>
+
               {/* Personal Information */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Личная информация</h3>
