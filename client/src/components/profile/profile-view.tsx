@@ -12,6 +12,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { User as UserType, Exercise, InsertExercise } from "@shared/schema";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { getExercisePhoto } from "@/components/ui/exercise-photos";
 import { ImageUpload } from "@/components/ui/image-upload";
@@ -187,10 +188,8 @@ export function ProfileView() {
   };
 
   const handleDeleteExercise = (exerciseId: number) => {
-    if (confirm('Вы уверены, что хотите удалить это упражнение?')) {
-      deleteExerciseMutation.mutate(exerciseId);
-    }
-  }
+    deleteExerciseMutation.mutate(exerciseId);
+  };
 
   const handleMuscleImageSave = (muscleGroup: string, imageUrl: string) => {
     setMuscleImages(prev => ({
@@ -741,14 +740,34 @@ export function ProfileView() {
                             >
                               <Edit className="h-4 w-4" />
                             </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteExercise(exercise.id)}
-                              className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-red-500 hover:bg-red-600 text-white transition-colors"
-                              title="Удалить упражнение"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <button
+                                  type="button"
+                                  className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-red-500 hover:bg-red-600 text-white transition-colors"
+                                  title="Удалить упражнение"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Удалить упражнение?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Это действие нельзя отменить. Упражнение "{exercise.name}" будет удалено навсегда.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Отмена</AlertDialogCancel>
+                                  <AlertDialogAction 
+                                    onClick={() => handleDeleteExercise(exercise.id)}
+                                    className="bg-red-600 hover:bg-red-700"
+                                  >
+                                    Удалить
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
                           </div>
                         </div>
                       ))}
