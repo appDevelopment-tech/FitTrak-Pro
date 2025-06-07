@@ -56,17 +56,17 @@ export const workoutSessions = pgTable("workout_sessions", {
 export const exercises = pgTable("exercises", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  primaryMuscles: text("primary_muscles").array().notNull(), // основные группы мышц
-  secondaryMuscles: text("secondary_muscles").array().notNull(), // вспомогательные группы мышц
+  primaryMuscles: text("primaryMuscles").array().notNull(), // основные группы мышц
+  secondaryMuscles: text("secondaryMuscles").array().default([]), // вспомогательные группы мышц
   difficulty: text("difficulty").notNull(), // 'начинающий', 'средний', 'продвинутый'
   overview: text("overview").notNull(), // обзор упражнения
   technique: text("technique").array().notNull(), // техника выполнения (пошагово)
-  commonMistakes: text("common_mistakes").array().notNull(), // частые ошибки и их исправление
+  commonMistakes: text("commonMistakes").array().notNull(), // частые ошибки и их исправление
   contraindications: text("contraindications").array().notNull(), // противопоказания
-  muscleImageUrl: text("muscle_image_url"), // ссылка на картинку с выделенными мышцами
-  createdBy: integer("created_by"), // кто создал упражнение (тренер)
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  muscleImageUrl: text("muscleImageUrl"), // ссылка на картинку с выделенными мышцами
+  createdBy: integer("createdBy"), // кто создал упражнение (тренер)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 });
 
 export const exerciseProgress = pgTable("exercise_progress", {
@@ -105,6 +105,12 @@ export const insertWorkoutSessionSchema = createInsertSchema(workoutSessions).om
 
 export const insertExerciseSchema = createInsertSchema(exercises).omit({
   id: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  secondaryMuscles: z.array(z.string()).optional().default([]),
+  commonMistakes: z.array(z.string()).optional().default([]),
+  contraindications: z.array(z.string()).optional().default([]),
 });
 
 export const insertExerciseProgressSchema = createInsertSchema(exerciseProgress).omit({
