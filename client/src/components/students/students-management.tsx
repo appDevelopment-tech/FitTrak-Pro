@@ -176,7 +176,7 @@ export function StudentsManagement() {
         </CardHeader>
         <CardContent className="p-0">
           <div className="divide-y divide-gray-200">
-            {filteredStudents.map((student) => (
+            {filteredStudents.map((student, index) => (
               <div
                 key={student.id}
                 className="p-4 hover:bg-gray-50 cursor-pointer transition-colors"
@@ -184,6 +184,11 @@ export function StudentsManagement() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
+                    {/* Student Number */}
+                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-semibold text-sm">
+                      {index + 1}
+                    </div>
+                    
                     {/* Student Photo */}
                     <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
                       {student.photo ? (
