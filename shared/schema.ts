@@ -60,6 +60,17 @@ export const exerciseProgress = pgTable("exercise_progress", {
   sessionId: integer("session_id"),
 });
 
+export const studentTrainingPlans = pgTable("student_training_plans", {
+  id: serial("id").primaryKey(),
+  studentId: integer("student_id").notNull(),
+  trainerId: integer("trainer_id").notNull(),
+  name: text("name").notNull(),
+  exercises: jsonb("exercises").notNull(), // массив упражнений с подходами/повторениями
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
 });
@@ -80,6 +91,10 @@ export const insertExerciseProgressSchema = createInsertSchema(exerciseProgress)
   id: true,
 });
 
+export const insertStudentTrainingPlanSchema = createInsertSchema(studentTrainingPlans).omit({
+  id: true,
+});
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type WorkoutProgram = typeof workoutPrograms.$inferSelect;
@@ -90,3 +105,5 @@ export type Exercise = typeof exercises.$inferSelect;
 export type InsertExercise = z.infer<typeof insertExerciseSchema>;
 export type ExerciseProgress = typeof exerciseProgress.$inferSelect;
 export type InsertExerciseProgress = z.infer<typeof insertExerciseProgressSchema>;
+export type StudentTrainingPlan = typeof studentTrainingPlans.$inferSelect;
+export type InsertStudentTrainingPlan = z.infer<typeof insertStudentTrainingPlanSchema>;

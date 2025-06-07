@@ -4,6 +4,7 @@ import {
   workoutSessions, 
   exercises,
   exerciseProgress,
+  studentTrainingPlans,
   type User, 
   type InsertUser,
   type WorkoutProgram,
@@ -13,7 +14,9 @@ import {
   type Exercise,
   type InsertExercise,
   type ExerciseProgress,
-  type InsertExerciseProgress
+  type InsertExerciseProgress,
+  type StudentTrainingPlan,
+  type InsertStudentTrainingPlan
 } from "@shared/schema";
 
 export interface IStorage {
@@ -45,6 +48,13 @@ export interface IStorage {
   getExerciseProgress(userId: number): Promise<ExerciseProgress[]>;
   createExerciseProgress(progress: InsertExerciseProgress): Promise<ExerciseProgress>;
   getExerciseProgressByExerciseId(userId: number, exerciseId: number): Promise<ExerciseProgress[]>;
+  
+  // Student training plan operations
+  getStudentTrainingPlans(studentId: number): Promise<StudentTrainingPlan[]>;
+  getActiveTrainingPlan(studentId: number): Promise<StudentTrainingPlan | undefined>;
+  createStudentTrainingPlan(plan: InsertStudentTrainingPlan): Promise<StudentTrainingPlan>;
+  updateStudentTrainingPlan(id: number, updates: Partial<InsertStudentTrainingPlan>): Promise<StudentTrainingPlan | undefined>;
+  deleteStudentTrainingPlan(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -53,11 +63,13 @@ export class MemStorage implements IStorage {
   private workoutSessions: Map<number, WorkoutSession>;
   private exercises: Map<number, Exercise>;
   private exerciseProgress: Map<number, ExerciseProgress>;
+  private studentTrainingPlans: Map<number, StudentTrainingPlan>;
   private currentUserId: number;
   private currentProgramId: number;
   private currentSessionId: number;
   private currentExerciseId: number;
   private currentProgressId: number;
+  private currentTrainingPlanId: number;
 
   constructor() {
     this.users = new Map();
@@ -65,11 +77,13 @@ export class MemStorage implements IStorage {
     this.workoutSessions = new Map();
     this.exercises = new Map();
     this.exerciseProgress = new Map();
+    this.studentTrainingPlans = new Map();
     this.currentUserId = 1;
     this.currentProgramId = 1;
     this.currentSessionId = 1;
     this.currentExerciseId = 1;
     this.currentProgressId = 1;
+    this.currentTrainingPlanId = 1;
 
     // Initialize with sample data
     this.initializeSampleData();
@@ -1136,6 +1150,47 @@ export class MemStorage implements IStorage {
 
   async deleteExercise(id: number): Promise<boolean> {
     return this.exercises.delete(id);
+  }
+
+  // Student training plan methods
+  async getStudentTrainingPlans(studentId: number): Promise<StudentTrainingPlan[]> {
+    return Array.from(this.studentTrainingPlans.values()).filter(plan => plan.studentId === studentId);
+  }
+
+  async getActiveTrainingPlan(studentId: number): Promise<StudentTrainingPlan | undefined> {
+    return Array.from(this.studentTrainingPlans.values()).find(
+      plan => plan.studentId === studentId && plan.isActive
+    );
+  }
+
+  async createStudentTrainingPlan(insertPlan: InsertStudentTrainingPlan): Promise<StudentTrainingPlan> {
+    const id = this.currentTrainingPlanId++;
+    const plan: StudentTrainingPlan = { 
+      ...insertPlan, 
+      id,
+      isActive: insertPlan.isActive ?? true,
+      createdAt: insertPlan.createdAt ?? new Date(),
+      updatedAt: insertPlan.updatedAt ?? new Date()
+    };
+    this.studentTrainingPlans.set(id, plan);
+    return plan;
+  }
+
+  async updateStudentTrainingPlan(id: number, updates: Partial<InsertStudentTrainingPlan>): Promise<StudentTrainingPlan | undefined> {
+    const plan = this.studentTrainingPlans.get(id);
+    if (!plan) return undefined;
+    
+    const updatedPlan = { 
+      ...plan, 
+      ...updates, 
+      updatedAt: new Date() 
+    };
+    this.studentTrainingPlans.set(id, updatedPlan);
+    return updatedPlan;
+  }
+
+  async deleteStudentTrainingPlan(id: number): Promise<boolean> {
+    return this.studentTrainingPlans.delete(id);
   }
 }
 
