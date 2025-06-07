@@ -373,7 +373,7 @@ export function StudentsManagement() {
                 />
               </div>
 
-              {/* Action Buttons */}
+              {/* Кнопки действий */}
               <div className="flex justify-end space-x-2 pt-4 border-t">
                 <Button
                   variant="outline"
@@ -405,7 +405,7 @@ export function StudentsManagement() {
             </DialogHeader>
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Photo Section */}
+              {/* Секция фотографии */}
               <div className="lg:col-span-1">
                 <div className="text-center">
                   <div 
@@ -436,7 +436,7 @@ export function StudentsManagement() {
                 </div>
               </div>
 
-              {/* Info Section */}
+              {/* Секция информации */}
               <div className="lg:col-span-2 space-y-6">
                 {/* Основная информация */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -483,7 +483,7 @@ export function StudentsManagement() {
                   </div>
                 </div>
 
-                {/* Physical Info */}
+                {/* Физические данные */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <Label htmlFor="editBirthDate">Дата рождения</Label>
@@ -554,7 +554,7 @@ export function StudentsManagement() {
               </div>
             </div>
 
-            {/* Action Buttons */}
+            {/* Кнопки действий */}
             <div className="flex justify-between items-center pt-4 border-t">
               <TrainingPlanButton pupilId={editingPupil.id} />
               
