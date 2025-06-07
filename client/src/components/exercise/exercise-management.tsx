@@ -164,8 +164,9 @@ export function ExerciseManagement() {
 
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Сложность:</span>
-                  <Badge variant={exercise.difficulty === 'начинающий' ? 'default' : 
-                               exercise.difficulty === 'средний' ? 'secondary' : 'destructive'}>
+                  <Badge variant={exercise.difficulty === 'легкий' ? 'default' : 
+                               exercise.difficulty === 'средний' ? 'secondary' : 'destructive'}
+                         className={exercise.difficulty === 'легкий' ? 'bg-blue-100 text-blue-800 hover:bg-blue-200' : ''}>
                     {exercise.difficulty}
                   </Badge>
                 </div>
@@ -525,6 +526,15 @@ interface ExerciseViewProps {
 }
 
 function ExerciseView({ exercise }: ExerciseViewProps) {
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty.toLowerCase()) {
+      case 'легкий': return 'bg-blue-100 text-blue-800';
+      case 'средний': return 'bg-yellow-100 text-yellow-800';
+      case 'продвинутый': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -532,7 +542,12 @@ function ExerciseView({ exercise }: ExerciseViewProps) {
           <h3 className="font-semibold mb-2">Основная информация</h3>
           <div className="space-y-2 text-sm">
             <div><span className="font-medium">Название:</span> {exercise.name}</div>
-            <div><span className="font-medium">Сложность:</span> {exercise.difficulty}</div>
+            <div className="flex items-center gap-2">
+              <span className="font-medium">Сложность:</span> 
+              <Badge className={getDifficultyColor(exercise.difficulty)}>
+                {exercise.difficulty}
+              </Badge>
+            </div>
           </div>
         </div>
 
