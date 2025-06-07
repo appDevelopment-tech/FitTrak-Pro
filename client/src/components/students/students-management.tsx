@@ -8,25 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useQuery } from "@tanstack/react-query";
-import type { StudentTrainingPlan } from "@shared/schema";
-
-interface Student {
-  id: number;
-  firstName: string;
-  lastName: string;
-  middleName?: string;
-  phone: string;
-  email: string;
-  birthDate?: string;
-  weight?: number;
-  height?: number;
-  goal?: string;
-  medicalNotes?: string;
-  photo?: string;
-  status: 'active' | 'inactive';
-  joinDate: string;
-}
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import type { StudentTrainingPlan, Student, InsertStudent } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
 
 export function StudentsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,48 +19,62 @@ export function StudentsManagement() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [students, setStudents] = useState<Student[]>([
-    {
-      id: 1,
-      firstName: "Анна",
-      lastName: "Петрова",
-      middleName: "Сергеевна",
-      phone: "+7 (999) 123-45-67",
-      email: "anna.petrova@email.com",
-      birthDate: "1990-05-15",
-      weight: 65,
-      height: 170,
-      goal: "Похудение и поддержание формы",
-      status: "active",
-      joinDate: "2024-01-15"
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  // Загружаем студентов для тренера с ID 1
+  const { data: students = [], isLoading } = useQuery<Student[]>({
+    queryKey: ['/api/trainers/1/students'],
+  });
+
+  // Мутация для создания нового студента
+  const createStudentMutation = useMutation({
+    mutationFn: (data: InsertStudent) => apiRequest('/api/trainers/1/students', 'POST', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/students'] });
+      setShowAddForm(false);
+      toast({
+        title: "Успешно",
+        description: "Студент добавлен",
+      });
     },
-    {
-      id: 2,
-      firstName: "Михаил",
-      lastName: "Иванов",
-      phone: "+7 (888) 987-65-43",
-      email: "mikhail.ivanov@email.com",
-      birthDate: "1985-08-22",
-      weight: 80,
-      height: 180,
-      goal: "Набор мышечной массы",
-      status: "active",
-      joinDate: "2024-02-01"
+    onError: () => {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось добавить студента",
+        variant: "destructive",
+      });
     },
-    {
-      id: 3,
-      firstName: "Екатерина",
-      lastName: "Смирнова",
-      phone: "+7 (777) 555-12-34",
-      email: "ekaterina.smirnova@email.com",
-      birthDate: "1995-12-03",
-      weight: 58,
-      height: 165,
-      goal: "Общая физическая подготовка",
-      status: "inactive",
-      joinDate: "2023-11-10"
-    }
-  ]);
+  });
+
+  // Мутация для обновления студента
+  const updateStudentMutation = useMutation({
+    mutationFn: (data: { id: number; updates: Partial<InsertStudent> }) => 
+      apiRequest(`/api/students/${data.id}`, 'PUT', data.updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/students'] });
+      setEditingStudent(null);
+      toast({
+        title: "Успешно",
+        description: "Данные студента обновлены",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось обновить данные студента",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const [newStudent, setNewStudent] = useState<Partial<InsertStudent>>({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+    trainerId: 1
+  });
 
   const filteredStudents = students.filter(student =>
     `${student.firstName} ${student.lastName} ${student.middleName || ''}`
@@ -106,12 +105,23 @@ export function StudentsManagement() {
 
   const handleSaveStudent = () => {
     if (editingStudent) {
-      setStudents(prev => 
-        prev.map(student => 
-          student.id === editingStudent.id ? editingStudent : student
-        )
-      );
-      setEditingStudent(null);
+      updateStudentMutation.mutate({
+        id: editingStudent.id,
+        updates: editingStudent
+      });
+    }
+  };
+
+  const handleAddStudent = () => {
+    if (newStudent.firstName && newStudent.lastName && newStudent.phone && newStudent.email) {
+      createStudentMutation.mutate(newStudent as InsertStudent);
+      setNewStudent({
+        firstName: "",
+        lastName: "",
+        phone: "",
+        email: "",
+        trainerId: 1
+      });
     }
   };
 

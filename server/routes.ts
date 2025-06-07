@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertWorkoutProgramSchema, insertWorkoutSessionSchema, insertExerciseProgressSchema, insertExerciseSchema, insertStudentTrainingPlanSchema } from "@shared/schema";
+import { insertWorkoutProgramSchema, insertWorkoutSessionSchema, insertExerciseProgressSchema, insertExerciseSchema, insertStudentTrainingPlanSchema, insertStudentSchema } from "@shared/schema";
 
 function translateExerciseToEnglish(russianName: string): string {
   const translations: Record<string, string> = {
@@ -295,6 +295,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(stats);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Student routes
+  app.get("/api/trainers/:trainerId/students", async (req, res) => {
+    try {
+      const trainerId = parseInt(req.params.trainerId);
+      const students = await storage.getStudents(trainerId);
+      res.json(students);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get students" });
+    }
+  });
+
+  app.get("/api/students/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const student = await storage.getStudent(id);
+      if (!student) {
+        return res.status(404).json({ message: "Student not found" });
+      }
+      res.json(student);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get student" });
+    }
+  });
+
+  app.post("/api/trainers/:trainerId/students", async (req, res) => {
+    try {
+      const trainerId = parseInt(req.params.trainerId);
+      const studentData = insertStudentSchema.parse({
+        ...req.body,
+        trainerId,
+        joinDate: new Date().toISOString().split('T')[0]
+      });
+      const student = await storage.createStudent(studentData);
+      res.json(student);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to create student" });
+    }
+  });
+
+  app.put("/api/students/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updates = req.body;
+      const student = await storage.updateStudent(id, updates);
+      if (!student) {
+        return res.status(404).json({ message: "Student not found" });
+      }
+      res.json(student);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to update student" });
+    }
+  });
+
+  app.delete("/api/students/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteStudent(id);
+      if (!success) {
+        return res.status(404).json({ message: "Student not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      res.status(400).json({ message: "Failed to delete student" });
     }
   });
 

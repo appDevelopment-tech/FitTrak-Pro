@@ -1481,6 +1481,43 @@ export class DatabaseStorage implements IStorage {
     const result = await db.delete(studentTrainingPlans).where(eq(studentTrainingPlans.id, id));
     return (result.rowCount ?? 0) > 0;
   }
+
+  // Student methods
+  async getStudents(trainerId: number): Promise<Student[]> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    return await db.select().from(students).where(eq(students.trainerId, trainerId));
+  }
+
+  async getStudent(id: number): Promise<Student | undefined> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    const [student] = await db.select().from(students).where(eq(students.id, id));
+    return student;
+  }
+
+  async createStudent(insertStudent: InsertStudent): Promise<Student> {
+    const { db } = await import("./db");
+    const [student] = await db.insert(students).values(insertStudent).returning();
+    return student;
+  }
+
+  async updateStudent(id: number, updates: Partial<InsertStudent>): Promise<Student | undefined> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    const [student] = await db.update(students).set({
+      ...updates,
+      updatedAt: new Date()
+    }).where(eq(students.id, id)).returning();
+    return student || undefined;
+  }
+
+  async deleteStudent(id: number): Promise<boolean> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    const result = await db.delete(students).where(eq(students.id, id));
+    return (result.rowCount ?? 0) > 0;
+  }
 }
 
 export const storage = new MemStorage();
