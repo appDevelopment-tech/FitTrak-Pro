@@ -101,6 +101,35 @@ export function ProfileView() {
     }
   });
 
+  const sortExercisesMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/exercises/sort', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to sort exercises');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
+      toast({ title: "Упражнения отсортированы", description: "Упражнения расположены в алфавитном порядке" });
+    },
+    onError: (error: Error) => {
+      console.error('Sort exercises error:', error);
+      toast({ 
+        title: "Ошибка", 
+        description: "Не удалось отсортировать упражнения", 
+        variant: "destructive" 
+      });
+    }
+  });
+
   // Фильтрация упражнений
   const filteredExercises = exercises.filter(exercise => {
     const matchesMuscleGroup = !selectedMuscleGroup || exercise.primaryMuscles.includes(selectedMuscleGroup);
