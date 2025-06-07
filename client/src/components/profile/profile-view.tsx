@@ -655,10 +655,25 @@ export function ProfileView() {
                     <Filter className="h-5 w-5" />
                     Упражнения для группы: {selectedMuscleGroup}
                   </CardTitle>
-                  <Button onClick={handleCreateExercise} className="flex items-center gap-2">
-                    <Plus className="h-4 w-4" />
-                    Добавить упражнение
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      onClick={() => sortExercisesMutation.mutate()} 
+                      variant="outline" 
+                      className="flex items-center gap-2"
+                      disabled={sortExercisesMutation.isPending}
+                    >
+                      {sortExercisesMutation.isPending ? (
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600" />
+                      ) : (
+                        "А-Я"
+                      )}
+                      Сортировать
+                    </Button>
+                    <Button onClick={handleCreateExercise} className="flex items-center gap-2">
+                      <Plus className="h-4 w-4" />
+                      Добавить упражнение
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
