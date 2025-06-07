@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Plus, Search, Edit, Trash2, Phone, Mail, X, Save, User, Calendar, Target, AlertCircle } from "lucide-react";
+import { useState, useRef } from "react";
+import { Plus, Search, Edit, Trash2, Phone, Mail, X, Save, User, Calendar, Target, AlertCircle, Upload, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Student {
   id: number;
@@ -31,6 +32,7 @@ export function StudentsManagement() {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [students, setStudents] = useState<Student[]>([
     {
       id: 1,
@@ -116,6 +118,29 @@ export function StudentsManagement() {
     if (editingStudent) {
       setEditingStudent(prev => prev ? { ...prev, [field]: value } : null);
     }
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && editingStudent) {
+      // Проверяем тип файла
+      if (!file.type.startsWith('image/')) {
+        alert('Пожалуйста, выберите файл изображения');
+        return;
+      }
+
+      // Создаем URL для предварительного просмотра
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setEditingStudent(prev => prev ? { ...prev, photo: result } : null);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const triggerFileUpload = () => {
+    fileInputRef.current?.click();
   };
 
   return (
@@ -246,8 +271,11 @@ export function StudentsManagement() {
             <div className="space-y-6 py-4">
               {/* Photo Section */}
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Фотография</h3>
-                <div className="flex items-center space-x-4">
+                <h3 className="text-lg font-medium flex items-center gap-2">
+                  <Camera className="h-5 w-5" />
+                  Фотография
+                </h3>
+                <div className="flex items-start space-x-4">
                   <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
                     {editingStudent.photo ? (
                       <img 
@@ -262,14 +290,43 @@ export function StudentsManagement() {
                     )}
                   </div>
                   <div className="flex-1">
-                    <Label htmlFor="photo">URL фотографии</Label>
-                    <Input
-                      id="photo"
-                      type="url"
-                      value={editingStudent.photo || ''}
-                      onChange={(e) => handleInputChange('photo', e.target.value)}
-                      placeholder="https://example.com/photo.jpg"
-                    />
+                    <Tabs defaultValue="upload" className="w-full">
+                      <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="upload">Загрузить файл</TabsTrigger>
+                        <TabsTrigger value="url">Ссылка</TabsTrigger>
+                      </TabsList>
+                      <TabsContent value="upload" className="space-y-2">
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileUpload}
+                          className="hidden"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={triggerFileUpload}
+                          className="w-full"
+                        >
+                          <Upload className="h-4 w-4 mr-2" />
+                          Выбрать фото с компьютера
+                        </Button>
+                        <p className="text-xs text-gray-500">
+                          Поддерживаются форматы: JPG, PNG, GIF
+                        </p>
+                      </TabsContent>
+                      <TabsContent value="url" className="space-y-2">
+                        <Label htmlFor="photo">URL фотографии</Label>
+                        <Input
+                          id="photo"
+                          type="url"
+                          value={editingStudent.photo?.startsWith('data:') ? '' : editingStudent.photo || ''}
+                          onChange={(e) => handleInputChange('photo', e.target.value)}
+                          placeholder="https://example.com/photo.jpg"
+                        />
+                      </TabsContent>
+                    </Tabs>
                   </div>
                 </div>
               </div>
