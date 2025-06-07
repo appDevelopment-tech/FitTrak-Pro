@@ -197,9 +197,7 @@ export function StudentsManagement() {
 
       {/* Список учеников */}
       <Card>
-        <CardHeader>
-          <CardTitle>Список учеников ({filteredPupils.length})</CardTitle>
-        </CardHeader>
+
         <CardContent className="p-0">
           <div className="divide-y divide-gray-200">
             {filteredPupils.map((pupil, index) => (
