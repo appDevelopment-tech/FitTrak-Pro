@@ -1,15 +1,15 @@
 import { 
   users, 
-  students,
+  pupils,
   workoutPrograms, 
   workoutSessions, 
   exercises,
   exerciseProgress,
-  studentTrainingPlans,
+  pupilTrainingPlans,
   type User, 
   type InsertUser,
-  type Student,
-  type InsertStudent,
+  type Pupil,
+  type InsertPupil,
   type WorkoutProgram,
   type InsertWorkoutProgram,
   type WorkoutSession,
@@ -18,8 +18,8 @@ import {
   type InsertExercise,
   type ExerciseProgress,
   type InsertExerciseProgress,
-  type StudentTrainingPlan,
-  type InsertStudentTrainingPlan
+  type PupilTrainingPlan,
+  type InsertPupilTrainingPlan
 } from "@shared/schema";
 
 export interface IStorage {
@@ -28,12 +28,12 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   
-  // Student operations
-  getStudents(trainerId: number): Promise<Student[]>;
-  getStudent(id: number): Promise<Student | undefined>;
-  createStudent(student: InsertStudent): Promise<Student>;
-  updateStudent(id: number, updates: Partial<InsertStudent>): Promise<Student | undefined>;
-  deleteStudent(id: number): Promise<boolean>;
+  // Pupil operations
+  getPupils(trainerId: number): Promise<Pupil[]>;
+  getPupil(id: number): Promise<Pupil | undefined>;
+  createPupil(pupil: InsertPupil): Promise<Pupil>;
+  updatePupil(id: number, updates: Partial<InsertPupil>): Promise<Pupil | undefined>;
+  deletePupil(id: number): Promise<boolean>;
   
   // Workout program operations
   getWorkoutPrograms(): Promise<WorkoutProgram[]>;
@@ -59,24 +59,24 @@ export interface IStorage {
   createExerciseProgress(progress: InsertExerciseProgress): Promise<ExerciseProgress>;
   getExerciseProgressByExerciseId(userId: number, exerciseId: number): Promise<ExerciseProgress[]>;
   
-  // Student training plan operations
-  getStudentTrainingPlans(studentId: number): Promise<StudentTrainingPlan[]>;
-  getActiveTrainingPlan(studentId: number): Promise<StudentTrainingPlan | undefined>;
-  createStudentTrainingPlan(plan: InsertStudentTrainingPlan): Promise<StudentTrainingPlan>;
-  updateStudentTrainingPlan(id: number, updates: Partial<InsertStudentTrainingPlan>): Promise<StudentTrainingPlan | undefined>;
-  deleteStudentTrainingPlan(id: number): Promise<boolean>;
+  // Pupil training plan operations
+  getPupilTrainingPlans(pupilId: number): Promise<PupilTrainingPlan[]>;
+  getActiveTrainingPlan(pupilId: number): Promise<PupilTrainingPlan | undefined>;
+  createPupilTrainingPlan(plan: InsertPupilTrainingPlan): Promise<PupilTrainingPlan>;
+  updatePupilTrainingPlan(id: number, updates: Partial<InsertPupilTrainingPlan>): Promise<PupilTrainingPlan | undefined>;
+  deletePupilTrainingPlan(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
-  private students: Map<number, Student>;
+  private pupils: Map<number, Pupil>;
   private workoutPrograms: Map<number, WorkoutProgram>;
   private workoutSessions: Map<number, WorkoutSession>;
   private exercises: Map<number, Exercise>;
   private exerciseProgress: Map<number, ExerciseProgress>;
-  private studentTrainingPlans: Map<number, StudentTrainingPlan>;
+  private pupilTrainingPlans: Map<number, PupilTrainingPlan>;
   private currentUserId: number;
-  private currentStudentId: number;
+  private currentPupilId: number;
   private currentProgramId: number;
   private currentSessionId: number;
   private currentExerciseId: number;
@@ -85,14 +85,14 @@ export class MemStorage implements IStorage {
 
   constructor() {
     this.users = new Map();
-    this.students = new Map();
+    this.pupils = new Map();
     this.workoutPrograms = new Map();
     this.workoutSessions = new Map();
     this.exercises = new Map();
     this.exerciseProgress = new Map();
-    this.studentTrainingPlans = new Map();
+    this.pupilTrainingPlans = new Map();
     this.currentUserId = 1;
-    this.currentStudentId = 1;
+    this.currentPupilId = 1;
     this.currentProgramId = 1;
     this.currentSessionId = 1;
     this.currentExerciseId = 1;
@@ -117,8 +117,8 @@ export class MemStorage implements IStorage {
     this.users.set(1, sampleUser);
     this.currentUserId = 2;
 
-    // Create sample students
-    const sampleStudents: Student[] = [
+    // Create sample pupils
+    const samplePupils: Pupil[] = [
       {
         id: 1,
         trainerId: 1,
@@ -159,10 +159,10 @@ export class MemStorage implements IStorage {
       }
     ];
 
-    sampleStudents.forEach(student => {
-      this.students.set(student.id, student);
+    samplePupils.forEach(pupil => {
+      this.pupils.set(pupil.id, pupil);
     });
-    this.currentStudentId = 3;
+    this.currentPupilId = 3;
 
     // Create sample workout programs
     const strengthProgram: WorkoutProgram = {
@@ -1213,50 +1213,50 @@ export class MemStorage implements IStorage {
     return this.exercises.delete(id);
   }
 
-  // Student methods
-  async getStudents(trainerId: number): Promise<Student[]> {
-    return Array.from(this.students.values()).filter(student => student.trainerId === trainerId);
+  // Pupil methods
+  async getPupils(trainerId: number): Promise<Pupil[]> {
+    return Array.from(this.pupils.values()).filter(pupil => pupil.trainerId === trainerId);
   }
 
-  async getStudent(id: number): Promise<Student | undefined> {
-    return this.students.get(id);
+  async getPupil(id: number): Promise<Pupil | undefined> {
+    return this.pupils.get(id);
   }
 
-  async createStudent(insertStudent: InsertStudent): Promise<Student> {
-    const id = this.currentStudentId++;
-    const student: Student = { 
-      ...insertStudent, 
+  async createPupil(insertPupil: InsertPupil): Promise<Pupil> {
+    const id = this.currentPupilId++;
+    const pupil: Pupil = { 
+      ...insertPupil, 
       id,
-      medicalNotes: insertStudent.medicalNotes ?? null,
-      photo: insertStudent.photo ?? null,
-      middleName: insertStudent.middleName ?? null,
-      birthDate: insertStudent.birthDate ?? null,
-      weight: insertStudent.weight ?? null,
-      height: insertStudent.height ?? null,
-      goal: insertStudent.goal ?? null,
-      status: insertStudent.status ?? "active",
-      createdAt: insertStudent.createdAt ?? new Date(),
-      updatedAt: insertStudent.updatedAt ?? new Date()
+      medicalNotes: insertPupil.medicalNotes ?? null,
+      photo: insertPupil.photo ?? null,
+      middleName: insertPupil.middleName ?? null,
+      birthDate: insertPupil.birthDate ?? null,
+      weight: insertPupil.weight ?? null,
+      height: insertPupil.height ?? null,
+      goal: insertPupil.goal ?? null,
+      status: insertPupil.status ?? "active",
+      createdAt: insertPupil.createdAt ?? new Date(),
+      updatedAt: insertPupil.updatedAt ?? new Date()
     };
-    this.students.set(id, student);
-    return student;
+    this.pupils.set(id, pupil);
+    return pupil;
   }
 
-  async updateStudent(id: number, updates: Partial<InsertStudent>): Promise<Student | undefined> {
-    const student = this.students.get(id);
-    if (!student) return undefined;
+  async updatePupil(id: number, updates: Partial<InsertPupil>): Promise<Pupil | undefined> {
+    const pupil = this.pupils.get(id);
+    if (!pupil) return undefined;
     
-    const updatedStudent = { 
-      ...student, 
+    const updatedPupil = { 
+      ...pupil, 
       ...updates, 
       updatedAt: new Date() 
     };
-    this.students.set(id, updatedStudent);
-    return updatedStudent;
+    this.pupils.set(id, updatedPupil);
+    return updatedPupil;
   }
 
-  async deleteStudent(id: number): Promise<boolean> {
-    return this.students.delete(id);
+  async deletePupil(id: number): Promise<boolean> {
+    return this.pupils.delete(id);
   }
 
   // Student training plan methods

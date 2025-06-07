@@ -12,7 +12,7 @@ export const users = pgTable("users", {
   isTrainer: boolean("is_trainer").default(false),
 });
 
-export const students = pgTable("students", {
+export const pupils = pgTable("pupils", {
   id: serial("id").primaryKey(),
   trainerId: integer("trainer_id").notNull(),
   firstName: text("first_name").notNull(),
@@ -80,9 +80,9 @@ export const exerciseProgress = pgTable("exercise_progress", {
   sessionId: integer("session_id"),
 });
 
-export const studentTrainingPlans = pgTable("student_training_plans", {
+export const pupilTrainingPlans = pgTable("pupil_training_plans", {
   id: serial("id").primaryKey(),
-  studentId: integer("student_id").notNull(),
+  pupilId: integer("pupil_id").notNull(),
   trainerId: integer("trainer_id").notNull(),
   name: text("name").notNull(),
   exercises: jsonb("exercises").notNull(), // массив упражнений с подходами/повторениями
@@ -111,18 +111,18 @@ export const insertExerciseProgressSchema = createInsertSchema(exerciseProgress)
   id: true,
 });
 
-export const insertStudentSchema = createInsertSchema(students).omit({
+export const insertPupilSchema = createInsertSchema(pupils).omit({
   id: true,
 });
 
-export const insertStudentTrainingPlanSchema = createInsertSchema(studentTrainingPlans).omit({
+export const insertPupilTrainingPlanSchema = createInsertSchema(pupilTrainingPlans).omit({
   id: true,
 });
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
-export type Student = typeof students.$inferSelect;
-export type InsertStudent = z.infer<typeof insertStudentSchema>;
+export type Pupil = typeof pupils.$inferSelect;
+export type InsertPupil = z.infer<typeof insertPupilSchema>;
 export type WorkoutProgram = typeof workoutPrograms.$inferSelect;
 export type InsertWorkoutProgram = z.infer<typeof insertWorkoutProgramSchema>;
 export type WorkoutSession = typeof workoutSessions.$inferSelect;
@@ -131,5 +131,5 @@ export type Exercise = typeof exercises.$inferSelect;
 export type InsertExercise = z.infer<typeof insertExerciseSchema>;
 export type ExerciseProgress = typeof exerciseProgress.$inferSelect;
 export type InsertExerciseProgress = z.infer<typeof insertExerciseProgressSchema>;
-export type StudentTrainingPlan = typeof studentTrainingPlans.$inferSelect;
-export type InsertStudentTrainingPlan = z.infer<typeof insertStudentTrainingPlanSchema>;
+export type PupilTrainingPlan = typeof pupilTrainingPlans.$inferSelect;
+export type InsertPupilTrainingPlan = z.infer<typeof insertPupilTrainingPlanSchema>;
