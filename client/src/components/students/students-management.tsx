@@ -195,7 +195,7 @@ export function StudentsManagement() {
         </div>
       </div>
 
-      {/* Students List */}
+      {/* Список учеников */}
       <Card>
         <CardHeader>
           <CardTitle>Список учеников ({filteredPupils.length})</CardTitle>
@@ -210,12 +210,12 @@ export function StudentsManagement() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    {/* Pupil Number */}
+                    {/* Номер ученика */}
                     <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-semibold text-sm">
                       {index + 1}
                     </div>
                     
-                    {/* Pupil Photo */}
+                    {/* Фото ученика */}
                     <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
                       {pupil.photo ? (
                         <img 
@@ -230,7 +230,7 @@ export function StudentsManagement() {
                       )}
                     </div>
                     
-                    {/* Pupil Name */}
+                    {/* Имя ученика */}
                     <div>
                       <h3 className="text-xl font-medium text-gray-900">
                         {pupil.lastName} {pupil.firstName}
@@ -238,7 +238,7 @@ export function StudentsManagement() {
                     </div>
                   </div>
 
-                  {/* Status Badge */}
+                  {/* Статус */}
                   <Badge variant={pupil.status === 'active' ? 'default' : 'secondary'}>
                     {pupil.status === 'active' ? 'Активен' : 'Неактивен'}
                   </Badge>
@@ -255,7 +255,7 @@ export function StudentsManagement() {
         </CardContent>
       </Card>
 
-      {/* Add Student Dialog */}
+      {/* Диалог добавления ученика */}
       {showAddForm && (
         <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -264,7 +264,7 @@ export function StudentsManagement() {
             </DialogHeader>
             
             <div className="space-y-6">
-              {/* Basic Info */}
+              {/* Основная информация */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="firstName">Имя*</Label>
@@ -438,7 +438,7 @@ export function StudentsManagement() {
 
               {/* Info Section */}
               <div className="lg:col-span-2 space-y-6">
-                {/* Basic Info */}
+                {/* Основная информация */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="editFirstName">Имя</Label>
