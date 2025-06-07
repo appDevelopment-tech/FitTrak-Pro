@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Plus, Search, Edit, Trash2, Phone, Mail, X, Save, User, Calendar, Target, AlertCircle, Upload, Camera } from "lucide-react";
+import { Plus, Search, X, Save, User, Target, AlertCircle, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Student {
   id: number;
@@ -275,8 +274,11 @@ export function StudentsManagement() {
                   <Camera className="h-5 w-5" />
                   Фотография
                 </h3>
-                <div className="flex items-start space-x-4">
-                  <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                <div className="flex items-center space-x-4">
+                  <div 
+                    className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors border-2 border-dashed border-gray-400 hover:border-gray-500"
+                    onClick={triggerFileUpload}
+                  >
                     {editingStudent.photo ? (
                       <img 
                         src={editingStudent.photo} 
@@ -284,49 +286,23 @@ export function StudentsManagement() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="text-gray-600 font-medium text-xl">
-                        {editingStudent.firstName.charAt(0)}{editingStudent.lastName.charAt(0)}
-                      </span>
+                      <div className="text-center">
+                        <Camera className="h-8 w-8 text-gray-500 mx-auto mb-1" />
+                        <span className="text-xs text-gray-500">Добавить фото</span>
+                      </div>
                     )}
                   </div>
                   <div className="flex-1">
-                    <Tabs defaultValue="upload" className="w-full">
-                      <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="upload">Загрузить файл</TabsTrigger>
-                        <TabsTrigger value="url">Ссылка</TabsTrigger>
-                      </TabsList>
-                      <TabsContent value="upload" className="space-y-2">
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/*"
-                          onChange={handleFileUpload}
-                          className="hidden"
-                        />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={triggerFileUpload}
-                          className="w-full"
-                        >
-                          <Upload className="h-4 w-4 mr-2" />
-                          Выбрать фото с компьютера
-                        </Button>
-                        <p className="text-xs text-gray-500">
-                          Поддерживаются форматы: JPG, PNG, GIF
-                        </p>
-                      </TabsContent>
-                      <TabsContent value="url" className="space-y-2">
-                        <Label htmlFor="photo">URL фотографии</Label>
-                        <Input
-                          id="photo"
-                          type="url"
-                          value={editingStudent.photo?.startsWith('data:') ? '' : editingStudent.photo || ''}
-                          onChange={(e) => handleInputChange('photo', e.target.value)}
-                          placeholder="https://example.com/photo.jpg"
-                        />
-                      </TabsContent>
-                    </Tabs>
+                    <p className="text-sm text-gray-600">
+                      Нажмите на круг чтобы выбрать фото с компьютера
+                    </p>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
                   </div>
                 </div>
               </div>
