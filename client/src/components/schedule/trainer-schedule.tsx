@@ -1087,7 +1087,7 @@ export function TrainerSchedule() {
                               </Button>
                               {timeSessions.length > 0 && (
                                 <Button size="sm" variant="outline" className="text-xs px-3 py-1">
-                                  На тренировку
+                                  Создать тренировку
                                 </Button>
                               )}
                             </div>
