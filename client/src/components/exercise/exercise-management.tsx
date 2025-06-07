@@ -165,9 +165,15 @@ export function ExerciseManagement() {
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Сложность:</span>
                   <Badge variant="outline"
-                         className={exercise.difficulty === 'легкий' || exercise.difficulty === 'начинающий' ? 'difficulty-easy' : 
-                                   exercise.difficulty === 'средний' ? 'difficulty-medium' : 
-                                   exercise.difficulty === 'продвинутый' ? 'difficulty-hard' : ''}>
+                         style={
+                           exercise.difficulty === 'легкий' || exercise.difficulty === 'начинающий' 
+                             ? { backgroundColor: '#dbeafe', color: '#1e40af', borderColor: '#93c5fd' }
+                             : exercise.difficulty === 'средний'
+                             ? { backgroundColor: '#fef3c7', color: '#92400e', borderColor: '#fcd34d' }
+                             : exercise.difficulty === 'продвинутый'
+                             ? { backgroundColor: '#fecaca', color: '#991b1b', borderColor: '#fca5a5' }
+                             : {}
+                         }>
                     {exercise.difficulty}
                   </Badge>
                 </div>
@@ -527,13 +533,13 @@ interface ExerciseViewProps {
 }
 
 function ExerciseView({ exercise }: ExerciseViewProps) {
-  const getDifficultyColor = (difficulty: string) => {
+  const getDifficultyStyle = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
       case 'легкий':
-      case 'начинающий': return 'difficulty-easy';
-      case 'средний': return 'difficulty-medium';
-      case 'продвинутый': return 'difficulty-hard';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'начинающий': return { backgroundColor: '#dbeafe', color: '#1e40af', borderColor: '#93c5fd' };
+      case 'средний': return { backgroundColor: '#fef3c7', color: '#92400e', borderColor: '#fcd34d' };
+      case 'продвинутый': return { backgroundColor: '#fecaca', color: '#991b1b', borderColor: '#fca5a5' };
+      default: return { backgroundColor: '#f3f4f6', color: '#374151', borderColor: '#d1d5db' };
     }
   };
 
@@ -546,7 +552,7 @@ function ExerciseView({ exercise }: ExerciseViewProps) {
             <div><span className="font-medium">Название:</span> {exercise.name}</div>
             <div className="flex items-center gap-2">
               <span className="font-medium">Сложность:</span> 
-              <Badge className={getDifficultyColor(exercise.difficulty)}>
+              <Badge variant="outline" style={getDifficultyStyle(exercise.difficulty)}>
                 {exercise.difficulty}
               </Badge>
             </div>

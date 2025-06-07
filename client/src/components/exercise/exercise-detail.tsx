@@ -23,14 +23,14 @@ interface ExerciseDetailProps {
 }
 
 export function ExerciseDetail({ exercise, onClose }: ExerciseDetailProps) {
-  const getDifficultyColor = (difficulty: string) => {
+  const getDifficultyStyle = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
       case 'легкий':
-      case 'начинающий': return 'difficulty-easy';
-      case 'средний': return 'difficulty-medium';
+      case 'начинающий': return { backgroundColor: '#dbeafe', color: '#1e40af', borderColor: '#93c5fd' };
+      case 'средний': return { backgroundColor: '#fef3c7', color: '#92400e', borderColor: '#fcd34d' };
       case 'продвинутый':
-      case 'сложный': return 'difficulty-hard';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'сложный': return { backgroundColor: '#fecaca', color: '#991b1b', borderColor: '#fca5a5' };
+      default: return { backgroundColor: '#f3f4f6', color: '#374151', borderColor: '#d1d5db' };
     }
   };
 
@@ -41,7 +41,7 @@ export function ExerciseDetail({ exercise, onClose }: ExerciseDetailProps) {
           <div>
             <h2 className="text-2xl font-bold text-gray-900">{exercise.name}</h2>
             <div className="flex items-center gap-2 mt-2">
-              <Badge className={getDifficultyColor(exercise.difficulty)}>
+              <Badge variant="outline" style={getDifficultyStyle(exercise.difficulty)}>
                 {exercise.difficulty}
               </Badge>
             </div>
