@@ -202,43 +202,36 @@ export function StudentsManagement() {
             {filteredPupils.map((pupil, index) => (
               <div
                 key={pupil.id}
-                className="p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+                className="p-2 hover:bg-gray-50 cursor-pointer transition-colors"
                 onClick={() => handlePupilClick(pupil)}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    {/* Номер ученика */}
-                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-semibold text-sm">
-                      {index + 1}
-                    </div>
-                    
-                    {/* Фото ученика */}
-                    <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-                      {pupil.photo ? (
-                        <img 
-                          src={pupil.photo} 
-                          alt={getPupilFullName(pupil)}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-gray-600 font-medium text-lg">
-                          {pupil.firstName.charAt(0)}{pupil.lastName.charAt(0)}
-                        </span>
-                      )}
-                    </div>
-                    
-                    {/* Имя ученика */}
-                    <div>
-                      <h3 className="text-xl font-medium text-gray-900">
-                        {pupil.lastName} {pupil.firstName}
-                      </h3>
-                    </div>
+                <div className="flex items-center space-x-3">
+                  {/* Номер ученика */}
+                  <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-semibold text-xs">
+                    {index + 1}
                   </div>
-
-                  {/* Статус */}
-                  <Badge variant={pupil.status === 'active' ? 'default' : 'secondary'}>
-                    {pupil.status === 'active' ? 'Активен' : 'Неактивен'}
-                  </Badge>
+                  
+                  {/* Фото ученика */}
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                    {pupil.photo ? (
+                      <img 
+                        src={pupil.photo} 
+                        alt={getPupilFullName(pupil)}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-gray-600 font-medium text-sm">
+                        {pupil.firstName.charAt(0)}{pupil.lastName.charAt(0)}
+                      </span>
+                    )}
+                  </div>
+                  
+                  {/* Имя ученика */}
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900">
+                      {pupil.lastName} {pupil.firstName}
+                    </h3>
+                  </div>
                 </div>
               </div>
             ))}
