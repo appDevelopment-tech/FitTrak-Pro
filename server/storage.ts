@@ -53,6 +53,7 @@ export interface IStorage {
   createExercise(exercise: InsertExercise): Promise<Exercise>;
   updateExercise(id: number, updates: Partial<InsertExercise>): Promise<Exercise | undefined>;
   deleteExercise(id: number): Promise<boolean>;
+  sortExercisesAlphabetically(): Promise<Exercise[]>;
   
   // Exercise progress operations
   getExerciseProgress(userId: number): Promise<ExerciseProgress[]>;
@@ -1213,6 +1214,30 @@ export class MemStorage implements IStorage {
     return this.exercises.delete(id);
   }
 
+  async sortExercisesAlphabetically(): Promise<Exercise[]> {
+    // Получаем все упражнения
+    const exercises = Array.from(this.exercises.values());
+    
+    // Сортируем по алфавиту
+    const sortedExercises = exercises.sort((a, b) => {
+      return a.name.localeCompare(b.name, 'ru');
+    });
+
+    // Очищаем текущую коллекцию
+    this.exercises.clear();
+
+    // Переназначаем ID и добавляем обратно в отсортированном порядке
+    sortedExercises.forEach((exercise, index) => {
+      const newExercise = { ...exercise, id: index + 1 };
+      this.exercises.set(index + 1, newExercise);
+    });
+
+    // Обновляем currentExerciseId
+    this.currentExerciseId = sortedExercises.length + 1;
+
+    return Array.from(this.exercises.values());
+  }
+
   // Pupil methods
   async getPupils(trainerId: number): Promise<Pupil[]> {
     return Array.from(this.pupils.values()).filter(pupil => pupil.trainerId === trainerId);
@@ -1415,6 +1440,38 @@ export class DatabaseStorage implements IStorage {
     const { eq } = await import("drizzle-orm");
     const result = await db.delete(exercises).where(eq(exercises.id, id));
     return (result.rowCount ?? 0) > 0;
+  }
+
+  async sortExercisesAlphabetically(): Promise<Exercise[]> {
+    const { db } = await import("./db");
+    
+    // Получаем все упражнения
+    const allExercises = await db.select().from(exercises);
+    
+    // Сортируем по алфавиту
+    const sortedExercises = allExercises.sort((a, b) => {
+      return a.name.localeCompare(b.name, 'ru');
+    });
+
+    // Удаляем все существующие упражнения
+    await db.delete(exercises);
+
+    // Добавляем упражнения обратно в отсортированном порядке с новыми ID
+    const result = [];
+    for (let i = 0; i < sortedExercises.length; i++) {
+      const exercise = sortedExercises[i];
+      const { id, createdAt, updatedAt, ...exerciseData } = exercise;
+      
+      const [newExercise] = await db.insert(exercises).values({
+        ...exerciseData,
+        createdAt: createdAt,
+        updatedAt: new Date()
+      }).returning();
+      
+      result.push(newExercise);
+    }
+
+    return result;
   }
 
   async getExerciseProgress(userId: number): Promise<ExerciseProgress[]> {
