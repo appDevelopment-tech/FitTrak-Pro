@@ -164,11 +164,9 @@ export function ExerciseManagement() {
 
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Сложность:</span>
-                  <Badge variant={exercise.difficulty === 'средний' ? 'secondary' : 
-                               exercise.difficulty === 'продвинутый' ? 'destructive' : 'default'}
-                         className={exercise.difficulty === 'легкий' || exercise.difficulty === 'начинающий' ? 'bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-200' : 
-                                   exercise.difficulty === 'средний' ? '' :
-                                   exercise.difficulty === 'продвинутый' ? '' : ''}>
+                  <Badge variant={exercise.difficulty === 'легкий' ? 'outline' : 
+                               exercise.difficulty === 'средний' ? 'secondary' : 'destructive'}
+                         className={exercise.difficulty === 'легкий' ? '!bg-blue-100 !text-blue-800 !border-blue-200 hover:!bg-blue-200' : ''}>
                     {exercise.difficulty}
                   </Badge>
                 </div>
@@ -531,10 +529,10 @@ function ExerciseView({ exercise }: ExerciseViewProps) {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
       case 'легкий':
-      case 'начинающий': return 'bg-blue-100 text-blue-800';
-      case 'средний': return 'bg-yellow-100 text-yellow-800';
-      case 'продвинутый': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'начинающий': return '!bg-blue-100 !text-blue-800 !border-blue-200';
+      case 'средний': return '!bg-yellow-100 !text-yellow-800 !border-yellow-200';
+      case 'продвинутый': return '!bg-red-100 !text-red-800 !border-red-200';
+      default: return '!bg-gray-100 !text-gray-800 !border-gray-200';
     }
   };
 
