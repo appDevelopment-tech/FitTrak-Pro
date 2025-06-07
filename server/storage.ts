@@ -1259,32 +1259,32 @@ export class MemStorage implements IStorage {
     return this.pupils.delete(id);
   }
 
-  // Student training plan methods
-  async getStudentTrainingPlans(studentId: number): Promise<StudentTrainingPlan[]> {
-    return Array.from(this.studentTrainingPlans.values()).filter(plan => plan.studentId === studentId);
+  // Pupil training plan methods
+  async getPupilTrainingPlans(pupilId: number): Promise<PupilTrainingPlan[]> {
+    return Array.from(this.pupilTrainingPlans.values()).filter(plan => plan.pupilId === pupilId);
   }
 
-  async getActiveTrainingPlan(studentId: number): Promise<StudentTrainingPlan | undefined> {
-    return Array.from(this.studentTrainingPlans.values()).find(
-      plan => plan.studentId === studentId && plan.isActive
+  async getActiveTrainingPlan(pupilId: number): Promise<PupilTrainingPlan | undefined> {
+    return Array.from(this.pupilTrainingPlans.values()).find(
+      plan => plan.pupilId === pupilId && plan.isActive
     );
   }
 
-  async createStudentTrainingPlan(insertPlan: InsertStudentTrainingPlan): Promise<StudentTrainingPlan> {
+  async createPupilTrainingPlan(insertPlan: InsertPupilTrainingPlan): Promise<PupilTrainingPlan> {
     const id = this.currentTrainingPlanId++;
-    const plan: StudentTrainingPlan = { 
+    const plan: PupilTrainingPlan = { 
       ...insertPlan, 
       id,
       isActive: insertPlan.isActive ?? true,
       createdAt: insertPlan.createdAt ?? new Date(),
       updatedAt: insertPlan.updatedAt ?? new Date()
     };
-    this.studentTrainingPlans.set(id, plan);
+    this.pupilTrainingPlans.set(id, plan);
     return plan;
   }
 
-  async updateStudentTrainingPlan(id: number, updates: Partial<InsertStudentTrainingPlan>): Promise<StudentTrainingPlan | undefined> {
-    const plan = this.studentTrainingPlans.get(id);
+  async updatePupilTrainingPlan(id: number, updates: Partial<InsertPupilTrainingPlan>): Promise<PupilTrainingPlan | undefined> {
+    const plan = this.pupilTrainingPlans.get(id);
     if (!plan) return undefined;
     
     const updatedPlan = { 
@@ -1292,12 +1292,12 @@ export class MemStorage implements IStorage {
       ...updates, 
       updatedAt: new Date() 
     };
-    this.studentTrainingPlans.set(id, updatedPlan);
+    this.pupilTrainingPlans.set(id, updatedPlan);
     return updatedPlan;
   }
 
-  async deleteStudentTrainingPlan(id: number): Promise<boolean> {
-    return this.studentTrainingPlans.delete(id);
+  async deletePupilTrainingPlan(id: number): Promise<boolean> {
+    return this.pupilTrainingPlans.delete(id);
   }
 }
 
@@ -1440,82 +1440,82 @@ export class DatabaseStorage implements IStorage {
     );
   }
 
-  // Student training plan methods
-  async getStudentTrainingPlans(studentId: number): Promise<StudentTrainingPlan[]> {
+  // Pupil training plan methods
+  async getPupilTrainingPlans(pupilId: number): Promise<PupilTrainingPlan[]> {
     const { db } = await import("./db");
     const { eq } = await import("drizzle-orm");
-    return await db.select().from(studentTrainingPlans).where(eq(studentTrainingPlans.studentId, studentId));
+    return await db.select().from(pupilTrainingPlans).where(eq(pupilTrainingPlans.pupilId, pupilId));
   }
 
-  async getActiveTrainingPlan(studentId: number): Promise<StudentTrainingPlan | undefined> {
+  async getActiveTrainingPlan(pupilId: number): Promise<PupilTrainingPlan | undefined> {
     const { db } = await import("./db");
     const { eq, and } = await import("drizzle-orm");
-    const [plan] = await db.select().from(studentTrainingPlans).where(
+    const [plan] = await db.select().from(pupilTrainingPlans).where(
       and(
-        eq(studentTrainingPlans.studentId, studentId),
-        eq(studentTrainingPlans.isActive, true)
+        eq(pupilTrainingPlans.pupilId, pupilId),
+        eq(pupilTrainingPlans.isActive, true)
       )
     );
     return plan;
   }
 
-  async createStudentTrainingPlan(insertPlan: InsertStudentTrainingPlan): Promise<StudentTrainingPlan> {
+  async createPupilTrainingPlan(insertPlan: InsertPupilTrainingPlan): Promise<PupilTrainingPlan> {
     const { db } = await import("./db");
-    const [plan] = await db.insert(studentTrainingPlans).values(insertPlan).returning();
+    const [plan] = await db.insert(pupilTrainingPlans).values(insertPlan).returning();
     return plan;
   }
 
-  async updateStudentTrainingPlan(id: number, updates: Partial<InsertStudentTrainingPlan>): Promise<StudentTrainingPlan | undefined> {
+  async updatePupilTrainingPlan(id: number, updates: Partial<InsertPupilTrainingPlan>): Promise<PupilTrainingPlan | undefined> {
     const { db } = await import("./db");
     const { eq } = await import("drizzle-orm");
-    const [plan] = await db.update(studentTrainingPlans).set({
+    const [plan] = await db.update(pupilTrainingPlans).set({
       ...updates,
       updatedAt: new Date()
-    }).where(eq(studentTrainingPlans.id, id)).returning();
+    }).where(eq(pupilTrainingPlans.id, id)).returning();
     return plan || undefined;
   }
 
-  async deleteStudentTrainingPlan(id: number): Promise<boolean> {
+  async deletePupilTrainingPlan(id: number): Promise<boolean> {
     const { db } = await import("./db");
     const { eq } = await import("drizzle-orm");
-    const result = await db.delete(studentTrainingPlans).where(eq(studentTrainingPlans.id, id));
+    const result = await db.delete(pupilTrainingPlans).where(eq(pupilTrainingPlans.id, id));
     return (result.rowCount ?? 0) > 0;
   }
 
-  // Student methods
-  async getStudents(trainerId: number): Promise<Student[]> {
+  // Pupil methods
+  async getPupils(trainerId: number): Promise<Pupil[]> {
     const { db } = await import("./db");
     const { eq } = await import("drizzle-orm");
-    return await db.select().from(students).where(eq(students.trainerId, trainerId));
+    return await db.select().from(pupils).where(eq(pupils.trainerId, trainerId));
   }
 
-  async getStudent(id: number): Promise<Student | undefined> {
+  async getPupil(id: number): Promise<Pupil | undefined> {
     const { db } = await import("./db");
     const { eq } = await import("drizzle-orm");
-    const [student] = await db.select().from(students).where(eq(students.id, id));
-    return student;
+    const [pupil] = await db.select().from(pupils).where(eq(pupils.id, id));
+    return pupil;
   }
 
-  async createStudent(insertStudent: InsertStudent): Promise<Student> {
+  async createPupil(insertPupil: InsertPupil): Promise<Pupil> {
     const { db } = await import("./db");
-    const [student] = await db.insert(students).values(insertStudent).returning();
-    return student;
+    const [pupil] = await db.insert(pupils).values(insertPupil).returning();
+    return pupil;
   }
 
-  async updateStudent(id: number, updates: Partial<InsertStudent>): Promise<Student | undefined> {
+  async updatePupil(id: number, updates: Partial<InsertPupil>): Promise<Pupil | undefined> {
     const { db } = await import("./db");
     const { eq } = await import("drizzle-orm");
-    const [student] = await db.update(students).set({
+    const [pupil] = await db.update(pupils).set({
       ...updates,
       updatedAt: new Date()
-    }).where(eq(students.id, id)).returning();
-    return student || undefined;
+    }).where(eq(pupils.id, id)).returning();
+    return pupil || undefined;
   }
 
-  async deleteStudent(id: number): Promise<boolean> {
+  async deletePupil(id: number): Promise<boolean> {
     const { db } = await import("./db");
     const { eq } = await import("drizzle-orm");
-    const result = await db.delete(students).where(eq(students.id, id));
+    const result = await db.delete(pupils).where(eq(pupils.id, id));
     return (result.rowCount ?? 0) > 0;
   }
 }

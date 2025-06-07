@@ -10,59 +10,59 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import type { StudentTrainingPlan, Student, InsertStudent } from "@shared/schema";
+import type { PupilTrainingPlan, Pupil, InsertPupil } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
-export function StudentsManagement() {
+export function PupilsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [selectedPupil, setSelectedPupil] = useState<Pupil | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingStudent, setEditingStudent] = useState<Student | null>(null);
+  const [editingPupil, setEditingPupil] = useState<Pupil | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Загружаем студентов для тренера с ID 1
-  const { data: students = [], isLoading } = useQuery<Student[]>({
-    queryKey: ['/api/trainers/1/students'],
+  // Загружаем учеников для тренера с ID 1
+  const { data: pupils = [], isLoading } = useQuery<Pupil[]>({
+    queryKey: ['/api/trainers/1/pupils'],
   });
 
-  // Мутация для создания нового студента
-  const createStudentMutation = useMutation({
-    mutationFn: (data: InsertStudent) => apiRequest('/api/trainers/1/students', 'POST', data),
+  // Мутация для создания нового ученика
+  const createPupilMutation = useMutation({
+    mutationFn: (data: InsertPupil) => apiRequest('/api/trainers/1/pupils', 'POST', data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/students'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/pupils'] });
       setShowAddForm(false);
       toast({
         title: "Успешно",
-        description: "Студент добавлен",
+        description: "Ученик добавлен",
       });
     },
     onError: () => {
       toast({
         title: "Ошибка",
-        description: "Не удалось добавить студента",
+        description: "Не удалось добавить ученика",
         variant: "destructive",
       });
     },
   });
 
-  // Мутация для обновления студента
-  const updateStudentMutation = useMutation({
-    mutationFn: (data: { id: number; updates: Partial<InsertStudent> }) => 
-      apiRequest(`/api/students/${data.id}`, 'PUT', data.updates),
+  // Мутация для обновления ученика
+  const updatePupilMutation = useMutation({
+    mutationFn: (data: { id: number; updates: Partial<InsertPupil> }) => 
+      apiRequest(`/api/pupils/${data.id}`, 'PUT', data.updates),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/students'] });
-      setEditingStudent(null);
+      queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/pupils'] });
+      setEditingPupil(null);
       toast({
         title: "Успешно",
-        description: "Данные студента обновлены",
+        description: "Данные ученика обновлены",
       });
     },
     onError: () => {
       toast({
         title: "Ошибка",
-        description: "Не удалось обновить данные студента",
+        description: "Не удалось обновить данные ученика",
         variant: "destructive",
       });
     },

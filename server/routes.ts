@@ -298,101 +298,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Student routes
-  app.get("/api/trainers/:trainerId/students", async (req, res) => {
+  // Pupil routes
+  app.get("/api/trainers/:trainerId/pupils", async (req, res) => {
     try {
       const trainerId = parseInt(req.params.trainerId);
-      const students = await storage.getStudents(trainerId);
-      res.json(students);
+      const pupils = await storage.getPupils(trainerId);
+      res.json(pupils);
     } catch (error) {
-      res.status(500).json({ message: "Failed to get students" });
+      res.status(500).json({ message: "Failed to get pupils" });
     }
   });
 
-  app.get("/api/students/:id", async (req, res) => {
+  app.get("/api/pupils/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const student = await storage.getStudent(id);
-      if (!student) {
-        return res.status(404).json({ message: "Student not found" });
+      const pupil = await storage.getPupil(id);
+      if (!pupil) {
+        return res.status(404).json({ message: "Pupil not found" });
       }
-      res.json(student);
+      res.json(pupil);
     } catch (error) {
-      res.status(500).json({ message: "Failed to get student" });
+      res.status(500).json({ message: "Failed to get pupil" });
     }
   });
 
-  app.post("/api/trainers/:trainerId/students", async (req, res) => {
+  app.post("/api/trainers/:trainerId/pupils", async (req, res) => {
     try {
       const trainerId = parseInt(req.params.trainerId);
-      const studentData = insertStudentSchema.parse({
+      const pupilData = insertPupilSchema.parse({
         ...req.body,
         trainerId,
         joinDate: new Date().toISOString().split('T')[0]
       });
-      const student = await storage.createStudent(studentData);
-      res.json(student);
+      const pupil = await storage.createPupil(pupilData);
+      res.json(pupil);
     } catch (error) {
-      res.status(400).json({ message: "Failed to create student" });
+      res.status(400).json({ message: "Failed to create pupil" });
     }
   });
 
-  app.put("/api/students/:id", async (req, res) => {
+  app.put("/api/pupils/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const updates = req.body;
-      const student = await storage.updateStudent(id, updates);
-      if (!student) {
-        return res.status(404).json({ message: "Student not found" });
+      const pupil = await storage.updatePupil(id, updates);
+      if (!pupil) {
+        return res.status(404).json({ message: "Pupil not found" });
       }
-      res.json(student);
+      res.json(pupil);
     } catch (error) {
-      res.status(400).json({ message: "Failed to update student" });
+      res.status(400).json({ message: "Failed to update pupil" });
     }
   });
 
-  app.delete("/api/students/:id", async (req, res) => {
+  app.delete("/api/pupils/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const success = await storage.deleteStudent(id);
+      const success = await storage.deletePupil(id);
       if (!success) {
-        return res.status(404).json({ message: "Student not found" });
+        return res.status(404).json({ message: "Pupil not found" });
       }
       res.json({ success: true });
     } catch (error) {
-      res.status(400).json({ message: "Failed to delete student" });
+      res.status(400).json({ message: "Failed to delete pupil" });
     }
   });
 
-  // Student training plan routes
-  app.get("/api/students/:studentId/training-plans", async (req, res) => {
+  // Pupil training plan routes
+  app.get("/api/pupils/:pupilId/training-plans", async (req, res) => {
     try {
-      const studentId = parseInt(req.params.studentId);
-      const plans = await storage.getStudentTrainingPlans(studentId);
+      const pupilId = parseInt(req.params.pupilId);
+      const plans = await storage.getPupilTrainingPlans(pupilId);
       res.json(plans);
     } catch (error) {
       res.status(500).json({ message: "Failed to get training plans" });
     }
   });
 
-  app.get("/api/students/:studentId/active-training-plan", async (req, res) => {
+  app.get("/api/pupils/:pupilId/active-training-plan", async (req, res) => {
     try {
-      const studentId = parseInt(req.params.studentId);
-      const plan = await storage.getActiveTrainingPlan(studentId);
+      const pupilId = parseInt(req.params.pupilId);
+      const plan = await storage.getActiveTrainingPlan(pupilId);
       res.json(plan || null);
     } catch (error) {
       res.status(500).json({ message: "Failed to get active training plan" });
     }
   });
 
-  app.post("/api/students/:studentId/training-plans", async (req, res) => {
+  app.post("/api/pupils/:pupilId/training-plans", async (req, res) => {
     try {
-      const studentId = parseInt(req.params.studentId);
-      const planData = insertStudentTrainingPlanSchema.parse({
+      const pupilId = parseInt(req.params.pupilId);
+      const planData = insertPupilTrainingPlanSchema.parse({
         ...req.body,
-        studentId
+        pupilId
       });
-      const plan = await storage.createStudentTrainingPlan(planData);
+      const plan = await storage.createPupilTrainingPlan(planData);
       res.json(plan);
     } catch (error) {
       res.status(400).json({ message: "Failed to create training plan" });
@@ -403,7 +403,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const updates = req.body;
-      const plan = await storage.updateStudentTrainingPlan(id, updates);
+      const plan = await storage.updatePupilTrainingPlan(id, updates);
       if (!plan) {
         return res.status(404).json({ message: "Training plan not found" });
       }
@@ -416,7 +416,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/training-plans/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const success = await storage.deleteStudentTrainingPlan(id);
+      const success = await storage.deletePupilTrainingPlan(id);
       if (!success) {
         return res.status(404).json({ message: "Training plan not found" });
       }
