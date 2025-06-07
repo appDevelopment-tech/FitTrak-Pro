@@ -268,15 +268,11 @@ export function StudentsManagement() {
             </DialogHeader>
             
             <div className="space-y-6 py-4">
-              {/* Photo Section */}
+              {/* Photo and Basic Info */}
               <div className="space-y-4">
-                <h3 className="text-lg font-medium flex items-center gap-2">
-                  <Camera className="h-5 w-5" />
-                  Фотография
-                </h3>
-                <div className="flex items-center space-x-4">
+                <div className="flex items-start space-x-6">
                   <div 
-                    className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors border-2 border-dashed border-gray-400 hover:border-gray-500"
+                    className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors border-2 border-dashed border-gray-400 hover:border-gray-500 flex-shrink-0"
                     onClick={triggerFileUpload}
                   >
                     {editingStudent.photo ? (
@@ -292,58 +288,51 @@ export function StudentsManagement() {
                       </div>
                     )}
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-gray-600">
-                      Нажмите на круг чтобы выбрать фото с компьютера
-                    </p>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileUpload}
-                      className="hidden"
-                    />
+                  <div className="flex-1 space-y-4">
+                    <h3 className="text-lg font-medium">Основная информация</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="firstName">Имя</Label>
+                        <Input
+                          id="firstName"
+                          value={editingStudent.firstName}
+                          onChange={(e) => handleInputChange('firstName', e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="lastName">Фамилия</Label>
+                        <Input
+                          id="lastName"
+                          value={editingStudent.lastName}
+                          onChange={(e) => handleInputChange('lastName', e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="middleName">Отчество</Label>
+                        <Input
+                          id="middleName"
+                          value={editingStudent.middleName || ''}
+                          onChange={(e) => handleInputChange('middleName', e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="birthDate">Дата рождения</Label>
+                        <Input
+                          id="birthDate"
+                          type="date"
+                          value={editingStudent.birthDate || ''}
+                          onChange={(e) => handleInputChange('birthDate', e.target.value)}
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Personal Information */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Личная информация</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="firstName">Имя</Label>
-                    <Input
-                      id="firstName"
-                      value={editingStudent.firstName}
-                      onChange={(e) => handleInputChange('firstName', e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="lastName">Фамилия</Label>
-                    <Input
-                      id="lastName"
-                      value={editingStudent.lastName}
-                      onChange={(e) => handleInputChange('lastName', e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="middleName">Отчество</Label>
-                    <Input
-                      id="middleName"
-                      value={editingStudent.middleName || ''}
-                      onChange={(e) => handleInputChange('middleName', e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="birthDate">Дата рождения</Label>
-                    <Input
-                      id="birthDate"
-                      type="date"
-                      value={editingStudent.birthDate || ''}
-                      onChange={(e) => handleInputChange('birthDate', e.target.value)}
-                    />
-                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
                 </div>
               </div>
 
