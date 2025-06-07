@@ -323,22 +323,52 @@ export function ProfileView() {
         </TabsContent>
 
         <TabsContent value="programs" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold">Тренировки</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12">
-                <Award className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">Создайте свою первую тренировку</h3>
-                <p className="text-gray-500 mb-4">Объединяйте упражнения в полноценные тренировки</p>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Готовые планы тренировок */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold flex items-center gap-2">
+                  <Award className="h-5 w-5 text-blue-500" />
+                  Готовые планы тренировок
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="text-center py-8">
+                    <Award className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500 mb-4">Готовые программы появятся здесь</p>
+                    <Button variant="outline">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Добавить готовый план
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Создать тренировку */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold flex items-center gap-2">
+                  <Plus className="h-5 w-5 text-green-500" />
                   Создать тренировку
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="text-center py-8">
+                    <Plus className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-700 mb-2">Создайте персональную тренировку</h3>
+                    <p className="text-gray-500 mb-4">Объединяйте упражнения в полноценные тренировки для учеников</p>
+                    <Button className="bg-green-600 hover:bg-green-700">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Создать новую тренировку
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="exercises" className="space-y-6">
