@@ -57,7 +57,7 @@ export const exercises = pgTable("exercises", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   primaryMuscles: text("primaryMuscles").array().notNull(), // основные группы мышц
-  secondaryMuscles: text("secondaryMuscles").array().default([]), // вспомогательные группы мышц
+  secondaryMuscles: text("secondaryMuscles").array().notNull().default([]), // вспомогательные группы мышц
   difficulty: text("difficulty").notNull(), // 'начинающий', 'средний', 'продвинутый'
   overview: text("overview").notNull(), // обзор упражнения
   technique: text("technique").array().notNull(), // техника выполнения (пошагово)
@@ -107,10 +107,6 @@ export const insertExerciseSchema = createInsertSchema(exercises).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-}).extend({
-  secondaryMuscles: z.array(z.string()).optional().default([]),
-  commonMistakes: z.array(z.string()).optional().default([]),
-  contraindications: z.array(z.string()).optional().default([]),
 });
 
 export const insertExerciseProgressSchema = createInsertSchema(exerciseProgress).omit({
