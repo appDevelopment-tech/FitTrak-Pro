@@ -340,48 +340,28 @@ export function ProfileView() {
                 {/* Список упражнений */}
                 <div className="space-y-4">
                   {filteredExercises.length > 0 ? (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {filteredExercises.map((exercise) => (
-                        <div key={exercise.id} className="flex items-center gap-4 p-4 bg-white border rounded-lg hover:shadow-sm transition-shadow">
-                          {/* Изображение */}
-                          <div className="w-16 h-16 flex-shrink-0">
-                            {exercise.muscleImageUrl ? (
-                              <img
-                                src={exercise.muscleImageUrl}
-                                alt={exercise.name}
-                                className="w-full h-full object-cover rounded-lg"
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
-                                <span className="text-2xl leading-none">💪</span>
-                              </div>
-                            )}
-                          </div>
-                          
-                          {/* Название и сложность */}
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3">
-                              <h4 
-                                className="font-medium text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
-                                onClick={() => setSelectedExerciseForDetail(exercise)}
-                              >
-                                {exercise.name}
-                              </h4>
-                              <Badge variant="outline" 
-                                     data-difficulty={exercise.difficulty} 
-                                     className={`text-xs ${
-                                       exercise.difficulty === 'легкий' || exercise.difficulty === 'начинающий' 
-                                         ? 'difficulty-easy-force' 
-                                         : exercise.difficulty === 'средний'
-                                         ? 'difficulty-medium-force'
-                                         : exercise.difficulty === 'продвинутый'
-                                         ? 'difficulty-hard-force'
-                                         : ''
-                                     }`}>
-                                {exercise.difficulty}
-                              </Badge>
-                            </div>
-                          </div>
+                        <div key={exercise.id} className="flex items-center justify-between p-3 bg-white border rounded-lg hover:bg-gray-50 transition-colors">
+                          <h4 
+                            className="font-medium text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
+                            onClick={() => setSelectedExerciseForDetail(exercise)}
+                          >
+                            {exercise.name}
+                          </h4>
+                          <Badge variant="outline" 
+                                 data-difficulty={exercise.difficulty} 
+                                 className={`text-xs ${
+                                   exercise.difficulty === 'легкий' || exercise.difficulty === 'начинающий' 
+                                     ? 'difficulty-easy-force' 
+                                     : exercise.difficulty === 'средний'
+                                     ? 'difficulty-medium-force'
+                                     : exercise.difficulty === 'продвинутый'
+                                     ? 'difficulty-hard-force'
+                                     : ''
+                                 }`}>
+                            {exercise.difficulty}
+                          </Badge>
                         </div>
                       ))}
                     </div>
