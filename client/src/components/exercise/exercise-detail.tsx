@@ -27,7 +27,7 @@ export function ExerciseDetail({ exercise, onClose }: ExerciseDetailProps) {
     switch (difficulty.toLowerCase()) {
       case 'легкий':
       case 'начинающий': return { backgroundColor: '#dbeafe', color: '#1e40af', borderColor: '#93c5fd' };
-      case 'средний': return { backgroundColor: '#fef3c7', color: '#92400e', borderColor: '#fcd34d' };
+      case 'средний': return { backgroundColor: '#dcfce7', color: '#166534', borderColor: '#86efac' };
       case 'продвинутый':
       case 'сложный': return { backgroundColor: '#fecaca', color: '#991b1b', borderColor: '#fca5a5' };
       default: return { backgroundColor: '#f3f4f6', color: '#374151', borderColor: '#d1d5db' };

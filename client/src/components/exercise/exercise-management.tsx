@@ -169,7 +169,7 @@ export function ExerciseManagement() {
                            exercise.difficulty === 'легкий' || exercise.difficulty === 'начинающий' 
                              ? { backgroundColor: '#dbeafe', color: '#1e40af', borderColor: '#93c5fd' }
                              : exercise.difficulty === 'средний'
-                             ? { backgroundColor: '#fef3c7', color: '#92400e', borderColor: '#fcd34d' }
+                             ? { backgroundColor: '#dcfce7', color: '#166534', borderColor: '#86efac' }
                              : exercise.difficulty === 'продвинутый'
                              ? { backgroundColor: '#fecaca', color: '#991b1b', borderColor: '#fca5a5' }
                              : {}
@@ -537,7 +537,7 @@ function ExerciseView({ exercise }: ExerciseViewProps) {
     switch (difficulty.toLowerCase()) {
       case 'легкий':
       case 'начинающий': return { backgroundColor: '#dbeafe', color: '#1e40af', borderColor: '#93c5fd' };
-      case 'средний': return { backgroundColor: '#fef3c7', color: '#92400e', borderColor: '#fcd34d' };
+      case 'средний': return { backgroundColor: '#dcfce7', color: '#166534', borderColor: '#86efac' };
       case 'продвинутый': return { backgroundColor: '#fecaca', color: '#991b1b', borderColor: '#fca5a5' };
       default: return { backgroundColor: '#f3f4f6', color: '#374151', borderColor: '#d1d5db' };
     }
