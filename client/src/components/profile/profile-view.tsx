@@ -24,10 +24,7 @@ export function ProfileView() {
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const [isExerciseDialogOpen, setIsExerciseDialogOpen] = useState(false);
-  const [editingExercise, setEditingExercise] = useState<Exercise | null>(null);
-  const [showImageManager, setShowImageManager] = useState(false);
-  const [selectedExerciseForImage, setSelectedExerciseForImage] = useState<Exercise | null>(null);
+
 
   const [selectedExerciseForDetail, setSelectedExerciseForDetail] = useState<Exercise | null>(null);
   const { toast } = useToast();
@@ -40,93 +37,9 @@ export function ProfileView() {
     queryKey: ['/api/exercises'],
   });
 
-  // Мутации для упражнений
-  const createExerciseMutation = useMutation({
-    mutationFn: (data: InsertExercise) => apiRequest('/api/exercises', 'POST', data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
-      setIsExerciseDialogOpen(false);
-      setEditingExercise(null);
-      toast({ title: "Упражнение создано", description: "Новое упражнение успешно добавлено" });
-    },
-    onError: () => {
-      toast({ title: "Ошибка", description: "Не удалось создать упражнение", variant: "destructive" });
-    }
-  });
 
-  const updateExerciseMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number, data: Partial<InsertExercise> }) => 
-      apiRequest(`/api/exercises/${id}`, 'PUT', data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
-      setIsExerciseDialogOpen(false);
-      setEditingExercise(null);
-      toast({ title: "Упражнение обновлено", description: "Изменения успешно сохранены" });
-    },
-    onError: (error) => {
-      console.error('Update exercise error:', error);
-      toast({ title: "Ошибка", description: "Не удалось обновить упражнение", variant: "destructive" });
-    }
-  });
 
-  const deleteExerciseMutation = useMutation({
-    mutationFn: async (id: number) => {
-      const response = await fetch(`/api/exercises/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-      }
-      
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
-      toast({ title: "Упражнение удалено", description: "Упражнение успешно удалено" });
-    },
-    onError: (error: Error) => {
-      console.error('Delete exercise error:', error);
-      toast({ 
-        title: "Ошибка", 
-        description: `Не удалось удалить упражнение: ${error.message}`, 
-        variant: "destructive" 
-      });
-    }
-  });
 
-  const sortExercisesMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch('/api/exercises/sort', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to sort exercises');
-      }
-      
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
-      toast({ title: "Упражнения отсортированы", description: "Упражнения расположены в алфавитном порядке" });
-    },
-    onError: (error: Error) => {
-      console.error('Sort exercises error:', error);
-      toast({ 
-        title: "Ошибка", 
-        description: "Не удалось отсортировать упражнения", 
-        variant: "destructive" 
-      });
-    }
-  });
 
   // Фильтрация упражнений
   const filteredExercises = exercises.filter(exercise => {
@@ -521,25 +434,7 @@ export function ProfileView() {
                     <Filter className="h-5 w-5" />
                     Упражнения для группы: {selectedMuscleGroup}
                   </CardTitle>
-                  <div className="flex items-center gap-2">
-                    <Button 
-                      onClick={() => sortExercisesMutation.mutate()} 
-                      variant="outline" 
-                      className="flex items-center gap-2"
-                      disabled={sortExercisesMutation.isPending}
-                    >
-                      {sortExercisesMutation.isPending ? (
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600" />
-                      ) : (
-                        "А-Я"
-                      )}
-                      Сортировать
-                    </Button>
-                    <Button onClick={handleCreateExercise} className="flex items-center gap-2">
-                      <Plus className="h-4 w-4" />
-                      Добавить упражнение
-                    </Button>
-                  </div>
+
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -607,45 +502,7 @@ export function ProfileView() {
                             </div>
                           </div>
                           
-                          {/* Кнопки управления */}
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => handleEditExercise(exercise)}
-                              className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-gray-500 hover:bg-gray-600 text-white transition-colors"
-                              title="Редактировать упражнение"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </button>
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <button
-                                  type="button"
-                                  className="inline-flex items-center justify-center h-8 w-8 rounded-md bg-red-500 hover:bg-red-600 text-white transition-colors"
-                                  title="Удалить упражнение"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Удалить упражнение?</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Это действие нельзя отменить. Упражнение "{exercise.name}" будет удалено навсегда.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Отмена</AlertDialogCancel>
-                                  <AlertDialogAction 
-                                    onClick={() => handleDeleteExercise(exercise.id)}
-                                    className="bg-red-600 hover:bg-red-700"
-                                  >
-                                    Удалить
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </div>
+
                         </div>
                       ))}
                     </div>
@@ -663,54 +520,7 @@ export function ProfileView() {
         </TabsContent>
       </Tabs>
 
-      {/* Диалог создания/редактирования упражнения */}
-      <Dialog open={isExerciseDialogOpen} onOpenChange={setIsExerciseDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {editingExercise ? 'Редактировать упражнение' : 'Создать новое упражнение'}
-            </DialogTitle>
-            <DialogDescription>
-              Заполните информацию об упражнении. Обязательные поля отмечены звездочкой (*).
-            </DialogDescription>
-          </DialogHeader>
-          <ExerciseForm
-            exercise={editingExercise}
-            onSubmit={(data) => {
-              if (editingExercise) {
-                updateExerciseMutation.mutate({ id: editingExercise.id, data });
-              } else {
-                createExerciseMutation.mutate(data);
-              }
-            }}
-            onClose={() => setIsExerciseDialogOpen(false)}
-            isLoading={createExerciseMutation.isPending || updateExerciseMutation.isPending}
-          />
-        </DialogContent>
-      </Dialog>
 
-      {/* Диалог управления изображениями */}
-      <Dialog open={showImageManager} onOpenChange={setShowImageManager}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Управление изображениями упражнения</DialogTitle>
-            <DialogDescription>
-              Выберите изображение из галереи качественных фотографий упражнений
-            </DialogDescription>
-          </DialogHeader>
-          {showImageManager && selectedExerciseForImage && (
-            <ExerciseImageManager
-              exerciseId={selectedExerciseForImage.id}
-              exerciseName={selectedExerciseForImage.name}
-              currentImageUrl={selectedExerciseForImage.muscleImageUrl}
-              onClose={() => {
-                setShowImageManager(false);
-                setSelectedExerciseForImage(null);
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
 
 
 
