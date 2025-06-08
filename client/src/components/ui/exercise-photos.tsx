@@ -6,60 +6,89 @@ interface ExercisePhotoProps {
 
 // Генератор SVG изображений для упражнений
 export const generateExerciseImage = (exerciseName: string, className = "w-16 h-16") => {
-  const name = exerciseName.toLowerCase();
+  const name = exerciseName.toLowerCase().replace(/"/g, ''); // Убираем кавычки
   
   // Упражнения для груди
-  if (name.includes('жим') || name.includes('отжим') || name.includes('разведение') || name.includes('пуловер')) {
+  if (name.includes('жим') || name.includes('отжим') || name.includes('разведение') || 
+      name.includes('пуловер') || name.includes('грудь') || name.includes('брусья') ||
+      name.includes('пек-дек') || name.includes('флай') || name.includes('кроссовер')) {
     return <ChestExercisePhoto className={className} />;
   }
   
   // Упражнения для спины
-  if (name.includes('подтягива') || name.includes('тяга') || name.includes('гиперэкстенз') || name.includes('доброе утро')) {
+  if (name.includes('подтягива') || name.includes('тяга') || name.includes('гиперэкстенз') || 
+      name.includes('доброе утро') || name.includes('спина') || name.includes('широчайш') ||
+      name.includes('ромбовидн') || name.includes('трапеци') || name.includes('верхний блок') ||
+      name.includes('нижний блок') || name.includes('австралийск')) {
     return <BackExercisePhoto className={className} />;
   }
   
   // Упражнения для ног
-  if (name.includes('присед') || name.includes('выпад') || name.includes('болгар') || name.includes('подъем на носки')) {
+  if (name.includes('присед') || name.includes('выпад') || name.includes('болгар') || 
+      name.includes('подъем на носки') || name.includes('ноги') || name.includes('квадрицепс') ||
+      name.includes('икроножн') || name.includes('голень') || name.includes('бедро') ||
+      name.includes('разгибан') && name.includes('ног') || name.includes('сгибан') && name.includes('ног') ||
+      name.includes('гакк') || name.includes('фронтальн')) {
     return <LegsExercisePhoto className={className} />;
   }
   
-  // Упражнения для рук
-  if (name.includes('бицепс') || name.includes('трицепс') || name.includes('сгибан') || name.includes('разгибан')) {
+  // Упражнения для ягодичных
+  if (name.includes('ягодиц') || name.includes('мостик') || name.includes('ягодичный') || 
+      name.includes('хип траст') || name.includes('ягодицы') || name.includes('отведение ног') ||
+      name.includes('подъем таза') || name.includes('становая') && name.includes('румынская')) {
+    return <GlutesExercisePhoto className={className} />;
+  }
+  
+  // Упражнения для рук (бицепс и трицепс)
+  if (name.includes('бицепс') || name.includes('трицепс') || name.includes('сгибан') && name.includes('рук') || 
+      name.includes('разгибан') && name.includes('рук') || name.includes('руки') ||
+      name.includes('французский жим') || name.includes('молот') || name.includes('концентрир') ||
+      name.includes('обратным хватом') && (name.includes('сгибан') || name.includes('подъем'))) {
     return <ArmsExercisePhoto className={className} />;
   }
   
   // Упражнения для плеч
-  if (name.includes('плеч') || name.includes('дельт') || name.includes('махи') || name.includes('подъем')) {
+  if (name.includes('плеч') || name.includes('дельт') || name.includes('махи') || 
+      name.includes('подъем') && (name.includes('сторон') || name.includes('перед') || name.includes('рук')) ||
+      name.includes('армейский') || name.includes('жим стоя') || name.includes('жим сидя') ||
+      name.includes('шраги') || name.includes('протяжка')) {
     return <ShouldersExercisePhoto className={className} />;
   }
   
-  // Упражнения для ягодичных
-  if (name.includes('ягодиц') || name.includes('мостик') || name.includes('ягодичный') || name.includes('хип траст')) {
-    return <GlutesExercisePhoto className={className} />;
-  }
-  
   // Упражнения для пресса
-  if (name.includes('скручива') || name.includes('планка') || name.includes('пресс') || name.includes('велосипед') || name.includes('подъем ног')) {
+  if (name.includes('скручива') || name.includes('планка') || name.includes('пресс') || 
+      name.includes('велосипед') || name.includes('подъем ног') || name.includes('живот') ||
+      name.includes('косые') || name.includes('боковые') && (name.includes('скручива') || name.includes('подъем')) ||
+      name.includes('ножницы') || name.includes('русский твист') || name.includes('складка') ||
+      name.includes('наклоны') && name.includes('сторон')) {
     return <AbsExercisePhoto className={className} />;
   }
   
   // Кардио упражнения
-  if (name.includes('бег') || name.includes('прыж') || name.includes('альпинист') || name.includes('берпи') || name.includes('джампинг')) {
+  if (name.includes('бег') || name.includes('прыж') || name.includes('альпинист') || 
+      name.includes('берпи') || name.includes('джампинг') || name.includes('кардио') ||
+      name.includes('интервал') || name.includes('скакалка') || name.includes('степ') ||
+      name.includes('аэробн') || name.includes('танц') || name.includes('зумба')) {
     return <CardioExercisePhoto className={className} />;
   }
   
   // Упражнения с резинкой
-  if (name.includes('резин') || name.includes('эспандер')) {
+  if (name.includes('резин') || name.includes('эспандер') || name.includes('лента') ||
+      name.includes('резистивн') || name.includes('эластичн')) {
     return <ResistanceBandExercisePhoto className={className} />;
   }
   
   // Функциональные упражнения
-  if (name.includes('функцион') || name.includes('комплекс') || name.includes('круговая')) {
+  if (name.includes('функцион') || name.includes('комплекс') || name.includes('круговая') ||
+      name.includes('кроссфит') || name.includes('воркаут') || name.includes('калистеник') ||
+      name.includes('табата') || name.includes('плиометр') || name.includes('взрывн')) {
     return <FunctionalExercisePhoto className={className} />;
   }
   
   // Упражнения с собственным весом
-  if (name.includes('собственн') || name.includes('вес тела')) {
+  if (name.includes('собственн') || name.includes('вес тела') || name.includes('без отягощ') ||
+      name.includes('собственного веса') || name.includes('на турнике') || 
+      name.includes('на полу') || name.includes('в упоре')) {
     return <BodyweightExercisePhoto className={className} />;
   }
   
