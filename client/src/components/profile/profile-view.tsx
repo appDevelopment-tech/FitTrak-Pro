@@ -64,11 +64,6 @@ export function ProfileView() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Профиль тренера</h1>
-        <p className="text-gray-600 mt-2">Управляйте своей информацией и инструментами для работы</p>
-      </div>
-
       <Tabs defaultValue="profile" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="profile">Личные данные</TabsTrigger>
