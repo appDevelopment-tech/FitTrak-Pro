@@ -69,7 +69,7 @@ export default function Dashboard() {
 
   const viewTitles = {
     schedule: 'Расписание тренировок',
-    students: 'Ученики',
+    students: 'Список учеников',
     profile: 'Профиль тренера',
   };
 
