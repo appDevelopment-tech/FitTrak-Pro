@@ -724,7 +724,7 @@ export function ProfileView() {
                               >
                                 {exercise.name}
                               </h4>
-                              <Badge variant={exercise.difficulty === 'начинающий' ? 'secondary' : exercise.difficulty === 'средний' ? 'default' : 'destructive'} className="text-xs">
+                              <Badge variant="outline" data-difficulty={exercise.difficulty} className="text-xs">
                                 {exercise.difficulty}
                               </Badge>
                             </div>
