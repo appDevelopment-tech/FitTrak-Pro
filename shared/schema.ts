@@ -12,7 +12,7 @@ export const users = pgTable("users", {
   isTrainer: boolean("is_trainer").default(false),
 });
 
-export const pupils = pgTable("pupils", {
+export const pupils = pgTable("students", {
   id: serial("id").primaryKey(),
   trainerId: integer("trainer_id").notNull(),
   firstName: text("first_name").notNull(),
