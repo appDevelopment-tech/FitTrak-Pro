@@ -167,7 +167,16 @@ export function StudentsManagement() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
+      {/* Header */}
+      <div className="flex justify-end items-center mb-6">
+        <Button
+          onClick={() => setShowAddForm(true)}
+          className="bg-green-600 hover:bg-green-700"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Добавить ученика
+        </Button>
+      </div>
 
       {/* Search */}
       <div className="mb-6">
