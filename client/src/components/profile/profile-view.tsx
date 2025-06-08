@@ -908,7 +908,7 @@ function ExerciseForm({ exercise, onSubmit, onClose, isLoading }: ExerciseFormPr
           </Button>
         </div>
         <div className="space-y-2">
-          {formData.secondaryMuscles.map((muscle, index) => (
+          {(formData.secondaryMuscles || []).map((muscle, index) => (
             <div key={index} className="flex gap-2">
               <div className="flex-1">
                 <Input
