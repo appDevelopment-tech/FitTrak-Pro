@@ -25,12 +25,27 @@ export function ProfileView() {
     queryKey: ['/api/exercises'],
   });
 
-  // Фильтрация упражнений
-  const filteredExercises = exercises.filter(exercise => {
-    const matchesMuscleGroup = !selectedMuscleGroup || exercise.primaryMuscles.includes(selectedMuscleGroup);
-    const matchesSearch = !searchTerm || exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesMuscleGroup && matchesSearch;
-  });
+  // Фильтрация и сортировка упражнений
+  const filteredExercises = exercises
+    .filter(exercise => {
+      const matchesMuscleGroup = !selectedMuscleGroup || exercise.primaryMuscles.includes(selectedMuscleGroup);
+      const matchesSearch = !searchTerm || exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesMuscleGroup && matchesSearch;
+    })
+    .sort((a, b) => {
+      // Определяем порядок сложности
+      const difficultyOrder = {
+        'легкий': 1,
+        'начинающий': 1,
+        'средний': 2,
+        'продвинутый': 3
+      };
+      
+      const aDifficulty = difficultyOrder[a.difficulty as keyof typeof difficultyOrder] || 2;
+      const bDifficulty = difficultyOrder[b.difficulty as keyof typeof difficultyOrder] || 2;
+      
+      return aDifficulty - bDifficulty;
+    });
 
   const handleMuscleGroupClick = (muscleGroup: string) => {
     setSelectedMuscleGroup(muscleGroup);
