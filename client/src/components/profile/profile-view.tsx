@@ -15,11 +15,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { getExercisePhoto } from "@/components/ui/exercise-photos";
-import { ImageUpload } from "@/components/ui/image-upload";
 import { ExerciseImageManager } from "@/components/exercise/exercise-image-manager";
 import { ExerciseImagePlaceholder } from "@/components/exercise/exercise-image-placeholder";
 import { ExerciseDetail } from "@/components/exercise/exercise-detail";
-import { MuscleImageUpload } from "@/components/ui/muscle-image-upload";
 
 export function ProfileView() {
   const [isEditing, setIsEditing] = useState(false);
@@ -169,28 +167,7 @@ export function ProfileView() {
     deleteExerciseMutation.mutate(exerciseId);
   };
 
-  const handleMuscleImageSave = (muscleGroup: string, imageUrl: string) => {
-    setMuscleImages(prev => ({
-      ...prev,
-      [muscleGroup]: imageUrl
-    }));
-    setSelectedMuscleForImage(null);
-  };
 
-  // Загрузка сохраненных изображений при монтировании компонента
-  useEffect(() => {
-    const muscleGroups = ['грудь', 'спина', 'ноги', 'руки', 'плечи', 'ягодичные', 'живот'];
-    const savedImages: Record<string, string> = {};
-    
-    muscleGroups.forEach(group => {
-      const savedImage = localStorage.getItem(`muscle-image-${group}`);
-      if (savedImage) {
-        savedImages[group] = savedImage;
-      }
-    });
-    
-    setMuscleImages(savedImages);
-  }, []);
   
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -735,16 +712,7 @@ export function ProfileView() {
         </DialogContent>
       </Dialog>
 
-      {/* Диалог для загрузки изображений мышечных групп */}
-      {selectedMuscleForImage && (
-        <MuscleImageUpload
-          isOpen={true}
-          onClose={() => setSelectedMuscleForImage(null)}
-          muscleGroup={selectedMuscleForImage}
-          currentImage={muscleImages[selectedMuscleForImage]}
-          onImageSave={(imageUrl) => handleMuscleImageSave(selectedMuscleForImage, imageUrl)}
-        />
-      )}
+
 
       {/* Диалог для отображения полного обзора упражнения */}
       {selectedExerciseForDetail && (
@@ -785,7 +753,7 @@ function ExerciseForm({ exercise, onSubmit, onClose, isLoading }: ExerciseFormPr
     const cleanedData = {
       ...formData,
       primaryMuscles: formData.primaryMuscles.filter(muscle => muscle.trim() !== ''),
-      secondaryMuscles: formData.secondaryMuscles.filter(muscle => muscle.trim() !== ''),
+      secondaryMuscles: (formData.secondaryMuscles || []).filter(muscle => muscle.trim() !== ''),
       technique: formData.technique.filter(step => step.trim() !== ''),
       commonMistakes: formData.commonMistakes.filter(mistake => mistake.trim() !== ''),
       contraindications: formData.contraindications.filter(contra => contra.trim() !== ''),
@@ -820,21 +788,21 @@ function ExerciseForm({ exercise, onSubmit, onClose, isLoading }: ExerciseFormPr
   const addSecondaryMuscle = () => {
     setFormData(prev => ({
       ...prev,
-      secondaryMuscles: [...prev.secondaryMuscles, '']
+      secondaryMuscles: [...(prev.secondaryMuscles || []), '']
     }));
   };
 
   const removeSecondaryMuscle = (index: number) => {
     setFormData(prev => ({
       ...prev,
-      secondaryMuscles: prev.secondaryMuscles.filter((_, i) => i !== index)
+      secondaryMuscles: (prev.secondaryMuscles || []).filter((_, i) => i !== index)
     }));
   };
 
   const updateSecondaryMuscle = (index: number, value: string) => {
     setFormData(prev => ({
       ...prev,
-      secondaryMuscles: prev.secondaryMuscles.map((muscle, i) => i === index ? value : muscle)
+      secondaryMuscles: (prev.secondaryMuscles || []).map((muscle, i) => i === index ? value : muscle)
     }));
   };
 
