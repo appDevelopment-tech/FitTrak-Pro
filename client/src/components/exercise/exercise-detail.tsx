@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExerciseAnimation } from "./exercise-animation";
+import { generateExerciseImage } from "@/components/ui/exercise-photos";
 import { X, AlertTriangle, CheckCircle, Info } from "lucide-react";
 
 interface Exercise {
@@ -65,7 +66,7 @@ export function ExerciseDetail({ exercise, onClose }: ExerciseDetailProps) {
           {/* Animation and Description */}
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-gray-50 rounded-lg p-6 flex items-center justify-center">
-              <ExerciseAnimation exerciseName={exercise.name} className="w-48 h-48" />
+              {generateExerciseImage(exercise.name, "w-48 h-36 border bg-white rounded-lg shadow-sm")}
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-3">Обзор упражнения</h3>

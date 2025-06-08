@@ -12,6 +12,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Plus, Edit, Trash2, Eye, Search, Filter } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { generateExerciseImage } from "@/components/ui/exercise-photos";
 import type { Exercise, InsertExercise } from "@shared/schema";
 
 interface ExerciseFormData {
@@ -150,14 +151,21 @@ export function ExerciseManagement() {
           {filteredExercises.map((exercise) => (
             <Card key={exercise.id} className="hover:shadow-lg transition-shadow">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg">{exercise.name}</CardTitle>
-                <div className="flex flex-wrap gap-1">
-                  {exercise.primaryMuscles.map(muscle => (
-                    <Badge key={muscle} variant="default">{muscle}</Badge>
-                  ))}
-                  {exercise.secondaryMuscles.map(muscle => (
-                    <Badge key={muscle} variant="secondary">{muscle}</Badge>
-                  ))}
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0">
+                    {generateExerciseImage(exercise.name, "w-16 h-16 rounded-lg border bg-white")}
+                  </div>
+                  <div className="flex-1">
+                    <CardTitle className="text-lg mb-2">{exercise.name}</CardTitle>
+                    <div className="flex flex-wrap gap-1">
+                      {exercise.primaryMuscles.map(muscle => (
+                        <Badge key={muscle} variant="default">{muscle}</Badge>
+                      ))}
+                      {exercise.secondaryMuscles.map(muscle => (
+                        <Badge key={muscle} variant="secondary">{muscle}</Badge>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -546,6 +554,11 @@ function ExerciseView({ exercise }: ExerciseViewProps) {
 
   return (
     <div className="space-y-6">
+      {/* Изображение упражнения */}
+      <div className="flex justify-center">
+        {generateExerciseImage(exercise.name, "w-32 h-24 rounded-lg border bg-white shadow-sm")}
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <h3 className="font-semibold mb-2">Основная информация</h3>
