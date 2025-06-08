@@ -724,7 +724,17 @@ export function ProfileView() {
                               >
                                 {exercise.name}
                               </h4>
-                              <Badge variant="outline" data-difficulty={exercise.difficulty} className="text-xs">
+                              <Badge variant="outline" 
+                                     data-difficulty={exercise.difficulty} 
+                                     className={`text-xs ${
+                                       exercise.difficulty === 'легкий' || exercise.difficulty === 'начинающий' 
+                                         ? 'difficulty-easy-force' 
+                                         : exercise.difficulty === 'средний'
+                                         ? 'difficulty-medium-force'
+                                         : exercise.difficulty === 'продвинутый'
+                                         ? 'difficulty-hard-force'
+                                         : ''
+                                     }`}>
                                 {exercise.difficulty}
                               </Badge>
                             </div>

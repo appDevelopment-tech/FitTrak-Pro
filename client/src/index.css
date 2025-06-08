@@ -31,43 +31,41 @@
   --chart-5: 27 87% 67%;
 }
 
-/* Custom difficulty badge styles with high specificity */
-.badge[data-difficulty="легкий"],
-.badge[data-difficulty="начинающий"] {
+/* Force difficulty colors with maximum specificity */
+[data-difficulty="легкий"],
+[data-difficulty="начинающий"] {
   background-color: #dbeafe !important;
   color: #1e40af !important;
   border-color: #93c5fd !important;
 }
 
-.badge[data-difficulty="средний"] {
+[data-difficulty="средний"] {
   background-color: #dcfce7 !important;
   color: #166534 !important;
   border-color: #86efac !important;
 }
 
-.badge[data-difficulty="продвинутый"],
-.badge[data-difficulty="сложный"] {
+[data-difficulty="продвинутый"],
+[data-difficulty="сложный"] {
   background-color: #fecaca !important;
   color: #991b1b !important;
   border-color: #fca5a5 !important;
 }
 
-/* Fallback with highest specificity */
-span.inline-flex[data-difficulty="легкий"],
-span.inline-flex[data-difficulty="начинающий"] {
+/* Extra specificity overrides */
+.difficulty-easy-force {
   background-color: #dbeafe !important;
   color: #1e40af !important;
   border-color: #93c5fd !important;
 }
 
-span.inline-flex[data-difficulty="средний"] {
+.difficulty-medium-force {
   background-color: #dcfce7 !important;
   color: #166534 !important;
   border-color: #86efac !important;
 }
 
-span.inline-flex[data-difficulty="продвинутый"],
-span.inline-flex[data-difficulty="сложный"] {
+.difficulty-hard-force {
   background-color: #fecaca !important;
   color: #991b1b !important;
   border-color: #fca5a5 !important;

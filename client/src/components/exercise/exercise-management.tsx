@@ -165,7 +165,16 @@ export function ExerciseManagement() {
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Сложность:</span>
                   <Badge variant="outline"
-                         data-difficulty={exercise.difficulty}>
+                         data-difficulty={exercise.difficulty}
+                         className={
+                           exercise.difficulty === 'легкий' || exercise.difficulty === 'начинающий' 
+                             ? 'difficulty-easy-force' 
+                             : exercise.difficulty === 'средний'
+                             ? 'difficulty-medium-force'
+                             : exercise.difficulty === 'продвинутый'
+                             ? 'difficulty-hard-force'
+                             : ''
+                         }>
                     {exercise.difficulty}
                   </Badge>
                 </div>
@@ -544,7 +553,17 @@ function ExerciseView({ exercise }: ExerciseViewProps) {
             <div><span className="font-medium">Название:</span> {exercise.name}</div>
             <div className="flex items-center gap-2">
               <span className="font-medium">Сложность:</span> 
-              <Badge variant="outline" data-difficulty={exercise.difficulty}>
+              <Badge variant="outline" 
+                     data-difficulty={exercise.difficulty}
+                     className={
+                       exercise.difficulty === 'легкий' || exercise.difficulty === 'начинающий' 
+                         ? 'difficulty-easy-force' 
+                         : exercise.difficulty === 'средний'
+                         ? 'difficulty-medium-force'
+                         : exercise.difficulty === 'продвинутый'
+                         ? 'difficulty-hard-force'
+                         : ''
+                     }>
                 {exercise.difficulty}
               </Badge>
             </div>

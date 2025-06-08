@@ -41,7 +41,17 @@ export function ExerciseDetail({ exercise, onClose }: ExerciseDetailProps) {
           <div>
             <h2 className="text-2xl font-bold text-gray-900">{exercise.name}</h2>
             <div className="flex items-center gap-2 mt-2">
-              <Badge variant="outline" data-difficulty={exercise.difficulty}>
+              <Badge variant="outline" 
+                     data-difficulty={exercise.difficulty}
+                     className={
+                       exercise.difficulty === 'легкий' || exercise.difficulty === 'начинающий' 
+                         ? 'difficulty-easy-force' 
+                         : exercise.difficulty === 'средний'
+                         ? 'difficulty-medium-force'
+                         : exercise.difficulty === 'продвинутый'
+                         ? 'difficulty-hard-force'
+                         : ''
+                     }>
                 {exercise.difficulty}
               </Badge>
             </div>
