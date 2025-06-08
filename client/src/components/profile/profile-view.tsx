@@ -1,33 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Edit, Save, Camera, Plus, Award, Clock, Users, Calendar, Filter, Search, X, Trash2 } from "lucide-react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { User as UserType, Exercise, InsertExercise } from "@shared/schema";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { useToast } from "@/hooks/use-toast";
+import { User, Filter, Search } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import type { User as UserType, Exercise } from "@shared/schema";
 import { getExercisePhoto } from "@/components/ui/exercise-photos";
-import { ExerciseImageManager } from "@/components/exercise/exercise-image-manager";
-import { ExerciseImagePlaceholder } from "@/components/exercise/exercise-image-placeholder";
 import { ExerciseDetail } from "@/components/exercise/exercise-detail";
 
 export function ProfileView() {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
-
-
-
   const [selectedExerciseForDetail, setSelectedExerciseForDetail] = useState<Exercise | null>(null);
-  const { toast } = useToast();
   
   const { data: user } = useQuery<UserType>({
     queryKey: ['/api/user/1'],
@@ -36,10 +24,6 @@ export function ProfileView() {
   const { data: exercises = [] } = useQuery<Exercise[]>({
     queryKey: ['/api/exercises'],
   });
-
-
-
-
 
   // Фильтрация упражнений
   const filteredExercises = exercises.filter(exercise => {
@@ -63,25 +47,6 @@ export function ProfileView() {
     }, 100);
   };
 
-
-
-  // Функции для управления упражнениями
-  const handleCreateExercise = () => {
-    setEditingExercise(null);
-    setIsExerciseDialogOpen(true);
-  };
-
-  const handleEditExercise = (exercise: Exercise) => {
-    setEditingExercise(exercise);
-    setIsExerciseDialogOpen(true);
-  };
-
-  const handleDeleteExercise = (exerciseId: number) => {
-    deleteExerciseMutation.mutate(exerciseId);
-  };
-
-
-  
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6">
@@ -108,13 +73,6 @@ export function ProfileView() {
                     <div className="w-32 h-32 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
                       <User className="h-16 w-16 text-white" />
                     </div>
-                    <Button
-                      size="sm"
-                      className="absolute bottom-2 right-2 rounded-full w-8 h-8 p-0"
-                      variant="secondary"
-                    >
-                      <Camera className="h-4 w-4" />
-                    </Button>
                   </div>
                 </div>
                 
@@ -170,101 +128,26 @@ export function ProfileView() {
                     </div>
                   </div>
                   
-                  <div>
-                    <Label>О себе</Label>
+                  <div className="flex justify-end pt-4">
                     {isEditing ? (
-                      <Textarea 
-                        defaultValue="Персональный тренер с 5-летним опытом работы. Специализируюсь на силовых тренировках и функциональном тренинге."
-                        className="min-h-[100px]"
-                      />
-                    ) : (
-                      <div className="p-3 bg-gray-50 rounded-md">
-                        Персональный тренер с 5-летним опытом работы. Специализируюсь на силовых тренировках и функциональном тренинге.
+                      <div className="flex gap-2">
+                        <Button variant="outline" onClick={() => setIsEditing(false)}>
+                          Отмена
+                        </Button>
+                        <Button onClick={() => setIsEditing(false)}>
+                          Сохранить
+                        </Button>
                       </div>
+                    ) : (
+                      <Button onClick={() => setIsEditing(true)}>
+                        Редактировать
+                      </Button>
                     )}
                   </div>
-
-                  <div>
-                    <Label>Специализация</Label>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      <Badge variant="secondary">Силовые тренировки</Badge>
-                      <Badge variant="secondary">Функциональный тренинг</Badge>
-                      <Badge variant="secondary">Похудение</Badge>
-                      <Badge variant="secondary">Реабилитация</Badge>
-                    </div>
-                  </div>
                 </div>
-              </div>
-              
-              <div className="flex justify-end">
-                {isEditing ? (
-                  <div className="space-x-2">
-                    <Button variant="outline" onClick={() => setIsEditing(false)}>
-                      Отмена
-                    </Button>
-                    <Button onClick={() => setIsEditing(false)}>
-                      <Save className="h-4 w-4 mr-2" />
-                      Сохранить
-                    </Button>
-                  </div>
-                ) : (
-                  <Button onClick={() => setIsEditing(true)}>
-                    <Edit className="h-4 w-4 mr-2" />
-                    Редактировать
-                  </Button>
-                )}
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="programs" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Готовые планы тренировок */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold flex items-center gap-2">
-                  <Award className="h-5 w-5 text-blue-500" />
-                  Готовые планы тренировок
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="text-center py-8">
-                    <Award className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500 mb-4">Готовые программы появятся здесь</p>
-                    <Button variant="outline">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Добавить готовый план
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Создать тренировку */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold flex items-center gap-2">
-                  <Plus className="h-5 w-5 text-green-500" />
-                  Создать тренировку
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="text-center py-8">
-                    <Plus className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-700 mb-2">Создайте персональную тренировку</h3>
-                    <p className="text-gray-500 mb-4">Объединяйте упражнения в полноценные тренировки для учеников</p>
-                    <Button className="bg-green-600 hover:bg-green-700">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Создать новую тренировку
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </TabsContent>
 
         <TabsContent value="exercises" className="space-y-6">
@@ -434,7 +317,6 @@ export function ProfileView() {
                     <Filter className="h-5 w-5" />
                     Упражнения для группы: {selectedMuscleGroup}
                   </CardTitle>
-
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -453,7 +335,6 @@ export function ProfileView() {
                       />
                     </div>
                   </div>
-
                 </div>
 
                 {/* Список упражнений */}
@@ -501,8 +382,6 @@ export function ProfileView() {
                               </Badge>
                             </div>
                           </div>
-                          
-
                         </div>
                       ))}
                     </div>
@@ -512,17 +391,11 @@ export function ProfileView() {
                     </div>
                   )}
                 </div>
-
-
               </CardContent>
             </Card>
           )}
         </TabsContent>
       </Tabs>
-
-
-
-
 
       {/* Диалог для отображения полного обзора упражнения */}
       {selectedExerciseForDetail && (
@@ -532,324 +405,5 @@ export function ProfileView() {
         />
       )}
     </div>
-  );
-}
-
-// Компонент формы упражнения
-interface ExerciseFormProps {
-  exercise?: Exercise | null;
-  onSubmit: (data: InsertExercise) => void;
-  onClose: () => void;
-  isLoading: boolean;
-}
-
-function ExerciseForm({ exercise, onSubmit, onClose, isLoading }: ExerciseFormProps) {
-  const [formData, setFormData] = useState<InsertExercise>({
-    name: exercise?.name || '',
-    primaryMuscles: exercise?.primaryMuscles || [],
-    secondaryMuscles: exercise?.secondaryMuscles || [],
-    difficulty: exercise?.difficulty || 'начинающий',
-    overview: exercise?.overview || '',
-    technique: exercise?.technique || [''],
-    commonMistakes: exercise?.commonMistakes || [''],
-    contraindications: exercise?.contraindications || [],
-    muscleImageUrl: exercise?.muscleImageUrl || undefined,
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Фильтруем пустые элементы из массивов
-    const cleanedData = {
-      ...formData,
-      primaryMuscles: formData.primaryMuscles.filter(muscle => muscle.trim() !== ''),
-      secondaryMuscles: (formData.secondaryMuscles || []).filter(muscle => muscle.trim() !== ''),
-      technique: formData.technique.filter(step => step.trim() !== ''),
-      commonMistakes: formData.commonMistakes.filter(mistake => mistake.trim() !== ''),
-      contraindications: formData.contraindications.filter(contra => contra.trim() !== ''),
-    };
-
-    onSubmit(cleanedData);
-  };
-
-  // Функции для основных групп мышц
-  const addPrimaryMuscle = () => {
-    setFormData(prev => ({
-      ...prev,
-      primaryMuscles: [...prev.primaryMuscles, '']
-    }));
-  };
-
-  const removePrimaryMuscle = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      primaryMuscles: prev.primaryMuscles.filter((_, i) => i !== index)
-    }));
-  };
-
-  const updatePrimaryMuscle = (index: number, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      primaryMuscles: prev.primaryMuscles.map((muscle, i) => i === index ? value : muscle)
-    }));
-  };
-
-  // Функции для вспомогательных групп мышц
-  const addSecondaryMuscle = () => {
-    setFormData(prev => ({
-      ...prev,
-      secondaryMuscles: [...(prev.secondaryMuscles || []), '']
-    }));
-  };
-
-  const removeSecondaryMuscle = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      secondaryMuscles: (prev.secondaryMuscles || []).filter((_, i) => i !== index)
-    }));
-  };
-
-  const updateSecondaryMuscle = (index: number, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      secondaryMuscles: (prev.secondaryMuscles || []).map((muscle, i) => i === index ? value : muscle)
-    }));
-  };
-
-  const addTechniqueStep = () => {
-    setFormData(prev => ({
-      ...prev,
-      technique: [...prev.technique, '']
-    }));
-  };
-
-  const removeTechniqueStep = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      technique: prev.technique.filter((_, i) => i !== index)
-    }));
-  };
-
-  const updateTechniqueStep = (index: number, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      technique: prev.technique.map((step, i) => i === index ? value : step)
-    }));
-  };
-
-  const addMistake = () => {
-    setFormData(prev => ({
-      ...prev,
-      commonMistakes: [...prev.commonMistakes, '']
-    }));
-  };
-
-  const removeMistake = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      commonMistakes: prev.commonMistakes.filter((_, i) => i !== index)
-    }));
-  };
-
-  const updateMistake = (index: number, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      commonMistakes: prev.commonMistakes.map((mistake, i) => i === index ? value : mistake)
-    }));
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Название упражнения */}
-      <div>
-        <Label htmlFor="name">Название упражнения *</Label>
-        <Input
-          id="name"
-          value={formData.name}
-          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-          placeholder="Введите название упражнения"
-          required
-        />
-      </div>
-
-      {/* Основные группы мышц */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <Label>Основные группы мышц *</Label>
-          <Button type="button" onClick={addPrimaryMuscle} size="sm" variant="outline">
-            <Plus className="h-4 w-4 mr-1" />
-            Добавить группу
-          </Button>
-        </div>
-        <div className="space-y-2">
-          {formData.primaryMuscles.map((muscle, index) => (
-            <div key={index} className="flex gap-2">
-              <div className="flex-1">
-                <Input
-                  value={muscle}
-                  onChange={(e) => updatePrimaryMuscle(index, e.target.value)}
-                  placeholder={`Группа мышц ${index + 1}`}
-                  required={index === 0}
-                />
-              </div>
-              {formData.primaryMuscles.length > 1 && (
-                <Button
-                  type="button"
-                  onClick={() => removePrimaryMuscle(index)}
-                  size="sm"
-                  variant="ghost"
-                  className="text-red-500"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Вспомогательные группы мышц */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <Label>Вспомогательные группы мышц</Label>
-          <Button type="button" onClick={addSecondaryMuscle} size="sm" variant="outline">
-            <Plus className="h-4 w-4 mr-1" />
-            Добавить группу
-          </Button>
-        </div>
-        <div className="space-y-2">
-          {(formData.secondaryMuscles || []).map((muscle, index) => (
-            <div key={index} className="flex gap-2">
-              <div className="flex-1">
-                <Input
-                  value={muscle}
-                  onChange={(e) => updateSecondaryMuscle(index, e.target.value)}
-                  placeholder={`Вспомогательная группа ${index + 1}`}
-                />
-              </div>
-              <Button
-                type="button"
-                onClick={() => removeSecondaryMuscle(index)}
-                size="sm"
-                variant="ghost"
-                className="text-red-500"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Сложность */}
-      <div>
-        <Label htmlFor="difficulty">Сложность *</Label>
-        <Select value={formData.difficulty} onValueChange={(value) => setFormData(prev => ({ ...prev, difficulty: value }))}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="начинающий">Начинающий</SelectItem>
-            <SelectItem value="средний">Средний</SelectItem>
-            <SelectItem value="продвинутый">Продвинутый</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Описание */}
-      <div>
-        <Label htmlFor="overview">Описание упражнения *</Label>
-        <Textarea
-          id="overview"
-          value={formData.overview}
-          onChange={(e) => setFormData(prev => ({ ...prev, overview: e.target.value }))}
-          placeholder="Краткое описание упражнения"
-          rows={3}
-          required
-        />
-      </div>
-
-      {/* Техника выполнения */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <Label>Техника выполнения *</Label>
-          <Button type="button" onClick={addTechniqueStep} size="sm" variant="outline">
-            <Plus className="h-4 w-4 mr-1" />
-            Добавить шаг
-          </Button>
-        </div>
-        <div className="space-y-2">
-          {formData.technique.map((step, index) => (
-            <div key={index} className="flex gap-2">
-              <div className="flex-1">
-                <Input
-                  value={step}
-                  onChange={(e) => updateTechniqueStep(index, e.target.value)}
-                  placeholder={`Шаг ${index + 1}`}
-                  required={index === 0}
-                />
-              </div>
-              {formData.technique.length > 1 && (
-                <Button
-                  type="button"
-                  onClick={() => removeTechniqueStep(index)}
-                  size="sm"
-                  variant="ghost"
-                  className="text-red-500"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Частые ошибки */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <Label>Частые ошибки *</Label>
-          <Button type="button" onClick={addMistake} size="sm" variant="outline">
-            <Plus className="h-4 w-4 mr-1" />
-            Добавить ошибку
-          </Button>
-        </div>
-        <div className="space-y-2">
-          {formData.commonMistakes.map((mistake, index) => (
-            <div key={index} className="flex gap-2">
-              <div className="flex-1">
-                <Input
-                  value={mistake}
-                  onChange={(e) => updateMistake(index, e.target.value)}
-                  placeholder={`Ошибка ${index + 1}`}
-                  required={index === 0}
-                />
-              </div>
-              {formData.commonMistakes.length > 1 && (
-                <Button
-                  type="button"
-                  onClick={() => removeMistake(index)}
-                  size="sm"
-                  variant="ghost"
-                  className="text-red-500"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Кнопки */}
-      <div className="flex justify-end gap-2 pt-4 border-t">
-        <Button type="button" variant="outline" onClick={onClose}>
-          Отмена
-        </Button>
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? 'Сохранение...' : (exercise ? 'Обновить' : 'Создать')}
-        </Button>
-      </div>
-    </form>
   );
 }
