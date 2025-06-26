@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ChevronLeft, ChevronRight, Clock, Plus, Check, Trash2, Users, Search, AlertCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, Plus, Check, Trash2, Users, Search, AlertCircle, UserPlus } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Pupil } from "@shared/schema";
@@ -229,9 +229,14 @@ export function NewSchedule() {
       setSessions(prev => [...prev, newSession]);
     }
 
-    setShowAddDialog(false);
+    // Очищаем выбор учеников, но не закрываем диалог
     setSelectedPupils([]);
     setSearchTerm('');
+    
+    toast({
+      title: "Успешно",
+      description: `Ученик${selectedPupils.length > 1 ? 'и' : ''} добавлен${selectedPupils.length > 1 ? 'ы' : ''} на ${selectedTime}`,
+    });
   };
 
   const handleQuickAddPupil = () => {
@@ -412,9 +417,9 @@ export function NewSchedule() {
                         size="sm"
                         variant="outline"
                         onClick={() => handleAddPupil(time)}
+                        className="p-2"
                       >
-                        <Plus className="h-4 w-4 mr-1" />
-                        Добавить ученика
+                        <UserPlus className="h-4 w-4" />
                       </Button>
                       
                       {session && (
@@ -439,13 +444,38 @@ export function NewSchedule() {
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Добавить ученика на {selectedTime}</DialogTitle>
+            <DialogTitle>Добавить ученика</DialogTitle>
             <DialogDescription>
-              Выберите одного или нескольких учеников для записи на тренировку
+              Выберите дату, время и учеников для записи на тренировку
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4">
+            {/* Выбор даты и времени */}
+            <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+              <div>
+                <Label className="text-sm font-medium">Дата</Label>
+                <Input
+                  type="date"
+                  value={selectedDate.toISOString().split('T')[0]}
+                  onChange={(e) => setSelectedDate(new Date(e.target.value))}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Время</Label>
+                <select
+                  value={selectedTime}
+                  onChange={(e) => setSelectedTime(e.target.value)}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {timeSlots.map(time => (
+                    <option key={time} value={time}>{time}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
             {/* Поиск */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
