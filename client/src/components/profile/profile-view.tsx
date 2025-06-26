@@ -11,6 +11,7 @@ import type { User as UserType, Exercise } from "@shared/schema";
 import { getExercisePhoto } from "@/components/ui/exercise-photos";
 import { ExerciseDetail } from "@/components/exercise/exercise-detail";
 import { StudentsManagement } from "@/components/students/students-management";
+import { WorkoutsManagement } from "@/components/workouts/workouts-management";
 
 export function ProfileView() {
   const [isEditing, setIsEditing] = useState(false);
@@ -164,6 +165,10 @@ export function ProfileView() {
 
         <TabsContent value="students">
           <StudentsManagement />
+        </TabsContent>
+
+        <TabsContent value="programs">
+          <WorkoutsManagement />
         </TabsContent>
 
         <TabsContent value="exercises" className="space-y-6">
