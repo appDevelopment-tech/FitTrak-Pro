@@ -69,7 +69,6 @@ export default function Dashboard() {
 
   const viewTitles = {
     schedule: 'Расписание',
-    students: 'Список учеников',
     profile: 'Кабинет',
   };
 
@@ -77,8 +76,6 @@ export default function Dashboard() {
     switch (activeView) {
       case 'schedule':
         return <NewSchedule />;
-      case 'students':
-        return <StudentsManagement />;
       case 'profile':
         return <ProfileView />;
 

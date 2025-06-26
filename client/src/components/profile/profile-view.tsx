@@ -5,11 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { User, Filter, Search } from "lucide-react";
+import { User, Filter, Search, Users, Dumbbell, Calendar } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import type { User as UserType, Exercise } from "@shared/schema";
 import { getExercisePhoto } from "@/components/ui/exercise-photos";
 import { ExerciseDetail } from "@/components/exercise/exercise-detail";
+import { StudentsManagement } from "@/components/students/students-management";
 
 export function ProfileView() {
   const [isEditing, setIsEditing] = useState(false);
@@ -65,8 +66,9 @@ export function ProfileView() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="profile">Личные данные</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="profile">Тренер</TabsTrigger>
+          <TabsTrigger value="students">Ученики</TabsTrigger>
           <TabsTrigger value="exercises">Упражнения</TabsTrigger>
           <TabsTrigger value="programs">Тренировки</TabsTrigger>
         </TabsList>
@@ -158,6 +160,10 @@ export function ProfileView() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="students">
+          <StudentsManagement />
         </TabsContent>
 
         <TabsContent value="exercises" className="space-y-6">
