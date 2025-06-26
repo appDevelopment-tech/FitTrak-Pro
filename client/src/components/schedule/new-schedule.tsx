@@ -30,12 +30,7 @@ interface CalendarDay {
 
 export function NewSchedule() {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [currentMonth1, setCurrentMonth1] = useState(new Date());
-  const [currentMonth2, setCurrentMonth2] = useState(() => {
-    const nextMonth = new Date();
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
-    return nextMonth;
-  });
+  const [currentMonth, setCurrentMonth] = useState(new Date());
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedPupils, setSelectedPupils] = useState<number[]>([]);
@@ -106,8 +101,7 @@ export function NewSchedule() {
     return days;
   };
 
-  const calendar1Days = generateCalendarDays(currentMonth1);
-  const calendar2Days = generateCalendarDays(currentMonth2);
+  const calendarDays = generateCalendarDays(currentMonth);
 
   // Получить сессии для выбранного дня
   const getSessionsForDay = () => {
@@ -311,38 +305,32 @@ export function NewSchedule() {
     'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
   ];
 
-  const weekDays = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+  const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 
-  const navigateMonth = (direction: 'prev' | 'next', monthNumber: 1 | 2) => {
-    if (monthNumber === 1) {
-      const newDate = new Date(currentMonth1);
-      newDate.setMonth(newDate.getMonth() + (direction === 'next' ? 1 : -1));
-      setCurrentMonth1(newDate);
-    } else {
-      const newDate = new Date(currentMonth2);
-      newDate.setMonth(newDate.getMonth() + (direction === 'next' ? 1 : -1));
-      setCurrentMonth2(newDate);
-    }
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    const newDate = new Date(currentMonth);
+    newDate.setMonth(newDate.getMonth() + (direction === 'next' ? 1 : -1));
+    setCurrentMonth(newDate);
   };
 
-  const renderCalendar = (days: CalendarDay[], currentMonth: Date, monthNumber: 1 | 2) => (
+  const renderCalendar = (days: CalendarDay[], month: Date) => (
     <Card className="mb-4">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigateMonth('prev', monthNumber)}
+            onClick={() => navigateMonth('prev')}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <CardTitle className="text-lg">
-            {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+            {monthNames[month.getMonth()]} {month.getFullYear()}
           </CardTitle>
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigateMonth('next', monthNumber)}
+            onClick={() => navigateMonth('next')}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -380,10 +368,9 @@ export function NewSchedule() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Левая колонка - календари */}
+        {/* Левая колонка - календарь */}
         <div className="lg:col-span-1">
-          {renderCalendar(calendar1Days, currentMonth1, 1)}
-          {renderCalendar(calendar2Days, currentMonth2, 2)}
+          {renderCalendar(calendarDays, currentMonth)}
         </div>
 
         {/* Правая колонка - расписание дня */}
