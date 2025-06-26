@@ -79,8 +79,13 @@ export function NewSchedule() {
     const month = baseDate.getMonth();
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
+    
+    // Корректируем для понедельника как первого дня недели
+    const firstDayOfWeek = firstDay.getDay();
+    const adjustedFirstDay = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+    
     const startDate = new Date(firstDay);
-    startDate.setDate(startDate.getDate() - firstDay.getDay());
+    startDate.setDate(startDate.getDate() - adjustedFirstDay);
 
     const days: CalendarDay[] = [];
     const today = new Date();
