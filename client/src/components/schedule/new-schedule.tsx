@@ -48,6 +48,8 @@ export function NewSchedule() {
     email: ''
   });
   const [sessions, setSessions] = useState<ScheduleSession[]>([]);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ sessionId: number; pupilId: number } | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -251,16 +253,26 @@ export function NewSchedule() {
     });
   };
 
-  const handleConfirmSession = (sessionId: number) => {
+  const handleToggleSessionStatus = (sessionId: number) => {
     setSessions(prev => prev.map(s => 
-      s.id === sessionId ? { ...s, status: 'confirmed' } : s
+      s.id === sessionId ? { 
+        ...s, 
+        status: s.status === 'confirmed' ? 'pending' : 'confirmed' 
+      } : s
     ));
   };
 
-  const handleRemovePupil = (sessionId: number, pupilId: number) => {
+  const handleDeleteClick = (sessionId: number, pupilId: number) => {
+    setDeleteTarget({ sessionId, pupilId });
+    setShowDeleteDialog(true);
+  };
+
+  const handleDeleteOneSession = () => {
+    if (!deleteTarget) return;
+    
     setSessions(prev => prev.map(s => {
-      if (s.id === sessionId) {
-        const updatedPupils = s.pupils.filter(p => p.id !== pupilId);
+      if (s.id === deleteTarget.sessionId) {
+        const updatedPupils = s.pupils.filter(p => p.id !== deleteTarget.pupilId);
         if (updatedPupils.length === 0) {
           return null; // Удаляем сессию если учеников не осталось
         }
@@ -268,6 +280,30 @@ export function NewSchedule() {
       }
       return s;
     }).filter(Boolean) as ScheduleSession[]);
+    
+    setShowDeleteDialog(false);
+    setDeleteTarget(null);
+  };
+
+  const handleDeleteTrainingPlan = () => {
+    if (!deleteTarget) return;
+    
+    // Удаляем ученика из всех сессий (весь тренировочный план)
+    setSessions(prev => prev.map(s => {
+      const updatedPupils = s.pupils.filter(p => p.id !== deleteTarget.pupilId);
+      if (updatedPupils.length === 0) {
+        return null; // Удаляем сессию если учеников не осталось
+      }
+      return { ...s, pupils: updatedPupils };
+    }).filter(Boolean) as ScheduleSession[]);
+    
+    setShowDeleteDialog(false);
+    setDeleteTarget(null);
+    
+    toast({
+      title: "Успешно",
+      description: "Тренировочный план удален",
+    });
   };
 
   const monthNames = [
@@ -382,13 +418,13 @@ export function NewSchedule() {
                               </span>
                               <div className="flex items-center gap-1">
                                 <button
-                                  onClick={() => handleConfirmSession(session.id)}
+                                  onClick={() => handleToggleSessionStatus(session.id)}
                                   className={`p-1.5 rounded-full transition-colors ${
                                     session.status === 'confirmed' 
                                       ? 'text-green-600 bg-green-100 hover:bg-green-200' 
                                       : 'text-yellow-600 bg-yellow-100 hover:bg-yellow-200'
                                   }`}
-                                  title={session.status === 'confirmed' ? 'Подтверждено' : 'Подтвердить'}
+                                  title={session.status === 'confirmed' ? 'Снять подтверждение' : 'Подтвердить'}
                                 >
                                   {session.status === 'confirmed' ? 
                                     <Check className="h-4 w-4" /> : 
@@ -403,7 +439,7 @@ export function NewSchedule() {
                                   <Dumbbell className="h-4 w-4" />
                                 </button>
                                 <button
-                                  onClick={() => handleRemovePupil(session.id, pupil.id)}
+                                  onClick={() => handleDeleteClick(session.id, pupil.id)}
                                   className="p-1.5 rounded-full text-red-600 bg-red-100 hover:bg-red-200 transition-colors"
                                   title="Удалить из расписания"
                                 >
@@ -551,6 +587,54 @@ export function NewSchedule() {
                 disabled={selectedPupils.length === 0}
               >
                 Добавить ({selectedPupils.length})
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Диалог подтверждения удаления */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Удалить тренировку</DialogTitle>
+            <DialogDescription>
+              Выберите действие для ученика
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="text-sm text-gray-600 mb-4">
+              Что вы хотите удалить?
+            </div>
+            
+            <div className="flex flex-col gap-3">
+              <Button
+                onClick={handleDeleteOneSession}
+                variant="outline"
+                className="justify-start h-auto py-3 px-4"
+              >
+                <div className="text-left">
+                  <div className="font-medium">Удалить одну тренировку</div>
+                  <div className="text-sm text-gray-500">Только эту запись на выбранное время</div>
+                </div>
+              </Button>
+              
+              <Button
+                onClick={handleDeleteTrainingPlan}
+                variant="outline"
+                className="justify-start h-auto py-3 px-4 border-red-200 hover:bg-red-50"
+              >
+                <div className="text-left">
+                  <div className="font-medium text-red-600">Удалить весь тренировочный план</div>
+                  <div className="text-sm text-red-500">Все записи этого ученика в расписании</div>
+                </div>
+              </Button>
+            </div>
+
+            <div className="flex justify-end pt-4 border-t">
+              <Button variant="ghost" onClick={() => setShowDeleteDialog(false)}>
+                Отмена
               </Button>
             </div>
           </div>
