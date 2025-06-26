@@ -11,11 +11,11 @@ import { TodaySchedule } from "@/components/schedule/today-schedule";
 
 
 import { ProfileView } from "@/components/profile/profile-view";
-import { TrainerSchedule } from "@/components/schedule/trainer-schedule";
+import { NewSchedule } from "@/components/schedule/new-schedule";
 import { StudentsManagement } from "@/components/students/students-management";
 import { Plus, BarChart3, Search, Flame, Trash2, Users } from "lucide-react";
 import type { DashboardStats } from "@/lib/types";
-import type { WorkoutSession, WorkoutProgram } from "@shared/schema";
+import type { WorkoutSession, WorkoutProgram, User } from "@shared/schema";
 
 export default function Dashboard() {
   const [activeView, setActiveView] = useState('schedule');
@@ -44,7 +44,7 @@ export default function Dashboard() {
     queryKey: ['/api/workout-sessions/1', selectedDate.toISOString().split('T')[0]],
   });
 
-  const { data: user } = useQuery({
+  const { data: user } = useQuery<User>({
     queryKey: ['/api/user/1'],
   });
 
@@ -68,7 +68,7 @@ export default function Dashboard() {
   };
 
   const viewTitles = {
-    schedule: 'Расписание тренировок',
+    schedule: 'Расписание',
     students: 'Список учеников',
     profile: 'Профиль тренера',
   };
@@ -76,7 +76,7 @@ export default function Dashboard() {
   const renderContent = () => {
     switch (activeView) {
       case 'schedule':
-        return <TrainerSchedule />;
+        return <NewSchedule />;
       case 'students':
         return <StudentsManagement />;
       case 'profile':
