@@ -94,6 +94,7 @@ This is a full-stack fitness training application designed for trainers and thei
 
 Changelog:
 - June 26, 2025. Initial setup
+- June 26, 2025. Реструктуризация навигации: перенос "Ученики" в "Кабинет" с новыми вкладками
 
 ## User Preferences
 
