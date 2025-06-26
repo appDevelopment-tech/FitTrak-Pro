@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ChevronLeft, ChevronRight, Clock, Plus, Check, Trash2, Users, Search, AlertCircle, UserPlus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, Plus, Check, Trash2, Users, Search, AlertCircle } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Pupil } from "@shared/schema";
@@ -45,9 +45,7 @@ export function NewSchedule() {
     firstName: '',
     lastName: '',
     phone: '',
-    email: '',
-    trainingDays: [] as string[],
-    trainingTimes: [] as string[]
+    email: ''
   });
   const [sessions, setSessions] = useState<ScheduleSession[]>([]);
   const queryClient = useQueryClient();
@@ -64,7 +62,7 @@ export function NewSchedule() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/pupils'] });
       setShowAddPupilForm(false);
-      setNewPupilData({ firstName: '', lastName: '', phone: '', email: '', trainingDays: [], trainingTimes: [] });
+      setNewPupilData({ firstName: '', lastName: '', phone: '', email: '' });
       toast({
         title: "Успешно",
         description: "Ученик добавлен",
@@ -231,14 +229,9 @@ export function NewSchedule() {
       setSessions(prev => [...prev, newSession]);
     }
 
-    // Очищаем выбор учеников, но не закрываем диалог
+    setShowAddDialog(false);
     setSelectedPupils([]);
     setSearchTerm('');
-    
-    toast({
-      title: "Успешно",
-      description: `Ученик${selectedPupils.length > 1 ? 'и' : ''} добавлен${selectedPupils.length > 1 ? 'ы' : ''} на ${selectedTime}`,
-    });
   };
 
   const handleQuickAddPupil = () => {
@@ -252,31 +245,10 @@ export function NewSchedule() {
     }
 
     createPupilMutation.mutate({
-      firstName: newPupilData.firstName,
-      lastName: newPupilData.lastName,
-      phone: newPupilData.phone,
-      email: newPupilData.email,
+      ...newPupilData,
       trainerId: 1,
       joinDate: new Date().toISOString().split('T')[0]
     });
-  };
-
-  const handleTrainingDayToggle = (day: string) => {
-    setNewPupilData(prev => ({
-      ...prev,
-      trainingDays: prev.trainingDays.includes(day)
-        ? prev.trainingDays.filter(d => d !== day)
-        : [...prev.trainingDays, day]
-    }));
-  };
-
-  const handleTrainingTimeToggle = (time: string) => {
-    setNewPupilData(prev => ({
-      ...prev,
-      trainingTimes: prev.trainingTimes.includes(time)
-        ? prev.trainingTimes.filter(t => t !== time)
-        : [...prev.trainingTimes, time]
-    }));
   };
 
   const handleConfirmSession = (sessionId: number) => {
@@ -440,9 +412,9 @@ export function NewSchedule() {
                         size="sm"
                         variant="outline"
                         onClick={() => handleAddPupil(time)}
-                        className="p-2"
                       >
-                        <UserPlus className="h-4 w-4" />
+                        <Plus className="h-4 w-4 mr-1" />
+                        Добавить ученика
                       </Button>
                       
                       {session && (
@@ -467,38 +439,13 @@ export function NewSchedule() {
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Добавить ученика</DialogTitle>
+            <DialogTitle>Добавить ученика на {selectedTime}</DialogTitle>
             <DialogDescription>
-              Выберите дату, время и учеников для записи на тренировку
+              Выберите одного или нескольких учеников для записи на тренировку
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4">
-            {/* Выбор даты и времени */}
-            <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
-              <div>
-                <Label className="text-sm font-medium">Дата</Label>
-                <Input
-                  type="date"
-                  value={selectedDate.toISOString().split('T')[0]}
-                  onChange={(e) => setSelectedDate(new Date(e.target.value))}
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label className="text-sm font-medium">Время</Label>
-                <select
-                  value={selectedTime}
-                  onChange={(e) => setSelectedTime(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {timeSlots.map(time => (
-                    <option key={time} value={time}>{time}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
             {/* Поиск */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -546,87 +493,41 @@ export function NewSchedule() {
               </div>
 
               {showAddPupilForm && (
-                <div className="space-y-4">
-                  {/* Основная информация */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label>Имя*</Label>
-                      <Input
-                        value={newPupilData.firstName}
-                        onChange={(e) => setNewPupilData(prev => ({ ...prev, firstName: e.target.value }))}
-                        placeholder="Введите имя"
-                      />
-                    </div>
-                    <div>
-                      <Label>Фамилия*</Label>
-                      <Input
-                        value={newPupilData.lastName}
-                        onChange={(e) => setNewPupilData(prev => ({ ...prev, lastName: e.target.value }))}
-                        placeholder="Введите фамилию"
-                      />
-                    </div>
-                    <div>
-                      <Label>Телефон*</Label>
-                      <Input
-                        value={newPupilData.phone}
-                        onChange={(e) => setNewPupilData(prev => ({ ...prev, phone: e.target.value }))}
-                        placeholder="+7 (999) 123-45-67"
-                      />
-                    </div>
-                    <div>
-                      <Label>Email*</Label>
-                      <Input
-                        type="email"
-                        value={newPupilData.email}
-                        onChange={(e) => setNewPupilData(prev => ({ ...prev, email: e.target.value }))}
-                        placeholder="email@example.com"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Дни тренировок */}
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label className="text-sm font-medium mb-3 block">Дни тренировок</Label>
-                    <div className="grid grid-cols-7 gap-2">
-                      {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map((day, index) => (
-                        <button
-                          key={day}
-                          type="button"
-                          onClick={() => handleTrainingDayToggle(day)}
-                          className={`p-2 text-sm rounded border transition-colors ${
-                            newPupilData.trainingDays.includes(day)
-                              ? 'bg-blue-500 text-white border-blue-500'
-                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                          }`}
-                        >
-                          {day}
-                        </button>
-                      ))}
-                    </div>
+                    <Label>Имя*</Label>
+                    <Input
+                      value={newPupilData.firstName}
+                      onChange={(e) => setNewPupilData(prev => ({ ...prev, firstName: e.target.value }))}
+                      placeholder="Введите имя"
+                    />
                   </div>
-
-                  {/* Время тренировок */}
                   <div>
-                    <Label className="text-sm font-medium mb-3 block">Предпочитаемое время</Label>
-                    <div className="grid grid-cols-4 gap-2">
-                      {['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '19:00', '20:00'].map(time => (
-                        <button
-                          key={time}
-                          type="button"
-                          onClick={() => handleTrainingTimeToggle(time)}
-                          className={`p-2 text-sm rounded border transition-colors ${
-                            newPupilData.trainingTimes.includes(time)
-                              ? 'bg-green-500 text-white border-green-500'
-                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                          }`}
-                        >
-                          {time}
-                        </button>
-                      ))}
-                    </div>
+                    <Label>Фамилия*</Label>
+                    <Input
+                      value={newPupilData.lastName}
+                      onChange={(e) => setNewPupilData(prev => ({ ...prev, lastName: e.target.value }))}
+                      placeholder="Введите фамилию"
+                    />
                   </div>
-
-                  <div className="pt-2">
+                  <div>
+                    <Label>Телефон*</Label>
+                    <Input
+                      value={newPupilData.phone}
+                      onChange={(e) => setNewPupilData(prev => ({ ...prev, phone: e.target.value }))}
+                      placeholder="+7 (999) 123-45-67"
+                    />
+                  </div>
+                  <div>
+                    <Label>Email*</Label>
+                    <Input
+                      type="email"
+                      value={newPupilData.email}
+                      onChange={(e) => setNewPupilData(prev => ({ ...prev, email: e.target.value }))}
+                      placeholder="email@example.com"
+                    />
+                  </div>
+                  <div className="col-span-2">
                     <Button
                       onClick={handleQuickAddPupil}
                       disabled={createPupilMutation.isPending}
