@@ -25,9 +25,9 @@ interface WorkoutPlan {
 interface CustomWorkout {
   name: string;
   level: 'начальный' | 'базовый' | 'средний' | 'высокий';
-  sessionsPerWeek: number;
-  sessionDuration: number;
   totalSessions: number;
+  startDate: Date | null;
+  startTime: string;
   selectedDates: Date[];
   trainerNotes: string;
 }
@@ -39,9 +39,9 @@ export function WorkoutsManagement() {
   const [customWorkout, setCustomWorkout] = useState<CustomWorkout>({
     name: '',
     level: 'начальный',
-    sessionsPerWeek: 3,
-    sessionDuration: 60,
     totalSessions: 12,
+    startDate: null,
+    startTime: '10:00',
     selectedDates: [],
     trainerNotes: ''
   });
@@ -125,7 +125,7 @@ export function WorkoutsManagement() {
     }
   };
 
-  const canConfirmSchedule = selectedDates.length === customWorkout.sessionsPerWeek;
+  const canConfirmSchedule = selectedDates.length === customWorkout.totalSessions;
 
   const handleCreateWorkout = () => {
     if (!customWorkout.name.trim()) {
@@ -137,10 +137,19 @@ export function WorkoutsManagement() {
       return;
     }
 
-    if (selectedDates.length !== customWorkout.sessionsPerWeek) {
+    if (!customWorkout.startDate) {
       toast({
         title: "Ошибка",
-        description: `Выберите ${customWorkout.sessionsPerWeek} дней для тренировок`,
+        description: "Выберите дату начала тренировки",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (selectedDates.length !== customWorkout.totalSessions) {
+      toast({
+        title: "Ошибка",
+        description: `Выберите ${customWorkout.totalSessions} дней для тренировок`,
         variant: "destructive",
       });
       return;
@@ -156,9 +165,9 @@ export function WorkoutsManagement() {
     setCustomWorkout({
       name: '',
       level: 'начальный',
-      sessionsPerWeek: 3,
-      sessionDuration: 60,
       totalSessions: 12,
+      startDate: null,
+      startTime: '10:00',
       selectedDates: [],
       trainerNotes: ''
     });
@@ -301,51 +310,43 @@ export function WorkoutsManagement() {
                   </div>
 
                   <div>
-                    <Label htmlFor="sessions-per-week">Количество тренировок в неделю</Label>
-                    <Select
-                      value={customWorkout.sessionsPerWeek.toString()}
-                      onValueChange={(value) => {
-                        const newValue = parseInt(value);
-                        setCustomWorkout(prev => ({ ...prev, sessionsPerWeek: newValue }));
-                        setSelectedDates([]); // Сброс выбранных дат при изменении количества
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="2">2 раза в неделю</SelectItem>
-                        <SelectItem value="3">3 раза в неделю</SelectItem>
-                        <SelectItem value="4">4 раза в неделю</SelectItem>
-                        <SelectItem value="5">5 раз в неделю</SelectItem>
-                        <SelectItem value="6">6 раз в неделю</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="session-duration">Время тренировки (минуты)</Label>
-                    <Input
-                      id="session-duration"
-                      type="number"
-                      value={customWorkout.sessionDuration}
-                      onChange={(e) => setCustomWorkout(prev => ({ ...prev, sessionDuration: parseInt(e.target.value) || 60 }))}
-                      min="30"
-                      max="180"
-                    />
-                  </div>
-
-                  <div>
                     <Label htmlFor="total-sessions">Всего тренировок</Label>
                     <Input
                       id="total-sessions"
                       type="number"
                       value={customWorkout.totalSessions}
-                      onChange={(e) => setCustomWorkout(prev => ({ ...prev, totalSessions: parseInt(e.target.value) || 12 }))}
+                      onChange={(e) => {
+                        const newValue = parseInt(e.target.value) || 1;
+                        setCustomWorkout(prev => ({ ...prev, totalSessions: newValue }));
+                        setSelectedDates([]); // Сброс выбранных дат при изменении количества
+                      }}
                       min="1"
-                      max="100"
+                      max="50"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="start-date">Дата начала тренировки</Label>
+                    <Input
+                      id="start-date"
+                      type="date"
+                      value={customWorkout.startDate ? customWorkout.startDate.toISOString().split('T')[0] : ''}
+                      onChange={(e) => {
+                        const date = e.target.value ? new Date(e.target.value) : null;
+                        setCustomWorkout(prev => ({ ...prev, startDate: date }));
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="start-time">Время начала тренировки</Label>
+                    <Input
+                      id="start-time"
+                      type="time"
+                      value={customWorkout.startTime}
+                      onChange={(e) => setCustomWorkout(prev => ({ ...prev, startTime: e.target.value }))}
                     />
                   </div>
 
@@ -353,7 +354,7 @@ export function WorkoutsManagement() {
                     <div className="flex items-center justify-between mb-2">
                       <Label>Выбор дней тренировок</Label>
                       <Badge variant={canConfirmSchedule ? "default" : "secondary"}>
-                        {selectedDates.length} из {customWorkout.sessionsPerWeek}
+                        {selectedDates.length} из {customWorkout.totalSessions}
                       </Badge>
                     </div>
                     <Button
@@ -392,13 +393,13 @@ export function WorkoutsManagement() {
                   ) : (
                     <>
                       <AlertCircle className="h-4 w-4 text-yellow-600" />
-                      Выберите все {customWorkout.sessionsPerWeek} дней
+                      Выберите все {customWorkout.totalSessions} дней
                     </>
                   )}
                 </div>
                 <Button
                   onClick={handleCreateWorkout}
-                  disabled={!canConfirmSchedule || !customWorkout.name.trim()}
+                  disabled={!canConfirmSchedule || !customWorkout.name.trim() || !customWorkout.startDate}
                   className="ml-auto"
                 >
                   Создать тренировку
@@ -415,7 +416,7 @@ export function WorkoutsManagement() {
           <DialogHeader>
             <DialogTitle>Выберите дни тренировок</DialogTitle>
             <DialogDescription>
-              Выберите {customWorkout.sessionsPerWeek} дней в неделю для тренировок
+              Выберите {customWorkout.totalSessions} дней для тренировок
             </DialogDescription>
           </DialogHeader>
           
@@ -437,7 +438,7 @@ export function WorkoutsManagement() {
             
             <div className="flex items-center justify-between pt-4 border-t">
               <div className="text-sm text-gray-600">
-                Выбрано: {selectedDates.length} из {customWorkout.sessionsPerWeek}
+                Выбрано: {selectedDates.length} из {customWorkout.totalSessions}
               </div>
               <div className="flex gap-2">
                 <Button 
@@ -451,7 +452,7 @@ export function WorkoutsManagement() {
                 </Button>
                 <Button 
                   onClick={() => setShowCalendarSelector(false)}
-                  disabled={selectedDates.length !== customWorkout.sessionsPerWeek}
+                  disabled={selectedDates.length !== customWorkout.totalSessions}
                 >
                   Применить
                 </Button>
