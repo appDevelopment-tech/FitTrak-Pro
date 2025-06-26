@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ChevronLeft, ChevronRight, Clock, Plus, Check, Trash2, Users, Search, AlertCircle, UserPlus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, Plus, Check, Trash2, Users, Search, AlertCircle, UserPlus, Dumbbell } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Pupil } from "@shared/schema";
@@ -374,31 +374,42 @@ export function NewSchedule() {
                       <span className="font-medium text-gray-900 w-16">{time}</span>
                       
                       {session ? (
-                        <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex items-center gap-3 flex-wrap">
                           {session.pupils.map(pupil => (
-                            <div key={pupil.id} className="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded-full">
+                            <div key={pupil.id} className="flex items-center gap-2 bg-blue-50 px-3 py-2 rounded-lg border">
                               <span className="text-sm font-medium">
                                 {pupil.lastName} {pupil.firstName}
                               </span>
-                              <button
-                                onClick={() => handleConfirmSession(session.id)}
-                                className={`p-1 rounded-full ${
-                                  session.status === 'confirmed' 
-                                    ? 'text-green-600 bg-green-100' 
-                                    : 'text-yellow-600 bg-yellow-100 hover:bg-yellow-200'
-                                }`}
-                              >
-                                {session.status === 'confirmed' ? 
-                                  <Check className="h-3 w-3" /> : 
-                                  <Clock className="h-3 w-3" />
-                                }
-                              </button>
-                              <button
-                                onClick={() => handleRemovePupil(session.id, pupil.id)}
-                                className="p-1 rounded-full text-red-600 bg-red-100 hover:bg-red-200"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </button>
+                              <div className="flex items-center gap-1">
+                                <button
+                                  onClick={() => handleConfirmSession(session.id)}
+                                  className={`p-1.5 rounded-full transition-colors ${
+                                    session.status === 'confirmed' 
+                                      ? 'text-green-600 bg-green-100 hover:bg-green-200' 
+                                      : 'text-yellow-600 bg-yellow-100 hover:bg-yellow-200'
+                                  }`}
+                                  title={session.status === 'confirmed' ? 'Подтверждено' : 'Подтвердить'}
+                                >
+                                  {session.status === 'confirmed' ? 
+                                    <Check className="h-4 w-4" /> : 
+                                    <Clock className="h-4 w-4" />
+                                  }
+                                </button>
+                                <button
+                                  onClick={() => console.log('Прикрепить план тренировки для ученика:', pupil.id)}
+                                  className="p-1.5 rounded-full text-blue-600 bg-blue-100 hover:bg-blue-200 transition-colors"
+                                  title="Прикрепить тренировочный план"
+                                >
+                                  <Dumbbell className="h-4 w-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleRemovePupil(session.id, pupil.id)}
+                                  className="p-1.5 rounded-full text-red-600 bg-red-100 hover:bg-red-200 transition-colors"
+                                  title="Удалить из расписания"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -412,19 +423,10 @@ export function NewSchedule() {
                         size="sm"
                         variant="outline"
                         onClick={() => handleAddPupil(time)}
+                        title="Добавить ученика"
                       >
                         <UserPlus className="h-4 w-4" />
                       </Button>
-                      
-                      {session && (
-                        <Button
-                          size="sm"
-                          className="bg-blue-600 hover:bg-blue-700"
-                        >
-                          <Users className="h-4 w-4 mr-1" />
-                          Тренировка
-                        </Button>
-                      )}
                     </div>
                   </div>
                 );
