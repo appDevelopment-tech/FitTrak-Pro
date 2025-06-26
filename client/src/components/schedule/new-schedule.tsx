@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -326,7 +326,7 @@ export function NewSchedule() {
               key={index}
               onClick={() => handleDateClick(day)}
               className={`
-                p-2 text-sm rounded hover:bg-blue-50 transition-colors
+                p-2 text-sm rounded hover:bg-blue-50 transition-colors text-center flex items-center justify-center min-h-[36px]
                 ${!day.isCurrentMonth ? 'text-gray-300' : 'text-gray-900'}
                 ${day.isToday ? 'bg-blue-100 font-semibold' : ''}
                 ${selectedDate.toDateString() === day.fullDate.toDateString() ? 'bg-blue-500 text-white' : ''}
@@ -440,6 +440,9 @@ export function NewSchedule() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Добавить ученика на {selectedTime}</DialogTitle>
+            <DialogDescription>
+              Выберите одного или нескольких учеников для записи на тренировку
+            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4">

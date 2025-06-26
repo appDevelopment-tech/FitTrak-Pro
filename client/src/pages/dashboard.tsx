@@ -70,7 +70,7 @@ export default function Dashboard() {
   const viewTitles = {
     schedule: 'Расписание',
     students: 'Список учеников',
-    profile: 'Профиль тренера',
+    profile: 'Кабинет',
   };
 
   const renderContent = () => {
@@ -98,29 +98,21 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Desktop Sidebar */}
-      <DesktopSidebar activeView={activeView} onViewChange={handleViewChange} />
-
-      {/* Main Content */}
-      <div className="md:pl-64 flex flex-col flex-1">
-        {/* Header */}
-        <header className="bg-white shadow-sm border-b border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between h-16">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-8">
               <div className="flex items-center">
-                <h1 className="text-2xl font-bold text-gray-800">
-                  {viewTitles[activeView as keyof typeof viewTitles]}
-                </h1>
+                <BarChart3 className="h-8 w-8 text-blue-600" />
+                <span className="ml-2 text-xl font-bold text-gray-900">FitTrak Pro</span>
               </div>
-              <div className="flex items-center space-x-4">
+            </div>
 
-                <Button variant="ghost" size="sm" className="relative">
-                  <Bell className="h-5 w-5 text-gray-500" />
-                  <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    3
-                  </span>
-                </Button>
-                <div className="flex items-center space-x-3">
+            {/* User Profile */}
+            <div className="flex items-center">
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2">
                   <img
                     src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=80&h=80"
                     alt="User Profile"
@@ -133,25 +125,49 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-        </header>
 
-        {/* Content */}
-        <main className="flex-1 pb-20 md:pb-8">
-          {renderContent()}
-        </main>
+          {/* Navigation Menu */}
+          <div className="border-t border-gray-200">
+            <nav className="flex space-x-8 px-0 py-0">
+              <button
+                onClick={() => setActiveView('schedule')}
+                className={`${
+                  activeView === 'schedule'
+                    ? 'border-blue-500 text-blue-600 bg-blue-50'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                } whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm transition-colors`}
+              >
+                Расписание
+              </button>
+              <button
+                onClick={() => setActiveView('students')}
+                className={`${
+                  activeView === 'students'
+                    ? 'border-blue-500 text-blue-600 bg-blue-50'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                } whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm transition-colors`}
+              >
+                Ученики
+              </button>
+              <button
+                onClick={() => setActiveView('profile')}
+                className={`${
+                  activeView === 'profile'
+                    ? 'border-blue-500 text-blue-600 bg-blue-50'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                } whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm transition-colors`}
+              >
+                Кабинет
+              </button>
+            </nav>
+          </div>
+        </div>
       </div>
 
-      {/* Mobile Navigation */}
-      <MobileNavigation activeView={activeView} onViewChange={handleViewChange} />
-
-      {/* Floating Action Button */}
-      <Button
-        size="lg"
-        className="fixed bottom-24 right-6 md:bottom-8 bg-orange-500 hover:bg-orange-600 text-white w-14 h-14 rounded-full shadow-lg transition-all transform hover:scale-105 z-40 p-0"
-        onClick={() => console.log('Quick start workout')}
-      >
-        <Play className="h-6 w-6" />
-      </Button>
+      {/* Main Content Area */}
+      <main className="flex-1">
+        {renderContent()}
+      </main>
     </div>
   );
 }
