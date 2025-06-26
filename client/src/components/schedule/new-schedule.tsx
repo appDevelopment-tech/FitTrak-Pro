@@ -413,8 +413,7 @@ export function NewSchedule() {
                         variant="outline"
                         onClick={() => handleAddPupil(time)}
                       >
-                        <Plus className="h-4 w-4 mr-1" />
-                        Добавить ученика
+                        <UserPlus className="h-4 w-4" />
                       </Button>
                       
                       {session && (
