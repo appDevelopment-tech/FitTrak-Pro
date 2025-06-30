@@ -19,158 +19,129 @@ interface ExtendedCalendarProps {
 }
 
 export function ExtendedCalendar({ onDateSelect, sessions = [] }: ExtendedCalendarProps) {
-  const [startDate, setStartDate] = useState(() => {
+  const [currentDate, setCurrentDate] = useState(() => {
     const today = new Date();
+    today.setDate(1); // Начинаем с первого числа текущего месяца
     today.setHours(0, 0, 0, 0);
     return today;
   });
 
-  // Генерация 60 дней начиная с сегодня
-  const generate60Days = (baseDate: Date): ExtendedCalendarDay[][] => {
-    const days: ExtendedCalendarDay[] = [];
+  // Генерация двух месяцев
+  const generateTwoMonths = (): { month1: ExtendedCalendarDay[][], month2: ExtendedCalendarDay[][], month1Name: string, month2Name: string } => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    
+    const month1 = new Date(currentDate);
+    const month2 = new Date(currentDate);
+    month2.setMonth(month2.getMonth() + 1);
 
-    for (let i = 0; i < 60; i++) {
-      const currentDate = new Date(baseDate);
-      currentDate.setDate(baseDate.getDate() + i);
+    const generateMonthDays = (monthDate: Date): ExtendedCalendarDay[][] => {
+      const year = monthDate.getFullYear();
+      const month = monthDate.getMonth();
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
       
-      const sessionCount = sessions.filter(session => {
-        const sessionDate = new Date(session.date);
-        sessionDate.setHours(0, 0, 0, 0);
-        return sessionDate.getTime() === currentDate.getTime();
-      }).length;
+      // Корректируем для понедельника как первого дня недели
+      const firstDayOfWeek = firstDay.getDay();
+      const adjustedFirstDay = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+      
+      const startDate = new Date(firstDay);
+      startDate.setDate(startDate.getDate() - adjustedFirstDay);
 
-      days.push({
-        date: currentDate.getDate(),
-        fullDate: new Date(currentDate),
-        isToday: currentDate.getTime() === today.getTime(),
-        hasSession: sessionCount > 0,
-        sessionCount,
-        isWeekend: currentDate.getDay() === 0 || currentDate.getDay() === 6
-      });
-    }
+      const days: ExtendedCalendarDay[] = [];
 
-    // Группируем по неделям (7 дней в ряду)
-    const weeks: ExtendedCalendarDay[][] = [];
-    for (let i = 0; i < days.length; i += 7) {
-      weeks.push(days.slice(i, i + 7));
-    }
+      for (let i = 0; i < 42; i++) {
+        const currentDate = new Date(startDate);
+        currentDate.setDate(startDate.getDate() + i);
+        
+        const sessionCount = sessions.filter(session => {
+          const sessionDate = new Date(session.date);
+          sessionDate.setHours(0, 0, 0, 0);
+          return sessionDate.getTime() === currentDate.getTime();
+        }).length;
 
-    return weeks;
+        days.push({
+          date: currentDate.getDate(),
+          fullDate: new Date(currentDate),
+          isToday: currentDate.getTime() === today.getTime(),
+          hasSession: sessionCount > 0,
+          sessionCount,
+          isWeekend: currentDate.getDay() === 0 || currentDate.getDay() === 6
+        });
+      }
+
+      // Группируем по неделям (7 дней в ряду)
+      const weeks: ExtendedCalendarDay[][] = [];
+      for (let i = 0; i < days.length; i += 7) {
+        weeks.push(days.slice(i, i + 7));
+      }
+
+      return weeks;
+    };
+
+    const month1Days = generateMonthDays(month1);
+    const month2Days = generateMonthDays(month2);
+    
+    const monthNames = [
+      'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+    ];
+
+    return {
+      month1: month1Days,
+      month2: month2Days,
+      month1Name: `${monthNames[month1.getMonth()]} ${month1.getFullYear()}`,
+      month2Name: `${monthNames[month2.getMonth()]} ${month2.getFullYear()}`
+    };
   };
 
-  const weeks = generate60Days(startDate);
+  const { month1, month2, month1Name, month2Name } = generateTwoMonths();
 
-  const navigateWeeks = (direction: 'prev' | 'next') => {
-    const newStartDate = new Date(startDate);
+  const navigateMonths = (direction: 'prev' | 'next') => {
+    const newDate = new Date(currentDate);
     if (direction === 'prev') {
-      newStartDate.setDate(startDate.getDate() - 7);
+      newDate.setMonth(newDate.getMonth() - 1);
     } else {
-      newStartDate.setDate(startDate.getDate() + 7);
+      newDate.setMonth(newDate.getMonth() + 1);
     }
-    setStartDate(newStartDate);
+    setCurrentDate(newDate);
   };
 
-  const formatDateRange = () => {
-    const endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + 59);
-    
-    const startMonth = startDate.toLocaleDateString('ru-RU', { month: 'long' });
-    const endMonth = endDate.toLocaleDateString('ru-RU', { month: 'long' });
-    const year = startDate.getFullYear();
-    
-    if (startMonth === endMonth) {
-      return `${startMonth.charAt(0).toUpperCase() + startMonth.slice(1)} ${year}`;
-    } else {
-      return `${startMonth.charAt(0).toUpperCase() + startMonth.slice(1)} - ${endMonth} ${year}`;
-    }
-  };
-
-  const getDayStatusColor = (day: ExtendedCalendarDay) => {
+  const getDayStatusColor = (day: ExtendedCalendarDay, isCurrentMonth: boolean) => {
     if (day.isToday) return "bg-blue-500 text-white";
     if (day.hasSession) return "bg-green-100 text-green-800 border-green-300";
-    if (day.isWeekend) return "bg-gray-50 text-gray-400";
+    if (!isCurrentMonth) return "bg-gray-50 text-gray-300";
     return "bg-white text-gray-900 hover:bg-gray-50";
   };
 
-  const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-
-  return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-lg">Расписание на 60 дней</CardTitle>
-            <p className="text-sm text-gray-600 mt-1">{formatDateRange()}</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigateWeeks('prev')}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setStartDate(new Date())}
-            >
-              Сегодня
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigateWeeks('next')}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+  const renderMonth = (weeks: ExtendedCalendarDay[][], monthName: string, monthDate: Date) => {
+    const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+    
+    return (
+      <div className="space-y-1">
+        <h3 className="text-center font-medium text-gray-900 mb-3">{monthName}</h3>
         
-        {/* Легенда */}
-        <div className="flex items-center gap-4 text-xs text-gray-600 pt-2 border-t">
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-blue-500 rounded"></div>
-            <span>Сегодня</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-green-100 border border-green-300 rounded"></div>
-            <span>Занятые дни</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-white border border-gray-300 rounded"></div>
-            <span>Свободные дни</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-gray-50 rounded"></div>
-            <span>Выходные</span>
-          </div>
+        {/* Заголовки дней недели */}
+        <div className="grid grid-cols-7 gap-1 mb-2">
+          {weekDays.map((day) => (
+            <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
+              {day}
+            </div>
+          ))}
         </div>
-      </CardHeader>
 
-      <CardContent>
-        <div className="space-y-1">
-          {/* Заголовки дней недели */}
-          <div className="grid grid-cols-7 gap-1 mb-2">
-            {weekDays.map((day) => (
-              <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
-                {day}
-              </div>
-            ))}
-          </div>
-
-          {/* Календарные недели */}
-          {weeks.map((week, weekIndex) => (
-            <div key={weekIndex} className="grid grid-cols-7 gap-1">
-              {week.map((day, dayIndex) => (
+        {/* Календарные недели */}
+        {weeks.map((week, weekIndex) => (
+          <div key={weekIndex} className="grid grid-cols-7 gap-1">
+            {week.map((day, dayIndex) => {
+              const isCurrentMonth = day.fullDate.getMonth() === monthDate.getMonth();
+              return (
                 <button
                   key={`${weekIndex}-${dayIndex}`}
                   onClick={() => onDateSelect?.(day.fullDate)}
                   className={`
                     relative p-2 text-sm border rounded-md transition-colors min-h-[36px] flex items-center justify-center
-                    ${getDayStatusColor(day)}
+                    ${getDayStatusColor(day, isCurrentMonth)}
                   `}
                 >
                   <span className="text-center">
@@ -185,18 +156,53 @@ export function ExtendedCalendar({ onDateSelect, sessions = [] }: ExtendedCalend
                     </div>
                   )}
                 </button>
-              ))}
-            </div>
-          ))}
-        </div>
-
-        {/* Статистика */}
-        <div className="flex items-center justify-between pt-4 mt-4 border-t text-sm text-gray-600">
-          <div className="flex items-center gap-4">
-            <span>Всего дней: 60</span>
-            <span>Занятых дней: {weeks.flat().filter(d => d.hasSession).length}</span>
-            <span>Свободных дней: {weeks.flat().filter(d => !d.hasSession && !d.isWeekend).length}</span>
+              );
+            })}
           </div>
+        ))}
+      </div>
+    );
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg">Расписание</CardTitle>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigateMonths('prev')}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const today = new Date();
+                today.setDate(1);
+                setCurrentDate(today);
+              }}
+            >
+              Сегодня
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigateMonths('next')}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        <div className="grid grid-cols-1 gap-6">
+          {renderMonth(month1, month1Name, new Date(currentDate))}
+          {renderMonth(month2, month2Name, new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1))}
         </div>
       </CardContent>
     </Card>
