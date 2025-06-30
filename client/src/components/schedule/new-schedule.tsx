@@ -11,6 +11,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Pupil } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
+import { ExtendedCalendar } from "./extended-calendar";
 
 interface ScheduleSession {
   id: number;
@@ -72,41 +73,6 @@ export function NewSchedule() {
   for (let hour = 8; hour <= 20; hour++) {
     timeSlots.push(`${hour.toString().padStart(2, '0')}:00`);
   }
-
-  // Генерация календарных дней
-  const generateCalendarDays = (baseDate: Date): CalendarDay[] => {
-    const year = baseDate.getFullYear();
-    const month = baseDate.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    
-    // Корректируем для понедельника как первого дня недели
-    const firstDayOfWeek = firstDay.getDay();
-    const adjustedFirstDay = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
-    
-    const startDate = new Date(firstDay);
-    startDate.setDate(startDate.getDate() - adjustedFirstDay);
-
-    const days: CalendarDay[] = [];
-    const today = new Date();
-
-    for (let i = 0; i < 42; i++) {
-      const currentDate = new Date(startDate);
-      currentDate.setDate(startDate.getDate() + i);
-      
-      days.push({
-        date: currentDate.getDate(),
-        fullDate: new Date(currentDate),
-        isCurrentMonth: currentDate.getMonth() === month,
-        isToday: currentDate.toDateString() === today.toDateString(),
-        hasSession: sessions.some(s => s.date === currentDate.toISOString().split('T')[0])
-      });
-    }
-
-    return days;
-  };
-
-  const calendarDays = generateCalendarDays(currentMonth);
 
   // Получить сессии для выбранного дня
   const getSessionsForDay = () => {
@@ -373,9 +339,12 @@ export function NewSchedule() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Левая колонка - календарь */}
+        {/* Левая колонка - расширенный календарь */}
         <div className="lg:col-span-1">
-          {renderCalendar(calendarDays, currentMonth)}
+          <ExtendedCalendar 
+            onDateSelect={setSelectedDate}
+            sessions={sessions}
+          />
         </div>
 
         {/* Правая колонка - расписание дня */}
