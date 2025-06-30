@@ -56,9 +56,12 @@ export function TwoMonthCalendar({ onDateSelect, sessions = [] }: TwoMonthCalend
       currentDateLoop.setDate(startDate.getDate() + i);
       
       const sessionCount = sessions.filter(session => {
-        const sessionDate = new Date(session.date);
-        sessionDate.setHours(0, 0, 0, 0);
-        return sessionDate.getTime() === currentDateLoop.getTime();
+        // Форматируем дату календаря в том же формате что и сессии
+        const year = currentDateLoop.getFullYear();
+        const month = String(currentDateLoop.getMonth() + 1).padStart(2, '0');
+        const day = String(currentDateLoop.getDate()).padStart(2, '0');
+        const calendarDateString = `${year}-${month}-${day}`;
+        return session.date === calendarDateString;
       }).length;
 
       days.push({

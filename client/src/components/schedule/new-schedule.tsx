@@ -76,13 +76,19 @@ export function NewSchedule() {
 
   // Получить сессии для выбранного дня
   const getSessionsForDay = () => {
-    const dateString = selectedDate.toISOString().split('T')[0];
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(selectedDate.getDate()).padStart(2, '0');
+    const dateString = `${year}-${month}-${day}`;
     return sessions.filter(s => s.date === dateString);
   };
 
   // Получить сессию для конкретного времени
   const getSessionForTime = (time: string) => {
-    const dateString = selectedDate.toISOString().split('T')[0];
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(selectedDate.getDate()).padStart(2, '0');
+    const dateString = `${year}-${month}-${day}`;
     return sessions.find(s => s.date === dateString && s.time === time);
   };
 
@@ -171,7 +177,12 @@ export function NewSchedule() {
       return;
     }
 
-    const dateString = selectedDate.toISOString().split('T')[0];
+    // Правильно форматируем дату без сдвига часовых поясов
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(selectedDate.getDate()).padStart(2, '0');
+    const dateString = `${year}-${month}-${day}`;
+    
     const existingSession = getSessionForTime(selectedTime);
     const newPupils = pupils.filter(p => selectedPupils.includes(p.id));
 
