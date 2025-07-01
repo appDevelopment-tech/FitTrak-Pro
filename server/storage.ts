@@ -6,6 +6,7 @@ import {
   exercises,
   exerciseProgress,
   pupilTrainingPlans,
+  pupilWorkoutHistory,
   type User, 
   type InsertUser,
   type Pupil,
@@ -19,7 +20,9 @@ import {
   type ExerciseProgress,
   type InsertExerciseProgress,
   type PupilTrainingPlan,
-  type InsertPupilTrainingPlan
+  type InsertPupilTrainingPlan,
+  type PupilWorkoutHistory,
+  type InsertPupilWorkoutHistory
 } from "@shared/schema";
 
 export interface IStorage {
@@ -66,6 +69,21 @@ export interface IStorage {
   createPupilTrainingPlan(plan: InsertPupilTrainingPlan): Promise<PupilTrainingPlan>;
   updatePupilTrainingPlan(id: number, updates: Partial<InsertPupilTrainingPlan>): Promise<PupilTrainingPlan | undefined>;
   deletePupilTrainingPlan(id: number): Promise<boolean>;
+  
+  // Pupil workout history operations
+  getPupilWorkoutHistory(pupilId: number): Promise<PupilWorkoutHistory[]>;
+  createPupilWorkoutHistory(history: InsertPupilWorkoutHistory): Promise<PupilWorkoutHistory>;
+  updatePupilWorkoutHistory(id: number, updates: Partial<InsertPupilWorkoutHistory>): Promise<PupilWorkoutHistory | undefined>;
+  
+  // Statistics operations
+  getPupilsStats(trainerId: number): Promise<{
+    totalPupils: number;
+    todayBookings: number;
+    confirmedToday: number;
+    pendingToday: number;
+  }>;
+  getPupilAge(pupil: Pupil): number;
+  isPupilMinor(pupil: Pupil): boolean;
 }
 
 export class MemStorage implements IStorage {
@@ -136,6 +154,18 @@ export class MemStorage implements IStorage {
         photo: null,
         status: "active",
         joinDate: "2024-01-15",
+        parentFirstName: null,
+        parentLastName: null,
+        parentMiddleName: null,
+        parentPhone: null,
+        parentEmail: null,
+        parentSpecialInstructions: null,
+        applicationSubmitted: true,
+        applicationDate: "2024-01-15",
+        rulesAccepted: true,
+        rulesAcceptedDate: "2024-01-15",
+        parentalConsent: false,
+        parentalConsentDate: null,
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -155,6 +185,18 @@ export class MemStorage implements IStorage {
         photo: null,
         status: "active",
         joinDate: "2024-02-01",
+        parentFirstName: null,
+        parentLastName: null,
+        parentMiddleName: null,
+        parentPhone: null,
+        parentEmail: null,
+        parentSpecialInstructions: null,
+        applicationSubmitted: true,
+        applicationDate: "2024-02-01",
+        rulesAccepted: true,
+        rulesAcceptedDate: "2024-02-01",
+        parentalConsent: false,
+        parentalConsentDate: null,
         createdAt: new Date(),
         updatedAt: new Date()
       }
@@ -1188,10 +1230,11 @@ export class MemStorage implements IStorage {
     const exercise: Exercise = { 
       ...insertExercise, 
       id,
+      secondaryMuscles: insertExercise.secondaryMuscles ?? [],
       createdBy: insertExercise.createdBy ?? null,
       muscleImageUrl: insertExercise.muscleImageUrl ?? null,
-      createdAt: insertExercise.createdAt ?? new Date(),
-      updatedAt: insertExercise.updatedAt ?? new Date()
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     this.exercises.set(id, exercise);
     return exercise;
@@ -1323,6 +1366,65 @@ export class MemStorage implements IStorage {
 
   async deletePupilTrainingPlan(id: number): Promise<boolean> {
     return this.pupilTrainingPlans.delete(id);
+  }
+
+  // Pupil workout history methods (заглушки для MemStorage)
+  async getPupilWorkoutHistory(pupilId: number): Promise<PupilWorkoutHistory[]> {
+    // В памяти пока не храним историю тренировок
+    return [];
+  }
+
+  async createPupilWorkoutHistory(history: InsertPupilWorkoutHistory): Promise<PupilWorkoutHistory> {
+    // Заглушка для MemStorage
+    const workoutHistory: PupilWorkoutHistory = {
+      ...history,
+      id: Date.now(),
+      confirmationStatus: history.confirmationStatus ?? "pending",
+      status: history.status ?? "completed",
+      confirmedAt: null,
+      createdAt: new Date()
+    };
+    return workoutHistory;
+  }
+
+  async updatePupilWorkoutHistory(id: number, updates: Partial<InsertPupilWorkoutHistory>): Promise<PupilWorkoutHistory | undefined> {
+    // Заглушка для MemStorage
+    return undefined;
+  }
+
+  // Statistics methods
+  async getPupilsStats(trainerId: number): Promise<{
+    totalPupils: number;
+    todayBookings: number;
+    confirmedToday: number;
+    pendingToday: number;
+  }> {
+    const pupils = Array.from(this.pupils.values()).filter(p => p.trainerId === trainerId);
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Для MemStorage используем простую заглушку
+    return {
+      totalPupils: pupils.length,
+      todayBookings: 0, // В MemStorage нет записей на сегодня
+      confirmedToday: 0,
+      pendingToday: 0
+    };
+  }
+
+  getPupilAge(pupil: Pupil): number {
+    const birthDate = new Date(pupil.birthDate);
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      return age - 1;
+    }
+    return age;
+  }
+
+  isPupilMinor(pupil: Pupil): boolean {
+    return this.getPupilAge(pupil) < 16;
   }
 }
 
