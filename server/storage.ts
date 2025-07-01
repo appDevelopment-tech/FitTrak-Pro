@@ -1298,13 +1298,24 @@ export class MemStorage implements IStorage {
       medicalNotes: insertPupil.medicalNotes ?? null,
       photo: insertPupil.photo ?? null,
       middleName: insertPupil.middleName ?? null,
-      birthDate: insertPupil.birthDate ?? null,
       weight: insertPupil.weight ?? null,
       height: insertPupil.height ?? null,
       goal: insertPupil.goal ?? null,
       status: insertPupil.status ?? "active",
-      createdAt: insertPupil.createdAt ?? new Date(),
-      updatedAt: insertPupil.updatedAt ?? new Date()
+      parentFirstName: insertPupil.parentFirstName ?? null,
+      parentLastName: insertPupil.parentLastName ?? null,
+      parentMiddleName: insertPupil.parentMiddleName ?? null,
+      parentPhone: insertPupil.parentPhone ?? null,
+      parentEmail: insertPupil.parentEmail ?? null,
+      parentSpecialInstructions: insertPupil.parentSpecialInstructions ?? null,
+      applicationSubmitted: insertPupil.applicationSubmitted ?? false,
+      applicationDate: insertPupil.applicationDate ?? null,
+      rulesAccepted: insertPupil.rulesAccepted ?? false,
+      rulesAcceptedDate: insertPupil.rulesAcceptedDate ?? null,
+      parentalConsent: insertPupil.parentalConsent ?? false,
+      parentalConsentDate: insertPupil.parentalConsentDate ?? null,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     this.pupils.set(id, pupil);
     return pupil;
@@ -1379,6 +1390,9 @@ export class MemStorage implements IStorage {
     const workoutHistory: PupilWorkoutHistory = {
       ...history,
       id: Date.now(),
+      duration: history.duration ?? null,
+      notes: history.notes ?? null,
+      pupilFeedback: history.pupilFeedback ?? null,
       confirmationStatus: history.confirmationStatus ?? "pending",
       status: history.status ?? "completed",
       confirmedAt: null,
@@ -1676,6 +1690,77 @@ export class DatabaseStorage implements IStorage {
     const { eq } = await import("drizzle-orm");
     const result = await db.delete(pupils).where(eq(pupils.id, id));
     return (result.rowCount ?? 0) > 0;
+  }
+
+  // Pupil workout history methods
+  async getPupilWorkoutHistory(pupilId: number): Promise<PupilWorkoutHistory[]> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    return await db.select().from(pupilWorkoutHistory).where(eq(pupilWorkoutHistory.pupilId, pupilId));
+  }
+
+  async createPupilWorkoutHistory(history: InsertPupilWorkoutHistory): Promise<PupilWorkoutHistory> {
+    const { db } = await import("./db");
+    const [newHistory] = await db.insert(pupilWorkoutHistory).values(history).returning();
+    return newHistory;
+  }
+
+  async updatePupilWorkoutHistory(id: number, updates: Partial<InsertPupilWorkoutHistory>): Promise<PupilWorkoutHistory | undefined> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    const [updated] = await db.update(pupilWorkoutHistory).set(updates).where(eq(pupilWorkoutHistory.id, id)).returning();
+    return updated || undefined;
+  }
+
+  // Statistics methods
+  async getPupilsStats(trainerId: number): Promise<{
+    totalPupils: number;
+    todayBookings: number;
+    confirmedToday: number;
+    pendingToday: number;
+  }> {
+    const { db } = await import("./db");
+    const { eq, and } = await import("drizzle-orm");
+    
+    // Получаем общее количество учеников
+    const pupilsList = await db.select().from(pupils).where(eq(pupils.trainerId, trainerId));
+    const totalPupils = pupilsList.length;
+    
+    // Получаем записи на сегодня
+    const today = new Date().toISOString().split('T')[0];
+    const todayHistory = await db.select().from(pupilWorkoutHistory).where(
+      and(
+        eq(pupilWorkoutHistory.trainerId, trainerId),
+        eq(pupilWorkoutHistory.workoutDate, today)
+      )
+    );
+    
+    const todayBookings = todayHistory.length;
+    const confirmedToday = todayHistory.filter(h => h.confirmationStatus === 'confirmed').length;
+    const pendingToday = todayHistory.filter(h => h.confirmationStatus === 'pending').length;
+    
+    return {
+      totalPupils,
+      todayBookings,
+      confirmedToday,
+      pendingToday
+    };
+  }
+
+  getPupilAge(pupil: Pupil): number {
+    const birthDate = new Date(pupil.birthDate);
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      return age - 1;
+    }
+    return age;
+  }
+
+  isPupilMinor(pupil: Pupil): boolean {
+    return this.getPupilAge(pupil) < 16;
   }
 }
 

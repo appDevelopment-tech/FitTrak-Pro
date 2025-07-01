@@ -373,6 +373,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Pupils statistics
+  app.get("/api/pupils/stats/:trainerId", async (req, res) => {
+    try {
+      const trainerId = parseInt(req.params.trainerId);
+      const stats = await storage.getPupilsStats(trainerId);
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get pupils statistics" });
+    }
+  });
+
   // Pupil training plan routes
   app.get("/api/pupils/:pupilId/training-plans", async (req, res) => {
     try {
