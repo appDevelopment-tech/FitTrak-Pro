@@ -81,10 +81,12 @@ export function ComprehensiveStudentsManagement() {
   });
 
   // Фильтрация учеников по поисковому запросу
-  const filteredPupils = pupilsWithAge.filter(pupil =>
-    `${pupil.firstName} ${pupil.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    pupil.phone.includes(searchTerm)
-  );
+  const filteredPupils = pupilsWithAge
+    .filter(pupil =>
+      `${pupil.firstName} ${pupil.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      pupil.phone.includes(searchTerm)
+    )
+    .sort((a, b) => a.lastName.localeCompare(b.lastName, 'ru'));
 
   // Мутация для создания ученика
   const createPupilMutation = useMutation({
@@ -241,35 +243,33 @@ export function ComprehensiveStudentsManagement() {
             className="cursor-pointer hover:shadow-md transition-shadow"
             onClick={() => handlePupilClick(pupil)}
           >
-            <CardContent className="p-4">
+            <CardContent className="p-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <Avatar>
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-8 w-8">
                     <AvatarImage src={pupil.photo || undefined} />
-                    <AvatarFallback>
+                    <AvatarFallback className="text-sm">
                       {pupil.firstName.charAt(0)}{pupil.lastName.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
                   
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold">
-                        {pupil.firstName} {pupil.lastName}
-                      </h3>
-                      {pupil.isMinor && (
-                        <Badge variant="secondary" className="text-xs">
-                          <Shield className="h-3 w-3 mr-1" />
-                          До 16 лет
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>{pupil.age} лет</span>
-                      <span className="flex items-center gap-1">
-                        <Phone className="h-3 w-3" />
-                        {pupil.phone}
-                      </span>
-                    </div>
+                  <div className="flex items-center gap-4">
+                    <span className="font-semibold">
+                      {pupil.lastName} {pupil.firstName}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {pupil.age} лет
+                    </span>
+                    <span className="flex items-center gap-1 text-muted-foreground">
+                      <Phone className="h-3 w-3" />
+                      {pupil.phone}
+                    </span>
+                    {pupil.isMinor && (
+                      <Badge variant="secondary" className="text-xs">
+                        <Shield className="h-3 w-3 mr-1" />
+                        До 16 лет
+                      </Badge>
+                    )}
                   </div>
                 </div>
                 
