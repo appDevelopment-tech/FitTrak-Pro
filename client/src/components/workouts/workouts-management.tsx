@@ -35,7 +35,10 @@ interface CustomWorkout {
 export function WorkoutsManagement() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showCalendarSelector, setShowCalendarSelector] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
+  const [editingPlan, setEditingPlan] = useState<WorkoutPlan | null>(null);
+  const [editedPlan, setEditedPlan] = useState<WorkoutPlan | null>(null);
   const [customWorkout, setCustomWorkout] = useState<CustomWorkout>({
     name: '',
     level: 'начальный',
@@ -186,6 +189,61 @@ export function WorkoutsManagement() {
     }
   };
 
+  // Функции для редактирования готовых планов
+  const handleEditPlan = (plan: WorkoutPlan) => {
+    setEditingPlan(plan);
+    setEditedPlan({ ...plan });
+    setShowEditDialog(true);
+  };
+
+  const handleSaveEditedPlan = () => {
+    if (!editedPlan) return;
+
+    // Здесь бы была логика сохранения в базу данных
+    toast({
+      title: "Успешно",
+      description: `План "${editedPlan.name}" обновлен`,
+    });
+
+    setShowEditDialog(false);
+    setEditingPlan(null);
+    setEditedPlan(null);
+  };
+
+  const handleCancelEdit = () => {
+    setShowEditDialog(false);
+    setEditingPlan(null);
+    setEditedPlan(null);
+  };
+
+  const addExerciseToEditedPlan = () => {
+    if (!editedPlan) return;
+    setEditedPlan({
+      ...editedPlan,
+      exercises: [...(editedPlan.exercises || []), "Новое упражнение"]
+    });
+  };
+
+  const removeExerciseFromEditedPlan = (index: number) => {
+    if (!editedPlan) return;
+    const newExercises = [...(editedPlan.exercises || [])];
+    newExercises.splice(index, 1);
+    setEditedPlan({
+      ...editedPlan,
+      exercises: newExercises
+    });
+  };
+
+  const updateExerciseInEditedPlan = (index: number, newValue: string) => {
+    if (!editedPlan) return;
+    const newExercises = [...(editedPlan.exercises || [])];
+    newExercises[index] = newValue;
+    setEditedPlan({
+      ...editedPlan,
+      exercises: newExercises
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -254,6 +312,7 @@ export function WorkoutsManagement() {
                       variant="outline"
                       size="sm"
                       className="flex-1"
+                      onClick={() => handleEditPlan(plan)}
                     >
                       <Edit className="h-4 w-4 mr-1" />
                       Редактировать
@@ -459,6 +518,118 @@ export function WorkoutsManagement() {
               </div>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Диалог редактирования готового плана */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Редактирование плана тренировки</DialogTitle>
+            <DialogDescription>
+              Измените параметры готового плана тренировки
+            </DialogDescription>
+          </DialogHeader>
+          
+          {editedPlan && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="edit-plan-name">Название плана</Label>
+                  <Input
+                    id="edit-plan-name"
+                    value={editedPlan.name}
+                    onChange={(e) => setEditedPlan({ ...editedPlan, name: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit-plan-difficulty">Сложность</Label>
+                  <Select 
+                    value={editedPlan.difficulty} 
+                    onValueChange={(value) => setEditedPlan({ ...editedPlan, difficulty: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="начальный">Начальный</SelectItem>
+                      <SelectItem value="базовый">Базовый</SelectItem>
+                      <SelectItem value="средний">Средний</SelectItem>
+                      <SelectItem value="высокий">Высокий</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="edit-plan-description">Описание</Label>
+                <Textarea
+                  id="edit-plan-description"
+                  value={editedPlan.description}
+                  onChange={(e) => setEditedPlan({ ...editedPlan, description: e.target.value })}
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="edit-sessions-per-week">Тренировок в неделю</Label>
+                <Input
+                  id="edit-sessions-per-week"
+                  type="number"
+                  min="1"
+                  max="7"
+                  value={editedPlan.sessionsPerWeek}
+                  onChange={(e) => setEditedPlan({ 
+                    ...editedPlan, 
+                    sessionsPerWeek: parseInt(e.target.value) || 1 
+                  })}
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <Label>Упражнения</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addExerciseToEditedPlan}
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    Добавить упражнение
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  {editedPlan.exercises?.map((exercise, index) => (
+                    <div key={index} className="flex gap-2">
+                      <Input
+                        value={exercise}
+                        onChange={(e) => updateExerciseInEditedPlan(index, e.target.value)}
+                        placeholder="Название упражнения"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeExerciseFromEditedPlan(index)}
+                      >
+                        ✕
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-4">
+                <Button variant="outline" onClick={handleCancelEdit}>
+                  Отмена
+                </Button>
+                <Button onClick={handleSaveEditedPlan}>
+                  Сохранить изменения
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
