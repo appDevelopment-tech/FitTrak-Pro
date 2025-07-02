@@ -25,7 +25,6 @@ interface ExerciseFormData {
   commonMistakes: string[];
   contraindications: string[];
   muscleImageUrl?: string;
-  videoUrl?: string;
   techniqueImageUrl?: string;
 }
 
@@ -295,7 +294,6 @@ function ExerciseForm({ exercise, onSubmit, isLoading }: ExerciseFormProps) {
     commonMistakes: exercise?.commonMistakes || [""],
     contraindications: exercise?.contraindications || [""],
     muscleImageUrl: exercise?.muscleImageUrl || "",
-    videoUrl: exercise?.videoUrl || "",
     techniqueImageUrl: exercise?.techniqueImageUrl || "",
   });
 
@@ -377,26 +375,16 @@ function ExerciseForm({ exercise, onSubmit, isLoading }: ExerciseFormProps) {
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="videoUrl">Ссылка на видео с техникой выполнения</Label>
-          <Input
-            id="videoUrl"
-            value={formData.videoUrl}
-            onChange={(e) => setFormData(prev => ({ ...prev, videoUrl: e.target.value }))}
-            placeholder="https://youtube.com/embed/videoid или другая ссылка"
-          />
-          <p className="text-xs text-gray-500">
-            Для YouTube используйте формат: https://youtube.com/embed/ID_ВИДЕО
-          </p>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="techniqueImageUrl">Ссылка на изображение с техникой выполнения</Label>
+          <Label htmlFor="techniqueImageUrl">Изображение с техникой выполнения</Label>
           <Input
             id="techniqueImageUrl"
             value={formData.techniqueImageUrl}
             onChange={(e) => setFormData(prev => ({ ...prev, techniqueImageUrl: e.target.value }))}
-            placeholder="https://example.com/technique.jpg"
+            placeholder="Вставьте ссылку на изображение (https://example.com/technique.jpg)"
           />
+          <p className="text-xs text-gray-500">
+            Вы можете загрузить изображение на любой хостинг изображений и вставить ссылку сюда
+          </p>
         </div>
       </div>
 
