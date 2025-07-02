@@ -27,7 +27,8 @@ import {
   Edit,
   FileText,
   Shield,
-  Activity
+  Activity,
+  Dumbbell
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import type { Pupil, InsertPupil } from "@shared/schema";
@@ -150,6 +151,14 @@ export function ComprehensiveStudentsManagement() {
     setSelectedPupil(pupil);
   };
 
+  const handleAssignWorkout = (pupil: PupilWithAge) => {
+    // Здесь будет логика прикрепления тренировочного плана
+    toast({
+      title: "Прикрепление плана",
+      description: `Выберите тренировочный план для ${pupil.firstName} ${pupil.lastName}`,
+    });
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('ru-RU', {
       year: 'numeric',
@@ -246,40 +255,39 @@ export function ComprehensiveStudentsManagement() {
             <CardContent className="p-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={pupil.photo || undefined} />
-                    <AvatarFallback className="text-sm">
-                      {pupil.firstName.charAt(0)}{pupil.lastName.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                  
-                  <div className="flex items-center gap-4">
-                    <span className="font-semibold">
-                      {pupil.lastName} {pupil.firstName}
-                    </span>
-                    <span className="text-muted-foreground">
-                      {pupil.age} лет
-                    </span>
-                    <span className="flex items-center gap-1 text-muted-foreground">
-                      <Phone className="h-3 w-3" />
-                      {pupil.phone}
-                    </span>
-                    {pupil.isMinor && (
-                      <Badge variant="secondary" className="text-xs">
-                        <Shield className="h-3 w-3 mr-1" />
-                        До 16 лет
-                      </Badge>
-                    )}
+                  <div className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full text-sm font-medium">
+                    {filteredPupils.findIndex(p => p.id === pupil.id) + 1}
+                  </div>
+                  <div className="font-medium text-sm">
+                    {pupil.lastName} {pupil.firstName} • {pupil.age} лет • {pupil.phone}
                   </div>
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  {getDocumentStatus(pupil).map((doc, index) => (
-                    <Badge key={index} variant="outline" className="text-xs">
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      {doc.label}
+                  {pupil.isMinor && (
+                    <Badge variant="outline" className="text-xs">
+                      <Shield className="h-3 w-3 mr-1" />
+                      Несовершеннолетний
                     </Badge>
-                  ))}
+                  )}
+                  {pupil.healthRestrictions && (
+                    <Badge variant="destructive" className="text-xs">
+                      <Heart className="h-3 w-3 mr-1" />
+                      Ограничения
+                    </Badge>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAssignWorkout(pupil);
+                    }}
+                    className="h-8 w-8 p-0"
+                    title="Прикрепить тренировочный план"
+                  >
+                    <Dumbbell className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             </CardContent>
