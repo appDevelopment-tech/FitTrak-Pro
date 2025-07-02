@@ -72,13 +72,31 @@ export function ExerciseDetail({ exercise, onClose }: ExerciseDetailProps) {
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h4 className="font-medium text-gray-900 mb-3">Видео техники выполнения</h4>
                   <div className="aspect-video bg-black rounded-lg overflow-hidden">
-                    <iframe
-                      src={exercise.videoUrl}
-                      className="w-full h-full"
-                      frameBorder="0"
-                      allowFullScreen
-                      title={`Видео упражнения ${exercise.name}`}
-                    />
+                    {exercise.videoUrl.includes('youtube.com') || exercise.videoUrl.includes('youtu.be') ? (
+                      <iframe
+                        src={exercise.videoUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
+                        className="w-full h-full"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title={`Видео упражнения ${exercise.name}`}
+                      />
+                    ) : (
+                      <video
+                        controls
+                        className="w-full h-full object-contain"
+                        title={`Видео упражнения ${exercise.name}`}
+                      >
+                        <source src={exercise.videoUrl} type="video/mp4" />
+                        <p className="text-white text-center p-4">
+                          Ваш браузер не поддерживает воспроизведение видео.
+                          <br />
+                          <a href={exercise.videoUrl} target="_blank" rel="noopener noreferrer" className="text-blue-300 underline">
+                            Открыть видео в новой вкладке
+                          </a>
+                        </p>
+                      </video>
+                    )}
                   </div>
                 </div>
               ) : exercise.techniqueImageUrl ? (
