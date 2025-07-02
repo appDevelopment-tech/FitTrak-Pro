@@ -426,14 +426,6 @@ export function ProfileView() {
         <ExerciseDetail
           exercise={selectedExerciseForDetail}
           onClose={() => setSelectedExerciseForDetail(null)}
-          onEdit={(exercise) => {
-            // Пока что просто закрываем окно - полное редактирование доступно в разделе "Упражнения"
-            setSelectedExerciseForDetail(null);
-            toast({
-              title: "Перейдите в раздел 'Упражнения'",
-              description: "Для редактирования упражнений используйте специальный раздел в меню."
-            });
-          }}
           onDelete={(exerciseId) => {
             deleteMutation.mutate(exerciseId);
             setSelectedExerciseForDetail(null);
