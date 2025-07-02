@@ -270,7 +270,10 @@ export function ComprehensiveStudentsManagement() {
                       Несовершеннолетний
                     </Badge>
                   )}
-                  {pupil.medicalNotes && pupil.medicalNotes.trim() !== '' && (
+                  {pupil.medicalNotes && 
+                   pupil.medicalNotes.trim() !== '' && 
+                   !pupil.medicalNotes.toLowerCase().includes('здоров') &&
+                   !pupil.medicalNotes.toLowerCase().includes('ограничений нет') && (
                     <Badge variant="destructive" className="text-xs">
                       <Heart className="h-3 w-3 mr-1" />
                       Ограничения
