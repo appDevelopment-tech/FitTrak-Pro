@@ -3,7 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExerciseAnimation } from "./exercise-animation";
 import { generateExerciseImage } from "@/components/ui/exercise-photos";
-import { X, AlertTriangle, CheckCircle, Info } from "lucide-react";
+import { X, AlertTriangle, CheckCircle, Info, Edit, Trash2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 interface Exercise {
   id: number;
@@ -22,9 +23,11 @@ interface Exercise {
 interface ExerciseDetailProps {
   exercise: Exercise;
   onClose: () => void;
+  onEdit?: (exercise: Exercise) => void;
+  onDelete?: (exerciseId: number) => void;
 }
 
-export function ExerciseDetail({ exercise, onClose }: ExerciseDetailProps) {
+export function ExerciseDetail({ exercise, onClose, onEdit, onDelete }: ExerciseDetailProps) {
   const getDifficultyStyle = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
       case 'легкий':
@@ -58,9 +61,45 @@ export function ExerciseDetail({ exercise, onClose }: ExerciseDetailProps) {
               </Badge>
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
+          <div className="flex gap-2">
+            {onEdit && (
+              <Button variant="outline" size="sm" onClick={() => onEdit(exercise)}>
+                <Edit className="h-4 w-4" />
+              </Button>
+            )}
+            {onDelete && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Удалить упражнение?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Это действие нельзя отменить. Упражнение "{exercise.name}" будет удалено навсегда.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Отмена</AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={() => {
+                        onDelete(exercise.id);
+                        onClose();
+                      }}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      Удалить
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+            <Button variant="ghost" size="sm" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
         <div className="p-6 space-y-6">
