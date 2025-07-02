@@ -245,7 +245,7 @@ export function ComprehensiveStudentsManagement() {
       </div>
 
       {/* Список учеников */}
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-2">
         {filteredPupils.map((pupil) => (
           <Card 
             key={pupil.id} 
@@ -270,7 +270,7 @@ export function ComprehensiveStudentsManagement() {
                       Несовершеннолетний
                     </Badge>
                   )}
-                  {pupil.healthRestrictions && (
+                  {pupil.medicalNotes && (
                     <Badge variant="destructive" className="text-xs">
                       <Heart className="h-3 w-3 mr-1" />
                       Ограничения
