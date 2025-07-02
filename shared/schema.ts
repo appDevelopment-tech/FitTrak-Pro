@@ -81,6 +81,8 @@ export const exercises = pgTable("exercises", {
   commonMistakes: text("commonMistakes").array().notNull(), // частые ошибки и их исправление
   contraindications: text("contraindications").array().notNull(), // противопоказания
   muscleImageUrl: text("muscleImageUrl"), // ссылка на картинку с выделенными мышцами
+  videoUrl: text("videoUrl"), // ссылка на видео с техникой выполнения
+  techniqueImageUrl: text("techniqueImageUrl"), // ссылка на изображение с техникой выполнения
   createdBy: integer("createdBy"), // кто создал упражнение (тренер)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),

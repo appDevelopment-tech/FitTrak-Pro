@@ -25,6 +25,8 @@ interface ExerciseFormData {
   commonMistakes: string[];
   contraindications: string[];
   muscleImageUrl?: string;
+  videoUrl?: string;
+  techniqueImageUrl?: string;
 }
 
 const muscleGroups = ['грудь', 'спина', 'ноги', 'руки', 'плечи', 'ягодичные', 'живот'];

@@ -16,6 +16,8 @@ interface Exercise {
   commonMistakes: string[];
   contraindications: string[];
   muscleImageUrl?: string | null;
+  videoUrl?: string | null;
+  techniqueImageUrl?: string | null;
 }
 
 interface ExerciseDetailProps {
@@ -63,10 +65,36 @@ export function ExerciseDetail({ exercise, onClose }: ExerciseDetailProps) {
         </div>
 
         <div className="p-6 space-y-6">
-          {/* Animation and Description */}
+          {/* Video and Technique Images */}
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-gray-50 rounded-lg p-6 flex items-center justify-center">
-              {generateExerciseImage(exercise.name, "w-48 h-36 border bg-white rounded-lg shadow-sm")}
+            <div className="space-y-4">
+              {exercise.videoUrl ? (
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h4 className="font-medium text-gray-900 mb-3">Видео техники выполнения</h4>
+                  <div className="aspect-video bg-black rounded-lg overflow-hidden">
+                    <iframe
+                      src={exercise.videoUrl}
+                      className="w-full h-full"
+                      frameBorder="0"
+                      allowFullScreen
+                      title={`Видео упражнения ${exercise.name}`}
+                    />
+                  </div>
+                </div>
+              ) : exercise.techniqueImageUrl ? (
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h4 className="font-medium text-gray-900 mb-3">Техника выполнения</h4>
+                  <img
+                    src={exercise.techniqueImageUrl}
+                    alt={`Техника выполнения ${exercise.name}`}
+                    className="w-full rounded-lg border bg-white shadow-sm"
+                  />
+                </div>
+              ) : (
+                <div className="bg-gray-50 rounded-lg p-6 flex items-center justify-center">
+                  {generateExerciseImage(exercise.name, "w-48 h-36 border bg-white rounded-lg shadow-sm")}
+                </div>
+              )}
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-3">Обзор упражнения</h3>
