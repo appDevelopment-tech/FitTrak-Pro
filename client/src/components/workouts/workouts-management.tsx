@@ -7,9 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Dumbbell, Plus, Edit, Calendar as CalendarIcon, Clock, Target, User, CheckCircle, AlertCircle } from "lucide-react";
+import { Dumbbell, Plus, Edit } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface WorkoutPlan {
@@ -22,32 +21,10 @@ interface WorkoutPlan {
   exercises?: string[];
 }
 
-interface CustomWorkout {
-  name: string;
-  level: 'начальный' | 'базовый' | 'средний' | 'высокий';
-  totalSessions: number;
-  startDate: Date | null;
-  startTime: string;
-  selectedDates: Date[];
-  trainerNotes: string;
-}
-
 export function WorkoutsManagement() {
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [showCalendarSelector, setShowCalendarSelector] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [editingPlan, setEditingPlan] = useState<WorkoutPlan | null>(null);
   const [editedPlan, setEditedPlan] = useState<WorkoutPlan | null>(null);
-  const [customWorkout, setCustomWorkout] = useState<CustomWorkout>({
-    name: '',
-    level: 'начальный',
-    totalSessions: 12,
-    startDate: null,
-    startTime: '10:00',
-    selectedDates: [],
-    trainerNotes: ''
-  });
 
   const { toast } = useToast();
 
@@ -101,82 +78,20 @@ export function WorkoutsManagement() {
     {
       id: 6,
       name: "Грудь-трицепс / Спина-бицепс / Ноги-плечи-живот",
-      description: "Продвинутый сплит по группам мышц",
+      description: "Классический трехдневный сплит по группам мышц",
       difficulty: "высокий",
       sessionsPerWeek: 3,
       type: 'ready',
-      exercises: ["Жим лежа", "Разгибания", "Тяга", "Подъемы", "Присед", "Жим стоя"]
+      exercises: ["Жим лежа", "Французский жим", "Тяга штанги", "Подъемы на бицепс", "Приседания", "Жим стоя"]
     }
   ];
 
   const handleSelectPlan = (plan: WorkoutPlan) => {
+    console.log('Прикрепить план тренировки для ученика:', plan.id);
     toast({
       title: "План выбран",
-      description: `План "${plan.name}" готов для прикрепления к ученику`,
+      description: `План "${plan.name}" готов к прикреплению к ученику`,
     });
-  };
-
-  const handleDateSelect = (date: Date | undefined) => {
-    if (!date) return;
-    
-    const isSelected = selectedDates.some(d => d.toDateString() === date.toDateString());
-    
-    if (isSelected) {
-      setSelectedDates(prev => prev.filter(d => d.toDateString() !== date.toDateString()));
-    } else {
-      setSelectedDates(prev => [...prev, date]);
-    }
-  };
-
-  const canConfirmSchedule = selectedDates.length === customWorkout.totalSessions;
-
-  const handleCreateWorkout = () => {
-    if (!customWorkout.name.trim()) {
-      toast({
-        title: "Ошибка",
-        description: "Введите название тренировки",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!customWorkout.startDate) {
-      toast({
-        title: "Ошибка",
-        description: "Выберите дату начала тренировки",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (selectedDates.length !== customWorkout.totalSessions) {
-      toast({
-        title: "Ошибка",
-        description: `Выберите ${customWorkout.totalSessions} дней для тренировок`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Создание кастомной тренировки
-    toast({
-      title: "Успешно",
-      description: `Тренировка "${customWorkout.name}" создана`,
-    });
-
-    // Сброс формы
-    setCustomWorkout({
-      name: '',
-      level: 'начальный',
-      totalSessions: 12,
-      startDate: null,
-      startTime: '10:00',
-      selectedDates: [],
-      trainerNotes: ''
-    });
-    setSelectedDates([]);
-    setShowCreateDialog(false);
-    setShowCalendarSelector(false);
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -246,24 +161,14 @@ export function WorkoutsManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Dumbbell className="h-6 w-6 text-blue-600" />
-          <h2 className="text-2xl font-bold">Тренировки</h2>
-        </div>
-        <Button 
-          onClick={() => setShowCreateDialog(true)}
-          className="flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Создать тренировку
-        </Button>
+      <div className="flex items-center gap-2">
+        <Dumbbell className="h-6 w-6 text-blue-600" />
+        <h2 className="text-2xl font-bold">Тренировки</h2>
       </div>
 
       <Tabs defaultValue="ready-plans" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-1">
           <TabsTrigger value="ready-plans">Готовые планы</TabsTrigger>
-          <TabsTrigger value="create-workout">Создать тренировку</TabsTrigger>
         </TabsList>
 
         {/* Готовые планы */}
@@ -280,19 +185,16 @@ export function WorkoutsManagement() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <p className="text-sm text-gray-600 line-clamp-2">
-                    {plan.description}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{plan.description}</p>
                   
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <div className="flex items-center gap-1">
-                      <CalendarIcon className="h-4 w-4" />
-                      {plan.sessionsPerWeek}/неделя
-                    </div>
+                  <div className="flex items-center gap-4 text-sm">
+                    <span className="flex items-center gap-1">
+                      <strong>{plan.sessionsPerWeek}</strong> раз/неделю
+                    </span>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label className="text-xs font-medium text-gray-500">ОСНОВНЫЕ УПРАЖНЕНИЯ</Label>
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Упражнения:</h4>
                     <div className="flex flex-wrap gap-1">
                       {plan.exercises?.slice(0, 3).map((exercise, index) => (
                         <Badge key={index} variant="outline" className="text-xs">
@@ -330,196 +232,7 @@ export function WorkoutsManagement() {
             ))}
           </div>
         </TabsContent>
-
-        {/* Создать тренировку */}
-        <TabsContent value="create-workout" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Создание новой тренировки</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="workout-name">Название тренировки</Label>
-                    <Input
-                      id="workout-name"
-                      value={customWorkout.name}
-                      onChange={(e) => setCustomWorkout(prev => ({ ...prev, name: e.target.value }))}
-                      placeholder="Введите название тренировки"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="level">Уровень сложности</Label>
-                    <Select
-                      value={customWorkout.level}
-                      onValueChange={(value: any) => setCustomWorkout(prev => ({ ...prev, level: value }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="начальный">Начальный</SelectItem>
-                        <SelectItem value="базовый">Базовый</SelectItem>
-                        <SelectItem value="средний">Средний</SelectItem>
-                        <SelectItem value="высокий">Высокий</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="total-sessions">Всего тренировок</Label>
-                    <Input
-                      id="total-sessions"
-                      type="number"
-                      value={customWorkout.totalSessions}
-                      onChange={(e) => {
-                        const newValue = parseInt(e.target.value) || 1;
-                        setCustomWorkout(prev => ({ ...prev, totalSessions: newValue }));
-                        setSelectedDates([]); // Сброс выбранных дат при изменении количества
-                      }}
-                      min="1"
-                      max="50"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="start-date">Дата начала тренировки</Label>
-                    <Input
-                      id="start-date"
-                      type="date"
-                      value={customWorkout.startDate ? customWorkout.startDate.toISOString().split('T')[0] : ''}
-                      onChange={(e) => {
-                        const date = e.target.value ? new Date(e.target.value) : null;
-                        setCustomWorkout(prev => ({ ...prev, startDate: date }));
-                      }}
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="start-time">Время начала тренировки</Label>
-                    <Input
-                      id="start-time"
-                      type="time"
-                      value={customWorkout.startTime}
-                      onChange={(e) => setCustomWorkout(prev => ({ ...prev, startTime: e.target.value }))}
-                    />
-                  </div>
-
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <Label>Выбор дней тренировок</Label>
-                      <Badge variant={canConfirmSchedule ? "default" : "secondary"}>
-                        {selectedDates.length} из {customWorkout.totalSessions}
-                      </Badge>
-                    </div>
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowCalendarSelector(true)}
-                      className="w-full"
-                    >
-                      <CalendarIcon className="h-4 w-4 mr-2" />
-                      {selectedDates.length > 0 
-                        ? `Выбрано дней: ${selectedDates.length}` 
-                        : "Выбрать дни в календаре"
-                      }
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="trainer-notes">Отметка тренера</Label>
-                <Textarea
-                  id="trainer-notes"
-                  value={customWorkout.trainerNotes}
-                  onChange={(e) => setCustomWorkout(prev => ({ ...prev, trainerNotes: e.target.value }))}
-                  placeholder="Записи о самочувствии ученика и ходе тренировки..."
-                  rows={3}
-                />
-              </div>
-
-              <div className="flex items-center gap-4 pt-4 border-t">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  {canConfirmSchedule ? (
-                    <>
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                      Готово к созданию
-                    </>
-                  ) : (
-                    <>
-                      <AlertCircle className="h-4 w-4 text-yellow-600" />
-                      Выберите все {customWorkout.totalSessions} дней
-                    </>
-                  )}
-                </div>
-                <Button
-                  onClick={handleCreateWorkout}
-                  disabled={!canConfirmSchedule || !customWorkout.name.trim() || !customWorkout.startDate}
-                  className="ml-auto"
-                >
-                  Создать тренировку
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
-
-      {/* Диалог выбора календаря */}
-      <Dialog open={showCalendarSelector} onOpenChange={setShowCalendarSelector}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Выберите дни тренировок</DialogTitle>
-            <DialogDescription>
-              Выберите {customWorkout.totalSessions} дней для тренировок
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <Calendar
-              mode="multiple"
-              selected={selectedDates}
-              onSelect={(dates) => {
-                if (dates) {
-                  setSelectedDates(Array.isArray(dates) ? dates : [dates]);
-                }
-              }}
-              disabled={(date) => {
-                // Ограничиваем выбор только будущими датами
-                return date < new Date();
-              }}
-              className="rounded-md border"
-            />
-            
-            <div className="flex items-center justify-between pt-4 border-t">
-              <div className="text-sm text-gray-600">
-                Выбрано: {selectedDates.length} из {customWorkout.totalSessions}
-              </div>
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setSelectedDates([]);
-                    setShowCalendarSelector(false);
-                  }}
-                >
-                  Отмена
-                </Button>
-                <Button 
-                  onClick={() => setShowCalendarSelector(false)}
-                  disabled={selectedDates.length !== customWorkout.totalSessions}
-                >
-                  Применить
-                </Button>
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Диалог редактирования готового плана */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
