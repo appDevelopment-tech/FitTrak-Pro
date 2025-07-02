@@ -307,9 +307,8 @@ export function ComprehensiveStudentsManagement() {
           
           {selectedPupil && (
             <Tabs defaultValue="profile" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="profile">Профиль</TabsTrigger>
-                <TabsTrigger value="training">Тренировки</TabsTrigger>
                 <TabsTrigger value="progress">Прогресс</TabsTrigger>
                 <TabsTrigger value="documents">Документы</TabsTrigger>
               </TabsList>
@@ -425,23 +424,7 @@ export function ComprehensiveStudentsManagement() {
                   )}
                 </div>
               </TabsContent>
-              
-              <TabsContent value="training" className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">Тренировочные планы</h3>
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Прикрепить план
-                  </Button>
-                </div>
-                
-                <Card>
-                  <CardContent className="p-4">
-                    <p className="text-muted-foreground">Активных планов тренировок нет</p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
+
               <TabsContent value="progress" className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <Activity className="h-5 w-5" />
