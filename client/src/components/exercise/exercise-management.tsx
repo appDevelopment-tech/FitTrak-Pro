@@ -295,6 +295,8 @@ function ExerciseForm({ exercise, onSubmit, isLoading }: ExerciseFormProps) {
     commonMistakes: exercise?.commonMistakes || [""],
     contraindications: exercise?.contraindications || [""],
     muscleImageUrl: exercise?.muscleImageUrl || "",
+    videoUrl: exercise?.videoUrl || "",
+    techniqueImageUrl: exercise?.techniqueImageUrl || "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -371,6 +373,29 @@ function ExerciseForm({ exercise, onSubmit, isLoading }: ExerciseFormProps) {
             value={formData.muscleImageUrl}
             onChange={(e) => setFormData(prev => ({ ...prev, muscleImageUrl: e.target.value }))}
             placeholder="https://example.com/image.jpg"
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="videoUrl">Ссылка на видео с техникой выполнения</Label>
+          <Input
+            id="videoUrl"
+            value={formData.videoUrl}
+            onChange={(e) => setFormData(prev => ({ ...prev, videoUrl: e.target.value }))}
+            placeholder="https://youtube.com/embed/videoid или другая ссылка"
+          />
+          <p className="text-xs text-gray-500">
+            Для YouTube используйте формат: https://youtube.com/embed/ID_ВИДЕО
+          </p>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="techniqueImageUrl">Ссылка на изображение с техникой выполнения</Label>
+          <Input
+            id="techniqueImageUrl"
+            value={formData.techniqueImageUrl}
+            onChange={(e) => setFormData(prev => ({ ...prev, techniqueImageUrl: e.target.value }))}
+            placeholder="https://example.com/technique.jpg"
           />
         </div>
       </div>
