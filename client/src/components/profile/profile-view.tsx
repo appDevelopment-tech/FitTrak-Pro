@@ -21,12 +21,33 @@ export function ProfileView() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedExerciseForDetail, setSelectedExerciseForDetail] = useState<Exercise | null>(null);
   
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
   const { data: user } = useQuery<UserType>({
     queryKey: ['/api/user/1'],
   });
 
   const { data: exercises = [] } = useQuery<Exercise[]>({
     queryKey: ['/api/exercises'],
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => apiRequest(`/api/exercises/${id}`, 'DELETE'),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
+      toast({
+        title: "Упражнение удалено",
+        description: "Упражнение было успешно удалено."
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось удалить упражнение. Попробуйте еще раз.",
+        variant: "destructive"
+      });
+    }
   });
 
   // Фильтрация и сортировка упражнений
@@ -405,6 +426,18 @@ export function ProfileView() {
         <ExerciseDetail
           exercise={selectedExerciseForDetail}
           onClose={() => setSelectedExerciseForDetail(null)}
+          onEdit={(exercise) => {
+            // Пока что просто закрываем окно - полное редактирование доступно в разделе "Упражнения"
+            setSelectedExerciseForDetail(null);
+            toast({
+              title: "Перейдите в раздел 'Упражнения'",
+              description: "Для редактирования упражнений используйте специальный раздел в меню."
+            });
+          }}
+          onDelete={(exerciseId) => {
+            deleteMutation.mutate(exerciseId);
+            setSelectedExerciseForDetail(null);
+          }}
         />
       )}
     </div>
