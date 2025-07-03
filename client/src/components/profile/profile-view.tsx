@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { User, Filter, Search, Users, Dumbbell, Calendar, Upload, Edit2, Image } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -254,33 +254,34 @@ export function ProfileView() {
             >
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-lg">
-                  <div 
-                    className="h-32 flex items-center justify-center relative"
-                    style={{
-                      backgroundImage: getMuscleGroupImage('грудь') 
-                        ? `url(${getMuscleGroupImage('грудь')})` 
-                        : 'linear-gradient(to bottom right, rgb(248 113 113), rgb(220 38 38))',
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
-                    }}
-                  >
-                    {/* Затемняющий слой для лучшей читаемости текста */}
-                    <div className="absolute inset-0 bg-black/20"></div>
-                    <div className="text-white text-center relative z-10">
-                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        {getExercisePhoto('грудь', 'w-16 h-16')}
+                  {/* Верхняя часть с изображением */}
+                  <div className="relative h-32 overflow-hidden">
+                    {getMuscleGroupImage('грудь') ? (
+                      <img 
+                        src={getMuscleGroupImage('грудь')!} 
+                        alt="Грудь" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
+                        <div className="w-16 h-16 text-white">
+                          {getExercisePhoto('грудь', 'w-16 h-16')}
+                        </div>
                       </div>
-                      <div className="text-lg font-semibold drop-shadow-lg">ГРУДЬ</div>
-                    </div>
+                    )}
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
+                      onClick={(e) => handleImageUpload('грудь', e)}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
-                    onClick={(e) => handleImageUpload('грудь', e)}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
+                  {/* Нижняя часть с текстом */}
+                  <div className="p-3 bg-white text-center">
+                    <div className="text-lg font-semibold text-gray-800 uppercase">ГРУДЬ</div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -292,32 +293,32 @@ export function ProfileView() {
             >
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-lg">
-                  <div 
-                    className="h-32 flex items-center justify-center relative"
-                    style={{
-                      backgroundImage: getMuscleGroupImage('спина') 
-                        ? `url(${getMuscleGroupImage('спина')})` 
-                        : 'linear-gradient(to bottom right, rgb(96 165 250), rgb(37 99 235))',
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-black/20"></div>
-                    <div className="text-white text-center relative z-10">
-                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        {getExercisePhoto('спина', 'w-16 h-16')}
+                  <div className="relative h-32 overflow-hidden">
+                    {getMuscleGroupImage('спина') ? (
+                      <img 
+                        src={getMuscleGroupImage('спина')!} 
+                        alt="Спина" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+                        <div className="w-16 h-16 text-white">
+                          {getExercisePhoto('спина', 'w-16 h-16')}
+                        </div>
                       </div>
-                      <div className="text-lg font-semibold drop-shadow-lg">СПИНА</div>
-                    </div>
+                    )}
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
+                      onClick={(e) => handleImageUpload('спина', e)}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
-                    onClick={(e) => handleImageUpload('спина', e)}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
+                  <div className="p-3 bg-white text-center">
+                    <div className="text-lg font-semibold text-gray-800 uppercase">СПИНА</div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -329,32 +330,32 @@ export function ProfileView() {
             >
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-lg">
-                  <div 
-                    className="h-32 flex items-center justify-center relative"
-                    style={{
-                      backgroundImage: getMuscleGroupImage('ноги') 
-                        ? `url(${getMuscleGroupImage('ноги')})` 
-                        : 'linear-gradient(to bottom right, rgb(74 222 128), rgb(34 197 94))',
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-black/20"></div>
-                    <div className="text-white text-center relative z-10">
-                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        {getExercisePhoto('ноги', 'w-16 h-16')}
+                  <div className="relative h-32 overflow-hidden">
+                    {getMuscleGroupImage('ноги') ? (
+                      <img 
+                        src={getMuscleGroupImage('ноги')!} 
+                        alt="Ноги" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
+                        <div className="w-16 h-16 text-white">
+                          {getExercisePhoto('ноги', 'w-16 h-16')}
+                        </div>
                       </div>
-                      <div className="text-lg font-semibold drop-shadow-lg">НОГИ</div>
-                    </div>
+                    )}
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
+                      onClick={(e) => handleImageUpload('ноги', e)}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
-                    onClick={(e) => handleImageUpload('ноги', e)}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
+                  <div className="p-3 bg-white text-center">
+                    <div className="text-lg font-semibold text-gray-800 uppercase">НОГИ</div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -366,32 +367,32 @@ export function ProfileView() {
             >
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-lg">
-                  <div 
-                    className="h-32 flex items-center justify-center relative"
-                    style={{
-                      backgroundImage: getMuscleGroupImage('руки') 
-                        ? `url(${getMuscleGroupImage('руки')})` 
-                        : 'linear-gradient(to bottom right, rgb(168 85 247), rgb(124 58 237))',
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-black/20"></div>
-                    <div className="text-white text-center relative z-10">
-                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        {getExercisePhoto('руки', 'w-16 h-16')}
+                  <div className="relative h-32 overflow-hidden">
+                    {getMuscleGroupImage('руки') ? (
+                      <img 
+                        src={getMuscleGroupImage('руки')!} 
+                        alt="Руки" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
+                        <div className="w-16 h-16 text-white">
+                          {getExercisePhoto('руки', 'w-16 h-16')}
+                        </div>
                       </div>
-                      <div className="text-lg font-semibold drop-shadow-lg">РУКИ</div>
-                    </div>
+                    )}
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
+                      onClick={(e) => handleImageUpload('руки', e)}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
-                    onClick={(e) => handleImageUpload('руки', e)}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
+                  <div className="p-3 bg-white text-center">
+                    <div className="text-lg font-semibold text-gray-800 uppercase">РУКИ</div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -403,32 +404,32 @@ export function ProfileView() {
             >
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-lg">
-                  <div 
-                    className="h-32 flex items-center justify-center relative"
-                    style={{
-                      backgroundImage: getMuscleGroupImage('плечи') 
-                        ? `url(${getMuscleGroupImage('плечи')})` 
-                        : 'linear-gradient(to bottom right, rgb(250 204 21), rgb(202 138 4))',
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-black/20"></div>
-                    <div className="text-white text-center relative z-10">
-                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        {getExercisePhoto('плечи', 'w-16 h-16')}
+                  <div className="relative h-32 overflow-hidden">
+                    {getMuscleGroupImage('плечи') ? (
+                      <img 
+                        src={getMuscleGroupImage('плечи')!} 
+                        alt="Плечи" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
+                        <div className="w-16 h-16 text-white">
+                          {getExercisePhoto('плечи', 'w-16 h-16')}
+                        </div>
                       </div>
-                      <div className="text-lg font-semibold drop-shadow-lg">ПЛЕЧИ</div>
-                    </div>
+                    )}
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
+                      onClick={(e) => handleImageUpload('плечи', e)}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
-                    onClick={(e) => handleImageUpload('плечи', e)}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
+                  <div className="p-3 bg-white text-center">
+                    <div className="text-lg font-semibold text-gray-800 uppercase">ПЛЕЧИ</div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -440,32 +441,32 @@ export function ProfileView() {
             >
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-lg">
-                  <div 
-                    className="h-32 flex items-center justify-center relative"
-                    style={{
-                      backgroundImage: getMuscleGroupImage('ягодичные') 
-                        ? `url(${getMuscleGroupImage('ягодичные')})` 
-                        : 'linear-gradient(to bottom right, rgb(244 114 182), rgb(219 39 119))',
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-black/20"></div>
-                    <div className="text-white text-center relative z-10">
-                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        {getExercisePhoto('ягодичные', 'w-16 h-16')}
+                  <div className="relative h-32 overflow-hidden">
+                    {getMuscleGroupImage('ягодичные') ? (
+                      <img 
+                        src={getMuscleGroupImage('ягодичные')!} 
+                        alt="Ягодичные" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center">
+                        <div className="w-16 h-16 text-white">
+                          {getExercisePhoto('ягодичные', 'w-16 h-16')}
+                        </div>
                       </div>
-                      <div className="text-lg font-semibold drop-shadow-lg">ЯГОДИЧНЫЕ</div>
-                    </div>
+                    )}
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
+                      onClick={(e) => handleImageUpload('ягодичные', e)}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
-                    onClick={(e) => handleImageUpload('ягодичные', e)}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
+                  <div className="p-3 bg-white text-center">
+                    <div className="text-lg font-semibold text-gray-800 uppercase">ЯГОДИЧНЫЕ</div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -477,32 +478,32 @@ export function ProfileView() {
             >
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-lg">
-                  <div 
-                    className="h-32 flex items-center justify-center relative"
-                    style={{
-                      backgroundImage: getMuscleGroupImage('живот') 
-                        ? `url(${getMuscleGroupImage('живот')})` 
-                        : 'linear-gradient(to bottom right, rgb(251 146 60), rgb(234 88 12))',
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-black/20"></div>
-                    <div className="text-white text-center relative z-10">
-                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        {getExercisePhoto('живот', 'w-16 h-16')}
+                  <div className="relative h-32 overflow-hidden">
+                    {getMuscleGroupImage('живот') ? (
+                      <img 
+                        src={getMuscleGroupImage('живот')!} 
+                        alt="Живот" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
+                        <div className="w-16 h-16 text-white">
+                          {getExercisePhoto('живот', 'w-16 h-16')}
+                        </div>
                       </div>
-                      <div className="text-lg font-semibold drop-shadow-lg">ЖИВОТ</div>
-                    </div>
+                    )}
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
+                      onClick={(e) => handleImageUpload('живот', e)}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
-                    onClick={(e) => handleImageUpload('живот', e)}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
+                  <div className="p-3 bg-white text-center">
+                    <div className="text-lg font-semibold text-gray-800 uppercase">ЖИВОТ</div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -514,32 +515,32 @@ export function ProfileView() {
             >
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-lg">
-                  <div 
-                    className="h-32 flex items-center justify-center relative"
-                    style={{
-                      backgroundImage: getMuscleGroupImage('кардио') 
-                        ? `url(${getMuscleGroupImage('кардио')})` 
-                        : 'linear-gradient(to bottom right, rgb(129 140 248), rgb(79 70 229))',
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-black/20"></div>
-                    <div className="text-white text-center relative z-10">
-                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        {getExercisePhoto('кардио', 'w-16 h-16')}
+                  <div className="relative h-32 overflow-hidden">
+                    {getMuscleGroupImage('кардио') ? (
+                      <img 
+                        src={getMuscleGroupImage('кардио')!} 
+                        alt="Кардио" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center">
+                        <div className="w-16 h-16 text-white">
+                          {getExercisePhoto('кардио', 'w-16 h-16')}
+                        </div>
                       </div>
-                      <div className="text-lg font-semibold drop-shadow-lg">КАРДИО</div>
-                    </div>
+                    )}
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
+                      onClick={(e) => handleImageUpload('кардио', e)}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
-                    onClick={(e) => handleImageUpload('кардио', e)}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
+                  <div className="p-3 bg-white text-center">
+                    <div className="text-lg font-semibold text-gray-800 uppercase">КАРДИО</div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -631,6 +632,9 @@ export function ProfileView() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Изменить изображение группы мышц</DialogTitle>
+            <DialogDescription>
+              Загрузите собственное изображение или восстановите изображение по умолчанию
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-sm text-gray-600">
