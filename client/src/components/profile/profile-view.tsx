@@ -252,10 +252,10 @@ export function ProfileView() {
               className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'грудь' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
               onClick={() => handleMuscleGroupClick('грудь')}
             >
-              <CardContent className="p-0">
+              <CardContent className="p-3">
                 <div className="relative overflow-hidden rounded-lg">
                   {/* Верхняя часть с изображением */}
-                  <div className="relative h-32 overflow-hidden">
+                  <div className="relative h-32 overflow-hidden rounded-lg">
                     {getMuscleGroupImage('грудь') ? (
                       <img 
                         src={getMuscleGroupImage('грудь')!} 
@@ -291,9 +291,9 @@ export function ProfileView() {
               className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'спина' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
               onClick={() => handleMuscleGroupClick('спина')}
             >
-              <CardContent className="p-0">
+              <CardContent className="p-3">
                 <div className="relative overflow-hidden rounded-lg">
-                  <div className="relative h-32 overflow-hidden">
+                  <div className="relative h-32 overflow-hidden rounded-lg">
                     {getMuscleGroupImage('спина') ? (
                       <img 
                         src={getMuscleGroupImage('спина')!} 
@@ -328,9 +328,9 @@ export function ProfileView() {
               className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'ноги' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
               onClick={() => handleMuscleGroupClick('ноги')}
             >
-              <CardContent className="p-0">
+              <CardContent className="p-3">
                 <div className="relative overflow-hidden rounded-lg">
-                  <div className="relative h-32 overflow-hidden">
+                  <div className="relative h-32 overflow-hidden rounded-lg">
                     {getMuscleGroupImage('ноги') ? (
                       <img 
                         src={getMuscleGroupImage('ноги')!} 
@@ -365,7 +365,7 @@ export function ProfileView() {
               className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'руки' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
               onClick={() => handleMuscleGroupClick('руки')}
             >
-              <CardContent className="p-0">
+              <CardContent className="p-3">
                 <div className="relative overflow-hidden rounded-lg">
                   <div className="relative h-32 overflow-hidden">
                     {getMuscleGroupImage('руки') ? (
@@ -402,9 +402,9 @@ export function ProfileView() {
               className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'плечи' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
               onClick={() => handleMuscleGroupClick('плечи')}
             >
-              <CardContent className="p-0">
+              <CardContent className="p-3">
                 <div className="relative overflow-hidden rounded-lg">
-                  <div className="relative h-32 overflow-hidden">
+                  <div className="relative h-32 overflow-hidden rounded-lg">
                     {getMuscleGroupImage('плечи') ? (
                       <img 
                         src={getMuscleGroupImage('плечи')!} 
@@ -439,9 +439,9 @@ export function ProfileView() {
               className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'ягодичные' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
               onClick={() => handleMuscleGroupClick('ягодичные')}
             >
-              <CardContent className="p-0">
+              <CardContent className="p-3">
                 <div className="relative overflow-hidden rounded-lg">
-                  <div className="relative h-32 overflow-hidden">
+                  <div className="relative h-32 overflow-hidden rounded-lg">
                     {getMuscleGroupImage('ягодичные') ? (
                       <img 
                         src={getMuscleGroupImage('ягодичные')!} 
@@ -476,9 +476,9 @@ export function ProfileView() {
               className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'живот' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
               onClick={() => handleMuscleGroupClick('живот')}
             >
-              <CardContent className="p-0">
+              <CardContent className="p-3">
                 <div className="relative overflow-hidden rounded-lg">
-                  <div className="relative h-32 overflow-hidden">
+                  <div className="relative h-32 overflow-hidden rounded-lg">
                     {getMuscleGroupImage('живот') ? (
                       <img 
                         src={getMuscleGroupImage('живот')!} 
@@ -513,9 +513,9 @@ export function ProfileView() {
               className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'кардио' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
               onClick={() => handleMuscleGroupClick('кардио')}
             >
-              <CardContent className="p-0">
+              <CardContent className="p-3">
                 <div className="relative overflow-hidden rounded-lg">
-                  <div className="relative h-32 overflow-hidden">
+                  <div className="relative h-32 overflow-hidden rounded-lg">
                     {getMuscleGroupImage('кардио') ? (
                       <img 
                         src={getMuscleGroupImage('кардио')!} 
