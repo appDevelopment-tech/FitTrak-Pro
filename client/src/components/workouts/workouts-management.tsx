@@ -28,6 +28,9 @@ export function WorkoutsManagement() {
   const [editedPlan, setEditedPlan] = useState<WorkoutPlan | null>(null);
   const [showCalendarSelector, setShowCalendarSelector] = useState(false);
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
+  const [showExerciseSelector, setShowExerciseSelector] = useState(false);
+  const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string>('');
+  const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
   const [customWorkout, setCustomWorkout] = useState({
     name: '',
     level: 'начальный',
@@ -115,6 +118,16 @@ export function WorkoutsManagement() {
     }
   };
 
+  // Группы мышц и упражнения
+  const muscleGroups = [
+    { name: 'грудь', exercises: ['Жим лежа', 'Отжимания', 'Жим гантелей лежа', 'Разводка гантелей', 'Жим в тренажере'] },
+    { name: 'спина', exercises: ['Подтягивания', 'Тяга штанги', 'Тяга блока', 'Тяга гантели', 'Гиперэкстензия'] },
+    { name: 'ноги', exercises: ['Приседания', 'Жим ногами', 'Выпады', 'Подъемы на носки', 'Сгибания ног'] },
+    { name: 'плечи', exercises: ['Жим стоя', 'Разводка гантелей', 'Подъемы через стороны', 'Тяга к подбородку', 'Жим в тренажере'] },
+    { name: 'руки', exercises: ['Подъемы на бицепс', 'Французский жим', 'Молотки', 'Отжимания на брусьях', 'Жим узким хватом'] },
+    { name: 'пресс', exercises: ['Скручивания', 'Планка', 'Подъемы ног', 'Велосипед', 'Русские скручивания'] }
+  ];
+
   // Функции для редактирования готовых планов
   const handleEditPlan = (plan: WorkoutPlan) => {
     setEditingPlan(plan);
@@ -142,12 +155,37 @@ export function WorkoutsManagement() {
     setEditedPlan(null);
   };
 
-  const addExerciseToEditedPlan = () => {
-    if (!editedPlan) return;
+  const handleOpenExerciseSelector = () => {
+    setSelectedMuscleGroup('');
+    setSelectedExercises([]);
+    setShowExerciseSelector(true);
+  };
+
+  const handleSelectMuscleGroup = (groupName: string) => {
+    setSelectedMuscleGroup(groupName);
+  };
+
+  const handleToggleExercise = (exercise: string) => {
+    setSelectedExercises(prev => {
+      if (prev.includes(exercise)) {
+        return prev.filter(e => e !== exercise);
+      } else {
+        return [...prev, exercise];
+      }
+    });
+  };
+
+  const handleAddSelectedExercises = () => {
+    if (!editedPlan || selectedExercises.length === 0) return;
+    
     setEditedPlan({
       ...editedPlan,
-      exercises: [...(editedPlan.exercises || []), "Новое упражнение"]
+      exercises: [...(editedPlan.exercises || []), ...selectedExercises]
     });
+    
+    setShowExerciseSelector(false);
+    setSelectedMuscleGroup('');
+    setSelectedExercises([]);
   };
 
   const removeExerciseFromEditedPlan = (index: number) => {
@@ -160,10 +198,11 @@ export function WorkoutsManagement() {
     });
   };
 
-  const updateExerciseInEditedPlan = (index: number, newValue: string) => {
+  const moveExercise = (fromIndex: number, toIndex: number) => {
     if (!editedPlan) return;
     const newExercises = [...(editedPlan.exercises || [])];
-    newExercises[index] = newValue;
+    const [moved] = newExercises.splice(fromIndex, 1);
+    newExercises.splice(toIndex, 0, moved);
     setEditedPlan({
       ...editedPlan,
       exercises: newExercises
@@ -447,7 +486,7 @@ export function WorkoutsManagement() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="edit-plan-difficulty">Сложность</Label>
+                  <Label htmlFor="edit-plan-difficulty">Уровень</Label>
                   <Select 
                     value={editedPlan.difficulty} 
                     onValueChange={(value) => setEditedPlan({ ...editedPlan, difficulty: value })}
@@ -497,7 +536,7 @@ export function WorkoutsManagement() {
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={addExerciseToEditedPlan}
+                    onClick={handleOpenExerciseSelector}
                   >
                     <Plus className="h-4 w-4 mr-1" />
                     Добавить упражнение
@@ -505,12 +544,30 @@ export function WorkoutsManagement() {
                 </div>
                 <div className="space-y-2">
                   {editedPlan.exercises?.map((exercise, index) => (
-                    <div key={index} className="flex gap-2">
-                      <Input
-                        value={exercise}
-                        onChange={(e) => updateExerciseInEditedPlan(index, e.target.value)}
-                        placeholder="Название упражнения"
-                      />
+                    <div key={index} className="flex gap-2 items-center">
+                      <div className="flex gap-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => index > 0 && moveExercise(index, index - 1)}
+                          disabled={index === 0}
+                        >
+                          ↑
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => index < (editedPlan.exercises?.length || 0) - 1 && moveExercise(index, index + 1)}
+                          disabled={index === (editedPlan.exercises?.length || 0) - 1}
+                        >
+                          ↓
+                        </Button>
+                      </div>
+                      <div className="flex-1 p-2 border rounded bg-gray-50">
+                        {exercise}
+                      </div>
                       <Button
                         type="button"
                         variant="outline"
@@ -529,7 +586,7 @@ export function WorkoutsManagement() {
                   Отмена
                 </Button>
                 <Button onClick={handleSaveEditedPlan}>
-                  Сохранить изменения
+                  Сохранить
                 </Button>
               </div>
             </div>
@@ -583,6 +640,109 @@ export function WorkoutsManagement() {
                 Подтвердить
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Диалог выбора упражнений */}
+      <Dialog open={showExerciseSelector} onOpenChange={setShowExerciseSelector}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Добавить упражнения</DialogTitle>
+            <DialogDescription>
+              Выберите группу мышц, затем выберите упражнения для добавления в план
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {!selectedMuscleGroup ? (
+              // Выбор группы мышц
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Выберите группу мышц</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {muscleGroups.map((group) => (
+                    <Card 
+                      key={group.name}
+                      className="cursor-pointer hover:shadow-md transition-shadow"
+                      onClick={() => handleSelectMuscleGroup(group.name)}
+                    >
+                      <CardContent className="p-4 text-center">
+                        <div className="text-lg font-medium capitalize">{group.name}</div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          {group.exercises.length} упражнений
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              // Выбор упражнений из группы
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setSelectedMuscleGroup('')}
+                  >
+                    ← Назад
+                  </Button>
+                  <h3 className="text-lg font-semibold capitalize">{selectedMuscleGroup}</h3>
+                </div>
+                
+                <div className="space-y-2">
+                  {muscleGroups
+                    .find(group => group.name === selectedMuscleGroup)
+                    ?.exercises.map((exercise) => (
+                      <div 
+                        key={exercise}
+                        className={`p-3 border rounded cursor-pointer transition-colors ${
+                          selectedExercises.includes(exercise)
+                            ? 'bg-blue-50 border-blue-300'
+                            : 'hover:bg-gray-50'
+                        }`}
+                        onClick={() => handleToggleExercise(exercise)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span>{exercise}</span>
+                          {selectedExercises.includes(exercise) && (
+                            <CheckCircle className="h-5 w-5 text-blue-600" />
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+                
+                {selectedExercises.length > 0 && (
+                  <div className="mt-4 p-3 bg-blue-50 rounded border border-blue-200">
+                    <div className="text-sm font-medium text-blue-800 mb-1">
+                      Выбрано упражнений: {selectedExercises.length}
+                    </div>
+                    <div className="text-xs text-blue-600">
+                      {selectedExercises.join(', ')}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          
+          <div className="flex gap-2 pt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setShowExerciseSelector(false);
+                setSelectedMuscleGroup('');
+                setSelectedExercises([]);
+              }}
+            >
+              Отмена
+            </Button>
+            {selectedMuscleGroup && selectedExercises.length > 0 && (
+              <Button onClick={handleAddSelectedExercises}>
+                Добавить выбранные ({selectedExercises.length})
+              </Button>
+            )}
           </div>
         </DialogContent>
       </Dialog>
