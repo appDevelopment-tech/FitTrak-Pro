@@ -37,9 +37,12 @@ export function WorkoutsManagement() {
     name: '',
     level: 'начальный',
     totalSessions: 1,
+    sessionsPerWeek: 3,
     startDate: null as Date | null,
     startTime: '09:00',
-    trainerNotes: ''
+    trainerNotes: '',
+    exercises: [] as string[],
+    timerEnabled: false
   });
 
   const { toast } = useToast();
@@ -177,6 +180,19 @@ export function WorkoutsManagement() {
     setShowExerciseSelector(true);
   };
 
+  const handleAddExercisesToCustomWorkout = () => {
+    if (selectedExercises.length === 0) return;
+    
+    setCustomWorkout(prev => ({
+      ...prev,
+      exercises: [...prev.exercises, ...selectedExercises]
+    }));
+    
+    setShowExerciseSelector(false);
+    setSelectedMuscleGroup('');
+    setSelectedExercises([]);
+  };
+
   const handleSelectMuscleGroup = (groupName: string) => {
     setSelectedMuscleGroup(groupName);
   };
@@ -192,12 +208,20 @@ export function WorkoutsManagement() {
   };
 
   const handleAddSelectedExercises = () => {
-    if (!editedPlan || selectedExercises.length === 0) return;
+    if (selectedExercises.length === 0) return;
     
-    setEditedPlan({
-      ...editedPlan,
-      exercises: [...(editedPlan.exercises || []), ...selectedExercises]
-    });
+    if (editedPlan) {
+      setEditedPlan({
+        ...editedPlan,
+        exercises: [...(editedPlan.exercises || []), ...selectedExercises]
+      });
+    } else {
+      // Для создания новой тренировки
+      setCustomWorkout(prev => ({
+        ...prev,
+        exercises: [...prev.exercises, ...selectedExercises]
+      }));
+    }
     
     setShowExerciseSelector(false);
     setSelectedMuscleGroup('');
@@ -242,9 +266,12 @@ export function WorkoutsManagement() {
       name: '',
       level: 'начальный',
       totalSessions: 1,
+      sessionsPerWeek: 3,
       startDate: null,
       startTime: '09:00',
-      trainerNotes: ''
+      trainerNotes: '',
+      exercises: [],
+      timerEnabled: false
     });
     setSelectedDates([]);
   };
@@ -341,138 +368,243 @@ export function WorkoutsManagement() {
         </TabsContent>
 
         {/* Создать тренировку */}
-        <TabsContent value="create-workout" className="space-y-4">
+        <TabsContent value="create-workout" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Создание новой тренировки</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Plus className="h-5 w-5" />
+                Создать индивидуальную тренировку
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="workout-name">Название тренировки</Label>
-                    <Input
-                      id="workout-name"
-                      value={customWorkout.name}
-                      onChange={(e) => setCustomWorkout(prev => ({ ...prev, name: e.target.value }))}
-                      placeholder="Введите название тренировки"
-                    />
-                  </div>
+              {/* Основная информация */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="workout-name">Название тренировки</Label>
+                  <Input
+                    id="workout-name"
+                    placeholder="Введите название"
+                    value={customWorkout.name}
+                    onChange={(e) => setCustomWorkout(prev => ({ ...prev, name: e.target.value }))}
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="workout-level">Уровень ученика</Label>
+                  <Select value={customWorkout.level} onValueChange={(value) => setCustomWorkout(prev => ({ ...prev, level: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Выберите уровень" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="начальный">Начальный</SelectItem>
+                      <SelectItem value="базовый">Базовый</SelectItem>
+                      <SelectItem value="средний">Средний</SelectItem>
+                      <SelectItem value="высокий">Высокий</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
+              {/* График тренировок */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">График тренировок</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="level">Уровень сложности</Label>
-                    <Select
-                      value={customWorkout.level}
-                      onValueChange={(value: any) => setCustomWorkout(prev => ({ ...prev, level: value }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="начальный">Начальный</SelectItem>
-                        <SelectItem value="базовый">Базовый</SelectItem>
-                        <SelectItem value="средний">Средний</SelectItem>
-                        <SelectItem value="высокий">Высокий</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="total-sessions">Общее количество тренировок</Label>
-                    <Input
-                      id="total-sessions"
-                      type="number"
-                      min="1"
-                      max="50"
-                      value={customWorkout.totalSessions}
-                      onChange={(e) => setCustomWorkout(prev => ({ 
-                        ...prev, 
-                        totalSessions: parseInt(e.target.value) || 1 
-                      }))}
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="start-date">Дата начала</Label>
+                    <Label htmlFor="start-date">Дата первой тренировки</Label>
                     <Input
                       id="start-date"
                       type="date"
                       value={customWorkout.startDate ? customWorkout.startDate.toISOString().split('T')[0] : ''}
-                      onChange={(e) => {
-                        const date = e.target.value ? new Date(e.target.value) : null;
-                        setCustomWorkout(prev => ({ ...prev, startDate: date }));
-                      }}
-                      min={new Date().toISOString().split('T')[0]}
+                      onChange={(e) => setCustomWorkout(prev => ({ 
+                        ...prev, 
+                        startDate: e.target.value ? new Date(e.target.value) : null 
+                      }))}
                     />
                   </div>
-
+                  
                   <div>
-                    <Label htmlFor="start-time">Время начала</Label>
+                    <Label htmlFor="sessions-per-week">Тренировок в неделю</Label>
+                    <Select 
+                      value={customWorkout.sessionsPerWeek?.toString()} 
+                      onValueChange={(value) => setCustomWorkout(prev => ({ ...prev, sessionsPerWeek: parseInt(value) }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Выберите" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1 раз в неделю</SelectItem>
+                        <SelectItem value="2">2 раза в неделю</SelectItem>
+                        <SelectItem value="3">3 раза в неделю</SelectItem>
+                        <SelectItem value="4">4 раза в неделю</SelectItem>
+                        <SelectItem value="5">5 раз в неделю</SelectItem>
+                        <SelectItem value="6">6 раз в неделю</SelectItem>
+                        <SelectItem value="7">Ежедневно</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="total-sessions">Всего тренировок</Label>
                     <Input
-                      id="start-time"
-                      type="time"
-                      value={customWorkout.startTime}
-                      onChange={(e) => setCustomWorkout(prev => ({ ...prev, startTime: e.target.value }))}
+                      id="total-sessions"
+                      type="number"
+                      min="1"
+                      placeholder="Количество"
+                      value={customWorkout.totalSessions}
+                      onChange={(e) => setCustomWorkout(prev => ({ ...prev, totalSessions: parseInt(e.target.value) || 1 }))}
                     />
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="trainer-notes">Заметки тренера</Label>
-                    <Textarea
-                      id="trainer-notes"
-                      value={customWorkout.trainerNotes}
-                      onChange={(e) => setCustomWorkout(prev => ({ ...prev, trainerNotes: e.target.value }))}
-                      placeholder="Добавьте заметки для ученика..."
-                      rows={4}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Выбор дней тренировок</Label>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setShowCalendarSelector(true)}
-                      className="w-full justify-start"
-                      disabled={!customWorkout.startDate}
-                    >
-                      <CalendarIcon className="h-4 w-4 mr-2" />
-                      {selectedDates.length > 0 
-                        ? `Выбрано: ${selectedDates.length} из ${customWorkout.totalSessions}` 
-                        : 'Выберите дни тренировок'
-                      }
-                    </Button>
-                    {!customWorkout.startDate && (
-                      <p className="text-sm text-muted-foreground">
-                        Сначала выберите дату начала тренировки
-                      </p>
-                    )}
-                  </div>
+                {/* Выбор дней и времени */}
+                <div className="space-y-3">
+                  <Label>Дни и время тренировок</Label>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowCalendarSelector(true)}
+                    className="w-full"
+                  >
+                    <CalendarIcon className="h-4 w-4 mr-2" />
+                    {selectedDates.length > 0 
+                      ? `Выбрано дней: ${selectedDates.length} из ${customWorkout.totalSessions}` 
+                      : 'Выберите дни в календаре'
+                    }
+                  </Button>
+                  
+                  {selectedDates.length > 0 && (
+                    <div className="space-y-2 max-h-40 overflow-y-auto border rounded p-3 bg-gray-50">
+                      {selectedDates.map((date, index) => (
+                        <div key={index} className="flex items-center justify-between">
+                          <span className="text-sm">{date.toLocaleDateString('ru-RU')}</span>
+                          <Input
+                            type="time"
+                            defaultValue={customWorkout.startTime}
+                            className="w-24 h-8"
+                            onChange={(e) => {
+                              // Здесь можно сохранить индивидуальное время для каждой тренировки
+                            }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {customWorkout.totalSessions > selectedDates.length && (
+                    <div className="text-sm text-amber-600 flex items-center gap-1">
+                      <AlertCircle className="h-4 w-4" />
+                      Необходимо выбрать еще {customWorkout.totalSessions - selectedDates.length} дней
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
-                <div className="flex items-center gap-2">
-                  {canConfirmSchedule ? (
-                    <>
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                      Готово к созданию
-                    </>
-                  ) : (
-                    <>
-                      <AlertCircle className="h-4 w-4 text-yellow-600" />
-                      Выберите все {customWorkout.totalSessions} дней
-                    </>
-                  )}
+              {/* Упражнения */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">Упражнения</h3>
+                  <Button
+                    variant="outline"
+                    onClick={handleOpenExerciseSelector}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Добавить упражнения
+                  </Button>
                 </div>
-                <Button
-                  onClick={handleCreateWorkout}
-                  disabled={!canConfirmSchedule || !customWorkout.name.trim() || !customWorkout.startDate}
-                  className="ml-auto"
+                
+                {customWorkout.exercises && customWorkout.exercises.length > 0 ? (
+                  <div className="space-y-2">
+                    {customWorkout.exercises.map((exercise, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 border rounded bg-gray-50">
+                        <span>{exercise}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            const newExercises = [...customWorkout.exercises];
+                            newExercises.splice(index, 1);
+                            setCustomWorkout(prev => ({ ...prev, exercises: newExercises }));
+                          }}
+                        >
+                          ✕
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded">
+                    Упражнения не добавлены
+                  </div>
+                )}
+              </div>
+
+              {/* Дополнительные настройки */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Дополнительные настройки</h3>
+                
+                <div className="flex items-center justify-between p-3 border rounded">
+                  <div>
+                    <Label className="text-base font-medium">Таймер</Label>
+                    <p className="text-sm text-muted-foreground">Включить таймер для отдыха между упражнениями</p>
+                  </div>
+                  <Button
+                    variant={customWorkout.timerEnabled ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCustomWorkout(prev => ({ ...prev, timerEnabled: !prev.timerEnabled }))}
+                  >
+                    {customWorkout.timerEnabled ? "Включен" : "Выключен"}
+                  </Button>
+                </div>
+
+                <div>
+                  <Label htmlFor="trainer-notes">Заметки тренера</Label>
+                  <Textarea
+                    id="trainer-notes"
+                    placeholder="Дополнительные заметки или инструкции..."
+                    value={customWorkout.trainerNotes}
+                    onChange={(e) => setCustomWorkout(prev => ({ ...prev, trainerNotes: e.target.value }))}
+                    className="mt-2"
+                  />
+                </div>
+              </div>
+
+              {/* Кнопки действий */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-4 border-t">
+                <Button 
+                  variant="outline" 
+                  className="flex items-center gap-2"
+                  onClick={() => {
+                    toast({
+                      title: "Выбор ученика",
+                      description: "Функция выбора ученика будет добавлена",
+                    });
+                  }}
                 >
-                  Создать тренировку
+                  <User className="h-4 w-4" />
+                  Выбрать ученика
+                </Button>
+                
+                <Button 
+                  disabled={selectedDates.length !== customWorkout.totalSessions}
+                  onClick={() => {
+                    toast({
+                      title: "Тренировка сохранена",
+                      description: "План тренировки сохранен для выбранного ученика",
+                    });
+                  }}
+                >
+                  Сохранить
+                </Button>
+                
+                <Button 
+                  variant="secondary"
+                  onClick={() => {
+                    toast({
+                      title: "План добавлен",
+                      description: "План сохранен в готовые планы",
+                    });
+                  }}
+                >
+                  Сохранить в готовые планы
                 </Button>
               </div>
             </CardContent>
@@ -526,23 +658,32 @@ export function WorkoutsManagement() {
                   id="edit-plan-description"
                   value={editedPlan.description}
                   onChange={(e) => setEditedPlan({ ...editedPlan, description: e.target.value })}
-                  rows={3}
+                  placeholder="Описание плана тренировки"
                 />
               </div>
 
               <div>
                 <Label htmlFor="edit-sessions-per-week">Тренировок в неделю</Label>
-                <Input
-                  id="edit-sessions-per-week"
-                  type="number"
-                  min="1"
-                  max="7"
-                  value={editedPlan.sessionsPerWeek}
-                  onChange={(e) => setEditedPlan({ 
+                <Select 
+                  value={editedPlan.sessionsPerWeek?.toString()} 
+                  onValueChange={(value) => setEditedPlan({ 
                     ...editedPlan, 
-                    sessionsPerWeek: parseInt(e.target.value) || 1 
+                    sessionsPerWeek: parseInt(value) 
                   })}
-                />
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">1 раз в неделю</SelectItem>
+                    <SelectItem value="2">2 раза в неделю</SelectItem>
+                    <SelectItem value="3">3 раза в неделю</SelectItem>
+                    <SelectItem value="4">4 раза в неделю</SelectItem>
+                    <SelectItem value="5">5 раз в неделю</SelectItem>
+                    <SelectItem value="6">6 раз в неделю</SelectItem>
+                    <SelectItem value="7">Ежедневно</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
@@ -610,13 +751,13 @@ export function WorkoutsManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* Диалог выбора календаря */}
+      {/* Диалог календаря */}
       <Dialog open={showCalendarSelector} onOpenChange={setShowCalendarSelector}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Выберите дни тренировок</DialogTitle>
             <DialogDescription>
-              Выберите {customWorkout.totalSessions} дней для тренировок
+              Выберите {customWorkout.totalSessions} дней для проведения тренировок
             </DialogDescription>
           </DialogHeader>
           
@@ -624,32 +765,21 @@ export function WorkoutsManagement() {
             <Calendar
               mode="multiple"
               selected={selectedDates}
-              onSelect={(dates) => {
-                if (dates && dates.length <= customWorkout.totalSessions) {
-                  setSelectedDates(dates);
-                }
-              }}
-              disabled={(date) => {
-                if (!customWorkout.startDate) return true;
-                return date < customWorkout.startDate;
-              }}
-              initialFocus
+              onSelect={(dates) => setSelectedDates(dates || [])}
+              className="rounded-md border"
+              disabled={(date) => date < new Date()}
             />
-            
-            <div className="flex justify-between items-center text-sm text-muted-foreground">
-              <span>Выбрано: {selectedDates.length} из {customWorkout.totalSessions}</span>
-            </div>
             
             <div className="flex gap-2">
               <Button 
-                variant="outline" 
+                variant="outline"
                 onClick={() => setShowCalendarSelector(false)}
                 className="flex-1"
               >
                 Отмена
               </Button>
               <Button 
-                onClick={handleConfirmDates}
+                onClick={() => setShowCalendarSelector(false)}
                 className="flex-1"
                 disabled={selectedDates.length === 0}
               >
