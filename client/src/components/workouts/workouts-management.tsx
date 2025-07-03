@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Dumbbell, Plus, Edit, Calendar as CalendarIcon, Clock, Target, User, CheckCircle, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import type { Exercise } from "@/../../shared/schema";
 
 interface WorkoutPlan {
   id: number;
@@ -118,15 +120,29 @@ export function WorkoutsManagement() {
     }
   };
 
-  // Группы мышц и упражнения
-  const muscleGroups = [
-    { name: 'грудь', exercises: ['Жим лежа', 'Отжимания', 'Жим гантелей лежа', 'Разводка гантелей', 'Жим в тренажере'] },
-    { name: 'спина', exercises: ['Подтягивания', 'Тяга штанги', 'Тяга блока', 'Тяга гантели', 'Гиперэкстензия'] },
-    { name: 'ноги', exercises: ['Приседания', 'Жим ногами', 'Выпады', 'Подъемы на носки', 'Сгибания ног'] },
-    { name: 'плечи', exercises: ['Жим стоя', 'Разводка гантелей', 'Подъемы через стороны', 'Тяга к подбородку', 'Жим в тренажере'] },
-    { name: 'руки', exercises: ['Подъемы на бицепс', 'Французский жим', 'Молотки', 'Отжимания на брусьях', 'Жим узким хватом'] },
-    { name: 'пресс', exercises: ['Скручивания', 'Планка', 'Подъемы ног', 'Велосипед', 'Русские скручивания'] }
-  ];
+  // Загрузка упражнений из API
+  const { data: exercises = [], isLoading: exercisesLoading } = useQuery<Exercise[]>({
+    queryKey: ['/api/exercises'],
+  });
+
+  // Группировка упражнений по группам мышц
+  const muscleGroups = useMemo(() => {
+    const groups: { [key: string]: Exercise[] } = {};
+    
+    exercises.forEach(exercise => {
+      // Используем первую группу мышц из primaryMuscles как основную группу
+      const primaryMuscle = exercise.primaryMuscles?.[0]?.toLowerCase() || 'другое';
+      if (!groups[primaryMuscle]) {
+        groups[primaryMuscle] = [];
+      }
+      groups[primaryMuscle].push(exercise);
+    });
+
+    return Object.entries(groups).map(([name, exerciseList]) => ({
+      name,
+      exercises: exerciseList
+    }));
+  }, [exercises]);
 
   // Функции для редактирования готовых планов
   const handleEditPlan = (plan: WorkoutPlan) => {
@@ -165,12 +181,12 @@ export function WorkoutsManagement() {
     setSelectedMuscleGroup(groupName);
   };
 
-  const handleToggleExercise = (exercise: string) => {
+  const handleToggleExercise = (exerciseName: string) => {
     setSelectedExercises(prev => {
-      if (prev.includes(exercise)) {
-        return prev.filter(e => e !== exercise);
+      if (prev.includes(exerciseName)) {
+        return prev.filter(e => e !== exerciseName);
       } else {
-        return [...prev, exercise];
+        return [...prev, exerciseName];
       }
     });
   };
@@ -655,7 +671,11 @@ export function WorkoutsManagement() {
           </DialogHeader>
           
           <div className="space-y-6">
-            {!selectedMuscleGroup ? (
+            {exercisesLoading ? (
+              <div className="text-center py-8">
+                <div className="text-lg">Загрузка упражнений...</div>
+              </div>
+            ) : !selectedMuscleGroup ? (
               // Выбор группы мышц
               <div>
                 <h3 className="text-lg font-semibold mb-4">Выберите группу мышц</h3>
@@ -695,17 +715,17 @@ export function WorkoutsManagement() {
                     .find(group => group.name === selectedMuscleGroup)
                     ?.exercises.map((exercise) => (
                       <div 
-                        key={exercise}
+                        key={exercise.id}
                         className={`p-3 border rounded cursor-pointer transition-colors ${
-                          selectedExercises.includes(exercise)
+                          selectedExercises.includes(exercise.name)
                             ? 'bg-blue-50 border-blue-300'
                             : 'hover:bg-gray-50'
                         }`}
-                        onClick={() => handleToggleExercise(exercise)}
+                        onClick={() => handleToggleExercise(exercise.name)}
                       >
                         <div className="flex items-center justify-between">
-                          <span>{exercise}</span>
-                          {selectedExercises.includes(exercise) && (
+                          <span>{exercise.name}</span>
+                          {selectedExercises.includes(exercise.name) && (
                             <CheckCircle className="h-5 w-5 text-blue-600" />
                           )}
                         </div>
