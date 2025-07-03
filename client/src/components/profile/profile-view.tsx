@@ -367,15 +367,15 @@ export function ProfileView() {
             >
               <CardContent className="p-3">
                 <div className="relative overflow-hidden rounded-lg">
-                  <div className="relative h-32 overflow-hidden">
+                  <div className="relative h-32 overflow-hidden rounded-lg">
                     {getMuscleGroupImage('руки') ? (
                       <img 
                         src={getMuscleGroupImage('руки')!} 
                         alt="Руки" 
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover rounded-lg"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
+                      <div className="w-full h-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center rounded-lg">
                         <div className="w-16 h-16 text-white">
                           {getExercisePhoto('руки', 'w-16 h-16')}
                         </div>
