@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { User, Filter, Search, Users, Dumbbell, Calendar } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { User, Filter, Search, Users, Dumbbell, Calendar, Upload, Edit2, Image } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -20,6 +21,10 @@ export function ProfileView() {
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedExerciseForDetail, setSelectedExerciseForDetail] = useState<Exercise | null>(null);
+  const [showImageUploadDialog, setShowImageUploadDialog] = useState(false);
+  const [selectedMuscleForImageUpload, setSelectedMuscleForImageUpload] = useState<string>("");
+  const [customMuscleImages, setCustomMuscleImages] = useState<Record<string, string>>({});
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -85,6 +90,49 @@ export function ProfileView() {
         });
       }
     }, 100);
+  };
+
+  const handleImageUpload = (muscleGroup: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    setSelectedMuscleForImageUpload(muscleGroup);
+    setShowImageUploadDialog(true);
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
+        setCustomMuscleImages(prev => ({
+          ...prev,
+          [selectedMuscleForImageUpload]: imageUrl
+        }));
+        setShowImageUploadDialog(false);
+        toast({
+          title: "Изображение загружено",
+          description: `Изображение для группы "${selectedMuscleForImageUpload}" успешно обновлено.`
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const resetMuscleImage = (muscleGroup: string) => {
+    setCustomMuscleImages(prev => {
+      const newImages = { ...prev };
+      delete newImages[muscleGroup];
+      return newImages;
+    });
+    setShowImageUploadDialog(false);
+    toast({
+      title: "Изображение сброшено",
+      description: `Изображение для группы "${muscleGroup}" восстановлено по умолчанию.`
+    });
+  };
+
+  const getMuscleGroupImage = (muscleGroup: string) => {
+    return customMuscleImages[muscleGroup] || null;
   };
 
   return (
@@ -208,12 +256,28 @@ export function ProfileView() {
                 <div className="relative overflow-hidden rounded-lg">
                   <div className="h-32 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
                     <div className="text-white text-center">
-                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        {getExercisePhoto('грудь', 'w-16 h-16')}
+                      <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm relative">
+                        {getMuscleGroupImage('грудь') ? (
+                          <img 
+                            src={getMuscleGroupImage('грудь')!} 
+                            alt="Грудь" 
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                        ) : (
+                          getExercisePhoto('грудь', 'w-16 h-16')
+                        )}
                       </div>
                       <div className="text-lg font-semibold">ГРУДЬ</div>
                     </div>
                   </div>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    onClick={(e) => handleImageUpload('грудь', e)}
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -228,11 +292,27 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        {getExercisePhoto('спина', 'w-16 h-16')}
+                        {getMuscleGroupImage('спина') ? (
+                          <img 
+                            src={getMuscleGroupImage('спина')!} 
+                            alt="Спина" 
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                        ) : (
+                          getExercisePhoto('спина', 'w-16 h-16')
+                        )}
                       </div>
                       <div className="text-lg font-semibold">СПИНА</div>
                     </div>
                   </div>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    onClick={(e) => handleImageUpload('спина', e)}
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -247,11 +327,27 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        {getExercisePhoto('ноги', 'w-16 h-16')}
+                        {getMuscleGroupImage('ноги') ? (
+                          <img 
+                            src={getMuscleGroupImage('ноги')!} 
+                            alt="Ноги" 
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                        ) : (
+                          getExercisePhoto('ноги', 'w-16 h-16')
+                        )}
                       </div>
                       <div className="text-lg font-semibold">НОГИ</div>
                     </div>
                   </div>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    onClick={(e) => handleImageUpload('ноги', e)}
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -266,11 +362,27 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        {getExercisePhoto('руки', 'w-16 h-16')}
+                        {getMuscleGroupImage('руки') ? (
+                          <img 
+                            src={getMuscleGroupImage('руки')!} 
+                            alt="Руки" 
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                        ) : (
+                          getExercisePhoto('руки', 'w-16 h-16')
+                        )}
                       </div>
                       <div className="text-lg font-semibold">РУКИ</div>
                     </div>
                   </div>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    onClick={(e) => handleImageUpload('руки', e)}
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -285,11 +397,27 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        {getExercisePhoto('плечи', 'w-16 h-16')}
+                        {getMuscleGroupImage('плечи') ? (
+                          <img 
+                            src={getMuscleGroupImage('плечи')!} 
+                            alt="Плечи" 
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                        ) : (
+                          getExercisePhoto('плечи', 'w-16 h-16')
+                        )}
                       </div>
                       <div className="text-lg font-semibold">ПЛЕЧИ</div>
                     </div>
                   </div>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    onClick={(e) => handleImageUpload('плечи', e)}
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -304,11 +432,27 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        {getExercisePhoto('ягодичные', 'w-16 h-16')}
+                        {getMuscleGroupImage('ягодичные') ? (
+                          <img 
+                            src={getMuscleGroupImage('ягодичные')!} 
+                            alt="Ягодичные" 
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                        ) : (
+                          getExercisePhoto('ягодичные', 'w-16 h-16')
+                        )}
                       </div>
                       <div className="text-lg font-semibold">ЯГОДИЧНЫЕ</div>
                     </div>
                   </div>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    onClick={(e) => handleImageUpload('ягодичные', e)}
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -323,11 +467,27 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        {getExercisePhoto('живот', 'w-16 h-16')}
+                        {getMuscleGroupImage('живот') ? (
+                          <img 
+                            src={getMuscleGroupImage('живот')!} 
+                            alt="Живот" 
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                        ) : (
+                          getExercisePhoto('живот', 'w-16 h-16')
+                        )}
                       </div>
                       <div className="text-lg font-semibold">ЖИВОТ</div>
                     </div>
                   </div>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    onClick={(e) => handleImageUpload('живот', e)}
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -342,11 +502,27 @@ export function ProfileView() {
                   <div className="h-32 bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center">
                     <div className="text-white text-center">
                       <div className="mb-2 w-20 h-20 mx-auto flex items-center justify-center border-4 border-white rounded-lg bg-white/20 backdrop-blur-sm">
-                        {getExercisePhoto('кардио', 'w-16 h-16')}
+                        {getMuscleGroupImage('кардио') ? (
+                          <img 
+                            src={getMuscleGroupImage('кардио')!} 
+                            alt="Кардио" 
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                        ) : (
+                          getExercisePhoto('кардио', 'w-16 h-16')
+                        )}
                       </div>
                       <div className="text-lg font-semibold">КАРДИО</div>
                     </div>
                   </div>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    onClick={(e) => handleImageUpload('кардио', e)}
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -432,6 +608,46 @@ export function ProfileView() {
           }}
         />
       )}
+
+      {/* Диалог для загрузки изображений */}
+      <Dialog open={showImageUploadDialog} onOpenChange={setShowImageUploadDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Изменить изображение группы мышц</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600">
+              Выберите новое изображение для группы "{selectedMuscleForImageUpload}"
+            </p>
+            <div className="flex flex-col gap-3">
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Загрузить изображение
+              </Button>
+              {customMuscleImages[selectedMuscleForImageUpload] && (
+                <Button
+                  variant="outline"
+                  onClick={() => resetMuscleImage(selectedMuscleForImageUpload)}
+                  className="w-full"
+                >
+                  <Image className="h-4 w-4 mr-2" />
+                  Восстановить по умолчанию
+                </Button>
+              )}
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
