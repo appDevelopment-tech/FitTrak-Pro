@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Dumbbell, Plus, Edit, Calendar as CalendarIcon, Clock, Target, User, CheckCircle, AlertCircle } from "lucide-react";
+import { Dumbbell, Plus, Edit, Calendar as CalendarIcon, Clock, Target, User, CheckCircle, AlertCircle, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { StudentSelectionDialog } from "./StudentSelectionDialog";
 import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
@@ -126,8 +126,31 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
   ];
 
   const handleSelectPlan = (plan: WorkoutPlan) => {
-    setSelectedPlanForStudent(plan);
-    setShowStudentSelectionDialog(true);
+    // Если есть выбранный ученик из расписания, сразу прикрепляем план
+    if (selectedPupilFromSchedule && user) {
+      const workoutProgram: WorkoutProgram = {
+        id: Date.now(), // Временный ID
+        name: plan.name,
+        description: plan.description,
+        difficulty: plan.difficulty,
+        exercises: plan.exercises || [],
+        type: plan.type || 'strength',
+        createdBy: user.id,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      addActiveWorkout(user.id, selectedPupilFromSchedule, workoutProgram);
+      
+      toast({
+        title: "План прикреплен!",
+        description: `План "${plan.name}" прикреплен к ученику ${selectedPupilFromSchedule.firstName} ${selectedPupilFromSchedule.lastName}`,
+      });
+    } else {
+      // Если нет выбранного ученика, открываем диалог выбора
+      setSelectedPlanForStudent(plan);
+      setShowStudentSelectionDialog(true);
+    }
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -311,9 +334,24 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2">
-        <Dumbbell className="h-6 w-6 text-blue-600" />
-        <h2 className="text-2xl font-bold">Тренировки</h2>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Dumbbell className="h-6 w-6 text-blue-600" />
+          <h2 className="text-2xl font-bold">Тренировки</h2>
+        </div>
+        {selectedPupilFromSchedule && (
+          <div className="flex items-center gap-2 px-3 py-1 bg-orange-100 rounded-lg">
+            <Users className="h-4 w-4 text-orange-600" />
+            <span className="text-sm font-medium text-orange-800">
+              Выбран: {selectedPupilFromSchedule.firstName} {selectedPupilFromSchedule.lastName}
+            </span>
+            {isWorkoutActive(trainerId, selectedPupilFromSchedule.id) && (
+              <Badge className="bg-green-100 text-green-800 ml-2">
+                Активная тренировка
+              </Badge>
+            )}
+          </div>
+        )}
       </div>
 
       <Tabs defaultValue="ready-plans" className="w-full">
