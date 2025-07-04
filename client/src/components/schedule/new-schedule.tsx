@@ -13,6 +13,7 @@ import type { Pupil } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { TwoMonthCalendar } from "./two-month-calendar";
 import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
+import { useLocation } from "wouter";
 
 interface ScheduleSession {
   id: number;
@@ -50,6 +51,7 @@ export function NewSchedule() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { isWorkoutActive } = useActiveWorkout();
+  const [, setLocation] = useLocation();
 
   // Загружаем учеников
   const { data: pupils = [] } = useQuery<Pupil[]>({
@@ -419,6 +421,8 @@ export function NewSchedule() {
                                         description: `Выберите план тренировки для ${pupil.firstName} ${pupil.lastName}`,
                                       });
                                     }
+                                    // Переходим в кабинет с вкладкой тренировок и сохраняем выбранного ученика
+                                    setLocation(`/profile?tab=programs&pupilId=${pupil.id}`);
                                   }}
                                   className={`p-1.5 rounded-full transition-colors ${
                                     isWorkoutActive(1, pupil.id)

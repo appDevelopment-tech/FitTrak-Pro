@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,11 +10,12 @@ import { User, Filter, Search, Users, Dumbbell, Calendar, Upload, Edit2, Image }
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { User as UserType, Exercise } from "@shared/schema";
+import type { User as UserType, Exercise, Pupil } from "@shared/schema";
 import { getExercisePhoto } from "@/components/ui/exercise-photos";
 import { ExerciseDetail } from "@/components/exercise/exercise-detail";
 import { StudentsManagement } from "@/components/students/students-management";
 import { WorkoutsManagement } from "@/components/workouts/workouts-management";
+import { useLocation } from "wouter";
 
 export function ProfileView() {
   const [isEditing, setIsEditing] = useState(false);
@@ -24,10 +25,13 @@ export function ProfileView() {
   const [showImageUploadDialog, setShowImageUploadDialog] = useState(false);
   const [selectedMuscleForImageUpload, setSelectedMuscleForImageUpload] = useState<string>("");
   const [customMuscleImages, setCustomMuscleImages] = useState<Record<string, string>>({});
+  const [activeTab, setActiveTab] = useState<string>("profile");
+  const [selectedPupil, setSelectedPupil] = useState<Pupil | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [location] = useLocation();
   
   const { data: user } = useQuery<UserType>({
     queryKey: ['/api/user/1'],
@@ -36,6 +40,29 @@ export function ProfileView() {
   const { data: exercises = [] } = useQuery<Exercise[]>({
     queryKey: ['/api/exercises'],
   });
+
+  // Загружаем учеников для поиска выбранного ученика из URL
+  const { data: pupils = [] } = useQuery<Pupil[]>({
+    queryKey: ['/api/trainers/1/pupils'],
+  });
+
+  // Обработка URL параметров
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.split('?')[1] || '');
+    const tab = urlParams.get('tab');
+    const pupilId = urlParams.get('pupilId');
+
+    if (tab) {
+      setActiveTab(tab);
+    }
+
+    if (pupilId && pupils.length > 0) {
+      const pupil = pupils.find(p => p.id === parseInt(pupilId));
+      if (pupil) {
+        setSelectedPupil(pupil);
+      }
+    }
+  }, [location, pupils]);
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => apiRequest(`/api/exercises/${id}`, 'DELETE'),
@@ -137,7 +164,7 @@ export function ProfileView() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <Tabs defaultValue="profile" className="space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="profile">Тренер</TabsTrigger>
           <TabsTrigger value="students">Ученики</TabsTrigger>
@@ -239,7 +266,7 @@ export function ProfileView() {
         </TabsContent>
 
         <TabsContent value="programs">
-          <WorkoutsManagement selectedPupilFromSchedule={null} />
+          <WorkoutsManagement selectedPupilFromSchedule={selectedPupil} />
         </TabsContent>
 
         <TabsContent value="exercises" className="space-y-6">
