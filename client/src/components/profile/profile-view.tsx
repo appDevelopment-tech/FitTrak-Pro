@@ -25,13 +25,18 @@ export function ProfileView() {
   const [showImageUploadDialog, setShowImageUploadDialog] = useState(false);
   const [selectedMuscleForImageUpload, setSelectedMuscleForImageUpload] = useState<string>("");
   const [customMuscleImages, setCustomMuscleImages] = useState<Record<string, string>>({});
-  const [activeTab, setActiveTab] = useState<string>("profile");
   const [selectedPupil, setSelectedPupil] = useState<Pupil | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [location] = useLocation();
+  
+  // Инициализируем activeTab на основе URL параметров
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    const urlParams = new URLSearchParams(location.split('?')[1] || '');
+    return urlParams.get('tab') || "profile";
+  });
   
   const { data: user } = useQuery<UserType>({
     queryKey: ['/api/user/1'],
