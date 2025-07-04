@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertWorkoutProgramSchema, insertWorkoutSessionSchema, insertExerciseProgressSchema, insertExerciseSchema, insertPupilTrainingPlanSchema, insertPupilSchema } from "@shared/schema";
+import { insertWorkoutProgramSchema, insertWorkoutSessionSchema, insertExerciseProgressSchema, insertExerciseSchema, insertPupilTrainingPlanSchema, insertPupilSchema, insertActiveWorkoutSchema } from "@shared/schema";
 
 function translateExerciseToEnglish(russianName: string): string {
   const translations: Record<string, string> = {
@@ -443,6 +443,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true });
     } catch (error) {
       res.status(400).json({ message: "Failed to delete training plan" });
+    }
+  });
+
+  // Active workout routes
+  app.get("/api/trainers/:trainerId/active-workouts", async (req, res) => {
+    try {
+      const trainerId = parseInt(req.params.trainerId);
+      const activeWorkouts = await storage.getActiveWorkouts(trainerId);
+      res.json(activeWorkouts);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get active workouts" });
+    }
+  });
+
+  app.get("/api/trainers/:trainerId/pupils/:pupilId/active-workout", async (req, res) => {
+    try {
+      const trainerId = parseInt(req.params.trainerId);
+      const pupilId = parseInt(req.params.pupilId);
+      const activeWorkout = await storage.getActiveWorkout(trainerId, pupilId);
+      res.json(activeWorkout || null);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get active workout" });
+    }
+  });
+
+  app.post("/api/active-workouts", async (req, res) => {
+    try {
+      const workoutData = insertActiveWorkoutSchema.parse(req.body);
+      const activeWorkout = await storage.createActiveWorkout(workoutData);
+      res.json(activeWorkout);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to create active workout" });
+    }
+  });
+
+  app.delete("/api/trainers/:trainerId/pupils/:pupilId/active-workout", async (req, res) => {
+    try {
+      const trainerId = parseInt(req.params.trainerId);
+      const pupilId = parseInt(req.params.pupilId);
+      const success = await storage.deleteActiveWorkout(trainerId, pupilId);
+      if (!success) {
+        return res.status(404).json({ message: "Active workout not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      res.status(400).json({ message: "Failed to delete active workout" });
     }
   });
 

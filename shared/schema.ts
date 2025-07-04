@@ -127,6 +127,15 @@ export const pupilWorkoutHistory = pgTable("pupil_workout_history", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Активные тренировки
+export const activeWorkouts = pgTable("active_workouts", {
+  id: serial("id").primaryKey(),
+  trainerId: integer("trainer_id").notNull(),
+  pupilId: integer("pupil_id").notNull(),
+  workoutProgramId: integer("workout_program_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
 });
@@ -161,6 +170,11 @@ export const insertPupilWorkoutHistorySchema = createInsertSchema(pupilWorkoutHi
   id: true,
 });
 
+export const insertActiveWorkoutSchema = createInsertSchema(activeWorkouts).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Pupil = typeof pupils.$inferSelect;
@@ -177,3 +191,5 @@ export type PupilTrainingPlan = typeof pupilTrainingPlans.$inferSelect;
 export type InsertPupilTrainingPlan = z.infer<typeof insertPupilTrainingPlanSchema>;
 export type PupilWorkoutHistory = typeof pupilWorkoutHistory.$inferSelect;
 export type InsertPupilWorkoutHistory = z.infer<typeof insertPupilWorkoutHistorySchema>;
+export type ActiveWorkout = typeof activeWorkouts.$inferSelect;
+export type InsertActiveWorkout = z.infer<typeof insertActiveWorkoutSchema>;

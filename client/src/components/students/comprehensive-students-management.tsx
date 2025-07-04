@@ -31,6 +31,7 @@ import {
   Dumbbell
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
 import type { Pupil, InsertPupil } from "@shared/schema";
 
 interface PupilsStats {
@@ -52,6 +53,9 @@ export function ComprehensiveStudentsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { isWorkoutActive, removeActiveWorkout } = useActiveWorkout();
+  
+  const trainerId = 1; // В реальном приложении это будет из контекста пользователя
 
   // Получаем статистику учеников
   const { data: stats } = useQuery<PupilsStats>({
@@ -279,6 +283,29 @@ export function ComprehensiveStudentsManagement() {
                       Ограничения
                     </Badge>
                   )}
+                  
+                  {/* Индикатор активной тренировки */}
+                  {isWorkoutActive(trainerId, pupil.id) && (
+                    <div className="relative group">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 w-8 p-0 text-orange-500 hover:text-orange-600 hover:bg-orange-50"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Переход к активной тренировке
+                          toast({
+                            title: "На тренировку",
+                            description: `Ученик ${pupil.firstName} ${pupil.lastName} на активной тренировке`,
+                          });
+                        }}
+                        title="На тренировку"
+                      >
+                        <Dumbbell className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                  
                   <Button
                     size="sm"
                     variant="outline"

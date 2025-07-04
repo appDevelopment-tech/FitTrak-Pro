@@ -12,7 +12,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Dumbbell, Plus, Edit, Calendar as CalendarIcon, Clock, Target, User, CheckCircle, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import type { Exercise } from "@/../../shared/schema";
+import { StudentSelectionDialog } from "./StudentSelectionDialog";
+import type { Exercise, Pupil, WorkoutProgram } from "@/../../shared/schema";
 
 interface WorkoutPlan {
   id: number;
@@ -33,6 +34,8 @@ export function WorkoutsManagement() {
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string>('');
   const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
+  const [showStudentSelectionDialog, setShowStudentSelectionDialog] = useState(false);
+  const [selectedPlanForStudent, setSelectedPlanForStudent] = useState<WorkoutPlan | null>(null);
   const [customWorkout, setCustomWorkout] = useState({
     name: '',
     level: 'начальный',
@@ -46,6 +49,17 @@ export function WorkoutsManagement() {
   });
 
   const { toast } = useToast();
+
+  // Загрузка данных пользователя и учеников
+  const { data: user } = useQuery({
+    queryKey: ['/api/user/1']
+  });
+
+  const { data: pupils = [] } = useQuery<Pupil[]>({
+    queryKey: ['/api/trainers/1/pupils']
+  });
+
+  const trainerId = user?.id || 1;
 
   // Готовые планы тренировок
   const readyPlans: WorkoutPlan[] = [
@@ -106,11 +120,8 @@ export function WorkoutsManagement() {
   ];
 
   const handleSelectPlan = (plan: WorkoutPlan) => {
-    console.log('Прикрепить план тренировки для ученика:', plan.id);
-    toast({
-      title: "План выбран",
-      description: `План "${plan.name}" готов к прикреплению к ученику`,
-    });
+    setSelectedPlanForStudent(plan);
+    setShowStudentSelectionDialog(true);
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -896,6 +907,31 @@ export function WorkoutsManagement() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Диалог выбора ученика */}
+      {selectedPlanForStudent && (
+        <StudentSelectionDialog
+          isOpen={showStudentSelectionDialog}
+          onClose={() => {
+            setShowStudentSelectionDialog(false);
+            setSelectedPlanForStudent(null);
+          }}
+          program={{
+            id: selectedPlanForStudent.id,
+            name: selectedPlanForStudent.name,
+            description: selectedPlanForStudent.description,
+            difficulty: selectedPlanForStudent.difficulty,
+            duration: selectedPlanForStudent.sessionsPerWeek,
+            type: selectedPlanForStudent.type,
+            exercises: selectedPlanForStudent.exercises || [],
+            createdBy: trainerId,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          } as WorkoutProgram}
+          pupils={pupils}
+          trainerId={trainerId}
+        />
+      )}
     </div>
   );
 }
