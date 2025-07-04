@@ -426,10 +426,24 @@ export function WorkoutsManagement() {
                       id="start-date"
                       type="date"
                       value={customWorkout.startDate ? customWorkout.startDate.toISOString().split('T')[0] : ''}
-                      onChange={(e) => setCustomWorkout(prev => ({ 
-                        ...prev, 
-                        startDate: e.target.value ? new Date(e.target.value) : null 
-                      }))}
+                      onChange={(e) => {
+                        const newStartDate = e.target.value ? new Date(e.target.value) : null;
+                        setCustomWorkout(prev => ({ 
+                          ...prev, 
+                          startDate: newStartDate
+                        }));
+                        
+                        // Сбрасываем выбранные даты при изменении даты первой тренировки
+                        if (newStartDate) {
+                          setSelectedDates(selectedDates.filter(date => {
+                            const dateOnly = new Date(date);
+                            dateOnly.setHours(0, 0, 0, 0);
+                            const startDateOnly = new Date(newStartDate);
+                            startDateOnly.setHours(0, 0, 0, 0);
+                            return dateOnly >= startDateOnly;
+                          }));
+                        }
+                      }}
                     />
                   </div>
                   
@@ -778,7 +792,20 @@ export function WorkoutsManagement() {
               selected={selectedDates}
               onSelect={(dates) => setSelectedDates(dates || [])}
               className="rounded-md border"
-              disabled={(date) => date < new Date()}
+              disabled={(date) => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                // Если выбрана дата первой тренировки, не разрешать выбирать даты раньше неё
+                if (customWorkout.startDate) {
+                  const startDate = new Date(customWorkout.startDate);
+                  startDate.setHours(0, 0, 0, 0);
+                  return date < startDate;
+                }
+                
+                // Иначе не разрешать выбирать даты раньше сегодняшнего дня
+                return date < today;
+              }}
             />
             
             <div className="flex gap-2">
