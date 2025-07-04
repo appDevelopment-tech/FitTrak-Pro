@@ -284,37 +284,29 @@ export function ComprehensiveStudentsManagement() {
                     </Badge>
                   )}
                   
-                  {/* Индикатор активной тренировки */}
-                  {isWorkoutActive(trainerId, pupil.id) && (
-                    <div className="relative group">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-8 w-8 p-0 text-orange-500 hover:text-orange-600 hover:bg-orange-50"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // Переход к активной тренировке
-                          toast({
-                            title: "На тренировку",
-                            description: `Ученик ${pupil.firstName} ${pupil.lastName} на активной тренировке`,
-                          });
-                        }}
-                        title="На тренировку"
-                      >
-                        <Dumbbell className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                  
+                  {/* Единая кнопка гантели */}
                   <Button
                     size="sm"
-                    variant="outline"
+                    variant="ghost"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleAssignWorkout(pupil);
+                      if (isWorkoutActive(trainerId, pupil.id)) {
+                        // Переход к активной тренировке
+                        toast({
+                          title: "Открытие тренировки",
+                          description: `Открываем активную тренировку для ${pupil.firstName} ${pupil.lastName}`,
+                        });
+                      } else {
+                        // Прикрепить новый план
+                        handleAssignWorkout(pupil);
+                      }
                     }}
-                    className="h-8 w-8 p-0"
-                    title="Прикрепить тренировочный план"
+                    className={`h-8 w-8 p-0 transition-colors ${
+                      isWorkoutActive(trainerId, pupil.id)
+                        ? 'text-orange-600 hover:text-orange-700 hover:bg-orange-50'
+                        : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                    }`}
+                    title={isWorkoutActive(trainerId, pupil.id) ? "Открыть активную тренировку" : "Прикрепить тренировочный план"}
                   >
                     <Dumbbell className="h-4 w-4" />
                   </Button>
