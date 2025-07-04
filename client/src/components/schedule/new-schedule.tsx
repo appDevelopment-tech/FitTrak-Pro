@@ -422,7 +422,7 @@ export function NewSchedule() {
                                       });
                                     }
                                     // Переходим в кабинет с вкладкой тренировок и сохраняем выбранного ученика
-                                    setLocation(`/profile?tab=programs&pupilId=${pupil.id}`);
+                                    setLocation(`/cabinet?tab=programs&pupilId=${pupil.id}`);
                                   }}
                                   className={`p-1.5 rounded-full transition-colors ${
                                     isWorkoutActive(1, pupil.id)
