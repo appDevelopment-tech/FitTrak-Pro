@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Dumbbell, Plus, Edit, Calendar as CalendarIcon, Clock, Target, User, CheckCircle, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { StudentSelectionDialog } from "./StudentSelectionDialog";
+import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
 import type { Exercise, Pupil, WorkoutProgram } from "@/../../shared/schema";
 
 interface WorkoutPlan {
@@ -26,6 +27,7 @@ interface WorkoutPlan {
 }
 
 export function WorkoutsManagement() {
+  const { activeWorkouts } = useActiveWorkout();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingPlan, setEditingPlan] = useState<WorkoutPlan | null>(null);
   const [editedPlan, setEditedPlan] = useState<WorkoutPlan | null>(null);
@@ -367,9 +369,10 @@ export function WorkoutsManagement() {
                     <Button
                       onClick={() => handleSelectPlan(plan)}
                       size="sm"
-                      className="flex-1"
+                      className="flex-1 flex items-center gap-1"
                     >
-                      Выбрать
+                      <Dumbbell className="h-4 w-4" />
+                      Выбрать ученика
                     </Button>
                   </div>
                 </CardContent>

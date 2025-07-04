@@ -12,6 +12,7 @@ import { apiRequest } from "@/lib/queryClient";
 import type { Pupil } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { TwoMonthCalendar } from "./two-month-calendar";
+import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
 
 interface ScheduleSession {
   id: number;
@@ -48,6 +49,7 @@ export function NewSchedule() {
   const [deleteTarget, setDeleteTarget] = useState<{ sessionId: number; pupilId: number } | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { isWorkoutActive } = useActiveWorkout();
 
   // Загружаем учеников
   const { data: pupils = [] } = useQuery<Pupil[]>({
@@ -404,9 +406,26 @@ export function NewSchedule() {
                                   }
                                 </button>
                                 <button
-                                  onClick={() => console.log('Прикрепить план тренировки для ученика:', pupil.id)}
-                                  className="p-1.5 rounded-full text-blue-600 bg-blue-100 hover:bg-blue-200 transition-colors"
-                                  title="Прикрепить тренировочный план"
+                                  onClick={() => {
+                                    const trainerId = 1; // Получаем из контекста пользователя
+                                    if (isWorkoutActive(trainerId, pupil.id)) {
+                                      toast({
+                                        title: "Открытие тренировки",
+                                        description: `Открываем активную тренировку для ${pupil.firstName} ${pupil.lastName}`,
+                                      });
+                                    } else {
+                                      toast({
+                                        title: "Прикрепление плана",
+                                        description: `Выберите план тренировки для ${pupil.firstName} ${pupil.lastName}`,
+                                      });
+                                    }
+                                  }}
+                                  className={`p-1.5 rounded-full transition-colors ${
+                                    isWorkoutActive(1, pupil.id)
+                                      ? 'text-orange-600 bg-orange-100 hover:bg-orange-200'
+                                      : 'text-gray-400 bg-gray-100 hover:bg-gray-200'
+                                  }`}
+                                  title={isWorkoutActive(1, pupil.id) ? "Открыть активную тренировку" : "Прикрепить тренировочный план"}
                                 >
                                   <Dumbbell className="h-4 w-4" />
                                 </button>

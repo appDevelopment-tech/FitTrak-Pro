@@ -25,7 +25,7 @@ export function StudentSelectionDialog({
   trainerId
 }: StudentSelectionDialogProps) {
   const [selectedPupil, setSelectedPupil] = useState<Pupil | null>(null);
-  const { addActiveWorkout, isWorkoutActive } = useActiveWorkout();
+  const { addActiveWorkout, isWorkoutActive, removeActiveWorkout } = useActiveWorkout();
   const { toast } = useToast();
 
   const handleSelectPupil = (pupil: Pupil) => {
@@ -60,6 +60,14 @@ export function StudentSelectionDialog({
   const handleCancel = () => {
     setSelectedPupil(null);
     onClose();
+  };
+
+  const handleCancelWorkout = (pupil: Pupil) => {
+    removeActiveWorkout(trainerId, pupil.id);
+    toast({
+      title: "План отменен",
+      description: `Тренировочный план для ${pupil.firstName} ${pupil.lastName} был отменен.`,
+    });
   };
 
   const getInitials = (firstName: string, lastName: string) => {
@@ -145,11 +153,27 @@ export function StudentSelectionDialog({
                         </div>
                       </div>
                       
-                      {isSelected && (
-                        <div className="text-blue-500 font-medium">
-                          Выбран
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {isActive && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCancelWorkout(pupil);
+                            }}
+                            className="text-orange-600 border-orange-300 hover:bg-orange-50"
+                          >
+                            Отменить план
+                          </Button>
+                        )}
+                        
+                        {isSelected && !isActive && (
+                          <div className="text-blue-500 font-medium">
+                            Выбран
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
