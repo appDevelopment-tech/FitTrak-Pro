@@ -593,15 +593,23 @@ export function WorkoutsManagement() {
               </div>
 
               {/* Кнопки действий */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-4 border-t">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-4 border-t">
                 <Button 
                   variant="outline" 
                   className="flex items-center gap-2"
+                  disabled={!canConfirmSchedule || !customWorkout.name.trim()}
                   onClick={() => {
-                    toast({
-                      title: "Выбор ученика",
-                      description: "Функция выбора ученика будет добавлена",
+                    // Открываем диалог выбора ученика для прикрепления плана
+                    setSelectedPlanForStudent({
+                      id: 0, // Временный ID для кастомного плана
+                      name: customWorkout.name,
+                      description: customWorkout.trainerNotes || 'Индивидуальная тренировка',
+                      difficulty: customWorkout.level,
+                      sessionsPerWeek: customWorkout.sessionsPerWeek,
+                      type: 'custom',
+                      exercises: customWorkout.exercises
                     });
+                    setShowStudentSelectionDialog(true);
                   }}
                 >
                   <User className="h-4 w-4" />
@@ -609,27 +617,29 @@ export function WorkoutsManagement() {
                 </Button>
                 
                 <Button 
-                  disabled={selectedDates.length !== customWorkout.totalSessions}
+                  disabled={!canConfirmSchedule || !customWorkout.name.trim()}
                   onClick={() => {
                     toast({
-                      title: "Тренировка сохранена",
-                      description: "План тренировки сохранен для выбранного ученика",
+                      title: "План сохранен",
+                      description: `План "${customWorkout.name}" сохранен в готовые планы и доступен для использования`,
                     });
+                    
+                    // Сброс формы после сохранения
+                    setCustomWorkout({
+                      name: '',
+                      level: 'начальный',
+                      totalSessions: 1,
+                      sessionsPerWeek: 3,
+                      startDate: null,
+                      startTime: '09:00',
+                      trainerNotes: '',
+                      exercises: [],
+                      timerEnabled: false
+                    });
+                    setSelectedDates([]);
                   }}
                 >
                   Сохранить
-                </Button>
-                
-                <Button 
-                  variant="secondary"
-                  onClick={() => {
-                    toast({
-                      title: "План добавлен",
-                      description: "План сохранен в готовые планы",
-                    });
-                  }}
-                >
-                  Сохранить в готовые планы
                 </Button>
               </div>
             </CardContent>
