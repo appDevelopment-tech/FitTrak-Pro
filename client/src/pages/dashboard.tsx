@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Bell, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +21,18 @@ import type { WorkoutSession, WorkoutProgram, User } from "@shared/schema";
 export default function Dashboard() {
   const [activeView, setActiveView] = useState('schedule');
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [location] = useLocation();
+
+  // Обработка URL при загрузке страницы
+  useEffect(() => {
+    const currentPath = location.split('?')[0];
+    
+    if (currentPath === '/cabinet') {
+      setActiveView('profile');
+    } else if (currentPath === '/dashboard' || currentPath === '/') {
+      setActiveView('schedule');
+    }
+  }, [location]);
 
   const handleViewChange = (view: string) => {
     setActiveView(view);
