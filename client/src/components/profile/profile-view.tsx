@@ -32,11 +32,7 @@ export function ProfileView() {
   const queryClient = useQueryClient();
   const [location] = useLocation();
   
-  // Инициализируем activeTab на основе URL параметров
-  const [activeTab, setActiveTab] = useState<string>(() => {
-    const urlParams = new URLSearchParams(location.split('?')[1] || '');
-    return urlParams.get('tab') || "profile";
-  });
+  const [activeTab, setActiveTab] = useState<string>("profile");
   
   const { data: user } = useQuery<UserType>({
     queryKey: ['/api/user/1'],
@@ -57,13 +53,19 @@ export function ProfileView() {
     const tab = urlParams.get('tab');
     const pupilId = urlParams.get('pupilId');
 
+    // Устанавливаем вкладку сразу при наличии параметра
     if (tab) {
+      console.log('Setting tab from URL:', tab); // Для отладки
       setActiveTab(tab);
+    } else {
+      // Если нет параметра tab, возвращаемся к profile
+      setActiveTab("profile");
     }
 
     if (pupilId && pupils.length > 0) {
       const pupil = pupils.find(p => p.id === parseInt(pupilId));
       if (pupil) {
+        console.log('Setting pupil from URL:', pupil); // Для отладки
         setSelectedPupil(pupil);
       }
     }
