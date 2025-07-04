@@ -406,7 +406,7 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
                     <Button
                       variant="outline"
                       size="sm"
-                      className="flex-1"
+                      className="w-full"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleEditPlan(plan);
@@ -415,10 +415,6 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
                       <Edit className="h-4 w-4 mr-1" />
                       Редактировать
                     </Button>
-                    <div className="flex-1 flex items-center justify-center text-orange-600 group-hover:text-orange-700">
-                      <Dumbbell className="h-4 w-4 mr-1" />
-                      <span className="text-sm font-medium">Прикрепить</span>
-                    </div>
                   </div>
                 </CardContent>
               </Card>

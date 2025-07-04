@@ -55,7 +55,6 @@ export function ProfileView() {
 
     // Устанавливаем вкладку сразу при наличии параметра
     if (tab) {
-      console.log('Setting tab from URL:', tab); // Для отладки
       setActiveTab(tab);
     } else {
       // Если нет параметра tab, возвращаемся к profile
@@ -65,7 +64,6 @@ export function ProfileView() {
     if (pupilId && pupils.length > 0) {
       const pupil = pupils.find(p => p.id === parseInt(pupilId));
       if (pupil) {
-        console.log('Setting pupil from URL:', pupil); // Для отладки
         setSelectedPupil(pupil);
       }
     }
