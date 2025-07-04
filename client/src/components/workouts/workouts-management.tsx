@@ -26,8 +26,12 @@ interface WorkoutPlan {
   exercises?: string[];
 }
 
-export function WorkoutsManagement() {
-  const { activeWorkouts } = useActiveWorkout();
+interface WorkoutsManagementProps {
+  selectedPupilFromSchedule?: Pupil | null;
+}
+
+export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManagementProps) {
+  const { activeWorkouts, addActiveWorkout } = useActiveWorkout();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingPlan, setEditingPlan] = useState<WorkoutPlan | null>(null);
   const [editedPlan, setEditedPlan] = useState<WorkoutPlan | null>(null);
@@ -322,10 +326,14 @@ export function WorkoutsManagement() {
         <TabsContent value="ready-plans" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {readyPlans.map((plan) => (
-              <Card key={plan.id} className="hover:shadow-md transition-shadow">
+              <Card 
+                key={plan.id} 
+                className="hover:shadow-lg hover:border-orange-200 transition-all duration-200 cursor-pointer group"
+                onClick={() => handleSelectPlan(plan)}
+              >
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
-                    <CardTitle className="text-lg">{plan.name}</CardTitle>
+                    <CardTitle className="text-lg group-hover:text-orange-600 transition-colors">{plan.name}</CardTitle>
                     <Badge className={getDifficultyColor(plan.difficulty)}>
                       {plan.difficulty}
                     </Badge>
@@ -361,19 +369,18 @@ export function WorkoutsManagement() {
                       variant="outline"
                       size="sm"
                       className="flex-1"
-                      onClick={() => handleEditPlan(plan)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditPlan(plan);
+                      }}
                     >
                       <Edit className="h-4 w-4 mr-1" />
                       Редактировать
                     </Button>
-                    <Button
-                      onClick={() => handleSelectPlan(plan)}
-                      size="sm"
-                      className="flex-1 flex items-center gap-1"
-                    >
-                      <Dumbbell className="h-4 w-4" />
-                      Выбрать ученика
-                    </Button>
+                    <div className="flex-1 flex items-center justify-center text-orange-600 group-hover:text-orange-700">
+                      <Dumbbell className="h-4 w-4 mr-1" />
+                      <span className="text-sm font-medium">Прикрепить</span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -622,10 +629,32 @@ export function WorkoutsManagement() {
                 <Button 
                   disabled={!canConfirmSchedule || !customWorkout.name.trim()}
                   onClick={() => {
-                    toast({
-                      title: "План сохранен",
-                      description: `План "${customWorkout.name}" сохранен в готовые планы и доступен для использования`,
-                    });
+                    // Если есть выбранный ученик из расписания, автоматически прикрепляем план
+                    if (selectedPupilFromSchedule && user) {
+                      const workoutProgram: WorkoutProgram = {
+                        id: Date.now(), // Временный ID
+                        name: customWorkout.name,
+                        description: customWorkout.trainerNotes || 'Индивидуальная тренировка',
+                        difficulty: customWorkout.level,
+                        type: 'custom',
+                        exercises: customWorkout.exercises,
+                        createdBy: user.id,
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                      };
+
+                      addActiveWorkout(user.id, selectedPupilFromSchedule, workoutProgram);
+                      
+                      toast({
+                        title: "Тренировка прикреплена!",
+                        description: `План "${customWorkout.name}" создан и прикреплен к ученику ${selectedPupilFromSchedule.firstName} ${selectedPupilFromSchedule.lastName}`,
+                      });
+                    } else {
+                      toast({
+                        title: "План сохранен",
+                        description: `План "${customWorkout.name}" сохранен в готовые планы и доступен для использования`,
+                      });
+                    }
                     
                     // Сброс формы после сохранения
                     setCustomWorkout({
@@ -642,7 +671,7 @@ export function WorkoutsManagement() {
                     setSelectedDates([]);
                   }}
                 >
-                  Сохранить
+                  {selectedPupilFromSchedule ? 'Создать и прикрепить' : 'Сохранить'}
                 </Button>
               </div>
             </CardContent>
