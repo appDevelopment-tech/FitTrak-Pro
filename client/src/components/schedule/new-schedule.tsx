@@ -422,6 +422,7 @@ export function NewSchedule() {
                                       });
                                     }
                                     // Переходим в кабинет с вкладкой тренировок и сохраняем выбранного ученика
+                                    console.log(`Navigating to: /cabinet?tab=programs&pupilId=${pupil.id}`);
                                     setLocation(`/cabinet?tab=programs&pupilId=${pupil.id}`);
                                   }}
                                   className={`p-1.5 rounded-full transition-colors ${
