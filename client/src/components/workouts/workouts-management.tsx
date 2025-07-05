@@ -32,8 +32,6 @@ interface WorkoutsManagementProps {
 }
 
 export function WorkoutsManagement({ selectedPupilFromSchedule, activeTab }: WorkoutsManagementProps) {
-  console.log('WorkoutsManagement received:', { selectedPupilFromSchedule, activeTab });
-  console.log('Ready plans tab should show:', activeTab === 'programs' || activeTab === 'ready-plans');
   const { activeWorkouts, addActiveWorkout, isWorkoutActive } = useActiveWorkout();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingPlan, setEditingPlan] = useState<WorkoutPlan | null>(null);
@@ -142,12 +140,7 @@ export function WorkoutsManagement({ selectedPupilFromSchedule, activeTab }: Wor
 
       addActiveWorkout(user.id, selectedPupilFromSchedule, workoutProgram);
       
-      // Отладочная информация
-      console.log('План прикреплен:', {
-        trainerId: user.id,
-        pupilId: selectedPupilFromSchedule.id,
-        programName: plan.name
-      });
+
       
       // Создаем сессию в расписании для ученика (например, на ближайшее время)
       const now = new Date();

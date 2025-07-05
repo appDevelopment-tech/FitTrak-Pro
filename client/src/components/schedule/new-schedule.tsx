@@ -421,12 +421,7 @@ export function NewSchedule() {
                                 <button
                                   onClick={() => {
                                     const trainerId = 1; // Получаем из контекста пользователя
-                                    console.log('Проверка активной тренировки:', {
-                                      trainerId,
-                                      pupilId: pupil.id,
-                                      isActive: isWorkoutActive(trainerId, pupil.id),
-                                      programName: getWorkoutProgramName(trainerId, pupil.id)
-                                    });
+
                                     if (isWorkoutActive(trainerId, pupil.id)) {
                                       // Если тренировка активна - открываем ее
                                       toast({

@@ -54,9 +54,7 @@ export function ProfileView() {
     const tab = urlParams.get('tab');
     const pupilId = urlParams.get('pupilId');
     
-    console.log('ProfileView location:', location);
-    console.log('ProfileView tab:', tab);
-    console.log('ProfileView pupilId:', pupilId);
+
 
 
 
@@ -72,7 +70,7 @@ export function ProfileView() {
       const pupil = pupils.find(p => p.id === parseInt(pupilId));
       if (pupil) {
         setSelectedPupil(pupil);
-        console.log('Selected pupil set:', pupil);
+
       }
     }
   }, [location, pupils]);
