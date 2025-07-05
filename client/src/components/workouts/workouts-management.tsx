@@ -150,6 +150,10 @@ export function WorkoutsManagement({ selectedPupilFromSchedule, activeTab, selec
         description: `План "${plan.name}" прикреплен к ученику ${selectedPupilFromSchedule.firstName} ${selectedPupilFromSchedule.lastName}`,
       });
 
+      // Очищаем форму создания тренировки для новой записи
+      setSelectedExercises([]);
+      setWorkoutName("");
+
       // Возвращаемся на страницу расписания через 1 секунду
       setTimeout(() => {
         window.location.href = '/dashboard';
