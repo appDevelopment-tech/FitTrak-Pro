@@ -411,18 +411,22 @@ export function NewSchedule() {
                                   onClick={() => {
                                     const trainerId = 1; // Получаем из контекста пользователя
                                     if (isWorkoutActive(trainerId, pupil.id)) {
+                                      // Если тренировка активна - открываем ее
                                       toast({
                                         title: "Открытие тренировки",
                                         description: `Открываем активную тренировку для ${pupil.firstName} ${pupil.lastName}`,
                                       });
+                                      // Переходим в кабинет с вкладкой создания тренировки для выполнения
+                                      setLocation(`/cabinet?tab=create-workout&pupilId=${pupil.id}&action=start`);
                                     } else {
+                                      // Если тренировка не активна - переходим к выбору планов
                                       toast({
                                         title: "Прикрепление плана",
                                         description: `Выберите план тренировки для ${pupil.firstName} ${pupil.lastName}`,
                                       });
+                                      // Переходим в кабинет с вкладкой готовых планов для выбора
+                                      setLocation(`/cabinet?tab=programs&pupilId=${pupil.id}`);
                                     }
-                                    // Переходим в кабинет с вкладкой тренировок и сохраняем выбранного ученика
-                                    setLocation(`/cabinet?tab=programs&pupilId=${pupil.id}`);
                                   }}
                                   className={`p-1.5 rounded-full transition-colors ${
                                     isWorkoutActive(1, pupil.id)

@@ -28,9 +28,10 @@ interface WorkoutPlan {
 
 interface WorkoutsManagementProps {
   selectedPupilFromSchedule?: Pupil | null;
+  activeTab?: string;
 }
 
-export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManagementProps) {
+export function WorkoutsManagement({ selectedPupilFromSchedule, activeTab }: WorkoutsManagementProps) {
   const { activeWorkouts, addActiveWorkout, isWorkoutActive } = useActiveWorkout();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingPlan, setEditingPlan] = useState<WorkoutPlan | null>(null);
@@ -144,10 +145,10 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
         description: `План "${plan.name}" прикреплен к ученику ${selectedPupilFromSchedule.firstName} ${selectedPupilFromSchedule.lastName}`,
       });
 
-      // Возвращаемся на страницу расписания через 2 секунды
+      // Возвращаемся на страницу расписания через 1 секунду
       setTimeout(() => {
         window.location.href = '/dashboard';
-      }, 2000);
+      }, 1000);
     }
   };
 
@@ -352,7 +353,11 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
         )}
       </div>
 
-      <Tabs defaultValue="ready-plans" className="w-full">
+      <Tabs 
+        value={activeTab === 'programs' ? 'ready-plans' : (activeTab === 'create-workout' ? 'create-workout' : 'ready-plans')} 
+        defaultValue="ready-plans" 
+        className="w-full"
+      >
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="ready-plans">Готовые планы</TabsTrigger>
           <TabsTrigger value="create-workout">Создать тренировку</TabsTrigger>
