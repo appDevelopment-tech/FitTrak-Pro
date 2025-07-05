@@ -49,11 +49,12 @@ export function ProfileView() {
 
   // Обработка URL параметров
   useEffect(() => {
-    const urlParams = new URLSearchParams(location.split('?')[1] || '');
+    // Используем window.location.search для получения параметров URL
+    const urlParams = new URLSearchParams(window.location.search);
     const tab = urlParams.get('tab');
     const pupilId = urlParams.get('pupilId');
 
-    console.log('ProfileView location:', location);
+    console.log('ProfileView window.location.search:', window.location.search);
     console.log('ProfileView tab:', tab);
     console.log('ProfileView pupilId:', pupilId);
 

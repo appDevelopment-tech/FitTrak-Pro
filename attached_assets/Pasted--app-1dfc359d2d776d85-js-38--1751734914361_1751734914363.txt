@@ -1,0 +1,123 @@
+_app-1dfc359d2d776d85.js:38 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+_app-1dfc359d2d776d85.js:38 [LaunchDarkly] LaunchDarkly client initialized
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+framework-c2be319115910dbc.js:1 Unrecognized feature: 'ambient-light-sensor'.
+_ @ framework-c2be319115910dbc.js:1
+framework-c2be319115910dbc.js:1 Unrecognized feature: 'battery'.
+_ @ framework-c2be319115910dbc.js:1
+framework-c2be319115910dbc.js:1 Unrecognized feature: 'execution-while-not-rendered'.
+_ @ framework-c2be319115910dbc.js:1
+framework-c2be319115910dbc.js:1 Unrecognized feature: 'execution-while-out-of-viewport'.
+_ @ framework-c2be319115910dbc.js:1
+framework-c2be319115910dbc.js:1 Unrecognized feature: 'layout-animations'.
+_ @ framework-c2be319115910dbc.js:1
+framework-c2be319115910dbc.js:1 Unrecognized feature: 'legacy-image-formats'.
+_ @ framework-c2be319115910dbc.js:1
+framework-c2be319115910dbc.js:1 Unrecognized feature: 'navigation-override'.
+_ @ framework-c2be319115910dbc.js:1
+framework-c2be319115910dbc.js:1 Unrecognized feature: 'oversized-images'.
+_ @ framework-c2be319115910dbc.js:1
+framework-c2be319115910dbc.js:1 Unrecognized feature: 'publickey-credentials'.
+_ @ framework-c2be319115910dbc.js:1
+framework-c2be319115910dbc.js:1 Unrecognized feature: 'speaker-selection'.
+_ @ framework-c2be319115910dbc.js:1
+framework-c2be319115910dbc.js:1 Unrecognized feature: 'unoptimized-images'.
+_ @ framework-c2be319115910dbc.js:1
+framework-c2be319115910dbc.js:1 Unrecognized feature: 'unsized-media'.
+_ @ framework-c2be319115910dbc.js:1
+framework-c2be319115910dbc.js:1 Unrecognized feature: 'web-share'.
+_ @ framework-c2be319115910dbc.js:1
+framework-c2be319115910dbc.js:1 Unrecognized feature: 'pointer-lock'.
+_ @ framework-c2be319115910dbc.js:1
+framework-c2be319115910dbc.js:1 Allow attribute will take precedence over 'allowfullscreen'.
+_ @ framework-c2be319115910dbc.js:1
+framework-c2be319115910dbc.js:1 Allow attribute will take precedence over 'allowpaymentrequest'.
+_ @ framework-c2be319115910dbc.js:1
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1632419050.1748896015&jid=5054889&gjid=1172599915&_gid=1021418668.1751565876&_u=SCCAgEAjQAAAAGgCIAD~&z=1248841247:1 
+        
+        
+       Failed to load resource: net::ERR_CONNECTION_RESET
+googleads.g.doubleclick.net/pagead/viewthroughconversion/11411994397/?random=1751733695970&cv=11&fst=1751733695970&bg=ffffff&guid=ON&async=1&gtm=45be5710h1v9171242957za200&gcd=13l3l3l3l1l1&dma=0&tag_exp=101509157~103116026~103200004~103233427~103351869~103351871~104684208~104684211~104718208~104839054~104839056~104885889~104885891&u_w=1920&u_h=1080&url=https%3A%2F%2Freplit.com%2F%40maxpetrusenkotu%2FFitTrak-Pro&hn=www.googleadservices.com&frm=0&tiba=FitTrak%20Pro%20-%20Replit&npa=0&pscdl=noapi&auid=1951114728.1748896013&fledge=1&data=event%3Dgtag.config&rfmt=3&fmt=4:1 
+        
+        
+       Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1632419050.1748896015&jid=1737443016&gjid=409443804&_gid=1021418668.1751565876&_u=SCCAgEAjQAAAAGgCIAD~&z=1177229479:1 
+        
+        
+       Failed to load resource: net::ERR_CONNECTION_RESET
+googleads.g.doubleclick.net/pagead/viewthroughconversion/11411994397/?random=1751733816780&cv=11&fst=1751733816780&bg=ffffff&guid=ON&async=1&gtm=45be5710h1v9171242957za200&gcd=13l3l3l3l1l1&dma=0&tag_exp=101509157~103116026~103200004~103233427~103351869~103351871~104684208~104684211~104718208~104839054~104839056~104885889~104885891&u_w=1920&u_h=1080&url=https%3A%2F%2Freplit.com%2F~&ref=https%3A%2F%2Freplit.com%2F%40maxpetrusenkotu%2FFitTrak-Pro&hn=www.googleadservices.com&frm=0&tiba=Home%20-%20Replit&npa=0&pscdl=noapi&auid=1951114728.1748896013&uaa=x86&uab=64&uafvl=Chromium%3B128.0.6613.186%7CNot%253BA%253DBrand%3B24.0.0.0%7CYaBrowser%3B24.10.4.931%7CYowser%3B2.5&uamb=0&uam=&uap=Windows&uapv=0.3.0&uaw=0&fledge=1&data=event%3Dpage_view&rfmt=3&fmt=4:1 
+        
+        
+       Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1632419050.1748896015&jid=935738148&gjid=1678572973&_gid=1021418668.1751565876&_u=SCCAgEAjQAAAAGgCIAD~&z=754676805:1 
+        
+        
+       Failed to load resource: net::ERR_CONNECTION_RESET
+googleads.g.doubleclick.net/pagead/viewthroughconversion/11411994397/?random=1751733821072&cv=11&fst=1751733821072&bg=ffffff&guid=ON&async=1&gtm=45be5710h1v9171242957za200&gcd=13l3l3l3l1l1&dma=0&tag_exp=101509157~103116026~103200004~103233427~103351869~103351871~104684208~104684211~104718208~104839054~104839056~104885889~104885891&u_w=1920&u_h=1080&url=https%3A%2F%2Freplit.com%2F%40maxpetrusenkotu%2FFitTrak-Pro&ref=https%3A%2F%2Freplit.com%2F~&hn=www.googleadservices.com&frm=0&tiba=FitTrak%20Pro%20-%20Replit&npa=0&pscdl=noapi&auid=1951114728.1748896013&uaa=x86&uab=64&uafvl=Chromium%3B128.0.6613.186%7CNot%253BA%253DBrand%3B24.0.0.0%7CYaBrowser%3B24.10.4.931%7CYowser%3B2.5&uamb=0&uam=&uap=Windows&uapv=0.3.0&uaw=0&fledge=1&_tu=wAQ&data=event%3Dpage_view&rfmt=3&fmt=4:1 
+        
+        
+       Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1632419050.1748896015&jid=222022291&gjid=1266552705&_gid=1021418668.1751565876&_u=SCCAgEAjQAAAAGgCIAD~&z=1305737424:1 
+        
+        
+       Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1632419050.1748896015&jid=206947599&gjid=1030491958&_gid=1021418668.1751565876&_u=SCCAgEAjQAAAAGgCIAD~&z=1654578983:1 
+        
+        
+       Failed to load resource: net::ERR_CONNECTION_RESET
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1632419050.1748896015&jid=520040270&gjid=1649843237&_gid=1021418668.1751565876&_u=SCCAgEAjQAAAAGgCIAD~&z=1770091239:1 
+        
+        
+       Failed to load resource: net::ERR_CONNECTION_RESET
+workspace_iframe.html:32 Unrecognized feature: 'ambient-light-sensor'.
+workspace_iframe.html:32 Unrecognized feature: 'battery'.
+workspace_iframe.html:32 Unrecognized feature: 'execution-while-not-rendered'.
+workspace_iframe.html:32 Unrecognized feature: 'execution-while-out-of-viewport'.
+workspace_iframe.html:32 Unrecognized feature: 'layout-animations'.
+workspace_iframe.html:32 Unrecognized feature: 'legacy-image-formats'.
+workspace_iframe.html:32 Unrecognized feature: 'navigation-override'.
+workspace_iframe.html:32 Unrecognized feature: 'oversized-images'.
+workspace_iframe.html:32 Unrecognized feature: 'publickey-credentials'.
+workspace_iframe.html:32 Unrecognized feature: 'speaker-selection'.
+workspace_iframe.html:32 Unrecognized feature: 'unoptimized-images'.
+workspace_iframe.html:32 Unrecognized feature: 'unsized-media'.
+workspace_iframe.html:32 Unrecognized feature: 'web-share'.
+workspace_iframe.html:32 Allow attribute will take precedence over 'allowfullscreen'.
+workspace_iframe.html:32 Allow attribute will take precedence over 'allowpaymentrequest'.
+Console.js:61 Dashboard location: /
+Console.js:61 Dashboard currentPath: /
+Console.js:61 Setting activeView to schedule
+Console.js:61 Navigating to: /cabinet?tab=programs&pupilId=2
+Console.js:61 Dashboard location: /cabinet
+Console.js:61 Dashboard currentPath: /cabinet
+Console.js:61 Setting activeView to profile
+Console.js:61 ProfileView location: /cabinet
+Console.js:61 ProfileView tab: null
+Console.js:61 ProfileView pupilId: null
+stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j101&tid=UA-25629695-1&cid=1632419050.1748896015&jid=1778242846&gjid=1289265842&_gid=1021418668.1751565876&_u=SCCAgEAjQAAAAGgCIAD~&z=810506172:1 
+        
+        
+       Failed to load resource: net::ERR_CONNECTION_RESET
+Console.js:61 Navigating to: /cabinet?tab=programs&pupilId=2
+Console.js:61 Navigating to: /cabinet?tab=programs&pupilId=2
+Console.js:61 Navigating to: /cabinet?tab=programs&pupilId=2
