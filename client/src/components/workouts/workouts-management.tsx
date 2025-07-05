@@ -12,7 +12,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Dumbbell, Plus, Edit, Calendar as CalendarIcon, Clock, Target, User, CheckCircle, AlertCircle, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { StudentSelectionDialog } from "./StudentSelectionDialog";
+
 import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
 import type { Exercise, Pupil, WorkoutProgram } from "@/../../shared/schema";
 
@@ -40,8 +40,7 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string>('');
   const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
-  const [showStudentSelectionDialog, setShowStudentSelectionDialog] = useState(false);
-  const [selectedPlanForStudent, setSelectedPlanForStudent] = useState<WorkoutPlan | null>(null);
+
   const [customWorkout, setCustomWorkout] = useState({
     name: '',
     level: 'начальный',
@@ -126,31 +125,8 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
   ];
 
   const handleSelectPlan = (plan: WorkoutPlan) => {
-    // Если есть выбранный ученик из расписания, сразу прикрепляем план
-    if (selectedPupilFromSchedule && user) {
-      const workoutProgram: WorkoutProgram = {
-        id: Date.now(), // Временный ID
-        name: plan.name,
-        description: plan.description,
-        difficulty: plan.difficulty,
-        exercises: plan.exercises || [],
-        type: plan.type || 'strength',
-        createdBy: user.id,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-
-      addActiveWorkout(user.id, selectedPupilFromSchedule, workoutProgram);
-      
-      toast({
-        title: "План прикреплен!",
-        description: `План "${plan.name}" прикреплен к ученику ${selectedPupilFromSchedule.firstName} ${selectedPupilFromSchedule.lastName}`,
-      });
-    } else {
-      // Если нет выбранного ученика, открываем диалог выбора
-      setSelectedPlanForStudent(plan);
-      setShowStudentSelectionDialog(true);
-    }
+    // Готовые планы больше не прикрепляются к ученикам
+    // Функция оставлена для совместимости, но не выполняет действий
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -636,58 +612,15 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
               </div>
 
               {/* Кнопки действий */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-4 border-t">
-                <Button 
-                  variant="outline" 
-                  className="flex items-center gap-2"
-                  disabled={!canConfirmSchedule || !customWorkout.name.trim()}
-                  onClick={() => {
-                    // Открываем диалог выбора ученика для прикрепления плана
-                    setSelectedPlanForStudent({
-                      id: 0, // Временный ID для кастомного плана
-                      name: customWorkout.name,
-                      description: customWorkout.trainerNotes || 'Индивидуальная тренировка',
-                      difficulty: customWorkout.level,
-                      sessionsPerWeek: customWorkout.sessionsPerWeek,
-                      type: 'custom',
-                      exercises: customWorkout.exercises
-                    });
-                    setShowStudentSelectionDialog(true);
-                  }}
-                >
-                  <User className="h-4 w-4" />
-                  Выбрать ученика
-                </Button>
+              <div className="flex justify-center pt-4 border-t">
                 
                 <Button 
                   disabled={!canConfirmSchedule || !customWorkout.name.trim()}
                   onClick={() => {
-                    // Если есть выбранный ученик из расписания, автоматически прикрепляем план
-                    if (selectedPupilFromSchedule && user) {
-                      const workoutProgram: WorkoutProgram = {
-                        id: Date.now(), // Временный ID
-                        name: customWorkout.name,
-                        description: customWorkout.trainerNotes || 'Индивидуальная тренировка',
-                        difficulty: customWorkout.level,
-                        type: 'custom',
-                        exercises: customWorkout.exercises,
-                        createdBy: user.id,
-                        createdAt: new Date(),
-                        updatedAt: new Date()
-                      };
-
-                      addActiveWorkout(user.id, selectedPupilFromSchedule, workoutProgram);
-                      
-                      toast({
-                        title: "Тренировка прикреплена!",
-                        description: `План "${customWorkout.name}" создан и прикреплен к ученику ${selectedPupilFromSchedule.firstName} ${selectedPupilFromSchedule.lastName}`,
-                      });
-                    } else {
-                      toast({
-                        title: "План сохранен",
-                        description: `План "${customWorkout.name}" сохранен в готовые планы и доступен для использования`,
-                      });
-                    }
+                    toast({
+                      title: "План сохранен",
+                      description: `План "${customWorkout.name}" сохранен в готовые планы и доступен для использования`,
+                    });
                     
                     // Сброс формы после сохранения
                     setCustomWorkout({
@@ -704,7 +637,7 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
                     setSelectedDates([]);
                   }}
                 >
-                  {selectedPupilFromSchedule ? 'Создать и прикрепить' : 'Сохранить'}
+                  Сохранить план
                 </Button>
               </div>
             </CardContent>
@@ -1010,30 +943,7 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
         </DialogContent>
       </Dialog>
 
-      {/* Диалог выбора ученика */}
-      {selectedPlanForStudent && (
-        <StudentSelectionDialog
-          isOpen={showStudentSelectionDialog}
-          onClose={() => {
-            setShowStudentSelectionDialog(false);
-            setSelectedPlanForStudent(null);
-          }}
-          program={{
-            id: selectedPlanForStudent.id,
-            name: selectedPlanForStudent.name,
-            description: selectedPlanForStudent.description,
-            difficulty: selectedPlanForStudent.difficulty,
-            duration: selectedPlanForStudent.sessionsPerWeek,
-            type: selectedPlanForStudent.type,
-            exercises: selectedPlanForStudent.exercises || [],
-            createdBy: trainerId,
-            createdAt: new Date(),
-            updatedAt: new Date()
-          } as WorkoutProgram}
-          pupils={pupils}
-          trainerId={trainerId}
-        />
-      )}
+
     </div>
   );
 }
