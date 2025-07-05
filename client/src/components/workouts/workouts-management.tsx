@@ -140,6 +140,26 @@ export function WorkoutsManagement({ selectedPupilFromSchedule, activeTab }: Wor
 
       addActiveWorkout(user.id, selectedPupilFromSchedule, workoutProgram);
       
+      // Создаем сессию в расписании для ученика (например, на ближайшее время)
+      const now = new Date();
+      const currentTime = `${now.getHours().toString().padStart(2, '0')}:00`;
+      const dateString = now.toISOString().split('T')[0];
+      
+      // Сохраняем данные о сессии в локальном хранилище для синхронизации с расписанием
+      const sessionData = {
+        id: Date.now(),
+        time: currentTime,
+        date: dateString,
+        pupilIds: [selectedPupilFromSchedule.id],
+        pupils: [selectedPupilFromSchedule],
+        status: 'confirmed'
+      };
+      
+      // Сохраняем в localStorage для передачи в расписание
+      const existingSessions = JSON.parse(localStorage.getItem('schedule_sessions') || '[]');
+      const updatedSessions = [...existingSessions, sessionData];
+      localStorage.setItem('schedule_sessions', JSON.stringify(updatedSessions));
+      
       toast({
         title: "План прикреплен!",
         description: `План "${plan.name}" прикреплен к ученику ${selectedPupilFromSchedule.firstName} ${selectedPupilFromSchedule.lastName}`,

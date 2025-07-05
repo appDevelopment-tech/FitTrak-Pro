@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -46,6 +46,17 @@ export function NewSchedule() {
     email: ''
   });
   const [sessions, setSessions] = useState<ScheduleSession[]>([]);
+
+  // Загружаем сессии из localStorage при инициализации
+  useEffect(() => {
+    const savedSessions = JSON.parse(localStorage.getItem('schedule_sessions') || '[]');
+    setSessions(savedSessions);
+  }, []);
+
+  // Синхронизируем изменения сессий с localStorage
+  useEffect(() => {
+    localStorage.setItem('schedule_sessions', JSON.stringify(sessions));
+  }, [sessions]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ sessionId: number; pupilId: number } | null>(null);
   const queryClient = useQueryClient();
