@@ -31,7 +31,7 @@ interface WorkoutsManagementProps {
 }
 
 export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManagementProps) {
-  const { activeWorkouts, addActiveWorkout } = useActiveWorkout();
+  const { activeWorkouts, addActiveWorkout, isWorkoutActive } = useActiveWorkout();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingPlan, setEditingPlan] = useState<WorkoutPlan | null>(null);
   const [editedPlan, setEditedPlan] = useState<WorkoutPlan | null>(null);
@@ -125,8 +125,25 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
   ];
 
   const handleSelectPlan = (plan: WorkoutPlan) => {
-    // Готовые планы больше не прикрепляются к ученикам
-    // Функция оставлена для совместимости, но не выполняет действий
+    // Если есть выбранный ученик из расписания, прикрепляем план
+    if (selectedPupilFromSchedule && user) {
+      const workoutProgram: WorkoutProgram = {
+        id: Date.now(), // Временный ID
+        name: plan.name,
+        level: plan.difficulty,
+        exercises: plan.exercises || [],
+        type: plan.type || 'strength',
+        duration: plan.sessionsPerWeek,
+        createdBy: user.id,
+      };
+
+      addActiveWorkout(user.id, selectedPupilFromSchedule, workoutProgram);
+      
+      toast({
+        title: "План прикреплен!",
+        description: `План "${plan.name}" прикреплен к ученику ${selectedPupilFromSchedule.firstName} ${selectedPupilFromSchedule.lastName}`,
+      });
+    }
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -338,11 +355,30 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
 
         {/* Готовые планы */}
         <TabsContent value="ready-plans" className="space-y-4">
+          {selectedPupilFromSchedule && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+              <div className="flex items-center gap-2 text-blue-700">
+                <User className="h-5 w-5" />
+                <span className="font-medium">
+                  Выбран ученик: {selectedPupilFromSchedule.firstName} {selectedPupilFromSchedule.lastName}
+                </span>
+              </div>
+              <p className="text-sm text-blue-600 mt-1">
+                Нажмите на план, чтобы прикрепить его к ученику
+              </p>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {readyPlans.map((plan) => (
               <Card 
                 key={plan.id} 
-                className="hover:shadow-lg hover:border-gray-200 transition-all duration-200"
+                className={`transition-all duration-200 ${
+                  selectedPupilFromSchedule 
+                    ? 'hover:shadow-lg hover:border-orange-300 cursor-pointer border-orange-200 bg-orange-50' 
+                    : 'hover:shadow-lg hover:border-gray-200 cursor-default'
+                }`}
+                onClick={() => selectedPupilFromSchedule && handleSelectPlan(plan)}
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
@@ -378,18 +414,33 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
                   </div>
 
                   <div className="flex gap-2 pt-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditPlan(plan);
-                      }}
-                    >
-                      <Edit className="h-4 w-4 mr-1" />
-                      Редактировать
-                    </Button>
+                    {selectedPupilFromSchedule ? (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="w-full bg-orange-600 hover:bg-orange-700"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSelectPlan(plan);
+                        }}
+                      >
+                        <User className="h-4 w-4 mr-1" />
+                        Прикрепить к ученику
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditPlan(plan);
+                        }}
+                      >
+                        <Edit className="h-4 w-4 mr-1" />
+                        Редактировать
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -612,7 +663,18 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
               </div>
 
               {/* Кнопки действий */}
-              <div className="flex justify-center pt-4 border-t">
+              <div className="flex justify-center gap-4 pt-4 border-t">
+                <Button
+                  variant="outline"
+                  disabled={!canConfirmSchedule || !customWorkout.name.trim()}
+                  onClick={() => {
+                    // Функция для выбора ученика (перенаправляет на расписание)
+                    window.location.href = '/cabinet?tab=schedule';
+                  }}
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Выбрать ученика
+                </Button>
                 
                 <Button 
                   disabled={!canConfirmSchedule || !customWorkout.name.trim()}
