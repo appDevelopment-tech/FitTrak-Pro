@@ -10,11 +10,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Dumbbell, Plus, Edit, Calendar as CalendarIcon, Clock, Target, User, CheckCircle, AlertCircle, Users } from "lucide-react";
+import { Dumbbell, Plus, Edit, Calendar as CalendarIcon, Clock, Target, CheckCircle, AlertCircle, Users, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
-import type { Exercise, Pupil, WorkoutProgram } from "@/../../shared/schema";
+import type { Exercise, Pupil, WorkoutProgram, User as UserType } from "@/../../shared/schema";
 
 interface WorkoutPlan {
   id: number;
@@ -56,7 +56,7 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
   const { toast } = useToast();
 
   // Загрузка данных пользователя и учеников
-  const { data: user } = useQuery({
+  const { data: user } = useQuery<UserType>({
     queryKey: ['/api/user/1']
   });
 
@@ -143,6 +143,11 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
         title: "План прикреплен!",
         description: `План "${plan.name}" прикреплен к ученику ${selectedPupilFromSchedule.firstName} ${selectedPupilFromSchedule.lastName}`,
       });
+
+      // Возвращаемся на страницу расписания через 2 секунды
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 2000);
     }
   };
 
