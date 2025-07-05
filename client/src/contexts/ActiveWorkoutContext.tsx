@@ -2,26 +2,28 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 import { ActiveWorkout, Pupil, WorkoutProgram } from '@shared/schema';
 
 interface ActiveWorkoutContextType {
-  activeWorkouts: ActiveWorkout[];
-  setActiveWorkouts: (workouts: ActiveWorkout[]) => void;
+  activeWorkouts: (ActiveWorkout & { programName?: string })[];
+  setActiveWorkouts: (workouts: (ActiveWorkout & { programName?: string })[]) => void;
   addActiveWorkout: (trainerId: number, pupil: Pupil, program: WorkoutProgram) => void;
   removeActiveWorkout: (trainerId: number, pupilId: number) => void;
   isWorkoutActive: (trainerId: number, pupilId: number) => boolean;
   getActiveWorkout: (trainerId: number, pupilId: number) => ActiveWorkout | undefined;
+  getWorkoutProgramName: (trainerId: number, pupilId: number) => string | undefined;
 }
 
 const ActiveWorkoutContext = createContext<ActiveWorkoutContextType | undefined>(undefined);
 
 export function ActiveWorkoutProvider({ children }: { children: ReactNode }) {
-  const [activeWorkouts, setActiveWorkouts] = useState<ActiveWorkout[]>([]);
+  const [activeWorkouts, setActiveWorkouts] = useState<(ActiveWorkout & { programName?: string })[]>([]);
 
   const addActiveWorkout = (trainerId: number, pupil: Pupil, program: WorkoutProgram) => {
-    const newWorkout: ActiveWorkout = {
+    const newWorkout: ActiveWorkout & { programName?: string } = {
       id: Date.now(), // Temporary ID для локального состояния
       trainerId,
       pupilId: pupil.id,
       workoutProgramId: program.id,
-      createdAt: new Date()
+      createdAt: new Date(),
+      programName: program.name // Добавляем название программы
     };
     
     // Удаляем существующую активную тренировку для этого ученика, если есть
@@ -43,6 +45,11 @@ export function ActiveWorkoutProvider({ children }: { children: ReactNode }) {
     return activeWorkouts.find(w => w.trainerId === trainerId && w.pupilId === pupilId);
   };
 
+  const getWorkoutProgramName = (trainerId: number, pupilId: number) => {
+    const workout = activeWorkouts.find(w => w.trainerId === trainerId && w.pupilId === pupilId) as ActiveWorkout & { programName?: string };
+    return workout?.programName;
+  };
+
   return (
     <ActiveWorkoutContext.Provider value={{
       activeWorkouts,
@@ -50,7 +57,8 @@ export function ActiveWorkoutProvider({ children }: { children: ReactNode }) {
       addActiveWorkout,
       removeActiveWorkout,
       isWorkoutActive,
-      getActiveWorkout
+      getActiveWorkout,
+      getWorkoutProgramName
     }}>
       {children}
     </ActiveWorkoutContext.Provider>

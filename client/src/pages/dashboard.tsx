@@ -27,14 +27,9 @@ export default function Dashboard() {
   useEffect(() => {
     const currentPath = location.split('?')[0];
     
-    console.log('Dashboard location:', location);
-    console.log('Dashboard currentPath:', currentPath);
-    
     if (currentPath === '/cabinet') {
-      console.log('Setting activeView to profile');
       setActiveView('profile');
     } else if (currentPath === '/dashboard' || currentPath === '/') {
-      console.log('Setting activeView to schedule');
       setActiveView('schedule');
     }
   }, [location]);

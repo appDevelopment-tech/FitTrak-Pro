@@ -54,9 +54,7 @@ export function ProfileView() {
     const tab = urlParams.get('tab');
     const pupilId = urlParams.get('pupilId');
 
-    console.log('ProfileView window.location.search:', window.location.search);
-    console.log('ProfileView tab:', tab);
-    console.log('ProfileView pupilId:', pupilId);
+
 
     // Устанавливаем вкладку сразу при наличии параметра
     if (tab) {

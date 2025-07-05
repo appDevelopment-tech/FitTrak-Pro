@@ -418,21 +418,8 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
                     </div>
                   </div>
 
-                  <div className="flex gap-2 pt-2">
-                    {selectedPupilFromSchedule ? (
-                      <Button
-                        variant="default"
-                        size="sm"
-                        className="w-full bg-orange-600 hover:bg-orange-700"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSelectPlan(plan);
-                        }}
-                      >
-                        <User className="h-4 w-4 mr-1" />
-                        Прикрепить к ученику
-                      </Button>
-                    ) : (
+                  {!selectedPupilFromSchedule && (
+                    <div className="flex gap-2 pt-2">
                       <Button
                         variant="outline"
                         size="sm"
@@ -445,8 +432,8 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
                         <Edit className="h-4 w-4 mr-1" />
                         Редактировать
                       </Button>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}

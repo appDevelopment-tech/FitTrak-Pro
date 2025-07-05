@@ -50,7 +50,7 @@ export function NewSchedule() {
   const [deleteTarget, setDeleteTarget] = useState<{ sessionId: number; pupilId: number } | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { isWorkoutActive } = useActiveWorkout();
+  const { isWorkoutActive, getWorkoutProgramName } = useActiveWorkout();
   const [, setLocation] = useLocation();
 
   // Загружаем учеников
@@ -422,7 +422,6 @@ export function NewSchedule() {
                                       });
                                     }
                                     // Переходим в кабинет с вкладкой тренировок и сохраняем выбранного ученика
-                                    console.log(`Navigating to: /cabinet?tab=programs&pupilId=${pupil.id}`);
                                     setLocation(`/cabinet?tab=programs&pupilId=${pupil.id}`);
                                   }}
                                   className={`p-1.5 rounded-full transition-colors ${
@@ -430,7 +429,9 @@ export function NewSchedule() {
                                       ? 'text-orange-600 bg-orange-100 hover:bg-orange-200'
                                       : 'text-gray-400 bg-gray-100 hover:bg-gray-200'
                                   }`}
-                                  title={isWorkoutActive(1, pupil.id) ? "Открыть активную тренировку" : "Прикрепить тренировочный план"}
+                                  title={isWorkoutActive(1, pupil.id) 
+                                    ? `Открыть активную тренировку: ${getWorkoutProgramName(1, pupil.id) || 'План'}` 
+                                    : "Прикрепить тренировочный план"}
                                 >
                                   <Dumbbell className="h-4 w-4" />
                                 </button>
