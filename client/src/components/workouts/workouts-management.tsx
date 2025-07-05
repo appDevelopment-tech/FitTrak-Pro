@@ -32,6 +32,7 @@ interface WorkoutsManagementProps {
 }
 
 export function WorkoutsManagement({ selectedPupilFromSchedule, activeTab }: WorkoutsManagementProps) {
+  console.log('WorkoutsManagement received:', { selectedPupilFromSchedule, activeTab });
   const { activeWorkouts, addActiveWorkout, isWorkoutActive } = useActiveWorkout();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingPlan, setEditingPlan] = useState<WorkoutPlan | null>(null);
@@ -392,6 +393,7 @@ export function WorkoutsManagement({ selectedPupilFromSchedule, activeTab }: Wor
 
         {/* Готовые планы */}
         <TabsContent value="ready-plans" className="space-y-4">
+          {console.log('Ready plans tab rendered, selectedPupil:', selectedPupilFromSchedule)}
           {selectedPupilFromSchedule && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
               <div className="flex items-center gap-2 text-blue-700">

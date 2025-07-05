@@ -72,6 +72,7 @@ export function ProfileView() {
       const pupil = pupils.find(p => p.id === parseInt(pupilId));
       if (pupil) {
         setSelectedPupil(pupil);
+        console.log('Selected pupil set:', pupil);
       }
     }
   }, [location, pupils]);
