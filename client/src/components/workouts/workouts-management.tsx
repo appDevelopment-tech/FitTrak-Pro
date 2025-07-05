@@ -140,6 +140,13 @@ export function WorkoutsManagement({ selectedPupilFromSchedule, activeTab }: Wor
 
       addActiveWorkout(user.id, selectedPupilFromSchedule, workoutProgram);
       
+      // Отладочная информация
+      console.log('План прикреплен:', {
+        trainerId: user.id,
+        pupilId: selectedPupilFromSchedule.id,
+        programName: plan.name
+      });
+      
       // Создаем сессию в расписании для ученика (например, на ближайшее время)
       const now = new Date();
       const currentTime = `${now.getHours().toString().padStart(2, '0')}:00`;

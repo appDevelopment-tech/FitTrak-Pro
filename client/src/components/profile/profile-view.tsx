@@ -53,6 +53,10 @@ export function ProfileView() {
     const urlParams = new URLSearchParams(window.location.search);
     const tab = urlParams.get('tab');
     const pupilId = urlParams.get('pupilId');
+    
+    console.log('ProfileView location:', location);
+    console.log('ProfileView tab:', tab);
+    console.log('ProfileView pupilId:', pupilId);
 
 
 
