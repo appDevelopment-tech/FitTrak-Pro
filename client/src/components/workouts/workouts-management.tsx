@@ -40,6 +40,8 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string>('');
   const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
+  const [showStudentSelectionDialog, setShowStudentSelectionDialog] = useState(false);
+  const [selectedPlanForStudent, setSelectedPlanForStudent] = useState<WorkoutPlan | null>(null);
 
   const [customWorkout, setCustomWorkout] = useState({
     name: '',
@@ -125,8 +127,45 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
   ];
 
   const handleSelectPlan = (plan: WorkoutPlan) => {
-    // Готовые планы больше не прикрепляются к ученикам
-    // Функция оставлена для совместимости, но не выполняет действий
+    // Открываем диалог выбора ученика для прикрепления плана
+    setSelectedPlanForStudent(plan);
+    setShowStudentSelectionDialog(true);
+  };
+
+  const handleAttachPlanToPupil = async (pupil: Pupil) => {
+    if (!selectedPlanForStudent || !user) return;
+
+    try {
+      // Создаем программу тренировки из плана
+      const workoutProgram: WorkoutProgram = {
+        id: Date.now(), // Временный ID
+        name: selectedPlanForStudent.name,
+        type: selectedPlanForStudent.type === 'ready' ? 'strength' : 'strength',
+        duration: 60, // По умолчанию 60 минут
+        level: selectedPlanForStudent.difficulty === 'начальный' ? 'beginner' : 
+               selectedPlanForStudent.difficulty === 'средний' ? 'intermediate' : 'advanced',
+        createdBy: user.id,
+        exercises: selectedPlanForStudent.exercises || []
+      };
+
+      // Прикрепляем план к ученику через контекст активных тренировок
+      addActiveWorkout(user.id, pupil, workoutProgram);
+      
+      toast({
+        title: "План прикреплен!",
+        description: `План "${selectedPlanForStudent.name}" прикреплен к ученику ${pupil.firstName} ${pupil.lastName}`,
+      });
+
+      // Закрываем диалог
+      setShowStudentSelectionDialog(false);
+      setSelectedPlanForStudent(null);
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось прикрепить план к ученику",
+        variant: "destructive"
+      });
+    }
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -381,7 +420,7 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
                     <Button
                       variant="outline"
                       size="sm"
-                      className="w-full"
+                      className="flex-1"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleEditPlan(plan);
@@ -389,6 +428,18 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
                     >
                       <Edit className="h-4 w-4 mr-1" />
                       Редактировать
+                    </Button>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="flex-1"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelectPlan(plan);
+                      }}
+                    >
+                      <Users className="h-4 w-4 mr-1" />
+                      Прикрепить
                     </Button>
                   </div>
                 </CardContent>
@@ -612,7 +663,29 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
               </div>
 
               {/* Кнопки действий */}
-              <div className="flex justify-center pt-4 border-t">
+              <div className="flex gap-3 justify-center pt-4 border-t">
+                <Button 
+                  variant="outline"
+                  disabled={!canConfirmSchedule || !customWorkout.name.trim()}
+                  onClick={() => {
+                    // Создаем план и открываем диалог выбора ученика
+                    const newPlan: WorkoutPlan = {
+                      id: Date.now(),
+                      name: customWorkout.name,
+                      description: customWorkout.trainerNotes || `Индивидуальная тренировка уровня "${customWorkout.level}"`,
+                      difficulty: customWorkout.level,
+                      sessionsPerWeek: customWorkout.sessionsPerWeek || 3,
+                      type: 'custom',
+                      exercises: customWorkout.exercises
+                    };
+                    
+                    setSelectedPlanForStudent(newPlan);
+                    setShowStudentSelectionDialog(true);
+                  }}
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Выбрать ученика
+                </Button>
                 
                 <Button 
                   disabled={!canConfirmSchedule || !customWorkout.name.trim()}
@@ -943,6 +1016,64 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
         </DialogContent>
       </Dialog>
 
+      {/* Диалог выбора ученика для прикрепления плана */}
+      <Dialog open={showStudentSelectionDialog} onOpenChange={setShowStudentSelectionDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Прикрепить план к ученику</DialogTitle>
+            <DialogDescription>
+              Выберите ученика для прикрепления плана "{selectedPlanForStudent?.name}"
+            </DialogDescription>
+          </DialogHeader>
+          
+          {pupils && pupils.length > 0 ? (
+            <div className="space-y-3 max-h-80 overflow-y-auto">
+              {pupils.map((pupil) => (
+                <Card 
+                  key={pupil.id}
+                  className="cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => handleAttachPlanToPupil(pupil)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium">
+                          {pupil.firstName} {pupil.lastName}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {pupil.email}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm text-muted-foreground">
+                          {new Date().getFullYear() - new Date(pupil.birthDate).getFullYear()} лет
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              У вас пока нет учеников
+            </div>
+          )}
+          
+          <div className="flex gap-2 pt-4">
+            <Button 
+              variant="outline" 
+              className="flex-1"
+              onClick={() => {
+                setShowStudentSelectionDialog(false);
+                setSelectedPlanForStudent(null);
+              }}
+            >
+              Отмена
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
     </div>
   );
