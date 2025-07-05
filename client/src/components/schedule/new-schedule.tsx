@@ -431,16 +431,40 @@ export function NewSchedule() {
                                       // Переходим в кабинет с вкладкой создания тренировки для выполнения
                                       setLocation(`/cabinet?tab=create-workout&pupilId=${pupil.id}&action=start`);
                                     } else {
-                                      // Если тренировка не активна - переходим к выбору планов
-                                      toast({
-                                        title: "Прикрепление плана",
-                                        description: `Выберите план тренировки для ${pupil.firstName} ${pupil.lastName}`,
-                                      });
-                                      // Переходим в кабинет с вкладкой готовых планов для выбора
+                                      // Если тренировка не активна - добавляем ученика в расписание и переходим к выбору планов
                                       const year = selectedDate.getFullYear();
                                       const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
                                       const day = String(selectedDate.getDate()).padStart(2, '0');
                                       const dateString = `${year}-${month}-${day}`;
+                                      
+                                      // Проверяем, есть ли уже ученик в этой дате
+                                      const existingSession = sessions.find(s => 
+                                        s.date === dateString && 
+                                        s.pupils.some(p => p.id === pupil.id)
+                                      );
+                                      
+                                      if (!existingSession) {
+                                        // Создаем новую сессию на текущее время
+                                        const now = new Date();
+                                        const currentTime = `${now.getHours().toString().padStart(2, '0')}:00`;
+                                        
+                                        const newSession: ScheduleSession = {
+                                          id: Date.now(),
+                                          time: currentTime,
+                                          date: dateString,
+                                          pupils: [pupil],
+                                          status: 'confirmed'
+                                        };
+                                        
+                                        setSessions(prev => [...prev, newSession]);
+                                      }
+                                      
+                                      toast({
+                                        title: "Прикрепление плана",
+                                        description: `Выберите план тренировки для ${pupil.firstName} ${pupil.lastName}`,
+                                      });
+                                      
+                                      // Переходим в кабинет с вкладкой готовых планов для выбора
                                       setLocation(`/cabinet?tab=programs&pupilId=${pupil.id}&date=${dateString}`);
                                     }
                                   }}

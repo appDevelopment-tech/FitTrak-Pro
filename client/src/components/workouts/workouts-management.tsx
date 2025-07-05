@@ -143,25 +143,7 @@ export function WorkoutsManagement({ selectedPupilFromSchedule, activeTab, selec
       
 
       
-      // Создаем сессию в расписании для ученика на выбранную дату
-      const now = new Date();
-      const currentTime = `${now.getHours().toString().padStart(2, '0')}:00`;
-      const dateString = selectedDate || now.toISOString().split('T')[0];
-      
-      // Сохраняем данные о сессии в локальном хранилище для синхронизации с расписанием
-      const sessionData = {
-        id: Date.now(),
-        time: currentTime,
-        date: dateString,
-        pupilIds: [selectedPupilFromSchedule.id],
-        pupils: [selectedPupilFromSchedule],
-        status: 'confirmed'
-      };
-      
-      // Сохраняем в localStorage для передачи в расписание
-      const existingSessions = JSON.parse(localStorage.getItem('schedule_sessions') || '[]');
-      const updatedSessions = [...existingSessions, sessionData];
-      localStorage.setItem('schedule_sessions', JSON.stringify(updatedSessions));
+      // Сессия уже создана в NewSchedule, здесь только прикрепляем план
       
       toast({
         title: "План прикреплен!",
