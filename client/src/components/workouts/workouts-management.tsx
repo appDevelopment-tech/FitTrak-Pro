@@ -29,9 +29,10 @@ interface WorkoutPlan {
 interface WorkoutsManagementProps {
   selectedPupilFromSchedule?: Pupil | null;
   activeTab?: string;
+  selectedDate?: string | null;
 }
 
-export function WorkoutsManagement({ selectedPupilFromSchedule, activeTab }: WorkoutsManagementProps) {
+export function WorkoutsManagement({ selectedPupilFromSchedule, activeTab, selectedDate }: WorkoutsManagementProps) {
   const { activeWorkouts, addActiveWorkout, isWorkoutActive } = useActiveWorkout();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingPlan, setEditingPlan] = useState<WorkoutPlan | null>(null);
@@ -142,10 +143,10 @@ export function WorkoutsManagement({ selectedPupilFromSchedule, activeTab }: Wor
       
 
       
-      // Создаем сессию в расписании для ученика (например, на ближайшее время)
+      // Создаем сессию в расписании для ученика на выбранную дату
       const now = new Date();
       const currentTime = `${now.getHours().toString().padStart(2, '0')}:00`;
-      const dateString = now.toISOString().split('T')[0];
+      const dateString = selectedDate || now.toISOString().split('T')[0];
       
       // Сохраняем данные о сессии в локальном хранилище для синхронизации с расписанием
       const sessionData = {

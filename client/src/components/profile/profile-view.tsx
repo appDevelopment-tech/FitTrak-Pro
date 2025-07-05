@@ -26,6 +26,7 @@ export function ProfileView() {
   const [selectedMuscleForImageUpload, setSelectedMuscleForImageUpload] = useState<string>("");
   const [customMuscleImages, setCustomMuscleImages] = useState<Record<string, string>>({});
   const [selectedPupil, setSelectedPupil] = useState<Pupil | null>(null);
+  const [selectedDateFromSchedule, setSelectedDateFromSchedule] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { toast } = useToast();
@@ -53,6 +54,7 @@ export function ProfileView() {
     const urlParams = new URLSearchParams(window.location.search);
     const tab = urlParams.get('tab');
     const pupilId = urlParams.get('pupilId');
+    const selectedDate = urlParams.get('date');
     
 
 
@@ -70,8 +72,11 @@ export function ProfileView() {
       const pupil = pupils.find(p => p.id === parseInt(pupilId));
       if (pupil) {
         setSelectedPupil(pupil);
-
       }
+    }
+
+    if (selectedDate) {
+      setSelectedDateFromSchedule(selectedDate);
     }
   }, [location, pupils]);
 
@@ -277,7 +282,7 @@ export function ProfileView() {
         </TabsContent>
 
         <TabsContent value="programs">
-          <WorkoutsManagement selectedPupilFromSchedule={selectedPupil} activeTab={activeTab} />
+          <WorkoutsManagement selectedPupilFromSchedule={selectedPupil} activeTab={activeTab} selectedDate={selectedDateFromSchedule} />
         </TabsContent>
 
         <TabsContent value="exercises" className="space-y-6">

@@ -437,7 +437,11 @@ export function NewSchedule() {
                                         description: `Выберите план тренировки для ${pupil.firstName} ${pupil.lastName}`,
                                       });
                                       // Переходим в кабинет с вкладкой готовых планов для выбора
-                                      setLocation(`/cabinet?tab=programs&pupilId=${pupil.id}`);
+                                      const year = selectedDate.getFullYear();
+                                      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                                      const day = String(selectedDate.getDate()).padStart(2, '0');
+                                      const dateString = `${year}-${month}-${day}`;
+                                      setLocation(`/cabinet?tab=programs&pupilId=${pupil.id}&date=${dateString}`);
                                     }
                                   }}
                                   className={`p-1.5 rounded-full transition-colors ${
