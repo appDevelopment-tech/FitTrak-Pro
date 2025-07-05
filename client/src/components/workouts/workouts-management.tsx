@@ -366,12 +366,11 @@ export function WorkoutsManagement({ selectedPupilFromSchedule }: WorkoutsManage
             {readyPlans.map((plan) => (
               <Card 
                 key={plan.id} 
-                className="hover:shadow-lg hover:border-orange-200 transition-all duration-200 cursor-pointer group"
-                onClick={() => handleSelectPlan(plan)}
+                className="hover:shadow-lg hover:border-gray-200 transition-all duration-200"
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
-                    <CardTitle className="text-lg group-hover:text-orange-600 transition-colors">{plan.name}</CardTitle>
+                    <CardTitle className="text-lg">{plan.name}</CardTitle>
                     <Badge className={getDifficultyColor(plan.difficulty)}>
                       {plan.difficulty}
                     </Badge>
