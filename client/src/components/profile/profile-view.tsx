@@ -282,7 +282,7 @@ export function ProfileView() {
         </TabsContent>
 
         <TabsContent value="programs">
-          <WorkoutsManagement selectedPupilFromSchedule={selectedPupil} activeTab={activeTab} selectedDate={selectedDateFromSchedule} />
+          <WorkoutsManagement activeTab={activeTab} />
         </TabsContent>
 
         <TabsContent value="exercises" className="space-y-6">
