@@ -415,7 +415,7 @@ export function ComprehensiveStudentsManagement() {
         
         <Card>
           <CardContent className="flex items-center p-6">
-            <Calendar className="h-8 w-8 text-green-500" />
+            <CalendarIcon className="h-8 w-8 text-green-500" />
             <div className="ml-4">
               <p className="text-sm font-medium text-muted-foreground">Записано на сегодня</p>
               <p className="text-2xl font-bold">{stats?.todayBookings ?? 0}</p>
@@ -580,7 +580,7 @@ export function ComprehensiveStudentsManagement() {
                           <span>{selectedPupil.email}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4" />
+                          <CalendarIcon className="h-4 w-4" />
                           <span>Дата рождения: {formatDate(selectedPupil.birthDate)}</span>
                         </div>
                       </div>
