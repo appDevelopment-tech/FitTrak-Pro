@@ -1552,7 +1552,7 @@ export function ComprehensiveStudentsManagement() {
           <div className="space-y-4">
             <div className="text-sm text-muted-foreground">
               {showScheduleDialog ? (
-                `Выберите конкретные дни для тренировок (всего планируется: ${scheduleData.totalSessions})`
+                `Выберите до ${scheduleData.totalSessions} дней для тренировок`
               ) : (
                 `Нужно выбрать ${customWorkout.totalSessions} дней`
               )}
@@ -1563,9 +1563,21 @@ export function ComprehensiveStudentsManagement() {
               selected={showScheduleDialog ? scheduleData.selectedDates : selectedDates}
               onSelect={(dates) => {
                 if (showScheduleDialog) {
-                  setScheduleData(prev => ({ ...prev, selectedDates: dates || [] }));
+                  const maxSessions = scheduleData.totalSessions;
+                  const newDates = dates || [];
+                  
+                  // Ограничиваем количество выбранных дней
+                  if (newDates.length <= maxSessions) {
+                    setScheduleData(prev => ({ ...prev, selectedDates: newDates }));
+                  }
                 } else {
-                  setSelectedDates(dates || []);
+                  const maxSessions = customWorkout.totalSessions;
+                  const newDates = dates || [];
+                  
+                  // Ограничиваем количество выбранных дней
+                  if (newDates.length <= maxSessions) {
+                    setSelectedDates(newDates);
+                  }
                 }
               }}
               disabled={(date) => {
@@ -1581,11 +1593,29 @@ export function ComprehensiveStudentsManagement() {
             />
             
             <div className="flex justify-between items-center pt-4">
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm">
                 {showScheduleDialog ? (
-                  `Выбрано: ${scheduleData.selectedDates.length} дней`
+                  <div className="space-y-1">
+                    <div className={scheduleData.selectedDates.length >= scheduleData.totalSessions ? "text-orange-600 font-medium" : "text-muted-foreground"}>
+                      Выбрано: {scheduleData.selectedDates.length} из {scheduleData.totalSessions} дней
+                    </div>
+                    {scheduleData.selectedDates.length >= scheduleData.totalSessions && (
+                      <div className="text-orange-600 text-xs">
+                        Достигнут максимум. Снимите выделение с дня, чтобы выбрать другой.
+                      </div>
+                    )}
+                  </div>
                 ) : (
-                  `Выбрано: ${selectedDates.length} из ${customWorkout.totalSessions}`
+                  <div className="space-y-1">
+                    <div className={selectedDates.length >= customWorkout.totalSessions ? "text-orange-600 font-medium" : "text-muted-foreground"}>
+                      Выбрано: {selectedDates.length} из {customWorkout.totalSessions}
+                    </div>
+                    {selectedDates.length >= customWorkout.totalSessions && (
+                      <div className="text-orange-600 text-xs">
+                        Достигнут максимум. Снимите выделение с дня, чтобы выбрать другой.
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
               <div className="flex gap-2">
