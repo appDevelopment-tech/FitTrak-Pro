@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
-import type { Pupil, InsertPupil } from "@shared/schema";
+import type { Pupil, InsertPupil, WorkoutProgram } from "@shared/schema";
 
 interface PupilsStats {
   totalPupils: number;
@@ -50,12 +50,42 @@ export function ComprehensiveStudentsManagement() {
   const [selectedPupil, setSelectedPupil] = useState<PupilWithAge | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showWorkoutPlanDialog, setShowWorkoutPlanDialog] = useState(false);
+  const [selectedPupilForWorkout, setSelectedPupilForWorkout] = useState<PupilWithAge | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { isWorkoutActive, removeActiveWorkout } = useActiveWorkout();
+  const { isWorkoutActive, removeActiveWorkout, addActiveWorkout, getActiveWorkout } = useActiveWorkout();
   
   const trainerId = 1; // В реальном приложении это будет из контекста пользователя
+
+  // Готовые планы тренировок
+  const readyPlans = [
+    {
+      id: 1,
+      name: "Все тело",
+      description: "Комплексная тренировка всех групп мышц за одну сессию",
+      difficulty: "начальный",
+      sessionsPerWeek: 3,
+      exercises: ["Приседания", "Отжимания", "Подтягивания", "Планка"]
+    },
+    {
+      id: 2,
+      name: "Тяни-толкай",
+      description: "Разделение на тянущие и толкающие движения",
+      difficulty: "базовый",
+      sessionsPerWeek: 4,
+      exercises: ["Становая тяга", "Жим лежа", "Тяга штанги", "Жим стоя"]
+    },
+    {
+      id: 3,
+      name: "Верх-низ",
+      description: "Разделение тренировок на верх и низ тела",
+      difficulty: "средний",
+      sessionsPerWeek: 4,
+      exercises: ["Приседания", "Жим лежа", "Становая тяга", "Подтягивания"]
+    }
+  ];
 
   // Получаем статистику учеников
   const { data: stats } = useQuery<PupilsStats>({
@@ -84,6 +114,47 @@ export function ComprehensiveStudentsManagement() {
       isMinor: actualAge < 16
     };
   });
+
+  // Функция для открытия диалога выбора плана тренировки
+  const handleAssignWorkout = (pupil: PupilWithAge) => {
+    setSelectedPupilForWorkout(pupil);
+    setShowWorkoutPlanDialog(true);
+  };
+
+  // Функция для прикрепления плана тренировки к ученику
+  const handleSelectPlan = (plan: any) => {
+    if (!selectedPupilForWorkout) return;
+
+    const workoutProgram: WorkoutProgram = {
+      id: Date.now(),
+      name: plan.name,
+      level: plan.difficulty,
+      exercises: plan.exercises || [],
+      type: 'strength',
+      duration: plan.sessionsPerWeek,
+      createdBy: trainerId,
+    };
+
+    addActiveWorkout(trainerId, selectedPupilForWorkout, workoutProgram);
+
+    toast({
+      title: "План прикреплен!",
+      description: `План "${plan.name}" прикреплен к ученику ${selectedPupilForWorkout.firstName} ${selectedPupilForWorkout.lastName}`,
+    });
+
+    setShowWorkoutPlanDialog(false);
+    setSelectedPupilForWorkout(null);
+  };
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'начальный': return 'bg-green-100 text-green-800';
+      case 'базовый': return 'bg-blue-100 text-blue-800';
+      case 'средний': return 'bg-yellow-100 text-yellow-800';
+      case 'высокий': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   // Фильтрация учеников по поисковому запросу
   const filteredPupils = pupilsWithAge
@@ -155,13 +226,7 @@ export function ComprehensiveStudentsManagement() {
     setSelectedPupil(pupil);
   };
 
-  const handleAssignWorkout = (pupil: PupilWithAge) => {
-    // Здесь будет логика прикрепления тренировочного плана
-    toast({
-      title: "Прикрепление плана",
-      description: `Выберите тренировочный план для ${pupil.firstName} ${pupil.lastName}`,
-    });
-  };
+
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('ru-RU', {
@@ -262,8 +327,15 @@ export function ComprehensiveStudentsManagement() {
                   <div className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full text-sm font-medium">
                     {filteredPupils.findIndex(p => p.id === pupil.id) + 1}
                   </div>
-                  <div className="font-medium text-sm">
-                    {pupil.lastName} {pupil.firstName} • {pupil.age} лет • {pupil.phone}
+                  <div className="flex flex-col">
+                    <div className="font-medium text-sm">
+                      {pupil.lastName} {pupil.firstName} • {pupil.age} лет • {pupil.phone}
+                    </div>
+                    {isWorkoutActive(trainerId, pupil.id) && (
+                      <div className="text-xs text-orange-600 font-medium">
+                        План: {getActiveWorkout(trainerId, pupil.id)?.workoutProgram?.name || 'Активная тренировка'}
+                      </div>
+                    )}
                   </div>
                 </div>
                 
@@ -528,6 +600,78 @@ export function ComprehensiveStudentsManagement() {
                 </div>
               </TabsContent>
             </Tabs>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Диалог выбора плана тренировки */}
+      <Dialog open={showWorkoutPlanDialog} onOpenChange={setShowWorkoutPlanDialog}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Dumbbell className="h-5 w-5" />
+              Выбор плана тренировки
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedPupilForWorkout && (
+            <div className="space-y-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center gap-2 text-blue-700">
+                  <User className="h-5 w-5" />
+                  <span className="font-medium">
+                    Выбран ученик: {selectedPupilForWorkout.firstName} {selectedPupilForWorkout.lastName}
+                  </span>
+                </div>
+                <p className="text-sm text-blue-600 mt-1">
+                  Выберите план тренировки для прикрепления
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {readyPlans.map((plan) => (
+                  <Card 
+                    key={plan.id} 
+                    className="transition-all duration-200 hover:shadow-lg hover:border-blue-300 cursor-pointer"
+                    onClick={() => handleSelectPlan(plan)}
+                  >
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between">
+                        <CardTitle className="text-lg">{plan.name}</CardTitle>
+                        <Badge className={getDifficultyColor(plan.difficulty)}>
+                          {plan.difficulty}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <p className="text-sm text-muted-foreground">{plan.description}</p>
+                      
+                      <div className="flex items-center gap-4 text-sm">
+                        <span className="flex items-center gap-1">
+                          <strong>{plan.sessionsPerWeek}</strong> раз/неделю
+                        </span>
+                      </div>
+
+                      <div>
+                        <h4 className="text-sm font-medium mb-2">Упражнения:</h4>
+                        <div className="flex flex-wrap gap-1">
+                          {plan.exercises?.slice(0, 3).map((exercise, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {exercise}
+                            </Badge>
+                          ))}
+                          {plan.exercises && plan.exercises.length > 3 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{plan.exercises.length - 3}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>
