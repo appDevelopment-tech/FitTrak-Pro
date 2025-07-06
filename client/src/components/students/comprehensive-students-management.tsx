@@ -30,7 +30,8 @@ import {
   FileText,
   Shield,
   Activity,
-  Dumbbell
+  Dumbbell,
+  Trash2
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
@@ -74,7 +75,7 @@ export function ComprehensiveStudentsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { isWorkoutActive, removeActiveWorkout, addActiveWorkout, getActiveWorkout } = useActiveWorkout();
+  const { isWorkoutActive, removeActiveWorkout, addActiveWorkout, getActiveWorkout, activeWorkouts } = useActiveWorkout();
   
   const trainerId = 1; // В реальном приложении это будет из контекста пользователя
 
@@ -546,8 +547,9 @@ export function ComprehensiveStudentsManagement() {
           
           {selectedPupil && (
             <Tabs defaultValue="profile" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="profile">Профиль</TabsTrigger>
+                <TabsTrigger value="workouts">Тренировки</TabsTrigger>
                 <TabsTrigger value="progress">Прогресс</TabsTrigger>
                 <TabsTrigger value="documents">Документы</TabsTrigger>
               </TabsList>
@@ -662,6 +664,113 @@ export function ComprehensiveStudentsManagement() {
                     </>
                   )}
                 </div>
+              </TabsContent>
+
+              <TabsContent value="workouts" className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Dumbbell className="h-5 w-5" />
+                  Программы тренировок
+                </h3>
+                
+                {/* Показываем прикрепленные планы тренировок */}
+                {activeWorkouts.filter(workout => workout.pupilId === selectedPupil?.id).length > 0 ? (
+                  <div className="space-y-4">
+                    {activeWorkouts
+                      .filter(workout => workout.pupilId === selectedPupil?.id)
+                      .map((workout) => (
+                        <Card key={workout.id} className="border border-orange-200 bg-orange-50">
+                          <CardContent className="p-4">
+                            <div className="flex justify-between items-start">
+                              <div className="space-y-2">
+                                <h4 className="font-semibold text-orange-800">{workout.name}</h4>
+                                <div className="flex gap-4 text-sm text-orange-700">
+                                  <span>Уровень: {workout.level}</span>
+                                  <span>Продолжительность: {workout.duration} недель</span>
+                                </div>
+                                <p className="text-sm text-orange-600">
+                                  Статус: <Badge className="bg-orange-600 text-white">Активная</Badge>
+                                </p>
+                              </div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={async () => {
+                                  try {
+                                    // Удаляем план тренировки через API
+                                    const response = await fetch(`/api/training-plans/${workout.id}`, {
+                                      method: 'DELETE',
+                                    });
+                                    
+                                    if (response.ok) {
+                                      // Удаляем из локального состояния activeWorkouts
+                                      removeActiveWorkout(workout.trainerId, workout.pupilId);
+                                      
+                                      toast({
+                                        title: "План удален",
+                                        description: `План "${workout.name}" успешно удален у ${selectedPupil?.firstName} ${selectedPupil?.lastName}`,
+                                      });
+                                    } else {
+                                      throw new Error('Failed to delete training plan');
+                                    }
+                                  } catch (error) {
+                                    toast({
+                                      title: "Ошибка",
+                                      description: "Не удалось удалить план тренировки",
+                                      variant: "destructive",
+                                    });
+                                  }
+                                }}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Удалить
+                              </Button>
+                            </div>
+                            
+                            {workout.exercises && workout.exercises.length > 0 && (
+                              <div className="mt-3 pt-3 border-t border-orange-200">
+                                <p className="text-sm font-medium text-orange-800 mb-2">Упражнения:</p>
+                                <div className="flex flex-wrap gap-2">
+                                  {workout.exercises.slice(0, 3).map((exercise, index) => (
+                                    <Badge key={index} variant="outline" className="text-orange-700 border-orange-300">
+                                      {exercise}
+                                    </Badge>
+                                  ))}
+                                  {workout.exercises.length > 3 && (
+                                    <Badge variant="outline" className="text-orange-700 border-orange-300">
+                                      +{workout.exercises.length - 3} еще
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      ))
+                    }
+                  </div>
+                ) : (
+                  <Card>
+                    <CardContent className="p-6 text-center">
+                      <Dumbbell className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground mb-4">
+                        У {selectedPupil?.firstName} пока нет прикрепленных программ тренировок
+                      </p>
+                      <Button
+                        onClick={() => {
+                          if (selectedPupil) {
+                            handleAssignWorkout(selectedPupil);
+                            setShowStudentDialog(false);
+                          }
+                        }}
+                        className="flex items-center gap-2"
+                      >
+                        <Plus className="h-4 w-4" />
+                        Прикрепить план тренировки
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )}
               </TabsContent>
 
               <TabsContent value="progress" className="space-y-4">
