@@ -40,6 +40,7 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string>('');
   const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
+  const [currentWorkoutTab, setCurrentWorkoutTab] = useState<string>('ready-plans');
 
   const [customWorkout, setCustomWorkout] = useState({
     name: '',
@@ -319,7 +320,8 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
       </div>
 
       <Tabs 
-        value={activeTab === 'programs' || activeTab === 'ready-plans' ? 'ready-plans' : (activeTab === 'create-workout' ? 'create-workout' : 'ready-plans')} 
+        value={currentWorkoutTab} 
+        onValueChange={setCurrentWorkoutTab}
         defaultValue="ready-plans" 
         className="w-full"
       >
