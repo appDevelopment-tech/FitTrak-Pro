@@ -56,6 +56,16 @@ export function ComprehensiveStudentsManagement() {
   const [showWorkoutPlanDialog, setShowWorkoutPlanDialog] = useState(false);
   const [selectedPupilForWorkout, setSelectedPupilForWorkout] = useState<PupilWithAge | null>(null);
   const [showCreateWorkoutDialog, setShowCreateWorkoutDialog] = useState(false);
+  const [showScheduleDialog, setShowScheduleDialog] = useState(false);
+  const [selectedPlanForSchedule, setSelectedPlanForSchedule] = useState<any>(null);
+  const [scheduleData, setScheduleData] = useState({
+    startDate: null as Date | null,
+    startTime: '09:00',
+    sessionsPerWeek: 3,
+    totalSessions: 8,
+    selectedDates: [] as Date[],
+    trainerNotes: ''
+  });
   const [customWorkout, setCustomWorkout] = useState({
     name: '',
     level: 'начальный',
@@ -171,8 +181,23 @@ export function ComprehensiveStudentsManagement() {
   };
 
   // Функция для прикрепления плана тренировки к ученику
-  const handleSelectPlan = async (plan: any) => {
-    if (!selectedPupilForWorkout) return;
+  const handleSelectPlan = (plan: any) => {
+    setSelectedPlanForSchedule(plan);
+    setScheduleData({
+      startDate: null,
+      startTime: '09:00',
+      sessionsPerWeek: plan.sessionsPerWeek || 3,
+      totalSessions: 8,
+      selectedDates: [],
+      trainerNotes: ''
+    });
+    setShowWorkoutPlanDialog(false);
+    setShowScheduleDialog(true);
+  };
+
+  // Функция подтверждения расписания для готового плана
+  const handleConfirmSchedule = async () => {
+    if (!selectedPupilForWorkout || !selectedPlanForSchedule) return;
 
     try {
       // Сохраняем план в базе данных
@@ -183,9 +208,10 @@ export function ComprehensiveStudentsManagement() {
         },
         body: JSON.stringify({
           trainerId: trainerId,
-          name: plan.name,
-          exercises: plan.exercises || [],
+          name: selectedPlanForSchedule.name,
+          exercises: selectedPlanForSchedule.exercises || [],
           isActive: true,
+          scheduleData: scheduleData,
         }),
       });
 
@@ -198,11 +224,11 @@ export function ComprehensiveStudentsManagement() {
       // Добавляем в локальное состояние с ID из базы данных
       const workoutProgram: WorkoutProgram = {
         id: savedPlan.id,
-        name: plan.name,
-        level: plan.difficulty,
-        exercises: plan.exercises || [],
+        name: selectedPlanForSchedule.name,
+        level: selectedPlanForSchedule.difficulty,
+        exercises: selectedPlanForSchedule.exercises || [],
         type: 'strength',
-        duration: plan.sessionsPerWeek,
+        duration: selectedPlanForSchedule.sessionsPerWeek,
         createdBy: trainerId,
       };
 
@@ -210,11 +236,21 @@ export function ComprehensiveStudentsManagement() {
 
       toast({
         title: "План прикреплен!",
-        description: `План "${plan.name}" прикреплен к ученику ${selectedPupilForWorkout.firstName} ${selectedPupilForWorkout.lastName}`,
+        description: `План "${selectedPlanForSchedule.name}" прикреплен к ученику ${selectedPupilForWorkout.firstName} ${selectedPupilForWorkout.lastName}`,
       });
 
-      setShowWorkoutPlanDialog(false);
+      // Закрываем все диалоги и сбрасываем состояние
+      setShowScheduleDialog(false);
       setSelectedPupilForWorkout(null);
+      setSelectedPlanForSchedule(null);
+      setScheduleData({
+        startDate: null,
+        startTime: '09:00',
+        sessionsPerWeek: 3,
+        totalSessions: 8,
+        selectedDates: [],
+        trainerNotes: ''
+      });
     } catch (error) {
       toast({
         title: "Ошибка",
@@ -1362,6 +1398,150 @@ export function ComprehensiveStudentsManagement() {
         </DialogContent>
       </Dialog>
 
+      {/* Диалог выбора расписания для готового плана */}
+      <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarIcon className="h-5 w-5" />
+              Настройка расписания тренировок
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedPupilForWorkout && selectedPlanForSchedule && (
+            <div className="space-y-6">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center gap-2 text-blue-700">
+                  <User className="h-5 w-5" />
+                  <span className="font-medium">
+                    {selectedPupilForWorkout.firstName} {selectedPupilForWorkout.lastName}
+                  </span>
+                </div>
+                <p className="text-sm text-blue-600 mt-1">
+                  План: <strong>{selectedPlanForSchedule.name}</strong>
+                </p>
+              </div>
+
+              {/* Основные настройки */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="start-date">Дата первой тренировки</Label>
+                  <Input
+                    id="start-date"
+                    type="date"
+                    value={scheduleData.startDate ? scheduleData.startDate.toISOString().split('T')[0] : ''}
+                    onChange={(e) => {
+                      const newStartDate = e.target.value ? new Date(e.target.value) : null;
+                      setScheduleData(prev => ({ 
+                        ...prev, 
+                        startDate: newStartDate,
+                        selectedDates: [] // Сбрасываем выбранные даты
+                      }));
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="start-time">Время тренировок</Label>
+                  <Input
+                    id="start-time"
+                    type="time"
+                    value={scheduleData.startTime}
+                    onChange={(e) => setScheduleData(prev => ({ ...prev, startTime: e.target.value }))}
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="sessions-per-week">Тренировок в неделю</Label>
+                  <Select 
+                    value={scheduleData.sessionsPerWeek?.toString()} 
+                    onValueChange={(value) => setScheduleData(prev => ({ ...prev, sessionsPerWeek: parseInt(value) }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Выберите" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 раз в неделю</SelectItem>
+                      <SelectItem value="2">2 раза в неделю</SelectItem>
+                      <SelectItem value="3">3 раза в неделю</SelectItem>
+                      <SelectItem value="4">4 раза в неделю</SelectItem>
+                      <SelectItem value="5">5 раз в неделю</SelectItem>
+                      <SelectItem value="6">6 раз в неделю</SelectItem>
+                      <SelectItem value="7">Ежедневно</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="total-sessions">Всего тренировок</Label>
+                <Input
+                  id="total-sessions"
+                  type="number"
+                  min="1"
+                  max="50"
+                  placeholder="Количество"
+                  value={scheduleData.totalSessions}
+                  onChange={(e) => setScheduleData(prev => ({ ...prev, totalSessions: parseInt(e.target.value) || 1 }))}
+                />
+              </div>
+
+              {/* Выбор конкретных дат */}
+              <div className="space-y-3">
+                <Label>Конкретные дни тренировок (необязательно)</Label>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowCalendarSelector(true)}
+                  className="w-full"
+                  disabled={!scheduleData.startDate}
+                >
+                  <CalendarIcon className="h-4 w-4 mr-2" />
+                  {scheduleData.selectedDates.length > 0 
+                    ? `Выбрано дней: ${scheduleData.selectedDates.length}` 
+                    : 'Выберите конкретные дни'
+                  }
+                </Button>
+                
+                {!scheduleData.startDate && (
+                  <p className="text-sm text-red-500">Сначала выберите дату первой тренировки</p>
+                )}
+                
+                {scheduleData.selectedDates.length > 0 && (
+                  <div className="text-sm text-green-600">
+                    ✓ Выбрано {scheduleData.selectedDates.length} дней для тренировок
+                  </div>
+                )}
+              </div>
+
+              {/* Заметки тренера */}
+              <div>
+                <Label htmlFor="trainer-notes">Заметки тренера (необязательно)</Label>
+                <Textarea
+                  id="trainer-notes"
+                  placeholder="Дополнительные указания для ученика"
+                  value={scheduleData.trainerNotes}
+                  onChange={(e) => setScheduleData(prev => ({ ...prev, trainerNotes: e.target.value }))}
+                />
+              </div>
+
+              {/* Кнопки */}
+              <div className="flex gap-3 pt-4 border-t">
+                <Button variant="outline" onClick={() => setShowScheduleDialog(false)} className="flex-1">
+                  Отмена
+                </Button>
+                <Button 
+                  onClick={handleConfirmSchedule}
+                  disabled={!scheduleData.startDate}
+                  className="flex-1"
+                >
+                  Прикрепить план
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* Диалог календаря */}
       <Dialog open={showCalendarSelector} onOpenChange={setShowCalendarSelector}>
         <DialogContent className="max-w-md">
@@ -1371,27 +1551,42 @@ export function ComprehensiveStudentsManagement() {
           
           <div className="space-y-4">
             <div className="text-sm text-muted-foreground">
-              Нужно выбрать {customWorkout.totalSessions} дней
+              {showScheduleDialog ? (
+                `Выберите конкретные дни для тренировок (всего планируется: ${scheduleData.totalSessions})`
+              ) : (
+                `Нужно выбрать ${customWorkout.totalSessions} дней`
+              )}
             </div>
             
             <Calendar
               mode="multiple"
-              selected={selectedDates}
-              onSelect={(dates) => setSelectedDates(dates || [])}
+              selected={showScheduleDialog ? scheduleData.selectedDates : selectedDates}
+              onSelect={(dates) => {
+                if (showScheduleDialog) {
+                  setScheduleData(prev => ({ ...prev, selectedDates: dates || [] }));
+                } else {
+                  setSelectedDates(dates || []);
+                }
+              }}
               disabled={(date) => {
-                if (!customWorkout.startDate) return date < new Date();
-                const startDate = new Date(customWorkout.startDate);
-                startDate.setHours(0, 0, 0, 0);
+                const startDate = showScheduleDialog ? scheduleData.startDate : customWorkout.startDate;
+                if (!startDate) return date < new Date();
+                const start = new Date(startDate);
+                start.setHours(0, 0, 0, 0);
                 const currentDate = new Date(date);
                 currentDate.setHours(0, 0, 0, 0);
-                return currentDate < startDate;
+                return currentDate < start;
               }}
               className="rounded-md border"
             />
             
             <div className="flex justify-between items-center pt-4">
               <div className="text-sm text-muted-foreground">
-                Выбрано: {selectedDates.length} из {customWorkout.totalSessions}
+                {showScheduleDialog ? (
+                  `Выбрано: ${scheduleData.selectedDates.length} дней`
+                ) : (
+                  `Выбрано: ${selectedDates.length} из ${customWorkout.totalSessions}`
+                )}
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setShowCalendarSelector(false)}>
