@@ -408,14 +408,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/pupils/:pupilId/training-plans", async (req, res) => {
     try {
       const pupilId = parseInt(req.params.pupilId);
+      console.log('Request body:', req.body);
+      console.log('Pupil ID:', pupilId);
+      
       const planData = insertPupilTrainingPlanSchema.parse({
         ...req.body,
         pupilId
       });
+      console.log('Parsed plan data:', planData);
+      
       const plan = await storage.createPupilTrainingPlan(planData);
       res.json(plan);
     } catch (error) {
-      res.status(400).json({ message: "Failed to create training plan" });
+      console.error('Error creating training plan:', error);
+      res.status(400).json({ 
+        message: "Failed to create training plan", 
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   });
 
