@@ -946,7 +946,7 @@ export function ComprehensiveStudentsManagement() {
                   </div>
                 </div>
 
-                {/* Выбор дней и времени */}
+                {/* Кнопка выбора дат */}
                 <div className="space-y-3">
                   <Label>Дни и время тренировок</Label>
                   <Button
@@ -962,26 +962,8 @@ export function ComprehensiveStudentsManagement() {
                   </Button>
                   
                   {selectedDates.length > 0 && (
-                    <div className="space-y-2 max-h-40 overflow-y-auto border rounded p-3 bg-gray-50">
-                      {selectedDates.map((date, index) => (
-                        <div key={index} className="flex items-center justify-between">
-                          <span className="text-sm">{date.toLocaleDateString('ru-RU')}</span>
-                          <Input
-                            type="time"
-                            defaultValue={customWorkout.startTime}
-                            className="w-24 h-8"
-                            onChange={(e) => {
-                              // Здесь можно сохранить индивидуальное время для каждой тренировки
-                            }}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {customWorkout.totalSessions > selectedDates.length && (
-                    <div className="text-sm text-muted-foreground">
-                      Осталось выбрать: {customWorkout.totalSessions - selectedDates.length} дней
+                    <div className="text-sm text-green-600">
+                      ✓ Выбрано {selectedDates.length} дней для тренировок
                     </div>
                   )}
                 </div>
