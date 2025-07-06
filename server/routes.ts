@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertWorkoutProgramSchema, insertWorkoutSessionSchema, insertExerciseProgressSchema, insertExerciseSchema, insertPupilTrainingPlanSchema, insertPupilSchema, insertActiveWorkoutSchema } from "@shared/schema";
+import { insertWorkoutProgramSchema, insertWorkoutSessionSchema, insertExerciseProgressSchema, insertExerciseSchema, insertPupilTrainingPlanSchema, insertPupilSchema, insertActiveWorkoutSchema, insertTrainerWorkoutSchema } from "@shared/schema";
 
 function translateExerciseToEnglish(russianName: string): string {
   const translations: Record<string, string> = {
@@ -489,6 +489,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true });
     } catch (error) {
       res.status(400).json({ message: "Failed to delete active workout" });
+    }
+  });
+
+  // Trainer workout routes
+  app.get("/api/trainers/:trainerId/workouts", async (req, res) => {
+    try {
+      const trainerId = parseInt(req.params.trainerId);
+      const workouts = await storage.getTrainerWorkouts(trainerId);
+      res.json(workouts);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch trainer workouts" });
+    }
+  });
+
+  app.get("/api/trainer-workouts/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const workout = await storage.getTrainerWorkout(id);
+      if (!workout) {
+        return res.status(404).json({ message: "Trainer workout not found" });
+      }
+      res.json(workout);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch trainer workout" });
+    }
+  });
+
+  app.post("/api/trainers/:trainerId/workouts", async (req, res) => {
+    try {
+      const trainerId = parseInt(req.params.trainerId);
+      const workoutData = { ...req.body, trainerId };
+      const validatedData = insertTrainerWorkoutSchema.parse(workoutData);
+      const workout = await storage.createTrainerWorkout(validatedData);
+      res.status(201).json(workout);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to create trainer workout" });
+    }
+  });
+
+  app.put("/api/trainer-workouts/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const validatedData = insertTrainerWorkoutSchema.partial().parse(req.body);
+      const workout = await storage.updateTrainerWorkout(id, validatedData);
+      if (!workout) {
+        return res.status(404).json({ message: "Trainer workout not found" });
+      }
+      res.json(workout);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to update trainer workout" });
+    }
+  });
+
+  app.delete("/api/trainer-workouts/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteTrainerWorkout(id);
+      if (!success) {
+        return res.status(404).json({ message: "Trainer workout not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      res.status(400).json({ message: "Failed to delete trainer workout" });
+    }
+  });
+
+  app.get("/api/trainers/:trainerId/workouts/date-range", async (req, res) => {
+    try {
+      const trainerId = parseInt(req.params.trainerId);
+      const { startDate, endDate } = req.query as { startDate: string; endDate: string };
+      
+      if (!startDate || !endDate) {
+        return res.status(400).json({ message: "Start date and end date are required" });
+      }
+      
+      const workouts = await storage.getTrainerWorkoutsByDateRange(trainerId, startDate, endDate);
+      res.json(workouts);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch trainer workouts by date range" });
     }
   });
 

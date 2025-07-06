@@ -193,3 +193,40 @@ export type PupilWorkoutHistory = typeof pupilWorkoutHistory.$inferSelect;
 export type InsertPupilWorkoutHistory = z.infer<typeof insertPupilWorkoutHistorySchema>;
 export type ActiveWorkout = typeof activeWorkouts.$inferSelect;
 export type InsertActiveWorkout = z.infer<typeof insertActiveWorkoutSchema>;
+
+// Таблица для тренировок тренера
+export const trainerWorkouts = pgTable("trainer_workouts", {
+  id: serial("id").primaryKey(),
+  trainerId: integer("trainer_id").notNull(),
+  name: text("name").notNull(),
+  date: text("date").notNull(), // YYYY-MM-DD
+  startTime: text("start_time").notNull(), // HH:MM
+  endTime: text("end_time"), // HH:MM
+  exercises: jsonb("exercises").notNull().$type<{
+    name: string;
+    sets: {
+      reps: number;
+      weight: number;
+      restTime: number; // секунды
+      completed: boolean;
+    }[];
+    notes?: string;
+  }[]>(),
+  totalDuration: integer("total_duration"), // минуты
+  calories: integer("calories"), // приблизительные калории
+  notes: text("notes"), // общие заметки о тренировке
+  feeling: text("feeling"), // самочувствие (отлично/хорошо/нормально/плохо)
+  energy: integer("energy"), // уровень энергии 1-10
+  mood: text("mood"), // настроение
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertTrainerWorkoutSchema = createInsertSchema(trainerWorkouts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type TrainerWorkout = typeof trainerWorkouts.$inferSelect;
+export type InsertTrainerWorkout = z.infer<typeof insertTrainerWorkoutSchema>;

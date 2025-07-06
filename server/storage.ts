@@ -8,6 +8,7 @@ import {
   pupilTrainingPlans,
   pupilWorkoutHistory,
   activeWorkouts,
+  trainerWorkouts,
   type User, 
   type InsertUser,
   type Pupil,
@@ -25,7 +26,9 @@ import {
   type PupilWorkoutHistory,
   type InsertPupilWorkoutHistory,
   type ActiveWorkout,
-  type InsertActiveWorkout
+  type InsertActiveWorkout,
+  type TrainerWorkout,
+  type InsertTrainerWorkout
 } from "@shared/schema";
 
 export interface IStorage {
@@ -84,6 +87,14 @@ export interface IStorage {
   createActiveWorkout(workout: InsertActiveWorkout): Promise<ActiveWorkout>;
   deleteActiveWorkout(trainerId: number, pupilId: number): Promise<boolean>;
   
+  // Trainer workout operations
+  getTrainerWorkouts(trainerId: number): Promise<TrainerWorkout[]>;
+  getTrainerWorkout(id: number): Promise<TrainerWorkout | undefined>;
+  createTrainerWorkout(workout: InsertTrainerWorkout): Promise<TrainerWorkout>;
+  updateTrainerWorkout(id: number, updates: Partial<InsertTrainerWorkout>): Promise<TrainerWorkout | undefined>;
+  deleteTrainerWorkout(id: number): Promise<boolean>;
+  getTrainerWorkoutsByDateRange(trainerId: number, startDate: string, endDate: string): Promise<TrainerWorkout[]>;
+  
   // Statistics operations
   getPupilsStats(trainerId: number): Promise<{
     totalPupils: number;
@@ -104,6 +115,7 @@ export class MemStorage implements IStorage {
   private exerciseProgress: Map<number, ExerciseProgress>;
   private pupilTrainingPlans: Map<number, PupilTrainingPlan>;
   private activeWorkouts: Map<number, ActiveWorkout>;
+  private trainerWorkouts: Map<number, TrainerWorkout>;
   private currentUserId: number;
   private currentPupilId: number;
   private currentProgramId: number;
@@ -112,6 +124,7 @@ export class MemStorage implements IStorage {
   private currentProgressId: number;
   private currentTrainingPlanId: number;
   private currentActiveWorkoutId: number;
+  private currentTrainerWorkoutId: number;
 
   constructor() {
     this.users = new Map();
@@ -122,6 +135,7 @@ export class MemStorage implements IStorage {
     this.exerciseProgress = new Map();
     this.pupilTrainingPlans = new Map();
     this.activeWorkouts = new Map();
+    this.trainerWorkouts = new Map();
     this.currentUserId = 1;
     this.currentPupilId = 1;
     this.currentProgramId = 1;
@@ -130,6 +144,7 @@ export class MemStorage implements IStorage {
     this.currentProgressId = 1;
     this.currentTrainingPlanId = 1;
     this.currentActiveWorkoutId = 1;
+    this.currentTrainerWorkoutId = 1;
 
     // Initialize with sample data
     this.initializeSampleData();
@@ -1839,6 +1854,57 @@ export class DatabaseStorage implements IStorage {
 
   isPupilMinor(pupil: Pupil): boolean {
     return this.getPupilAge(pupil) < 16;
+  }
+
+  // Trainer workout operations
+  async getTrainerWorkouts(trainerId: number): Promise<TrainerWorkout[]> {
+    const { db } = await import("./db");
+    const { eq, desc } = await import("drizzle-orm");
+    return await db.select().from(trainerWorkouts)
+      .where(eq(trainerWorkouts.trainerId, trainerId))
+      .orderBy(desc(trainerWorkouts.date), desc(trainerWorkouts.startTime));
+  }
+
+  async getTrainerWorkout(id: number): Promise<TrainerWorkout | undefined> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    const [workout] = await db.select().from(trainerWorkouts).where(eq(trainerWorkouts.id, id));
+    return workout || undefined;
+  }
+
+  async createTrainerWorkout(insertWorkout: InsertTrainerWorkout): Promise<TrainerWorkout> {
+    const { db } = await import("./db");
+    const [workout] = await db.insert(trainerWorkouts).values(insertWorkout).returning();
+    return workout;
+  }
+
+  async updateTrainerWorkout(id: number, updates: Partial<InsertTrainerWorkout>): Promise<TrainerWorkout | undefined> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    const [workout] = await db.update(trainerWorkouts)
+      .set(updates)
+      .where(eq(trainerWorkouts.id, id))
+      .returning();
+    return workout || undefined;
+  }
+
+  async deleteTrainerWorkout(id: number): Promise<boolean> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    const result = await db.delete(trainerWorkouts).where(eq(trainerWorkouts.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getTrainerWorkoutsByDateRange(trainerId: number, startDate: string, endDate: string): Promise<TrainerWorkout[]> {
+    const { db } = await import("./db");
+    const { eq, and, gte, lte, desc } = await import("drizzle-orm");
+    return await db.select().from(trainerWorkouts)
+      .where(and(
+        eq(trainerWorkouts.trainerId, trainerId),
+        gte(trainerWorkouts.date, startDate),
+        lte(trainerWorkouts.date, endDate)
+      ))
+      .orderBy(desc(trainerWorkouts.date), desc(trainerWorkouts.startTime));
   }
 }
 

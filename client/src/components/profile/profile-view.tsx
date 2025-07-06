@@ -15,6 +15,7 @@ import { getExercisePhoto } from "@/components/ui/exercise-photos";
 import { ExerciseDetail } from "@/components/exercise/exercise-detail";
 import { StudentsManagement } from "@/components/students/students-management";
 import { WorkoutsManagement } from "@/components/workouts/workouts-management";
+import { TrainerWorkout } from "@/components/trainer/trainer-workout";
 import { useLocation } from "wouter";
 
 export function ProfileView() {
@@ -181,9 +182,10 @@ export function ProfileView() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="profile">Тренер</TabsTrigger>
           <TabsTrigger value="students">Ученики</TabsTrigger>
+          <TabsTrigger value="my-workout">Моя тренировка</TabsTrigger>
           <TabsTrigger value="exercises">Упражнения</TabsTrigger>
           <TabsTrigger value="programs">Тренировки</TabsTrigger>
         </TabsList>
@@ -279,6 +281,10 @@ export function ProfileView() {
 
         <TabsContent value="students">
           <StudentsManagement />
+        </TabsContent>
+
+        <TabsContent value="my-workout">
+          <TrainerWorkout />
         </TabsContent>
 
         <TabsContent value="programs">
