@@ -182,10 +182,8 @@ export function ComprehensiveStudentsManagement() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          trainerId: trainerId,
           name: plan.name,
-          description: plan.description || '',
-          difficulty: plan.difficulty,
-          sessionsPerWeek: plan.sessionsPerWeek,
           exercises: plan.exercises || [],
           isActive: true,
         }),
@@ -244,10 +242,8 @@ export function ComprehensiveStudentsManagement() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          trainerId: trainerId,
           name: customWorkout.name,
-          description: customWorkout.trainerNotes || '',
-          difficulty: customWorkout.level,
-          sessionsPerWeek: customWorkout.sessionsPerWeek,
           exercises: customWorkout.exercises,
           isActive: true,
         }),
