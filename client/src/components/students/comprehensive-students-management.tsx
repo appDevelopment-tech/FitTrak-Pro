@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
-import type { Pupil, InsertPupil, WorkoutProgram } from "@shared/schema";
+import type { Pupil, InsertPupil, WorkoutProgram, Exercise } from "@shared/schema";
 
 interface PupilsStats {
   totalPupils: number;
@@ -52,6 +52,16 @@ export function ComprehensiveStudentsManagement() {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showWorkoutPlanDialog, setShowWorkoutPlanDialog] = useState(false);
   const [selectedPupilForWorkout, setSelectedPupilForWorkout] = useState<PupilWithAge | null>(null);
+  const [showCreateWorkoutDialog, setShowCreateWorkoutDialog] = useState(false);
+  const [customWorkout, setCustomWorkout] = useState({
+    name: '',
+    level: 'начальный',
+    exercises: [] as string[],
+    description: ''
+  });
+  const [showExerciseSelector, setShowExerciseSelector] = useState(false);
+  const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string>('');
+  const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -84,6 +94,30 @@ export function ComprehensiveStudentsManagement() {
       difficulty: "средний",
       sessionsPerWeek: 4,
       exercises: ["Приседания", "Жим лежа", "Становая тяга", "Подтягивания"]
+    },
+    {
+      id: 4,
+      name: "Грудь-спина-ноги",
+      description: "Классический трехдневный сплит по группам мышц",
+      difficulty: "средний",
+      sessionsPerWeek: 3,
+      exercises: ["Жим лежа", "Тяга штанги", "Приседания", "Жим стоя", "Подъемы на бицепс"]
+    },
+    {
+      id: 5,
+      name: "Силовой марафон",
+      description: "Интенсивная программа для опытных спортсменов",
+      difficulty: "высокий",
+      sessionsPerWeek: 5,
+      exercises: ["Становая тяга", "Приседания со штангой", "Жим лежа", "Подтягивания с весом", "Жим стоя"]
+    },
+    {
+      id: 6,
+      name: "Грудь-трицепс / Спина-бицепс / Ноги-плечи-живот",
+      description: "Классический трехдневный сплит по группам мышц",
+      difficulty: "высокий",
+      sessionsPerWeek: 3,
+      exercises: ["Жим лежа", "Французский жим", "Тяга штанги", "Подъемы на бицепс", "Приседания", "Жим стоя"]
     }
   ];
 
@@ -95,6 +129,11 @@ export function ComprehensiveStudentsManagement() {
   // Получаем список учеников
   const { data: pupils = [], isLoading } = useQuery<Pupil[]>({
     queryKey: ['/api/trainers/1/pupils'],
+  });
+
+  // Получаем упражнения для создания кастомных тренировок
+  const { data: exercises = [] } = useQuery<Exercise[]>({
+    queryKey: ['/api/exercises'],
   });
 
   // Вычисляем возраст и статус несовершеннолетия для каждого ученика
@@ -144,6 +183,97 @@ export function ComprehensiveStudentsManagement() {
 
     setShowWorkoutPlanDialog(false);
     setSelectedPupilForWorkout(null);
+  };
+
+  // Функция для создания кастомной тренировки
+  const handleCreateCustomWorkout = () => {
+    setShowWorkoutPlanDialog(false);
+    setShowCreateWorkoutDialog(true);
+  };
+
+  // Функция для сохранения кастомной тренировки
+  const handleSaveCustomWorkout = () => {
+    if (!selectedPupilForWorkout || !customWorkout.name.trim()) return;
+
+    const workoutProgram: WorkoutProgram = {
+      id: Date.now(),
+      name: customWorkout.name,
+      level: customWorkout.level,
+      exercises: customWorkout.exercises,
+      type: 'strength',
+      duration: 3,
+      createdBy: trainerId,
+    };
+
+    addActiveWorkout(trainerId, selectedPupilForWorkout, workoutProgram);
+
+    toast({
+      title: "Тренировка создана!",
+      description: `Кастомная тренировка "${customWorkout.name}" прикреплена к ученику ${selectedPupilForWorkout.firstName} ${selectedPupilForWorkout.lastName}`,
+    });
+
+    // Сброс состояний
+    setShowCreateWorkoutDialog(false);
+    setSelectedPupilForWorkout(null);
+    setCustomWorkout({
+      name: '',
+      level: 'начальный',
+      exercises: [],
+      description: ''
+    });
+    setSelectedExercises([]);
+  };
+
+  // Группировка упражнений по группам мышц
+  const muscleGroups = React.useMemo(() => {
+    const groups: { [key: string]: Exercise[] } = {};
+    
+    exercises.forEach(exercise => {
+      const primaryMuscle = exercise.primaryMuscles?.[0]?.toLowerCase() || 'другое';
+      if (!groups[primaryMuscle]) {
+        groups[primaryMuscle] = [];
+      }
+      groups[primaryMuscle].push(exercise);
+    });
+
+    return Object.entries(groups).map(([name, exerciseList]) => ({
+      name,
+      exercises: exerciseList
+    }));
+  }, [exercises]);
+
+  // Функции для работы с упражнениями
+  const handleOpenExerciseSelector = () => {
+    setSelectedMuscleGroup('');
+    setSelectedExercises([]);
+    setShowExerciseSelector(true);
+  };
+
+  const handleSelectMuscleGroup = (groupName: string) => {
+    setSelectedMuscleGroup(groupName);
+  };
+
+  const handleToggleExercise = (exerciseName: string) => {
+    setSelectedExercises(prev => {
+      if (prev.includes(exerciseName)) {
+        return prev.filter(e => e !== exerciseName);
+      } else {
+        return [...prev, exerciseName];
+      }
+    });
+  };
+
+  const handleAddSelectedExercises = () => {
+    if (selectedExercises.length === 0) return;
+    
+    setCustomWorkout(prev => ({
+      ...prev,
+      exercises: [...prev.exercises, ...selectedExercises]
+    }));
+    
+    setShowExerciseSelector(false);
+    setSelectedMuscleGroup('');
+    setSelectedExercises([]);
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -628,6 +758,17 @@ export function ComprehensiveStudentsManagement() {
                 </p>
               </div>
 
+              <div className="flex justify-end mb-4">
+                <Button
+                  variant="outline"
+                  onClick={handleCreateCustomWorkout}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Создать тренировку
+                </Button>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {readyPlans.map((plan) => (
                   <Card 
@@ -673,6 +814,224 @@ export function ComprehensiveStudentsManagement() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Диалог создания кастомной тренировки */}
+      <Dialog open={showCreateWorkoutDialog} onOpenChange={setShowCreateWorkoutDialog}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Dumbbell className="h-5 w-5" />
+              Создание тренировки
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedPupilForWorkout && (
+            <div className="space-y-6">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center gap-2 text-blue-700">
+                  <User className="h-5 w-5" />
+                  <span className="font-medium">
+                    Создание тренировки для: {selectedPupilForWorkout.firstName} {selectedPupilForWorkout.lastName}
+                  </span>
+                </div>
+              </div>
+
+              {/* Основная информация */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="workout-name">Название тренировки</Label>
+                  <Input
+                    id="workout-name"
+                    placeholder="Введите название"
+                    value={customWorkout.name}
+                    onChange={(e) => setCustomWorkout(prev => ({ ...prev, name: e.target.value }))}
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="workout-level">Уровень сложности</Label>
+                  <select 
+                    value={customWorkout.level} 
+                    onChange={(e) => setCustomWorkout(prev => ({ ...prev, level: e.target.value }))}
+                    className="w-full p-2 border rounded"
+                  >
+                    <option value="начальный">Начальный</option>
+                    <option value="базовый">Базовый</option>
+                    <option value="средний">Средний</option>
+                    <option value="высокий">Высокий</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="workout-description">Описание (необязательно)</Label>
+                <Textarea
+                  id="workout-description"
+                  placeholder="Краткое описание тренировки"
+                  value={customWorkout.description}
+                  onChange={(e) => setCustomWorkout(prev => ({ ...prev, description: e.target.value }))}
+                />
+              </div>
+
+              {/* Упражнения */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">Упражнения</h3>
+                  <Button
+                    variant="outline"
+                    onClick={handleOpenExerciseSelector}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Добавить упражнения
+                  </Button>
+                </div>
+                
+                {customWorkout.exercises && customWorkout.exercises.length > 0 ? (
+                  <div className="space-y-2">
+                    {customWorkout.exercises.map((exercise, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 border rounded bg-gray-50">
+                        <span>{exercise}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            const newExercises = [...customWorkout.exercises];
+                            newExercises.splice(index, 1);
+                            setCustomWorkout(prev => ({ ...prev, exercises: newExercises }));
+                          }}
+                        >
+                          ✕
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded">
+                    Упражнения не добавлены
+                  </div>
+                )}
+              </div>
+
+              {/* Кнопки действий */}
+              <div className="flex gap-2 pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowCreateWorkoutDialog(false)}
+                >
+                  Отмена
+                </Button>
+                <Button 
+                  disabled={!customWorkout.name.trim() || customWorkout.exercises.length === 0}
+                  onClick={handleSaveCustomWorkout}
+                >
+                  Создать и прикрепить
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Диалог выбора упражнений */}
+      <Dialog open={showExerciseSelector} onOpenChange={setShowExerciseSelector}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Добавить упражнения</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {!selectedMuscleGroup ? (
+              // Выбор группы мышц
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Выберите группу мышц</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {muscleGroups.map((group) => (
+                    <Card 
+                      key={group.name}
+                      className="cursor-pointer hover:shadow-md transition-shadow"
+                      onClick={() => handleSelectMuscleGroup(group.name)}
+                    >
+                      <CardContent className="p-4 text-center">
+                        <div className="text-lg font-medium capitalize">{group.name}</div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          {group.exercises.length} упражнений
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              // Выбор упражнений из группы
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setSelectedMuscleGroup('')}
+                  >
+                    ← Назад
+                  </Button>
+                  <h3 className="text-lg font-semibold capitalize">{selectedMuscleGroup}</h3>
+                </div>
+                
+                <div className="space-y-2">
+                  {muscleGroups
+                    .find(group => group.name === selectedMuscleGroup)
+                    ?.exercises.map((exercise) => (
+                      <div 
+                        key={exercise.id}
+                        className={`p-3 border rounded cursor-pointer transition-colors ${
+                          selectedExercises.includes(exercise.name)
+                            ? 'bg-blue-50 border-blue-300'
+                            : 'hover:bg-gray-50'
+                        }`}
+                        onClick={() => handleToggleExercise(exercise.name)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span>{exercise.name}</span>
+                          {selectedExercises.includes(exercise.name) && (
+                            <CheckCircle className="h-5 w-5 text-blue-600" />
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+                
+                {selectedExercises.length > 0 && (
+                  <div className="mt-4 p-3 bg-blue-50 rounded border border-blue-200">
+                    <div className="text-sm font-medium text-blue-800 mb-1">
+                      Выбрано упражнений: {selectedExercises.length}
+                    </div>
+                    <div className="text-xs text-blue-600">
+                      {selectedExercises.join(', ')}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          
+          <div className="flex gap-2 pt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setShowExerciseSelector(false);
+                setSelectedMuscleGroup('');
+                setSelectedExercises([]);
+              }}
+            >
+              Отмена
+            </Button>
+            <Button 
+              disabled={selectedExercises.length === 0}
+              onClick={handleAddSelectedExercises}
+            >
+              Добавить выбранные ({selectedExercises.length})
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
