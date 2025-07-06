@@ -171,28 +171,59 @@ export function ComprehensiveStudentsManagement() {
   };
 
   // Функция для прикрепления плана тренировки к ученику
-  const handleSelectPlan = (plan: any) => {
+  const handleSelectPlan = async (plan: any) => {
     if (!selectedPupilForWorkout) return;
 
-    const workoutProgram: WorkoutProgram = {
-      id: Date.now(),
-      name: plan.name,
-      level: plan.difficulty,
-      exercises: plan.exercises || [],
-      type: 'strength',
-      duration: plan.sessionsPerWeek,
-      createdBy: trainerId,
-    };
+    try {
+      // Сохраняем план в базе данных
+      const response = await fetch(`/api/pupils/${selectedPupilForWorkout.id}/training-plans`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: plan.name,
+          description: plan.description || '',
+          difficulty: plan.difficulty,
+          sessionsPerWeek: plan.sessionsPerWeek,
+          exercises: plan.exercises || [],
+          isActive: true,
+        }),
+      });
 
-    addActiveWorkout(trainerId, selectedPupilForWorkout, workoutProgram);
+      if (!response.ok) {
+        throw new Error('Failed to save training plan');
+      }
 
-    toast({
-      title: "План прикреплен!",
-      description: `План "${plan.name}" прикреплен к ученику ${selectedPupilForWorkout.firstName} ${selectedPupilForWorkout.lastName}`,
-    });
+      const savedPlan = await response.json();
 
-    setShowWorkoutPlanDialog(false);
-    setSelectedPupilForWorkout(null);
+      // Добавляем в локальное состояние с ID из базы данных
+      const workoutProgram: WorkoutProgram = {
+        id: savedPlan.id,
+        name: plan.name,
+        level: plan.difficulty,
+        exercises: plan.exercises || [],
+        type: 'strength',
+        duration: plan.sessionsPerWeek,
+        createdBy: trainerId,
+      };
+
+      addActiveWorkout(trainerId, selectedPupilForWorkout, workoutProgram);
+
+      toast({
+        title: "План прикреплен!",
+        description: `План "${plan.name}" прикреплен к ученику ${selectedPupilForWorkout.firstName} ${selectedPupilForWorkout.lastName}`,
+      });
+
+      setShowWorkoutPlanDialog(false);
+      setSelectedPupilForWorkout(null);
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось прикрепить план тренировки",
+        variant: "destructive",
+      });
+    }
   };
 
   // Функция для создания кастомной тренировки
@@ -202,42 +233,73 @@ export function ComprehensiveStudentsManagement() {
   };
 
   // Функция для сохранения кастомной тренировки
-  const handleSaveCustomWorkout = () => {
+  const handleSaveCustomWorkout = async () => {
     if (!selectedPupilForWorkout || !customWorkout.name.trim()) return;
 
-    const workoutProgram: WorkoutProgram = {
-      id: Date.now(),
-      name: customWorkout.name,
-      level: customWorkout.level,
-      exercises: customWorkout.exercises,
-      type: 'strength',
-      duration: 3,
-      createdBy: trainerId,
-    };
+    try {
+      // Сохраняем план в базе данных
+      const response = await fetch(`/api/pupils/${selectedPupilForWorkout.id}/training-plans`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: customWorkout.name,
+          description: customWorkout.trainerNotes || '',
+          difficulty: customWorkout.level,
+          sessionsPerWeek: customWorkout.sessionsPerWeek,
+          exercises: customWorkout.exercises,
+          isActive: true,
+        }),
+      });
 
-    addActiveWorkout(trainerId, selectedPupilForWorkout, workoutProgram);
+      if (!response.ok) {
+        throw new Error('Failed to save training plan');
+      }
 
-    toast({
-      title: "Тренировка создана!",
-      description: `Кастомная тренировка "${customWorkout.name}" прикреплена к ученику ${selectedPupilForWorkout.firstName} ${selectedPupilForWorkout.lastName}`,
-    });
+      const savedPlan = await response.json();
 
-    // Сброс состояний
-    setShowCreateWorkoutDialog(false);
-    setSelectedPupilForWorkout(null);
-    setCustomWorkout({
-      name: '',
-      level: 'начальный',
-      totalSessions: 1,
-      sessionsPerWeek: 3,
-      startDate: null as Date | null,
-      startTime: '09:00',
-      trainerNotes: '',
-      exercises: [] as string[],
-      timerEnabled: false
-    });
-    setSelectedExercises([]);
-    setSelectedDates([]);
+      // Добавляем в локальное состояние с ID из базы данных
+      const workoutProgram: WorkoutProgram = {
+        id: savedPlan.id,
+        name: customWorkout.name,
+        level: customWorkout.level,
+        exercises: customWorkout.exercises,
+        type: 'strength',
+        duration: customWorkout.sessionsPerWeek,
+        createdBy: trainerId,
+      };
+
+      addActiveWorkout(trainerId, selectedPupilForWorkout, workoutProgram);
+
+      toast({
+        title: "Тренировка создана!",
+        description: `Кастомная тренировка "${customWorkout.name}" прикреплена к ученику ${selectedPupilForWorkout.firstName} ${selectedPupilForWorkout.lastName}`,
+      });
+
+      // Сброс состояний
+      setShowCreateWorkoutDialog(false);
+      setSelectedPupilForWorkout(null);
+      setCustomWorkout({
+        name: '',
+        level: 'начальный',
+        totalSessions: 1,
+        sessionsPerWeek: 3,
+        startDate: null as Date | null,
+        startTime: '09:00',
+        trainerNotes: '',
+        exercises: [] as string[],
+        timerEnabled: false
+      });
+      setSelectedExercises([]);
+      setSelectedDates([]);
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось создать тренировку",
+        variant: "destructive",
+      });
+    }
   };
 
   // Группировка упражнений по группам мышц

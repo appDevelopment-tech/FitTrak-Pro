@@ -18,7 +18,7 @@ export function ActiveWorkoutProvider({ children }: { children: ReactNode }) {
 
   const addActiveWorkout = (trainerId: number, pupil: Pupil, program: WorkoutProgram) => {
     const newWorkout: ActiveWorkout & { programName?: string } = {
-      id: Date.now(), // Temporary ID для локального состояния
+      id: program.id, // Используем ID из базы данных
       trainerId,
       pupilId: pupil.id,
       workoutProgramId: program.id,
