@@ -75,7 +75,7 @@ export function ComprehensiveStudentsManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { isWorkoutActive, removeActiveWorkout, addActiveWorkout, getActiveWorkout, activeWorkouts } = useActiveWorkout();
+  const { isWorkoutActive, removeActiveWorkout, addActiveWorkout, getActiveWorkout, activeWorkouts, getWorkoutProgramName } = useActiveWorkout();
   
   const trainerId = 1; // В реальном приложении это будет из контекста пользователя
 
@@ -502,32 +502,88 @@ export function ComprehensiveStudentsManagement() {
                     </Badge>
                   )}
                   
-                  {/* Единая кнопка гантели */}
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (isWorkoutActive(trainerId, pupil.id)) {
-                        // Переход к активной тренировке
-                        toast({
-                          title: "Открытие тренировки",
-                          description: `Открываем активную тренировку для ${pupil.firstName} ${pupil.lastName}`,
-                        });
-                      } else {
-                        // Прикрепить новый план
-                        handleAssignWorkout(pupil);
-                      }
-                    }}
-                    className={`h-8 w-8 p-0 transition-colors ${
-                      isWorkoutActive(trainerId, pupil.id)
-                        ? 'text-orange-600 hover:text-orange-700 hover:bg-orange-50'
-                        : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
-                    }`}
-                    title={isWorkoutActive(trainerId, pupil.id) ? "Открыть активную тренировку" : "Прикрепить тренировочный план"}
-                  >
-                    <Dumbbell className="h-4 w-4" />
-                  </Button>
+                  {/* Кнопки управления тренировками */}
+                  <div className="flex items-center gap-1">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (isWorkoutActive(trainerId, pupil.id)) {
+                          // Переход к активной тренировке
+                          toast({
+                            title: "Открытие тренировки",
+                            description: `Открываем активную тренировку для ${pupil.firstName} ${pupil.lastName}`,
+                          });
+                        } else {
+                          // Прикрепить новый план
+                          handleAssignWorkout(pupil);
+                        }
+                      }}
+                      className={`h-8 w-8 p-0 transition-colors ${
+                        isWorkoutActive(trainerId, pupil.id)
+                          ? 'text-orange-600 hover:text-orange-700 hover:bg-orange-50'
+                          : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                      }`}
+                      title={isWorkoutActive(trainerId, pupil.id) 
+                        ? `Активная тренировка: ${getWorkoutProgramName(trainerId, pupil.id) || 'Неизвестный план'}`
+                        : "Прикрепить тренировочный план"}
+                    >
+                      <Dumbbell className="h-4 w-4" />
+                    </Button>
+                    
+                    {/* Кнопка удаления плана - показывается только при активной тренировке */}
+                    {isWorkoutActive(trainerId, pupil.id) && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          
+                          const activeWorkout = getActiveWorkout(trainerId, pupil.id);
+                          const programName = getWorkoutProgramName(trainerId, pupil.id);
+                          
+                          if (!activeWorkout) return;
+                          
+                          // Подтверждение удаления
+                          const confirmed = window.confirm(
+                            `Удалить план "${programName || 'Тренировка'}" у ${pupil.firstName} ${pupil.lastName}?\n\nЭто действие нельзя отменить.`
+                          );
+                          
+                          if (!confirmed) return;
+                          
+                          try {
+                            // Удаляем план тренировки через API
+                            const response = await fetch(`/api/training-plans/${activeWorkout.id}`, {
+                              method: 'DELETE',
+                            });
+                            
+                            if (response.ok) {
+                              // Удаляем из локального состояния activeWorkouts
+                              removeActiveWorkout(trainerId, pupil.id);
+                              
+                              toast({
+                                title: "План удален",
+                                description: `План "${programName || 'Тренировка'}" удален у ${pupil.firstName} ${pupil.lastName}`,
+                              });
+                            } else {
+                              throw new Error('Failed to delete training plan');
+                            }
+                          } catch (error) {
+                            toast({
+                              title: "Ошибка",
+                              description: "Не удалось удалить план тренировки",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
+                        className="h-6 w-6 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
+                        title="Удалить план тренировки"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             </CardContent>
