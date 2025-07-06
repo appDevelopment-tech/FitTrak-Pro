@@ -58,6 +58,8 @@ export function ComprehensiveStudentsManagement() {
   const [showCreateWorkoutDialog, setShowCreateWorkoutDialog] = useState(false);
   const [showScheduleDialog, setShowScheduleDialog] = useState(false);
   const [selectedPlanForSchedule, setSelectedPlanForSchedule] = useState<any>(null);
+  const [showActiveWorkoutDialog, setShowActiveWorkoutDialog] = useState(false);
+  const [selectedActiveWorkout, setSelectedActiveWorkout] = useState<any>(null);
   const [scheduleData, setScheduleData] = useState({
     startDate: null as Date | null,
     startTime: '09:00',
@@ -607,11 +609,13 @@ export function ComprehensiveStudentsManagement() {
                       onClick={(e) => {
                         e.stopPropagation();
                         if (isWorkoutActive(trainerId, pupil.id)) {
-                          // Переход к активной тренировке
-                          toast({
-                            title: "Открытие тренировки",
-                            description: `Открываем активную тренировку для ${pupil.firstName} ${pupil.lastName}`,
-                          });
+                          // Открыть активную тренировку
+                          const activeWorkout = getActiveWorkout(trainerId, pupil.id);
+                          if (activeWorkout) {
+                            setSelectedActiveWorkout(activeWorkout);
+                            setSelectedPupilForWorkout(pupil);
+                            setShowActiveWorkoutDialog(true);
+                          }
                         } else {
                           // Прикрепить новый план
                           handleAssignWorkout(pupil);
@@ -1398,6 +1402,154 @@ export function ComprehensiveStudentsManagement() {
               Добавить выбранные ({selectedExercises.length})
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Диалог просмотра активного тренировочного плана */}
+      <Dialog open={showActiveWorkoutDialog} onOpenChange={setShowActiveWorkoutDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Dumbbell className="h-5 w-5 text-orange-600" />
+              Активный тренировочный план
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedActiveWorkout && selectedPupilForWorkout && (
+            <div className="space-y-6">
+              {/* Информация об ученике и плане */}
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2 text-orange-700">
+                      <User className="h-5 w-5" />
+                      <span className="font-medium">
+                        {selectedPupilForWorkout.firstName} {selectedPupilForWorkout.lastName}
+                      </span>
+                    </div>
+                    <p className="text-sm text-orange-600 mt-1">
+                      План: <strong>{selectedActiveWorkout.workoutProgram?.name}</strong>
+                    </p>
+                    <p className="text-xs text-orange-500 mt-1">
+                      Уровень: {selectedActiveWorkout.workoutProgram?.level || 'Не указан'}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs text-orange-500">Статус</div>
+                    <div className="text-sm font-medium text-orange-700">Активен</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Упражнения в плане */}
+              <div className="space-y-3">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <Target className="h-4 w-4" />
+                  Упражнения
+                </h3>
+                
+                {selectedActiveWorkout.workoutProgram?.exercises && selectedActiveWorkout.workoutProgram.exercises.length > 0 ? (
+                  <div className="grid gap-2">
+                    {selectedActiveWorkout.workoutProgram.exercises.map((exercise, index) => (
+                      <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">
+                          {index + 1}
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium">{exercise}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Упражнения не указаны
+                  </div>
+                )}
+              </div>
+
+              {/* Дополнительная информация */}
+              <div className="space-y-3">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <CalendarIcon className="h-4 w-4" />
+                  Детали плана
+                </h3>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <div className="text-sm">
+                      <span className="text-muted-foreground">Тип:</span>
+                      <span className="ml-2 font-medium">
+                        {selectedActiveWorkout.workoutProgram?.type === 'strength' ? 'Силовая' : 
+                         selectedActiveWorkout.workoutProgram?.type === 'cardio' ? 'Кардио' : 
+                         selectedActiveWorkout.workoutProgram?.type || 'Не указан'}
+                      </span>
+                    </div>
+                    
+                    <div className="text-sm">
+                      <span className="text-muted-foreground">Продолжительность:</span>
+                      <span className="ml-2 font-medium">
+                        {selectedActiveWorkout.workoutProgram?.duration || 'Не указана'}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="text-sm">
+                      <span className="text-muted-foreground">ID плана:</span>
+                      <span className="ml-2 font-medium">
+                        #{selectedActiveWorkout.workoutProgram?.id}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Кнопки управления */}
+              <div className="flex gap-3 pt-4 border-t">
+                <Button variant="outline" onClick={() => setShowActiveWorkoutDialog(false)} className="flex-1">
+                  Закрыть
+                </Button>
+                <Button 
+                  variant="destructive"
+                  onClick={async () => {
+                    const confirmed = window.confirm(
+                      `Удалить план "${selectedActiveWorkout.workoutProgram?.name}" у ${selectedPupilForWorkout.firstName} ${selectedPupilForWorkout.lastName}?\n\nЭто действие нельзя отменить.`
+                    );
+                    
+                    if (!confirmed) return;
+                    
+                    try {
+                      const response = await fetch(`/api/training-plans/${selectedActiveWorkout.workoutProgram?.id}`, {
+                        method: 'DELETE',
+                      });
+                      
+                      if (response.ok) {
+                        removeActiveWorkout(trainerId, selectedPupilForWorkout);
+                        setShowActiveWorkoutDialog(false);
+                        toast({
+                          title: "План удален",
+                          description: `План тренировки удален у ${selectedPupilForWorkout.firstName} ${selectedPupilForWorkout.lastName}`,
+                        });
+                      } else {
+                        throw new Error('Ошибка при удалении плана');
+                      }
+                    } catch (error) {
+                      toast({
+                        title: "Ошибка",
+                        description: "Не удалось удалить план тренировки",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                  className="flex-1"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Удалить план
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
