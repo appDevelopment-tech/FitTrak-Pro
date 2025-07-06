@@ -64,6 +64,7 @@ export function ComprehensiveStudentsManagement() {
     sessionsPerWeek: 3,
     totalSessions: 8,
     selectedDates: [] as Date[],
+    dateTimes: {} as Record<string, string>, // Время для каждой конкретной даты
     trainerNotes: ''
   });
   const [customWorkout, setCustomWorkout] = useState({
@@ -189,6 +190,7 @@ export function ComprehensiveStudentsManagement() {
       sessionsPerWeek: plan.sessionsPerWeek || 3,
       totalSessions: 8,
       selectedDates: [],
+      dateTimes: {},
       trainerNotes: ''
     });
     setShowWorkoutPlanDialog(false);
@@ -249,6 +251,7 @@ export function ComprehensiveStudentsManagement() {
         sessionsPerWeek: 3,
         totalSessions: 8,
         selectedDates: [],
+        dateTimes: {},
         trainerNotes: ''
       });
     } catch (error) {
@@ -1513,6 +1516,77 @@ export function ComprehensiveStudentsManagement() {
                 )}
               </div>
 
+              {/* Редактирование времени для каждой выбранной даты */}
+              {scheduleData.selectedDates.length > 0 && (
+                <div className="space-y-3">
+                  <Label>Время для каждого дня тренировки</Label>
+                  <div className="space-y-2 max-h-48 overflow-y-auto border rounded-lg p-3">
+                    {scheduleData.selectedDates
+                      .sort((a, b) => a.getTime() - b.getTime())
+                      .map((date, index) => {
+                        const dateKey = date.toISOString().split('T')[0];
+                        const formattedDate = date.toLocaleDateString('ru-RU', {
+                          weekday: 'short',
+                          day: 'numeric',
+                          month: 'short'
+                        });
+                        
+                        return (
+                          <div key={dateKey} className="flex items-center justify-between gap-3 p-2 bg-gray-50 rounded">
+                            <span className="text-sm font-medium min-w-0 flex-1">
+                              {formattedDate}
+                            </span>
+                            <Input
+                              type="time"
+                              value={scheduleData.dateTimes[dateKey] || scheduleData.startTime}
+                              onChange={(e) => {
+                                setScheduleData(prev => ({
+                                  ...prev,
+                                  dateTimes: {
+                                    ...prev.dateTimes,
+                                    [dateKey]: e.target.value
+                                  }
+                                }));
+                              }}
+                              className="w-24 text-sm"
+                            />
+                          </div>
+                        );
+                      })}
+                  </div>
+                  <div className="flex items-center gap-2 pt-2 border-t">
+                    <span className="text-xs text-muted-foreground">Применить ко всем:</span>
+                    <Input
+                      type="time"
+                      value={scheduleData.startTime}
+                      onChange={(e) => {
+                        const newTime = e.target.value;
+                        setScheduleData(prev => {
+                          // Обновляем время по умолчанию
+                          const newDateTimes = { ...prev.dateTimes };
+                          
+                          // Применяем новое время ко всем выбранным датам
+                          prev.selectedDates.forEach(date => {
+                            const dateKey = date.toISOString().split('T')[0];
+                            newDateTimes[dateKey] = newTime;
+                          });
+                          
+                          return {
+                            ...prev,
+                            startTime: newTime,
+                            dateTimes: newDateTimes
+                          };
+                        });
+                      }}
+                      className="w-24 text-xs"
+                    />
+                    <span className="text-xs text-muted-foreground">
+                      Это изменит время для всех выбранных дней
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {/* Заметки тренера */}
               <div>
                 <Label htmlFor="trainer-notes">Заметки тренера (необязательно)</Label>
@@ -1568,7 +1642,32 @@ export function ComprehensiveStudentsManagement() {
                   
                   // Ограничиваем количество выбранных дней
                   if (newDates.length <= maxSessions) {
-                    setScheduleData(prev => ({ ...prev, selectedDates: newDates }));
+                    setScheduleData(prev => {
+                      // Обновляем времена для новых дат
+                      const newDateTimes = { ...prev.dateTimes };
+                      
+                      // Добавляем время по умолчанию для новых дат
+                      newDates.forEach(date => {
+                        const dateKey = date.toISOString().split('T')[0];
+                        if (!newDateTimes[dateKey]) {
+                          newDateTimes[dateKey] = prev.startTime;
+                        }
+                      });
+                      
+                      // Удаляем времена для дат, которые больше не выбраны
+                      const newDateKeys = newDates.map(date => date.toISOString().split('T')[0]);
+                      Object.keys(newDateTimes).forEach(dateKey => {
+                        if (!newDateKeys.includes(dateKey)) {
+                          delete newDateTimes[dateKey];
+                        }
+                      });
+                      
+                      return { 
+                        ...prev, 
+                        selectedDates: newDates,
+                        dateTimes: newDateTimes
+                      };
+                    });
                   }
                 } else {
                   const maxSessions = customWorkout.totalSessions;
