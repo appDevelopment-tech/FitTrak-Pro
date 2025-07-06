@@ -632,58 +632,7 @@ export function ComprehensiveStudentsManagement() {
                     >
                       <Dumbbell className="h-4 w-4" />
                     </Button>
-                    
-                    {/* Кнопка удаления плана - показывается только при активной тренировке */}
-                    {isWorkoutActive(trainerId, pupil.id) && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          
-                          const activeWorkout = getActiveWorkout(trainerId, pupil.id);
-                          const programName = getWorkoutProgramName(trainerId, pupil.id);
-                          
-                          if (!activeWorkout) return;
-                          
-                          // Подтверждение удаления
-                          const confirmed = window.confirm(
-                            `Удалить план "${programName || 'Тренировка'}" у ${pupil.firstName} ${pupil.lastName}?\n\nЭто действие нельзя отменить.`
-                          );
-                          
-                          if (!confirmed) return;
-                          
-                          try {
-                            // Удаляем план тренировки через API
-                            const response = await fetch(`/api/training-plans/${activeWorkout.id}`, {
-                              method: 'DELETE',
-                            });
-                            
-                            if (response.ok) {
-                              // Удаляем из локального состояния activeWorkouts
-                              removeActiveWorkout(trainerId, pupil.id);
-                              
-                              toast({
-                                title: "План удален",
-                                description: `План "${programName || 'Тренировка'}" удален у ${pupil.firstName} ${pupil.lastName}`,
-                              });
-                            } else {
-                              throw new Error('Failed to delete training plan');
-                            }
-                          } catch (error) {
-                            toast({
-                              title: "Ошибка",
-                              description: "Не удалось удалить план тренировки",
-                              variant: "destructive",
-                            });
-                          }
-                        }}
-                        className="h-6 w-6 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
-                        title="Удалить план тренировки"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    )}
+
                   </div>
                 </div>
               </div>
@@ -1507,8 +1456,18 @@ export function ComprehensiveStudentsManagement() {
 
               {/* Кнопки управления */}
               <div className="flex gap-3 pt-4 border-t">
-                <Button variant="outline" onClick={() => setShowActiveWorkoutDialog(false)} className="flex-1">
-                  Закрыть
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    // TODO: Открыть диалог редактирования тренировочного плана
+                    toast({
+                      title: "Редактирование",
+                      description: "Функция редактирования плана будет добавлена в следующем обновлении",
+                    });
+                  }}
+                  className="flex-1"
+                >
+                  Редактировать
                 </Button>
                 <Button 
                   variant="destructive"
@@ -1544,8 +1503,7 @@ export function ComprehensiveStudentsManagement() {
                   }}
                   className="flex-1"
                 >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Удалить план
+                  Удалить
                 </Button>
               </div>
             </div>
