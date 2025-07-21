@@ -63,10 +63,8 @@ export function ProfileView() {
     // Устанавливаем вкладку сразу при наличии параметра
     if (tab) {
       setActiveTab(tab);
-    } else {
-      // Если нет параметра tab, возвращаемся к profile
-      setActiveTab("profile");
     }
+    // Не сбрасываем на profile если нет параметра - оставляем текущую вкладку
 
     if (pupilId && pupils.length > 0) {
       const pupil = pupils.find(p => p.id === parseInt(pupilId));
@@ -79,6 +77,14 @@ export function ProfileView() {
       setSelectedDateFromSchedule(selectedDate);
     }
   }, [location, pupils]);
+
+  // Обновляем URL при смене вкладки
+  const handleTabChange = (newTab: string) => {
+    setActiveTab(newTab);
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', newTab);
+    window.history.pushState({}, '', url);
+  };
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => apiRequest(`/api/exercises/${id}`, 'DELETE'),
@@ -180,7 +186,7 @@ export function ProfileView() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="profile">Тренер</TabsTrigger>
           <TabsTrigger value="students">Ученики</TabsTrigger>

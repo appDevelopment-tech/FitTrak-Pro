@@ -578,7 +578,7 @@ export function ComprehensiveStudentsManagement() {
                     </div>
                     {isWorkoutActive(trainerId, pupil.id) && (
                       <div className="text-xs text-orange-600 font-medium">
-                        План: {getActiveWorkout(trainerId, pupil.id)?.workoutProgram?.name || 'Активная тренировка'}
+                        План: {getWorkoutProgramName(trainerId, pupil.id) || 'Активная тренировка'}
                       </div>
                     )}
                   </div>
@@ -1484,7 +1484,7 @@ export function ComprehensiveStudentsManagement() {
                       });
                       
                       if (response.ok) {
-                        removeActiveWorkout(trainerId, selectedPupilForWorkout);
+                        removeActiveWorkout(trainerId, selectedPupilForWorkout.id);
                         setShowActiveWorkoutDialog(false);
                         toast({
                           title: "План удален",

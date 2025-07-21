@@ -91,13 +91,26 @@ export default function Dashboard() {
         return <NewSchedule />;
       case 'profile':
         return <ProfileView />;
-
+      case 'students':
+        return <StudentsManagement />;
+      case 'progress':
+        // Progress view is not implemented yet
+        return (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="text-center py-16">
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                Прогресс
+              </h3>
+              <p className="text-gray-600">Раздел в разработке</p>
+            </div>
+          </div>
+        );
       default:
         return (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="text-center py-16">
               <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                {viewTitles[activeView as keyof typeof viewTitles]}
+                {viewTitles[activeView as keyof typeof viewTitles] || 'Неизвестный раздел'}
               </h3>
               <p className="text-gray-600">Раздел в разработке</p>
             </div>
