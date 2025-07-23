@@ -26,20 +26,22 @@ export function ExerciseImageManager({
   const queryClient = useQueryClient();
 
   const updateImageMutation = useMutation({
-    mutationFn: (imageUrl: string) => 
-      apiRequest(`/api/exercises/${exerciseId}/image`, 'PATCH', { imageUrl }),
+    mutationFn: async (imageUrl: string) => {
+      const response = await apiRequest('PATCH', `/api/exercises/${exerciseId}/image`, { imageUrl });
+      return response.json();
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['exercises'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
       toast({
         title: "Изображение обновлено",
         description: "Изображение упражнения успешно добавлено"
       });
       onClose();
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: "Ошибка",
-        description: "Не удалось обновить изображение",
+        description: error instanceof Error ? error.message : "Не удалось обновить изображение",
         variant: "destructive"
       });
     }

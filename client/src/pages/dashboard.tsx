@@ -63,7 +63,6 @@ export default function Dashboard() {
 
   const handleStartWorkout = (sessionId: number) => {
     // Handle workout start logic
-    console.log('Starting workout:', sessionId);
   };
 
   const handleQuickAction = (action: string) => {

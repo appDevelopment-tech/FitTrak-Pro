@@ -43,43 +43,65 @@ export function ExerciseManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: exercises = [], isLoading } = useQuery<Exercise[]>({
+  const { data: exercises = [], isLoading, error } = useQuery<Exercise[]>({
     queryKey: ['/api/exercises'],
+    staleTime: 0,
+    refetchOnMount: true,
   });
 
   const createMutation = useMutation({
-    mutationFn: (data: InsertExercise) => apiRequest('/api/exercises', 'POST', data),
+    mutationFn: async (data: InsertExercise) => {
+      const response = await apiRequest('POST', '/api/exercises', data);
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
       setIsCreateDialogOpen(false);
       toast({ title: "Упражнение создано успешно" });
     },
-    onError: () => {
-      toast({ title: "Ошибка при создании упражнения", variant: "destructive" });
+    onError: (error) => {
+      toast({ 
+        title: "Ошибка при создании упражнения", 
+        description: error instanceof Error ? error.message : 'Неизвестная ошибка',
+        variant: "destructive" 
+      });
     }
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<InsertExercise> }) => 
-      apiRequest(`/api/exercises/${id}`, 'PUT', data),
+    mutationFn: async ({ id, data }: { id: number; data: Partial<InsertExercise> }) => {
+      const response = await apiRequest('PUT', `/api/exercises/${id}`, data);
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
       setIsEditDialogOpen(false);
       toast({ title: "Упражнение обновлено успешно" });
     },
-    onError: () => {
-      toast({ title: "Ошибка при обновлении упражнения", variant: "destructive" });
+    onError: (error) => {
+      toast({ 
+        title: "Ошибка при обновлении упражнения", 
+        description: error instanceof Error ? error.message : 'Неизвестная ошибка',
+        variant: "destructive" 
+      });
     }
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => apiRequest(`/api/exercises/${id}`, 'DELETE'),
+    mutationFn: async (id: number) => {
+      const response = await apiRequest('DELETE', `/api/exercises/${id}`);
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
       toast({ title: "Упражнение удалено успешно" });
     },
-    onError: () => {
-      toast({ title: "Ошибка при удалении упражнения", variant: "destructive" });
+    onError: (error) => {
+      toast({ 
+        title: "Ошибка при удалении упражнения", 
+        description: error instanceof Error ? error.message : 'Неизвестная ошибка',
+        variant: "destructive" 
+      });
     }
   });
 
@@ -145,6 +167,11 @@ export function ExerciseManagement() {
       </Card>
 
       {/* Список упражнений */}
+      {error && (
+        <div className="text-center py-8 text-red-600">
+          Ошибка загрузки упражнений: {error instanceof Error ? error.message : 'Неизвестная ошибка'}
+        </div>
+      )}
       {isLoading ? (
         <div className="text-center py-8">Загрузка упражнений...</div>
       ) : (
@@ -353,7 +380,7 @@ function ExerciseForm({ exercise, onSubmit, isLoading }: ExerciseFormProps) {
             value={formData.difficulty} 
             onValueChange={(value) => setFormData(prev => ({ ...prev, difficulty: value }))}
           >
-            <SelectTrigger>
+            <SelectTrigger id="difficulty">
               <SelectValue placeholder="Выберите сложность" />
             </SelectTrigger>
             <SelectContent>

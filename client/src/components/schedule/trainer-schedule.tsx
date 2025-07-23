@@ -342,10 +342,6 @@ export function TrainerSchedule() {
   };
 
   const openStudentProfile = (student: Student) => {
-    console.log('Clicked on student:', student.name);
-    console.log('Available students:', students.map(s => s.name));
-    console.log('Found student:', student);
-    console.log('Opening student profile for:', student.name);
     
     setSelectedStudentProfile(student);
     setIsEditingProfile(false);
@@ -970,7 +966,7 @@ export function TrainerSchedule() {
                       <div className="flex items-center space-x-4">
                         <div className="flex bg-gray-100 rounded-lg p-1">
                           <Button
-                            variant={viewMode === 'day' ? 'default' : 'ghost'}
+                            variant={(viewMode as string) === 'day' ? 'default' : 'ghost'}
                             size="sm"
                             onClick={() => {
                               setViewMode('day');
@@ -981,7 +977,7 @@ export function TrainerSchedule() {
                             Сегодня
                           </Button>
                           <Button
-                            variant={viewMode === 'month' ? 'default' : 'ghost'}
+                            variant={(viewMode as string) === 'month' ? 'default' : 'ghost'}
                             size="sm"
                             onClick={() => setViewMode('month')}
                             className="text-xs px-3 py-1 transition-all duration-200"
@@ -1104,7 +1100,7 @@ export function TrainerSchedule() {
                       <div className="flex items-center space-x-4">
                         <div className="flex bg-gray-100 rounded-lg p-1">
                           <Button
-                            variant={viewMode === 'day' ? 'default' : 'ghost'}
+                            variant={(viewMode as string) === 'day' ? 'default' : 'ghost'}
                             size="sm"
                             onClick={() => {
                               setViewMode('day');
@@ -1115,7 +1111,7 @@ export function TrainerSchedule() {
                             Сегодня
                           </Button>
                           <Button
-                            variant={viewMode === 'month' ? 'default' : 'ghost'}
+                            variant={(viewMode as string) === 'month' ? 'default' : 'ghost'}
                             size="sm"
                             onClick={() => setViewMode('month')}
                             className="text-xs px-3 py-1 transition-all duration-200"

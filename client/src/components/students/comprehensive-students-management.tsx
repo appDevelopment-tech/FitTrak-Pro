@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,10 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { useToast } from "@/hooks/use-toast";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { insertPupilSchema } from "@shared/schema";
 import { 
   User, 
   Phone, 
@@ -89,6 +93,35 @@ export function ComprehensiveStudentsManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { isWorkoutActive, removeActiveWorkout, addActiveWorkout, getActiveWorkout, activeWorkouts, getWorkoutProgramName } = useActiveWorkout();
+
+  // Form configurations
+  const addPupilForm = useForm<InsertPupil>({
+    resolver: zodResolver(insertPupilSchema),
+    defaultValues: {
+      trainerId: 1, // TODO: Get from auth context
+      firstName: "",
+      lastName: "",
+      middleName: "",
+      phone: "",
+      email: "",
+      birthDate: "",
+      weight: null,
+      height: null,
+      goal: "",
+      medicalNotes: "",
+      status: "active",
+      joinDate: new Date().toISOString().split('T')[0],
+      applicationSubmitted: true,
+      applicationDate: new Date().toISOString().split('T')[0],
+      rulesAccepted: true,
+      rulesAcceptedDate: new Date().toISOString().split('T')[0],
+      parentalConsent: false,
+    }
+  });
+
+  const editPupilForm = useForm<Partial<InsertPupil>>({
+    resolver: zodResolver(insertPupilSchema.partial()),
+  });
   
   const trainerId = 1; // В реальном приложении это будет из контекста пользователя
 
@@ -205,25 +238,13 @@ export function ComprehensiveStudentsManagement() {
 
     try {
       // Сохраняем план в базе данных
-      const response = await fetch(`/api/pupils/${selectedPupilForWorkout.id}/training-plans`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          trainerId: trainerId,
-          name: selectedPlanForSchedule.name,
-          exercises: selectedPlanForSchedule.exercises || [],
-          isActive: true,
-          scheduleData: scheduleData,
-        }),
+      const savedPlan = await apiRequest('POST', `/api/pupils/${selectedPupilForWorkout.id}/training-plans`, {
+        trainerId: trainerId,
+        name: selectedPlanForSchedule.name,
+        exercises: selectedPlanForSchedule.exercises || [],
+        isActive: true,
+        scheduleData: scheduleData,
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to save training plan');
-      }
-
-      const savedPlan = await response.json();
 
       // Добавляем в локальное состояние с ID из базы данных
       const workoutProgram: WorkoutProgram = {
@@ -237,6 +258,9 @@ export function ComprehensiveStudentsManagement() {
       };
 
       addActiveWorkout(trainerId, selectedPupilForWorkout, workoutProgram);
+
+      // Invalidate relevant queries to refresh UI
+      queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/pupils'] });
 
       toast({
         title: "План прикреплен!",
@@ -277,24 +301,12 @@ export function ComprehensiveStudentsManagement() {
 
     try {
       // Сохраняем план в базе данных
-      const response = await fetch(`/api/pupils/${selectedPupilForWorkout.id}/training-plans`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          trainerId: trainerId,
-          name: customWorkout.name,
-          exercises: customWorkout.exercises,
-          isActive: true,
-        }),
+      const savedPlan = await apiRequest('POST', `/api/pupils/${selectedPupilForWorkout.id}/training-plans`, {
+        trainerId: trainerId,
+        name: customWorkout.name,
+        exercises: customWorkout.exercises,
+        isActive: true,
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to save training plan');
-      }
-
-      const savedPlan = await response.json();
 
       // Добавляем в локальное состояние с ID из базы данных
       const workoutProgram: WorkoutProgram = {
@@ -308,6 +320,9 @@ export function ComprehensiveStudentsManagement() {
       };
 
       addActiveWorkout(trainerId, selectedPupilForWorkout, workoutProgram);
+
+      // Invalidate relevant queries to refresh UI
+      queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/pupils'] });
 
       toast({
         title: "Тренировка создана!",
@@ -412,13 +427,7 @@ export function ComprehensiveStudentsManagement() {
   // Мутация для создания ученика
   const createPupilMutation = useMutation({
     mutationFn: async (newPupil: InsertPupil) => {
-      const response = await fetch('/api/pupils', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newPupil)
-      });
-      if (!response.ok) throw new Error('Failed to create pupil');
-      return response.json();
+      return await apiRequest('POST', '/api/trainers/1/pupils', newPupil);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/pupils'] });
@@ -441,13 +450,7 @@ export function ComprehensiveStudentsManagement() {
   // Мутация для обновления ученика
   const updatePupilMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: number; updates: Partial<InsertPupil> }) => {
-      const response = await fetch(`/api/pupils/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates)
-      });
-      if (!response.ok) throw new Error('Failed to update pupil');
-      return response.json();
+      return await apiRequest('PUT', `/api/pupils/${id}`, updates);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/pupils'] });
@@ -466,6 +469,34 @@ export function ComprehensiveStudentsManagement() {
       });
     }
   });
+
+  // Form submission handlers
+  const onAddPupil = (data: InsertPupil) => {
+    createPupilMutation.mutate(data);
+  };
+
+  const onEditPupil = (data: Partial<InsertPupil>) => {
+    if (!selectedPupil) return;
+    updatePupilMutation.mutate({ id: selectedPupil.id, updates: data });
+  };
+
+  // Effect to populate edit form when selectedPupil changes
+  useEffect(() => {
+    if (selectedPupil && showEditDialog) {
+      editPupilForm.reset({
+        firstName: selectedPupil.firstName,
+        lastName: selectedPupil.lastName,
+        middleName: selectedPupil.middleName || "",
+        phone: selectedPupil.phone,
+        email: selectedPupil.email,
+        birthDate: selectedPupil.birthDate,
+        weight: selectedPupil.weight,
+        height: selectedPupil.height,
+        goal: selectedPupil.goal || "",
+        medicalNotes: selectedPupil.medicalNotes || "",
+      });
+    }
+  }, [selectedPupil, showEditDialog, editPupilForm]);
 
   const handlePupilClick = (pupil: PupilWithAge) => {
     setSelectedPupil(pupil);
@@ -788,10 +819,10 @@ export function ComprehensiveStudentsManagement() {
                           <CardContent className="p-4">
                             <div className="flex justify-between items-start">
                               <div className="space-y-2">
-                                <h4 className="font-semibold text-orange-800">{workout.name}</h4>
+                                <h4 className="font-semibold text-orange-800">{workout.programName || 'Активная тренировка'}</h4>
                                 <div className="flex gap-4 text-sm text-orange-700">
-                                  <span>Уровень: {workout.level}</span>
-                                  <span>Продолжительность: {workout.duration} недель</span>
+                                  <span>Уровень: {'Не указан'}</span>
+                                  <span>Продолжительность: {'Не указана'}</span>
                                 </div>
                                 <p className="text-sm text-orange-600">
                                   Статус: <Badge className="bg-orange-600 text-white">Активная</Badge>
@@ -803,21 +834,18 @@ export function ComprehensiveStudentsManagement() {
                                 onClick={async () => {
                                   try {
                                     // Удаляем план тренировки через API
-                                    const response = await fetch(`/api/training-plans/${workout.id}`, {
-                                      method: 'DELETE',
-                                    });
+                                    await apiRequest('DELETE', `/api/training-plans/${workout.id}`);
                                     
-                                    if (response.ok) {
-                                      // Удаляем из локального состояния activeWorkouts
-                                      removeActiveWorkout(workout.trainerId, workout.pupilId);
-                                      
-                                      toast({
-                                        title: "План удален",
-                                        description: `План "${workout.name}" успешно удален у ${selectedPupil?.firstName} ${selectedPupil?.lastName}`,
-                                      });
-                                    } else {
-                                      throw new Error('Failed to delete training plan');
-                                    }
+                                    // Удаляем из локального состояния activeWorkouts
+                                    removeActiveWorkout(workout.trainerId, workout.pupilId);
+                                    
+                                    // Invalidate relevant queries to refresh UI
+                                    queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/pupils'] });
+                                    
+                                    toast({
+                                      title: "План удален",
+                                      description: `План "${workout.programName || 'активная тренировка'}" успешно удален у ${selectedPupil?.firstName} ${selectedPupil?.lastName}`,
+                                    });
                                   } catch (error) {
                                     toast({
                                       title: "Ошибка",
@@ -833,23 +861,6 @@ export function ComprehensiveStudentsManagement() {
                               </Button>
                             </div>
                             
-                            {workout.exercises && workout.exercises.length > 0 && (
-                              <div className="mt-3 pt-3 border-t border-orange-200">
-                                <p className="text-sm font-medium text-orange-800 mb-2">Упражнения:</p>
-                                <div className="flex flex-wrap gap-2">
-                                  {workout.exercises.slice(0, 3).map((exercise, index) => (
-                                    <Badge key={index} variant="outline" className="text-orange-700 border-orange-300">
-                                      {exercise}
-                                    </Badge>
-                                  ))}
-                                  {workout.exercises.length > 3 && (
-                                    <Badge variant="outline" className="text-orange-700 border-orange-300">
-                                      +{workout.exercises.length - 3} еще
-                                    </Badge>
-                                  )}
-                                </div>
-                              </div>
-                            )}
                           </CardContent>
                         </Card>
                       ))
@@ -866,7 +877,7 @@ export function ComprehensiveStudentsManagement() {
                         onClick={() => {
                           if (selectedPupil) {
                             handleAssignWorkout(selectedPupil);
-                            setShowStudentDialog(false);
+                            setShowEditDialog(false);
                           }
                         }}
                         className="flex items-center gap-2"
@@ -1083,7 +1094,7 @@ export function ComprehensiveStudentsManagement() {
                 <div>
                   <Label htmlFor="workout-level">Уровень сложности</Label>
                   <Select value={customWorkout.level} onValueChange={(value) => setCustomWorkout(prev => ({ ...prev, level: value }))}>
-                    <SelectTrigger>
+                    <SelectTrigger id="workout-level">
                       <SelectValue placeholder="Выберите уровень" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1377,10 +1388,10 @@ export function ComprehensiveStudentsManagement() {
                       </span>
                     </div>
                     <p className="text-sm text-orange-600 mt-1">
-                      План: <strong>{selectedActiveWorkout.workoutProgram?.name}</strong>
+                      План: <strong>{selectedActiveWorkout.programName || 'Не указан'}</strong>
                     </p>
                     <p className="text-xs text-orange-500 mt-1">
-                      Уровень: {selectedActiveWorkout.workoutProgram?.level || 'Не указан'}
+                      Уровень: {'Не указан'}
                     </p>
                   </div>
                   <div className="text-right">
@@ -1397,24 +1408,9 @@ export function ComprehensiveStudentsManagement() {
                   Упражнения
                 </h3>
                 
-                {selectedActiveWorkout.workoutProgram?.exercises && selectedActiveWorkout.workoutProgram.exercises.length > 0 ? (
-                  <div className="grid gap-2">
-                    {selectedActiveWorkout.workoutProgram.exercises.map((exercise, index) => (
-                      <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">
-                          {index + 1}
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-medium">{exercise}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Упражнения не указаны
-                  </div>
-                )}
+                <div className="text-center py-8 text-muted-foreground">
+                  Упражнения не указаны
+                </div>
               </div>
 
               {/* Дополнительная информация */}
@@ -1429,9 +1425,7 @@ export function ComprehensiveStudentsManagement() {
                     <div className="text-sm">
                       <span className="text-muted-foreground">Тип:</span>
                       <span className="ml-2 font-medium">
-                        {selectedActiveWorkout.workoutProgram?.type === 'strength' ? 'Силовая' : 
-                         selectedActiveWorkout.workoutProgram?.type === 'cardio' ? 'Кардио' : 
-                         selectedActiveWorkout.workoutProgram?.type || 'Не указан'}
+                        {'Не указан'}
                       </span>
                     </div>
                     
@@ -1473,26 +1467,24 @@ export function ComprehensiveStudentsManagement() {
                   variant="destructive"
                   onClick={async () => {
                     const confirmed = window.confirm(
-                      `Удалить план "${selectedActiveWorkout.workoutProgram?.name}" у ${selectedPupilForWorkout.firstName} ${selectedPupilForWorkout.lastName}?\n\nЭто действие нельзя отменить.`
+                      `Удалить план "${selectedActiveWorkout.programName || 'Unknown'}" у ${selectedPupilForWorkout.firstName} ${selectedPupilForWorkout.lastName}?\n\nЭто действие нельзя отменить.`
                     );
                     
                     if (!confirmed) return;
                     
                     try {
-                      const response = await fetch(`/api/training-plans/${selectedActiveWorkout.workoutProgram?.id}`, {
-                        method: 'DELETE',
-                      });
+                      await apiRequest('DELETE', `/api/training-plans/${selectedActiveWorkout.workoutProgram?.id}`);
                       
-                      if (response.ok) {
-                        removeActiveWorkout(trainerId, selectedPupilForWorkout.id);
-                        setShowActiveWorkoutDialog(false);
-                        toast({
-                          title: "План удален",
-                          description: `План тренировки удален у ${selectedPupilForWorkout.firstName} ${selectedPupilForWorkout.lastName}`,
-                        });
-                      } else {
-                        throw new Error('Ошибка при удалении плана');
-                      }
+                      removeActiveWorkout(trainerId, selectedPupilForWorkout.id);
+                      setShowActiveWorkoutDialog(false);
+                      
+                      // Invalidate relevant queries to refresh UI
+                      queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/pupils'] });
+                      
+                      toast({
+                        title: "План удален",
+                        description: `План тренировки удален у ${selectedPupilForWorkout.firstName} ${selectedPupilForWorkout.lastName}`,
+                      });
                     } catch (error) {
                       toast({
                         title: "Ошибка",
@@ -1834,6 +1826,340 @@ export function ComprehensiveStudentsManagement() {
               </div>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Student Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              Добавить ученика
+            </DialogTitle>
+          </DialogHeader>
+          
+          <Form {...addPupilForm}>
+            <form onSubmit={addPupilForm.handleSubmit(onAddPupil)} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={addPupilForm.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Имя *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Введите имя" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={addPupilForm.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Фамилия *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Введите фамилию" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={addPupilForm.control}
+                  name="middleName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Отчество</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Введите отчество" {...field} value={field.value || ''} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={addPupilForm.control}
+                  name="birthDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Дата рождения *</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={addPupilForm.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Телефон *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="+7 (999) 123-45-67" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={addPupilForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email *</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="example@email.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={addPupilForm.control}
+                  name="weight"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Вес (кг)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="70" {...field} value={field.value || ''} onChange={e => field.onChange(e.target.value ? parseInt(e.target.value) : null)} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={addPupilForm.control}
+                  name="height"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Рост (см)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="175" {...field} value={field.value || ''} onChange={e => field.onChange(e.target.value ? parseInt(e.target.value) : null)} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <FormField
+                control={addPupilForm.control}
+                name="goal"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Цели тренировок</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Например: похудение, набор мышечной массы" {...field} value={field.value || ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={addPupilForm.control}
+                name="medicalNotes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ограничения по здоровью</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Травмы, заболевания и т.д." {...field} value={field.value || ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="flex gap-2 pt-4">
+                <Button type="submit" className="flex-1">
+                  Добавить ученика
+                </Button>
+                <Button type="button" variant="outline" onClick={() => setShowAddDialog(false)} className="flex-1">
+                  Отмена
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Student Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Edit className="h-5 w-5" />
+              Редактировать ученика
+            </DialogTitle>
+          </DialogHeader>
+          
+          <Form {...editPupilForm}>
+            <form onSubmit={editPupilForm.handleSubmit(onEditPupil)} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={editPupilForm.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Имя *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Введите имя" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={editPupilForm.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Фамилия *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Введите фамилию" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={editPupilForm.control}
+                  name="middleName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Отчество</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Введите отчество" {...field} value={field.value || ''} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={editPupilForm.control}
+                  name="birthDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Дата рождения *</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={editPupilForm.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Телефон *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="+7 (999) 123-45-67" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={editPupilForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email *</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="example@email.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={editPupilForm.control}
+                  name="weight"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Вес (кг)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="70" {...field} value={field.value || ''} onChange={e => field.onChange(e.target.value ? parseInt(e.target.value) : null)} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={editPupilForm.control}
+                  name="height"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Рост (см)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="175" {...field} value={field.value || ''} onChange={e => field.onChange(e.target.value ? parseInt(e.target.value) : null)} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <FormField
+                control={editPupilForm.control}
+                name="goal"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Цели тренировок</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Например: похудение, набор мышечной массы" {...field} value={field.value || ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={editPupilForm.control}
+                name="medicalNotes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ограничения по здоровью</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Травмы, заболевания и т.д." {...field} value={field.value || ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="flex gap-2 pt-4">
+                <Button type="submit" className="flex-1">
+                  Сохранить изменения
+                </Button>
+                <Button type="button" variant="outline" onClick={() => setShowEditDialog(false)} className="flex-1">
+                  Отмена
+                </Button>
+              </div>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
     </div>

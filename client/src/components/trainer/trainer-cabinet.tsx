@@ -113,6 +113,7 @@ export function TrainerCabinet() {
               </Label>
               <Input
                 id="program-name"
+                name="program-name"
                 value={programName}
                 onChange={(e) => setProgramName(e.target.value)}
                 placeholder="Силовая тренировка верха"
@@ -124,7 +125,7 @@ export function TrainerCabinet() {
                 Тип тренировки
               </Label>
               <Select value={programType} onValueChange={setProgramType}>
-                <SelectTrigger>
+                <SelectTrigger id="program-type">
                   <SelectValue placeholder="Выберите тип" />
                 </SelectTrigger>
                 <SelectContent>
@@ -141,6 +142,7 @@ export function TrainerCabinet() {
               </Label>
               <Input
                 id="duration"
+                name="duration"
                 type="number"
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
@@ -153,7 +155,7 @@ export function TrainerCabinet() {
                 Уровень сложности
               </Label>
               <Select value={level} onValueChange={setLevel}>
-                <SelectTrigger>
+                <SelectTrigger id="level">
                   <SelectValue placeholder="Выберите уровень" />
                 </SelectTrigger>
                 <SelectContent>

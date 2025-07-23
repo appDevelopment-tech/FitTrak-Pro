@@ -60,6 +60,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user route
+  app.put("/api/user/:id", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const updates = req.body;
+      
+      const updatedUser = await storage.updateUser(userId, updates);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Don't send password
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Workout program routes
   app.get("/api/workout-programs", async (req, res) => {
     try {
@@ -75,6 +95,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertWorkoutProgramSchema.parse(req.body);
       const program = await storage.createWorkoutProgram(validatedData);
       res.status(201).json(program);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid data" });
+    }
+  });
+
+  app.put("/api/workout-programs/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const validatedData = insertWorkoutProgramSchema.partial().parse(req.body);
+      const program = await storage.updateWorkoutProgram(id, validatedData);
+      if (!program) {
+        return res.status(404).json({ message: "Workout program not found" });
+      }
+      res.json(program);
     } catch (error) {
       res.status(400).json({ message: "Invalid data" });
     }
@@ -204,6 +238,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const exerciseId = parseInt(req.params.id);
       const updates = req.body;
+      
+      
       const exercise = await storage.updateExercise(exerciseId, updates);
       if (!exercise) {
         return res.status(404).json({ message: "Exercise not found" });
@@ -249,7 +285,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Return empty array - user will add images manually
       res.json([]);
     } catch (error) {
-      console.error('Image search error:', error);
       res.status(500).json({ message: "Failed to search images" });
     }
   });
@@ -334,12 +369,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/trainers/:trainerId/pupils", async (req, res) => {
     try {
       const trainerId = parseInt(req.params.trainerId);
+      
       const pupilData = insertPupilSchema.parse({
         ...req.body,
         trainerId,
         joinDate: new Date().toISOString().split('T')[0]
       });
+      
       const pupil = await storage.createPupil(pupilData);
+      
       res.json(pupil);
     } catch (error) {
       res.status(400).json({ message: "Failed to create pupil" });
@@ -350,7 +388,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const updates = req.body;
+      
       const pupil = await storage.updatePupil(id, updates);
+      
       if (!pupil) {
         return res.status(404).json({ message: "Pupil not found" });
       }
@@ -408,19 +448,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/pupils/:pupilId/training-plans", async (req, res) => {
     try {
       const pupilId = parseInt(req.params.pupilId);
-      console.log('Request body:', req.body);
-      console.log('Pupil ID:', pupilId);
       
       const planData = insertPupilTrainingPlanSchema.parse({
         ...req.body,
         pupilId
       });
-      console.log('Parsed plan data:', planData);
       
       const plan = await storage.createPupilTrainingPlan(planData);
       res.json(plan);
     } catch (error) {
-      console.error('Error creating training plan:', error);
       res.status(400).json({ 
         message: "Failed to create training plan", 
         error: error instanceof Error ? error.message : 'Unknown error'

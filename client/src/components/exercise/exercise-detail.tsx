@@ -53,7 +53,10 @@ export function ExerciseDetail({ exercise, onClose, onEdit, onDelete }: Exercise
   const queryClient = useQueryClient();
 
   const updateMutation = useMutation({
-    mutationFn: (data: any) => apiRequest(`/api/exercises/${exercise.id}`, 'PATCH', data),
+    mutationFn: async (data: any) => {
+      const response = await apiRequest('PUT', `/api/exercises/${exercise.id}`, data);
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
       setIsEditing(false);
@@ -62,17 +65,37 @@ export function ExerciseDetail({ exercise, onClose, onEdit, onDelete }: Exercise
         description: "Изменения успешно сохранены."
       });
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: "Ошибка",
-        description: "Не удалось сохранить изменения. Попробуйте еще раз.",
+        description: error instanceof Error ? error.message : "Не удалось сохранить изменения. Попробуйте еще раз.",
         variant: "destructive"
       });
     }
   });
 
   const handleSave = () => {
-    updateMutation.mutate(editForm);
+    // Ensure arrays are properly formatted
+    const formattedData = {
+      ...editForm,
+      primaryMuscles: Array.isArray(editForm.primaryMuscles) 
+        ? editForm.primaryMuscles 
+        : (editForm.primaryMuscles as string).split(',').map((m: string) => m.trim()).filter((m: string) => m),
+      secondaryMuscles: Array.isArray(editForm.secondaryMuscles) 
+        ? editForm.secondaryMuscles 
+        : (editForm.secondaryMuscles as string).split(',').map((m: string) => m.trim()).filter((m: string) => m),
+      technique: Array.isArray(editForm.technique) 
+        ? editForm.technique 
+        : (editForm.technique as string).split('\n').filter((t: string) => t.trim()),
+      commonMistakes: Array.isArray(editForm.commonMistakes) 
+        ? editForm.commonMistakes 
+        : (editForm.commonMistakes as string).split('\n').filter((t: string) => t.trim()),
+      contraindications: Array.isArray(editForm.contraindications) 
+        ? editForm.contraindications 
+        : (editForm.contraindications as string).split('\n').filter((t: string) => t.trim()),
+    };
+
+    updateMutation.mutate(formattedData);
   };
 
   const getDifficultyStyle = (difficulty: string) => {
@@ -173,7 +196,7 @@ export function ExerciseDetail({ exercise, onClose, onEdit, onDelete }: Exercise
                     value={editForm.difficulty} 
                     onValueChange={(value) => setEditForm({ ...editForm, difficulty: value })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="difficulty">
                       <SelectValue placeholder="Выберите сложность" />
                     </SelectTrigger>
                     <SelectContent>

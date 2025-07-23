@@ -71,7 +71,7 @@ export function NewSchedule() {
 
   // Мутация для создания нового ученика
   const createPupilMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('/api/trainers/1/pupils', 'POST', data),
+    mutationFn: (data: any) => apiRequest('POST', '/api/trainers/1/pupils', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/pupils'] });
       setShowAddPupilForm(false);

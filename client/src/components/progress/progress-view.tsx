@@ -9,12 +9,13 @@ export function ProgressView() {
     queryKey: ['/api/exercise-progress/1'],
   });
 
-  // Group progress by exercise name and get latest entries
+  // Group progress by exercise ID and get latest entries
   const exerciseGroups = progressData.reduce((acc, progress) => {
-    if (!acc[progress.exerciseName]) {
-      acc[progress.exerciseName] = [];
+    const exerciseKey = `exercise_${progress.exerciseId}`;
+    if (!acc[exerciseKey]) {
+      acc[exerciseKey] = [];
     }
-    acc[progress.exerciseName].push(progress);
+    acc[exerciseKey].push(progress);
     return acc;
   }, {} as Record<string, ExerciseProgress[]>);
 

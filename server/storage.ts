@@ -33,6 +33,7 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined>;
   
   // Pupil operations
   getPupils(trainerId: number): Promise<Pupil[]>;
@@ -45,6 +46,7 @@ export interface IStorage {
   getWorkoutPrograms(): Promise<WorkoutProgram[]>;
   getWorkoutProgram(id: number): Promise<WorkoutProgram | undefined>;
   createWorkoutProgram(program: InsertWorkoutProgram): Promise<WorkoutProgram>;
+  updateWorkoutProgram(id: number, updates: Partial<InsertWorkoutProgram>): Promise<WorkoutProgram | undefined>;
   
   // Workout session operations
   getWorkoutSessions(userId: number): Promise<WorkoutSession[]>;
@@ -276,6 +278,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы плечевого сустава", "боли в спине"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -302,6 +306,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы плечевого сустава"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -328,6 +334,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы плечевого сустава", "боли в спине"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -354,6 +362,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы плечевого сустава"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -380,6 +390,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы запястий", "боли в пояснице"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -406,6 +418,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы коленей", "травмы запястий"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -433,6 +447,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы плечевого сустава", "проблемы с шейным отделом"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -460,6 +476,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы плечевого сустава", "проблемы с шейным отделом"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -487,6 +505,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы плечевого сустава", "травмы запястий", "проблемы с локтевыми суставами"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -514,6 +534,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы плечевого сустава"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -541,6 +563,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы плечевого сустава", "боли в спине"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -568,6 +592,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["проблемы с давлением", "травмы шейного отдела", "головокружения"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -595,6 +621,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы плечевого сустава", "проблемы с позвоночником"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -622,6 +650,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["острые травмы плечевого сустава"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -649,6 +679,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы запястий", "боли в пояснице"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -676,6 +708,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["проблемы с давлением", "травмы запястий"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -712,6 +746,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы позвоночника", "грыжи", "проблемы с поясницей"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -739,6 +775,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы плечевых суставов", "травмы запястий"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -766,6 +804,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["проблемы с поясницей", "травмы позвоночника"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -793,6 +833,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы плечевого сустава"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -820,6 +862,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы плечевых суставов"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -847,6 +891,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["проблемы с поясницей"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -874,6 +920,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы плечевых суставов", "травмы запястий"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -901,6 +949,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["острые боли в пояснице", "грыжи позвоночника"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -928,6 +978,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["проблемы с поясницей"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -955,6 +1007,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы шейного отдела"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -982,6 +1036,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы плечевых суставов"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -1009,6 +1065,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["проблемы с поясницей"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -1036,6 +1094,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы плечевых суставов"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -1063,6 +1123,8 @@ export class MemStorage implements IStorage {
         ],
         contraindications: ["травмы плечевых суставов"],
         muscleImageUrl: null,
+        techniqueImageUrl: null,
+        videoUrl: null,
         createdBy: 1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -1151,6 +1213,14 @@ export class MemStorage implements IStorage {
     this.users.set(id, user);
     return user;
   }
+  async updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser = { ...user, ...updates };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
 
   async getWorkoutPrograms(): Promise<WorkoutProgram[]> {
     return Array.from(this.workoutPrograms.values());
@@ -1165,6 +1235,15 @@ export class MemStorage implements IStorage {
     const program: WorkoutProgram = { ...insertProgram, id };
     this.workoutPrograms.set(id, program);
     return program;
+  }
+  async updateWorkoutProgram(id: number, updates: Partial<InsertWorkoutProgram>): Promise<WorkoutProgram | undefined> {
+    const existingProgram = this.workoutPrograms.get(id);
+    if (!existingProgram) {
+      return undefined;
+    }
+    const updatedProgram: WorkoutProgram = { ...existingProgram, ...updates };
+    this.workoutPrograms.set(id, updatedProgram);
+    return updatedProgram;
   }
 
   async getWorkoutSessions(userId: number): Promise<WorkoutSession[]> {
@@ -1246,6 +1325,8 @@ export class MemStorage implements IStorage {
       secondaryMuscles: insertExercise.secondaryMuscles ?? [],
       createdBy: insertExercise.createdBy ?? null,
       muscleImageUrl: insertExercise.muscleImageUrl ?? null,
+      techniqueImageUrl: insertExercise.techniqueImageUrl ?? null,
+      videoUrl: insertExercise.videoUrl ?? null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -1503,6 +1584,18 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
+  async updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined> {
+    const { db } = await import("./db");
+    const { users } = await import("@shared/schema");
+    const { eq } = await import("drizzle-orm");
+    
+    const [user] = await db.update(users)
+      .set(updates)
+      .where(eq(users.id, id))
+      .returning();
+    
+    return user;
+  }
 
   async getWorkoutPrograms(): Promise<WorkoutProgram[]> {
     const { db } = await import("./db");
@@ -1520,6 +1613,15 @@ export class DatabaseStorage implements IStorage {
     const { db } = await import("./db");
     const [program] = await db.insert(workoutPrograms).values(insertProgram).returning();
     return program;
+  }
+  async updateWorkoutProgram(id: number, updates: Partial<InsertWorkoutProgram>): Promise<WorkoutProgram | undefined> {
+    const { db } = await import("./db");
+    const { eq } = await import("drizzle-orm");
+    const [program] = await db.update(workoutPrograms)
+      .set(updates)
+      .where(eq(workoutPrograms.id, id))
+      .returning();
+    return program || undefined;
   }
 
   async getWorkoutSessions(userId: number): Promise<WorkoutSession[]> {
@@ -1596,7 +1698,7 @@ export class DatabaseStorage implements IStorage {
     const { db } = await import("./db");
     const { eq } = await import("drizzle-orm");
     const result = await db.delete(exercises).where(eq(exercises.id, id));
-    return (result.rowCount ?? 0) > 0;
+    return result.length > 0;
   }
 
   async sortExercisesAlphabetically(): Promise<Exercise[]> {
@@ -1693,7 +1795,7 @@ export class DatabaseStorage implements IStorage {
     const { db } = await import("./db");
     const { eq } = await import("drizzle-orm");
     const result = await db.delete(pupilTrainingPlans).where(eq(pupilTrainingPlans.id, id));
-    return (result.rowCount ?? 0) > 0;
+    return result.length > 0;
   }
 
   // Pupil methods
@@ -1711,26 +1813,37 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPupil(insertPupil: InsertPupil): Promise<Pupil> {
-    const { db } = await import("./db");
-    const [pupil] = await db.insert(pupils).values(insertPupil).returning();
-    return pupil;
+    try {
+      const { db } = await import("./db");
+      
+      const [pupil] = await db.insert(pupils).values(insertPupil).returning();
+      return pupil;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async updatePupil(id: number, updates: Partial<InsertPupil>): Promise<Pupil | undefined> {
-    const { db } = await import("./db");
-    const { eq } = await import("drizzle-orm");
-    const [pupil] = await db.update(pupils).set({
-      ...updates,
-      updatedAt: new Date()
-    }).where(eq(pupils.id, id)).returning();
-    return pupil || undefined;
+    try {
+      const { db } = await import("./db");
+      const { eq } = await import("drizzle-orm");
+      
+      const [pupil] = await db.update(pupils).set({
+        ...updates,
+        updatedAt: new Date()
+      }).where(eq(pupils.id, id)).returning();
+      
+      return pupil || undefined;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async deletePupil(id: number): Promise<boolean> {
     const { db } = await import("./db");
     const { eq } = await import("drizzle-orm");
     const result = await db.delete(pupils).where(eq(pupils.id, id));
-    return (result.rowCount ?? 0) > 0;
+    return result.length > 0;
   }
 
   // Pupil workout history methods
@@ -1787,7 +1900,7 @@ export class DatabaseStorage implements IStorage {
         eq(activeWorkouts.pupilId, pupilId)
       )
     );
-    return (result.rowCount ?? 0) > 0;
+    return result.length > 0;
   }
 
   // Statistics methods

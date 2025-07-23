@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,8 +33,8 @@ interface WorkoutsManagementProps {
 export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
   const { activeWorkouts, addActiveWorkout, isWorkoutActive } = useActiveWorkout();
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const [editingPlan, setEditingPlan] = useState<WorkoutPlan | null>(null);
-  const [editedPlan, setEditedPlan] = useState<WorkoutPlan | null>(null);
+  const [editingPlan, setEditingPlan] = useState<WorkoutProgram | null>(null);
+  const [editedPlan, setEditedPlan] = useState<WorkoutProgram | null>(null);
   const [showCalendarSelector, setShowCalendarSelector] = useState(false);
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
@@ -55,6 +55,7 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
   });
 
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Загрузка данных пользователя и учеников
   const { data: user } = useQuery<UserType>({
@@ -65,78 +66,54 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
     queryKey: ['/api/trainers/1/pupils']
   });
 
+  // Загрузка готовых планов тренировок из API
+  const { data: workoutPrograms = [], isLoading: workoutProgramsLoading } = useQuery<WorkoutProgram[]>({
+    queryKey: ['/api/workout-programs']
+  });
+
   const trainerId = user?.id || 1;
 
-  // Готовые планы тренировок
-  const readyPlans: WorkoutPlan[] = [
-    {
-      id: 1,
-      name: "Все тело",
-      description: "Комплексная тренировка всех групп мышц за одну сессию",
-      difficulty: "начальный",
-      sessionsPerWeek: 3,
-      type: 'ready',
-      exercises: ["Приседания", "Отжимания", "Подтягивания", "Планка"]
+  // Мутация для обновления планов тренировок
+  const updateWorkoutProgramMutation = useMutation({
+    mutationFn: async ({ id, updates }: { id: number; updates: Partial<WorkoutProgram> }) => {
+      const response = await fetch(`/api/workout-programs/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updates),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update workout program');
+      }
+      return response.json();
     },
-    {
-      id: 2,
-      name: "Тяни-толкай",
-      description: "Разделение на тянущие и толкающие движения",
-      difficulty: "базовый",
-      sessionsPerWeek: 4,
-      type: 'ready',
-      exercises: ["Становая тяга", "Жим лежа", "Тяга штанги", "Жим стоя"]
+    onSuccess: () => {
+      // Инвалидируем кэш для workout programs
+      queryClient.invalidateQueries({ queryKey: ['/api/workout-programs'] });
     },
-    {
-      id: 3,
-      name: "Верх-низ",
-      description: "Разделение тренировок на верх и низ тела",
-      difficulty: "средний",
-      sessionsPerWeek: 4,
-      type: 'ready',
-      exercises: ["Приседания", "Жим лежа", "Становая тяга", "Подтягивания"]
-    },
-    {
-      id: 4,
-      name: "Грудь-спина-кардио / Ноги-плечи / Руки-живот",
-      description: "Трехдневный сплит с кардио",
-      difficulty: "средний",
-      sessionsPerWeek: 3,
-      type: 'ready',
-      exercises: ["Жим лежа", "Тяга", "Приседания", "Жим стоя", "Бицепс", "Трицепс"]
-    },
-    {
-      id: 5,
-      name: "Грудь-спина / Ноги / Плечи-руки",
-      description: "Классический трехдневный сплит",
-      difficulty: "высокий",
-      sessionsPerWeek: 3,
-      type: 'ready',
-      exercises: ["Жим лежа", "Тяга штанги", "Присед", "Жим стоя", "Подъемы на бицепс"]
-    },
-    {
-      id: 6,
-      name: "Грудь-трицепс / Спина-бицепс / Ноги-плечи-живот",
-      description: "Классический трехдневный сплит по группам мышц",
-      difficulty: "высокий",
-      sessionsPerWeek: 3,
-      type: 'ready',
-      exercises: ["Жим лежа", "Французский жим", "Тяга штанги", "Подъемы на бицепс", "Приседания", "Жим стоя"]
-    }
-  ];
+  });
 
-  const handleSelectPlan = (plan: WorkoutPlan) => {
+  const handleSelectPlan = (plan: WorkoutProgram) => {
     // Готовые планы больше не прикрепляются к ученикам
     // Они служат только как шаблоны для просмотра
   };
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'начальный': return 'bg-green-100 text-green-800';
-      case 'базовый': return 'bg-blue-100 text-blue-800';
-      case 'средний': return 'bg-yellow-100 text-yellow-800';
-      case 'высокий': return 'bg-red-100 text-red-800';
+  const getDifficultyColor = (level: string) => {
+    switch (level) {
+      case 'beginner': return 'bg-green-100 text-green-800';
+      case 'intermediate': return 'bg-blue-100 text-blue-800';
+      case 'advanced': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getLevelText = (level: string) => {
+    switch (level) {
+      case 'beginner': return 'Начальный';
+      case 'intermediate': return 'Средний';
+      case 'advanced': return 'Высокий';
+      default: return level;
     }
   };
 
@@ -165,7 +142,7 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
   }, [exercises]);
 
   // Функции для редактирования готовых планов
-  const handleEditPlan = (plan: WorkoutPlan) => {
+  const handleEditPlan = (plan: WorkoutProgram) => {
     setEditingPlan(plan);
     setEditedPlan({ ...plan });
     setShowEditDialog(true);
@@ -174,15 +151,30 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
   const handleSaveEditedPlan = () => {
     if (!editedPlan) return;
 
-    // Здесь бы была логика сохранения в базу данных
-    toast({
-      title: "Успешно",
-      description: `План "${editedPlan.name}" обновлен`,
-    });
-
-    setShowEditDialog(false);
-    setEditingPlan(null);
-    setEditedPlan(null);
+    updateWorkoutProgramMutation.mutate(
+      {
+        id: editedPlan.id,
+        updates: editedPlan,
+      },
+      {
+        onSuccess: () => {
+          toast({
+            title: "Успешно",
+            description: `План "${editedPlan.name}" обновлен`,
+          });
+          setShowEditDialog(false);
+          setEditingPlan(null);
+          setEditedPlan(null);
+        },
+        onError: () => {
+          toast({
+            title: "Ошибка",
+            description: "Не удалось обновить план тренировки",
+            variant: "destructive",
+          });
+        },
+      }
+    );
   };
 
   const handleCancelEdit = () => {
@@ -228,9 +220,12 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
     if (selectedExercises.length === 0) return;
     
     if (editedPlan) {
+      // For the database WorkoutProgram type, exercises is a JSONB field
+      const currentExercises = Array.isArray(editedPlan.exercises) ? editedPlan.exercises : [];
+      const newExercises = selectedExercises.map(name => ({ name }));
       setEditedPlan({
         ...editedPlan,
-        exercises: [...(editedPlan.exercises || []), ...selectedExercises]
+        exercises: [...currentExercises, ...newExercises]
       });
     } else {
       // Для создания новой тренировки
@@ -247,7 +242,8 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
 
   const removeExerciseFromEditedPlan = (index: number) => {
     if (!editedPlan) return;
-    const newExercises = [...(editedPlan.exercises || [])];
+    const currentExercises = Array.isArray(editedPlan.exercises) ? editedPlan.exercises : [];
+    const newExercises = [...currentExercises];
     newExercises.splice(index, 1);
     setEditedPlan({
       ...editedPlan,
@@ -257,7 +253,8 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
 
   const moveExercise = (fromIndex: number, toIndex: number) => {
     if (!editedPlan) return;
-    const newExercises = [...(editedPlan.exercises || [])];
+    const currentExercises = Array.isArray(editedPlan.exercises) ? editedPlan.exercises : [];
+    const newExercises = [...currentExercises];
     const [moved] = newExercises.splice(fromIndex, 1);
     newExercises.splice(toIndex, 0, moved);
     setEditedPlan({
@@ -332,65 +329,73 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
 
         {/* Готовые планы */}
         <TabsContent value="ready-plans" className="space-y-4">
-
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {readyPlans.map((plan) => (
-              <Card 
-                key={plan.id} 
-                className="transition-all duration-200 hover:shadow-lg hover:border-gray-200"
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <CardTitle className="text-lg">{plan.name}</CardTitle>
-                    <Badge className={getDifficultyColor(plan.difficulty)}>
-                      {plan.difficulty}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-sm text-muted-foreground">{plan.description}</p>
-                  
-                  <div className="flex items-center gap-4 text-sm">
-                    <span className="flex items-center gap-1">
-                      <strong>{plan.sessionsPerWeek}</strong> раз/неделю
-                    </span>
-                  </div>
-
-                  <div>
-                    <h4 className="text-sm font-medium mb-2">Упражнения:</h4>
-                    <div className="flex flex-wrap gap-1">
-                      {plan.exercises?.slice(0, 3).map((exercise, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
-                          {exercise}
+          {workoutProgramsLoading ? (
+            <div className="text-center py-8">
+              <div className="text-lg">Загрузка планов тренировок...</div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {workoutPrograms.map((program) => {
+                const exercisesArray = Array.isArray(program.exercises) ? program.exercises : [];
+                return (
+                  <Card 
+                    key={program.id} 
+                    className="transition-all duration-200 hover:shadow-lg hover:border-gray-200"
+                  >
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between">
+                        <CardTitle className="text-lg">{program.name}</CardTitle>
+                        <Badge className={getDifficultyColor(program.level)}>
+                          {getLevelText(program.level)}
                         </Badge>
-                      ))}
-                      {plan.exercises && plan.exercises.length > 3 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{plan.exercises.length - 3}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center gap-4 text-sm">
+                        <span className="flex items-center gap-1">
+                          <strong>{program.duration}</strong> мин
+                        </span>
+                        <span className="flex items-center gap-1">
+                          Тип: <strong>{program.type}</strong>
+                        </span>
+                      </div>
 
-                  <div className="flex gap-2 pt-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditPlan(plan);
-                      }}
-                    >
-                      <Edit className="h-4 w-4 mr-1" />
-                      Редактировать
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                      <div>
+                        <h4 className="text-sm font-medium mb-2">Упражнения:</h4>
+                        <div className="flex flex-wrap gap-1">
+                          {exercisesArray.slice(0, 3).map((exercise: any, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {exercise.name || exercise}
+                            </Badge>
+                          ))}
+                          {exercisesArray.length > 3 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{exercisesArray.length - 3}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2 pt-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditPlan(program);
+                          }}
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          Редактировать
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </TabsContent>
 
         {/* Создать тренировку */}
@@ -418,7 +423,7 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
                 <div>
                   <Label htmlFor="workout-level">Уровень ученика</Label>
                   <Select value={customWorkout.level} onValueChange={(value) => setCustomWorkout(prev => ({ ...prev, level: value }))}>
-                    <SelectTrigger>
+                    <SelectTrigger id="workout-level">
                       <SelectValue placeholder="Выберите уровень" />
                     </SelectTrigger>
                     <SelectContent>
@@ -674,56 +679,51 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="edit-plan-difficulty">Уровень</Label>
+                  <Label htmlFor="edit-plan-level">Уровень</Label>
                   <Select 
-                    value={editedPlan.difficulty} 
-                    onValueChange={(value) => setEditedPlan({ ...editedPlan, difficulty: value })}
+                    value={editedPlan.level} 
+                    onValueChange={(value) => setEditedPlan({ ...editedPlan, level: value })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="edit-plan-level">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="начальный">Начальный</SelectItem>
-                      <SelectItem value="базовый">Базовый</SelectItem>
-                      <SelectItem value="средний">Средний</SelectItem>
-                      <SelectItem value="высокий">Высокий</SelectItem>
+                      <SelectItem value="beginner">Начальный</SelectItem>
+                      <SelectItem value="intermediate">Средний</SelectItem>
+                      <SelectItem value="advanced">Высокий</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
 
-              <div>
-                <Label htmlFor="edit-plan-description">Описание</Label>
-                <Textarea
-                  id="edit-plan-description"
-                  value={editedPlan.description}
-                  onChange={(e) => setEditedPlan({ ...editedPlan, description: e.target.value })}
-                  placeholder="Описание плана тренировки"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="edit-sessions-per-week">Тренировок в неделю</Label>
-                <Select 
-                  value={editedPlan.sessionsPerWeek?.toString()} 
-                  onValueChange={(value) => setEditedPlan({ 
-                    ...editedPlan, 
-                    sessionsPerWeek: parseInt(value) 
-                  })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">1 раз в неделю</SelectItem>
-                    <SelectItem value="2">2 раза в неделю</SelectItem>
-                    <SelectItem value="3">3 раза в неделю</SelectItem>
-                    <SelectItem value="4">4 раза в неделю</SelectItem>
-                    <SelectItem value="5">5 раз в неделю</SelectItem>
-                    <SelectItem value="6">6 раз в неделю</SelectItem>
-                    <SelectItem value="7">Ежедневно</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="edit-plan-type">Тип тренировки</Label>
+                  <Select 
+                    value={editedPlan.type} 
+                    onValueChange={(value) => setEditedPlan({ ...editedPlan, type: value })}
+                  >
+                    <SelectTrigger id="edit-plan-type">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="strength">Силовая</SelectItem>
+                      <SelectItem value="cardio">Кардио</SelectItem>
+                      <SelectItem value="functional">Функциональная</SelectItem>
+                      <SelectItem value="stretching">Растяжка</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="edit-plan-duration">Продолжительность (мин)</Label>
+                  <Input
+                    id="edit-plan-duration"
+                    type="number"
+                    min="1"
+                    value={editedPlan.duration}
+                    onChange={(e) => setEditedPlan({ ...editedPlan, duration: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
               </div>
 
               <div>
@@ -740,41 +740,44 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
                   </Button>
                 </div>
                 <div className="space-y-2">
-                  {editedPlan.exercises?.map((exercise, index) => (
-                    <div key={index} className="flex gap-2 items-center">
-                      <div className="flex gap-1">
+                  {(() => {
+                    const exercisesArray = Array.isArray(editedPlan.exercises) ? editedPlan.exercises : [];
+                    return exercisesArray.map((exercise: any, index) => (
+                      <div key={index} className="flex gap-2 items-center">
+                        <div className="flex gap-1">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => index > 0 && moveExercise(index, index - 1)}
+                            disabled={index === 0}
+                          >
+                            ↑
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => index < exercisesArray.length - 1 && moveExercise(index, index + 1)}
+                            disabled={index === exercisesArray.length - 1}
+                          >
+                            ↓
+                          </Button>
+                        </div>
+                        <div className="flex-1 p-2 border rounded bg-gray-50">
+                          {exercise.name || exercise}
+                        </div>
                         <Button
                           type="button"
-                          variant="ghost"
+                          variant="outline"
                           size="sm"
-                          onClick={() => index > 0 && moveExercise(index, index - 1)}
-                          disabled={index === 0}
+                          onClick={() => removeExerciseFromEditedPlan(index)}
                         >
-                          ↑
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => index < (editedPlan.exercises?.length || 0) - 1 && moveExercise(index, index + 1)}
-                          disabled={index === (editedPlan.exercises?.length || 0) - 1}
-                        >
-                          ↓
+                          ✕
                         </Button>
                       </div>
-                      <div className="flex-1 p-2 border rounded bg-gray-50">
-                        {exercise}
-                      </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => removeExerciseFromEditedPlan(index)}
-                      >
-                        ✕
-                      </Button>
-                    </div>
-                  ))}
+                    ));
+                  })()}
                 </div>
               </div>
 

@@ -10,6 +10,9 @@ import { User, Filter, Search, Users, Dumbbell, Calendar, Upload, Edit2, Image }
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import type { User as UserType, Exercise, Pupil } from "@shared/schema";
 import { getExercisePhoto } from "@/components/ui/exercise-photos";
 import { ExerciseDetail } from "@/components/exercise/exercise-detail";
@@ -41,6 +44,64 @@ export function ProfileView() {
 
   const { data: exercises = [] } = useQuery<Exercise[]>({
     queryKey: ['/api/exercises'],
+  });
+
+  // Form schema for user profile editing
+  const userProfileSchema = z.object({
+    firstName: z.string().min(1, "Имя обязательно"),
+    lastName: z.string().min(1, "Фамилия обязательна"),
+    middleName: z.string().optional(),
+    birthDate: z.string().min(1, "Дата рождения обязательна"),
+    email: z.string().email("Некорректный email"),
+    phone: z.string().min(1, "Телефон обязателен"),
+  });
+
+  type UserProfileForm = z.infer<typeof userProfileSchema>;
+
+  const form = useForm<UserProfileForm>({
+    resolver: zodResolver(userProfileSchema),
+    defaultValues: {
+      firstName: user?.firstName || "",
+      lastName: user?.lastName || "",
+      middleName: user?.middleName || "",
+      birthDate: user?.birthDate || "",
+      email: user?.email || "",
+      phone: user?.phone || "",
+    },
+  });
+
+  // Update form when user data loads
+  useEffect(() => {
+    if (user) {
+      form.reset({
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        middleName: user.middleName || "",
+        birthDate: user.birthDate || "",
+        email: user.email || "",
+        phone: user.phone || "",
+      });
+    }
+  }, [user, form]);
+
+  // Mutation for updating user profile
+  const updateUserMutation = useMutation({
+    mutationFn: (data: UserProfileForm) => apiRequest('PUT', `/api/user/1`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/user/1'] });
+      setIsEditing(false);
+      toast({
+        title: "Успешно",
+        description: "Профиль обновлен",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось обновить профиль",
+        variant: "destructive",
+      });
+    },
   });
 
   // Загружаем учеников для поиска выбранного ученика из URL
@@ -87,7 +148,7 @@ export function ProfileView() {
   };
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => apiRequest(`/api/exercises/${id}`, 'DELETE'),
+    mutationFn: (id: number) => apiRequest('DELETE', `/api/exercises/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
       toast({
@@ -210,73 +271,116 @@ export function ProfileView() {
                 </div>
                 
                 <div className="flex-1 space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label>Имя</Label>
-                      {isEditing ? (
-                        <Input defaultValue={user?.firstName || "Александр"} />
-                      ) : (
-                        <div className="p-3 bg-gray-50 rounded-md">{user?.firstName || "Александр"}</div>
-                      )}
-                    </div>
-                    <div>
-                      <Label>Фамилия</Label>
-                      {isEditing ? (
-                        <Input defaultValue={user?.lastName || "Петров"} />
-                      ) : (
-                        <div className="p-3 bg-gray-50 rounded-md">{user?.lastName || "Петров"}</div>
-                      )}
-                    </div>
-                    <div>
-                      <Label>Отчество</Label>
-                      {isEditing ? (
-                        <Input defaultValue="Иванович" />
-                      ) : (
-                        <div className="p-3 bg-gray-50 rounded-md">Иванович</div>
-                      )}
-                    </div>
-                    <div>
-                      <Label>Дата рождения</Label>
-                      {isEditing ? (
-                        <Input type="date" defaultValue="1990-03-15" />
-                      ) : (
-                        <div className="p-3 bg-gray-50 rounded-md">15 марта 1990</div>
-                      )}
-                    </div>
-                    <div>
-                      <Label>Email</Label>
-                      {isEditing ? (
-                        <Input type="email" defaultValue={user?.email || "alexander.petrov@email.com"} />
-                      ) : (
-                        <div className="p-3 bg-gray-50 rounded-md">{user?.email || "alexander.petrov@email.com"}</div>
-                      )}
-                    </div>
-                    <div>
-                      <Label>Телефон</Label>
-                      {isEditing ? (
-                        <Input defaultValue="+7 (999) 123-45-67" />
-                      ) : (
-                        <div className="p-3 bg-gray-50 rounded-md">+7 (999) 123-45-67</div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-end pt-4">
-                    {isEditing ? (
-                      <div className="flex gap-2">
-                        <Button variant="outline" onClick={() => setIsEditing(false)}>
-                          Отмена
-                        </Button>
-                        <Button onClick={() => setIsEditing(false)}>
-                          Сохранить
-                        </Button>
+                  <form onSubmit={form.handleSubmit((data) => updateUserMutation.mutate(data))}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label>Имя</Label>
+                        {isEditing ? (
+                          <Input 
+                            {...form.register("firstName")}
+                            className={form.formState.errors.firstName ? "border-red-500" : ""}
+                          />
+                        ) : (
+                          <div className="p-3 bg-gray-50 rounded-md">{user?.firstName || ""}</div>
+                        )}
+                        {form.formState.errors.firstName && (
+                          <p className="text-sm text-red-500 mt-1">{form.formState.errors.firstName.message}</p>
+                        )}
                       </div>
-                    ) : (
-                      <Button onClick={() => setIsEditing(true)}>
-                        Редактировать
-                      </Button>
-                    )}
-                  </div>
+                      <div>
+                        <Label>Фамилия</Label>
+                        {isEditing ? (
+                          <Input 
+                            {...form.register("lastName")}
+                            className={form.formState.errors.lastName ? "border-red-500" : ""}
+                          />
+                        ) : (
+                          <div className="p-3 bg-gray-50 rounded-md">{user?.lastName || ""}</div>
+                        )}
+                        {form.formState.errors.lastName && (
+                          <p className="text-sm text-red-500 mt-1">{form.formState.errors.lastName.message}</p>
+                        )}
+                      </div>
+                      <div>
+                        <Label>Отчество</Label>
+                        {isEditing ? (
+                          <Input {...form.register("middleName")} />
+                        ) : (
+                          <div className="p-3 bg-gray-50 rounded-md">{user?.middleName || ""}</div>
+                        )}
+                      </div>
+                      <div>
+                        <Label>Дата рождения</Label>
+                        {isEditing ? (
+                          <Input 
+                            type="date" 
+                            {...form.register("birthDate")}
+                            className={form.formState.errors.birthDate ? "border-red-500" : ""}
+                          />
+                        ) : (
+                          <div className="p-3 bg-gray-50 rounded-md">
+                            {user?.birthDate ? new Date(user.birthDate).toLocaleDateString('ru-RU', {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric'
+                            }) : ""}
+                          </div>
+                        )}
+                        {form.formState.errors.birthDate && (
+                          <p className="text-sm text-red-500 mt-1">{form.formState.errors.birthDate.message}</p>
+                        )}
+                      </div>
+                      <div>
+                        <Label>Email</Label>
+                        {isEditing ? (
+                          <Input 
+                            type="email" 
+                            {...form.register("email")}
+                            className={form.formState.errors.email ? "border-red-500" : ""}
+                          />
+                        ) : (
+                          <div className="p-3 bg-gray-50 rounded-md">{user?.email || ""}</div>
+                        )}
+                        {form.formState.errors.email && (
+                          <p className="text-sm text-red-500 mt-1">{form.formState.errors.email.message}</p>
+                        )}
+                      </div>
+                      <div>
+                        <Label>Телефон</Label>
+                        {isEditing ? (
+                          <Input 
+                            {...form.register("phone")}
+                            className={form.formState.errors.phone ? "border-red-500" : ""}
+                          />
+                        ) : (
+                          <div className="p-3 bg-gray-50 rounded-md">{user?.phone || ""}</div>
+                        )}
+                        {form.formState.errors.phone && (
+                          <p className="text-sm text-red-500 mt-1">{form.formState.errors.phone.message}</p>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-end pt-4">
+                      {isEditing ? (
+                        <div className="flex gap-2">
+                          <Button variant="outline" type="button" onClick={() => {
+                            setIsEditing(false);
+                            form.reset();
+                          }}>
+                            Отмена
+                          </Button>
+                          <Button type="submit" disabled={updateUserMutation.isPending}>
+                            {updateUserMutation.isPending ? "Сохранение..." : "Сохранить"}
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button onClick={() => setIsEditing(true)}>
+                          Редактировать
+                        </Button>
+                      )}
+                    </div>
+                  </form>
                 </div>
               </div>
             </CardContent>
