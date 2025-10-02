@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronLeft, ChevronRight, Clock, Plus, Check, Trash2, Users, Search, AlertCircle, UserPlus, Dumbbell } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { studentsDb } from "@/lib/database";
 import type { Pupil } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { TwoMonthCalendar } from "./two-month-calendar";
@@ -66,14 +66,15 @@ export function NewSchedule() {
 
   // Загружаем учеников
   const { data: pupils = [] } = useQuery<Pupil[]>({
-    queryKey: ['/api/trainers/1/pupils'],
+    queryKey: ['students'],
+    queryFn: () => studentsDb.getAll(),
   });
 
   // Мутация для создания нового ученика
   const createPupilMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('POST', '/api/trainers/1/pupils', data),
+    mutationFn: (data: any) => studentsDb.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/pupils'] });
+      queryClient.invalidateQueries({ queryKey: ['students'] });
       setShowAddPupilForm(false);
       setNewPupilData({ firstName: '', lastName: '', phone: '', email: '' });
       toast({
@@ -240,7 +241,9 @@ export function NewSchedule() {
     createPupilMutation.mutate({
       ...newPupilData,
       trainerId: 1,
-      joinDate: new Date().toISOString().split('T')[0]
+      birthDate: '2000-01-01', // Default birth date for quick add
+      joinDate: new Date().toISOString().split('T')[0],
+      status: 'active'
     });
   };
 

@@ -11,7 +11,7 @@ import { generateExerciseImage } from "@/components/ui/exercise-photos";
 import { X, AlertTriangle, CheckCircle, Info, Edit, Trash2, Save, ArrowLeft } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { exercisesDb } from "@/lib/database";
 import { useToast } from "@/hooks/use-toast";
 
 interface Exercise {
@@ -54,11 +54,10 @@ export function ExerciseDetail({ exercise, onClose, onEdit, onDelete }: Exercise
 
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await apiRequest('PUT', `/api/exercises/${exercise.id}`, data);
-      return response.json();
+      return await exercisesDb.update(exercise.id, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
+      queryClient.invalidateQueries({ queryKey: ['exercises'] });
       setIsEditing(false);
       toast({
         title: "Упражнение обновлено",

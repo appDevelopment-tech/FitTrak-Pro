@@ -5,11 +5,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ### Development
-- `npm run dev` - Start development server with Vite frontend and Express backend
-- `npm run build` - Build both frontend (Vite) and backend (esbuild) for production
+- `npm run dev` - Start development server with Vite frontend
+- `npm run build` - Build frontend (Vite) for production
 - `npm run start` - Start production server
 - `npm run check` - Run TypeScript type checking
-- `npm run db:push` - Push database schema changes using Drizzle Kit
+- `npm run cleanup` - Clean up temporary test files and screenshots
+
+### Testing
+- `npm run test:e2e` - Run end-to-end tests (Playwright)
+- `npm run test:clean` - Clean up and run tests
 
 ### Database Management
 - Database migrations are handled via Drizzle Kit
@@ -128,3 +132,62 @@ This is a full-stack fitness training management application with the following 
 - Path aliases configured in `vite.config.ts` and `tsconfig.json`
 - Shared types between frontend and backend via `shared/` directory
 - Component organization by feature domain in `client/src/components/`
+
+## Cleanup Protocol
+
+### After Testing Sessions
+**ALWAYS run cleanup after QA testing or debugging:**
+1. Delete temporary test files: `npm run cleanup` or `bash scripts/cleanup.sh`
+2. Remove ad-hoc test scripts from root: `rm -f *-test.js test-*.js browser-test*.js`
+3. Clean screenshots: All test screenshots are auto-removed by cleanup script
+4. Clean test artifacts: `.test-artifacts/` directory is auto-cleaned
+
+### Test File Management
+
+#### Ad-hoc Tests (Temporary)
+- **Location**: Project root (for quick debugging)
+- **Naming**: `*-test.js`, `test-*.js`, `browser-test*.js`
+- **Lifecycle**: DELETE immediately after use
+- **Examples**: `browser-test-debug.js`, `test-student-creation.js`
+
+#### Production Tests (Permanent)
+- **Location**: `tests/e2e/*.spec.ts` or `tests/integration/*.spec.ts`
+- **Naming**: `{feature}.spec.ts` (e.g., `students.spec.ts`)
+- **Lifecycle**: KEEP and maintain
+- **When to create**: When test is reusable and should run in CI/CD
+
+#### Screenshot Management
+- **Ad-hoc screenshots**: Auto-deleted by cleanup script
+- **Reference screenshots**: Save to `tests/screenshots/{feature}/` with descriptive names
+- **Naming**: `{feature}-{action}-{state}.png` (e.g., `student-create-success.png`)
+- **Retention**: Auto-delete screenshots older than 7 days from `tests/screenshots/`
+
+### Test Directory Structure
+```
+tests/
+├── e2e/              # End-to-end Playwright tests
+├── integration/      # Integration tests
+├── unit/            # Unit tests
+├── fixtures/        # Test data and mocks
+├── screenshots/     # Test screenshots (gitignored)
+└── helpers/         # Shared test utilities
+```
+
+### Before Git Commits
+1. Run `npm run cleanup` to remove temporary files
+2. Verify no test files in root: `ls *-test.js test-*.js 2>/dev/null`
+3. Check .gitignore covers test artifacts
+4. Commit only production tests in `tests/` directory
+
+### Quick Cleanup Commands
+```bash
+# Full cleanup (recommended)
+npm run cleanup
+
+# Manual cleanup
+rm -f *-test.js test-*.js browser-test*.js screenshot-*.png test-*.png
+rm -f /tmp/*.png
+
+# Check for leftover test files
+ls *-test.js test-*.js *.png 2>/dev/null | grep -v "generated-icon.png"
+```

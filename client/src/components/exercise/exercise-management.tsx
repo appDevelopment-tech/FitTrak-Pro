@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Plus, Edit, Trash2, Eye, Search, Filter } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import { exercisesDb } from "@/lib/database";
 import { useToast } from "@/hooks/use-toast";
 import { generateExerciseImage } from "@/components/ui/exercise-photos";
 import type { Exercise, InsertExercise } from "@shared/schema";
@@ -44,18 +44,18 @@ export function ExerciseManagement() {
   const queryClient = useQueryClient();
 
   const { data: exercises = [], isLoading, error } = useQuery<Exercise[]>({
-    queryKey: ['/api/exercises'],
+    queryKey: ['exercises'],
+    queryFn: () => exercisesDb.getAll(),
     staleTime: 0,
     refetchOnMount: true,
   });
 
   const createMutation = useMutation({
     mutationFn: async (data: InsertExercise) => {
-      const response = await apiRequest('POST', '/api/exercises', data);
-      return response.json();
+      return await exercisesDb.create(data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
+      queryClient.invalidateQueries({ queryKey: ['exercises'] });
       setIsCreateDialogOpen(false);
       toast({ title: "Упражнение создано успешно" });
     },
@@ -70,11 +70,10 @@ export function ExerciseManagement() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: Partial<InsertExercise> }) => {
-      const response = await apiRequest('PUT', `/api/exercises/${id}`, data);
-      return response.json();
+      return await exercisesDb.update(id, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
+      queryClient.invalidateQueries({ queryKey: ['exercises'] });
       setIsEditDialogOpen(false);
       toast({ title: "Упражнение обновлено успешно" });
     },
@@ -89,11 +88,10 @@ export function ExerciseManagement() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await apiRequest('DELETE', `/api/exercises/${id}`);
-      return response.json();
+      return await exercisesDb.delete(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
+      queryClient.invalidateQueries({ queryKey: ['exercises'] });
       toast({ title: "Упражнение удалено успешно" });
     },
     onError: (error) => {

@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { Bell, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatsCard } from "@/components/ui/stats-card";
@@ -9,12 +7,11 @@ import { MobileNavigation } from "@/components/navigation/mobile-nav";
 import { DesktopSidebar } from "@/components/navigation/desktop-sidebar";
 import { CalendarView } from "@/components/schedule/calendar-view";
 import { TodaySchedule } from "@/components/schedule/today-schedule";
-
-
 import { ProfileView } from "@/components/profile/profile-view";
 import { NewSchedule } from "@/components/schedule/new-schedule";
 import { StudentsManagement } from "@/components/students/students-management";
-import { Plus, BarChart3, Search, Flame, Trash2, Users } from "lucide-react";
+import { Plus, BarChart3, Search, Flame, Trash2, Users, LogOut } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 import type { DashboardStats } from "@/lib/types";
 import type { WorkoutSession, WorkoutProgram, User } from "@shared/schema";
 
@@ -49,17 +46,7 @@ export default function Dashboard() {
 
   };
 
-  const { data: dashboardStats } = useQuery<DashboardStats>({
-    queryKey: ['/api/dashboard-stats/1'],
-  });
-
-  const { data: todaySessions = [] } = useQuery<(WorkoutSession & { program?: WorkoutProgram })[]>({
-    queryKey: ['/api/workout-sessions/1', selectedDate.toISOString().split('T')[0]],
-  });
-
-  const { data: user } = useQuery<User>({
-    queryKey: ['/api/user/1'],
-  });
+  const { user, signOut } = useAuth();
 
   const handleStartWorkout = (sessionId: number) => {
     // Handle workout start logic
@@ -132,19 +119,20 @@ export default function Dashboard() {
             </div>
 
             {/* User Profile */}
-            <div className="flex items-center">
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-2">
-                  <img
-                    src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=80&h=80"
-                    alt="User Profile"
-                    className="h-8 w-8 rounded-full"
-                  />
-                  <span className="text-sm font-medium text-gray-700">
-                    {user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : 'Александр Петров'}
-                  </span>
-                </div>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <img
+                  src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=80&h=80"
+                  alt="User Profile"
+                  className="h-8 w-8 rounded-full"
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  {user?.email || 'User'}
+                </span>
               </div>
+              <Button variant="ghost" size="sm" onClick={() => signOut()}>
+                <LogOut className="h-4 w-4" />
+              </Button>
             </div>
           </div>
 

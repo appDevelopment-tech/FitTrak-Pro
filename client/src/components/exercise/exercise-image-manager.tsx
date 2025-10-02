@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { exercisesDb } from "@/lib/database";
 
 interface ExerciseImageManagerProps {
   exerciseId: number;
@@ -27,11 +27,10 @@ export function ExerciseImageManager({
 
   const updateImageMutation = useMutation({
     mutationFn: async (imageUrl: string) => {
-      const response = await apiRequest('PATCH', `/api/exercises/${exerciseId}/image`, { imageUrl });
-      return response.json();
+      return await exercisesDb.update(exerciseId, { techniqueImageUrl: imageUrl });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/exercises'] });
+      queryClient.invalidateQueries({ queryKey: ['exercises'] });
       toast({
         title: "Изображение обновлено",
         description: "Изображение упражнения успешно добавлено"

@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Trash2 } from "lucide-react";
 import { Exercise } from "@/lib/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { workoutProgramsDb } from "@/lib/database";
 import { useToast } from "@/hooks/use-toast";
 
 export function TrainerCabinet() {
@@ -22,7 +22,7 @@ export function TrainerCabinet() {
 
   const createProgramMutation = useMutation({
     mutationFn: async (programData: any) => {
-      return apiRequest('POST', '/api/workout-programs', programData);
+      return await workoutProgramsDb.create(programData);
     },
     onSuccess: () => {
       toast({

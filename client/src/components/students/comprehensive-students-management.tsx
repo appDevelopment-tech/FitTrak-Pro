@@ -37,7 +37,7 @@ import {
   Dumbbell,
   Trash2
 } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import { studentsDb, exercisesDb, trainingPlansDb } from "@/lib/database";
 import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
 import type { Pupil, InsertPupil, WorkoutProgram, Exercise } from "@shared/schema";
 
@@ -179,28 +179,48 @@ export function ComprehensiveStudentsManagement() {
 
   // Получаем статистику учеников
   const { data: stats } = useQuery<PupilsStats>({
-    queryKey: ['/api/pupils/stats/1'],
+    queryKey: ['pupils-stats'],
+    queryFn: async () => {
+      const pupils = await studentsDb.getAll();
+      return {
+        totalPupils: pupils.length,
+        todayBookings: 0,
+        confirmedToday: 0,
+        pendingToday: 0
+      };
+    }
   });
 
   // Получаем список учеников
   const { data: pupils = [], isLoading } = useQuery<Pupil[]>({
-    queryKey: ['/api/trainers/1/pupils'],
+    queryKey: ['students'],
+    queryFn: () => studentsDb.getAll(),
   });
 
   // Получаем упражнения для создания кастомных тренировок
   const { data: exercises = [] } = useQuery<Exercise[]>({
-    queryKey: ['/api/exercises'],
+    queryKey: ['exercises'],
+    queryFn: () => exercisesDb.getAll(),
   });
 
   // Вычисляем возраст и статус несовершеннолетия для каждого ученика
   const pupilsWithAge: PupilWithAge[] = pupils.map(pupil => {
+    // Validate birth date before calculation
+    if (!pupil.birthDate || isNaN(new Date(pupil.birthDate).getTime())) {
+      return {
+        ...pupil,
+        age: 0,
+        isMinor: false
+      };
+    }
+
     const birthDate = new Date(pupil.birthDate);
     const today = new Date();
     const age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
-    const actualAge = (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) 
-      ? age - 1 
+
+    const actualAge = (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()))
+      ? age - 1
       : age;
 
     return {
@@ -238,12 +258,12 @@ export function ComprehensiveStudentsManagement() {
 
     try {
       // Сохраняем план в базе данных
-      const savedPlan = await apiRequest('POST', `/api/pupils/${selectedPupilForWorkout.id}/training-plans`, {
+      const savedPlan = await trainingPlansDb.create({
         trainerId: trainerId,
+        pupilId: selectedPupilForWorkout.id,
         name: selectedPlanForSchedule.name,
         exercises: selectedPlanForSchedule.exercises || [],
         isActive: true,
-        scheduleData: scheduleData,
       });
 
       // Добавляем в локальное состояние с ID из базы данных
@@ -301,8 +321,9 @@ export function ComprehensiveStudentsManagement() {
 
     try {
       // Сохраняем план в базе данных
-      const savedPlan = await apiRequest('POST', `/api/pupils/${selectedPupilForWorkout.id}/training-plans`, {
+      const savedPlan = await trainingPlansDb.create({
         trainerId: trainerId,
+        pupilId: selectedPupilForWorkout.id,
         name: customWorkout.name,
         exercises: customWorkout.exercises,
         isActive: true,
@@ -422,16 +443,16 @@ export function ComprehensiveStudentsManagement() {
       `${pupil.firstName} ${pupil.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
       pupil.phone.includes(searchTerm)
     )
-    .sort((a, b) => a.lastName.localeCompare(b.lastName, 'ru'));
+    .sort((a, b) => (a.lastName || '').localeCompare(b.lastName || '', 'ru'));
 
   // Мутация для создания ученика
   const createPupilMutation = useMutation({
     mutationFn: async (newPupil: InsertPupil) => {
-      return await apiRequest('POST', '/api/trainers/1/pupils', newPupil);
+      return await studentsDb.create(newPupil);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/pupils'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/pupils/stats/1'] });
+      queryClient.invalidateQueries({ queryKey: ['students'] });
+      queryClient.invalidateQueries({ queryKey: ['pupils-stats'] });
       setShowAddDialog(false);
       toast({
         title: "Успешно",
@@ -450,10 +471,10 @@ export function ComprehensiveStudentsManagement() {
   // Мутация для обновления ученика
   const updatePupilMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: number; updates: Partial<InsertPupil> }) => {
-      return await apiRequest('PUT', `/api/pupils/${id}`, updates);
+      return await studentsDb.update(id, updates);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/pupils'] });
+      queryClient.invalidateQueries({ queryKey: ['students'] });
       setShowEditDialog(false);
       setSelectedPupil(null);
       toast({
@@ -696,7 +717,7 @@ export function ComprehensiveStudentsManagement() {
                   <Avatar className="h-24 w-24">
                     <AvatarImage src={selectedPupil.photo || undefined} />
                     <AvatarFallback className="text-2xl">
-                      {selectedPupil.firstName.charAt(0)}{selectedPupil.lastName.charAt(0)}
+                      {(selectedPupil.firstName || '?').charAt(0)}{(selectedPupil.lastName || '?').charAt(0)}
                     </AvatarFallback>
                   </Avatar>
                   
@@ -834,7 +855,7 @@ export function ComprehensiveStudentsManagement() {
                                 onClick={async () => {
                                   try {
                                     // Удаляем план тренировки через API
-                                    await apiRequest('DELETE', `/api/training-plans/${workout.id}`);
+                                    await trainingPlansDb.delete(workout.id);
                                     
                                     // Удаляем из локального состояния activeWorkouts
                                     removeActiveWorkout(workout.trainerId, workout.pupilId);
@@ -1473,7 +1494,7 @@ export function ComprehensiveStudentsManagement() {
                     if (!confirmed) return;
                     
                     try {
-                      await apiRequest('DELETE', `/api/training-plans/${selectedActiveWorkout.workoutProgram?.id}`);
+                      await trainingPlansDb.delete(selectedActiveWorkout.workoutProgram?.id);
                       
                       removeActiveWorkout(trainerId, selectedPupilForWorkout.id);
                       setShowActiveWorkoutDialog(false);

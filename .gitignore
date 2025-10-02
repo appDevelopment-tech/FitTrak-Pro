@@ -8,3 +8,22 @@ vite.config.ts.*
 .env.local
 .env.production
 .env.development
+
+# Test artifacts
+.test-artifacts/
+tests/screenshots/
+/tmp/
+*-test.js
+test-*.js
+test-*.json
+browser-test*.js
+screenshot-*.png
+test-*.png
+final-*.png
+snap-*.png
+network-test-*.png
+supabase-test-*.png
+
+# Keep test specs
+!tests/**/*.spec.ts
+!tests/**/*.spec.js
