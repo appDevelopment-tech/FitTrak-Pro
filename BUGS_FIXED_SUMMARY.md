@@ -5,7 +5,7 @@
 
 ---
 
-## Bugs Fixed (5 total)
+## Bugs Fixed (5 total
 
 ### Bug #1: Student Creation 400 Bad Request ✅ FIXED
 **File:** `client/src/components/schedule/new-schedule.tsx:241-247`
