@@ -11,7 +11,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { studentsDb } from "@/lib/database";
 import type { Pupil } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
-import { TwoMonthCalendar } from "./two-month-calendar";
 import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
 import { useLocation } from "wouter";
 
@@ -367,17 +366,9 @@ export function NewSchedule() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Левая колонка - двухмесячный календарь */}
-        <div className="lg:col-span-1">
-          <TwoMonthCalendar 
-            onDateSelect={setSelectedDate}
-            sessions={sessions}
-          />
-        </div>
-
-        {/* Правая колонка - расписание дня */}
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 gap-6">
+        {/* Расписание дня */}
+        <div className="col-span-1">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
