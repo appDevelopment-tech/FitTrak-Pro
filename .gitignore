@@ -11,7 +11,8 @@ vite.config.ts.*
 
 # Test artifacts
 .test-artifacts/
-tests/screenshots/
+test-screenshots/
+test-results/
 /tmp/
 *-test.js
 test-*.js
@@ -24,6 +25,8 @@ snap-*.png
 network-test-*.png
 supabase-test-*.png
 
-# Keep test specs
-!tests/**/*.spec.ts
-!tests/**/*.spec.js
+# Claude workspace (not committed)
+.claude/
+
+# Removed directories
+attached_assets/
