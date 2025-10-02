@@ -151,33 +151,33 @@ This is a full-stack fitness training management application with the following 
 - **Examples**: `browser-test-debug.js`, `test-student-creation.js`
 
 #### Production Tests (Permanent)
-- **Location**: `tests/e2e/*.spec.ts` or `tests/integration/*.spec.ts`
-- **Naming**: `{feature}.spec.ts` (e.g., `students.spec.ts`)
-- **Lifecycle**: KEEP and maintain
+- **Location**: `.claude/agents/qa-tester/*.spec.ts`
+- **Naming**: `{feature}.spec.ts` or `test-{feature}.spec.ts`
+- **Lifecycle**: KEEP and maintain in qa-tester folder
 - **When to create**: When test is reusable and should run in CI/CD
+- **Who creates**: QA tester agent manages all tests
 
 #### Screenshot Management
 - **Ad-hoc screenshots**: Auto-deleted by cleanup script
-- **Reference screenshots**: Save to `tests/screenshots/{feature}/` with descriptive names
+- **Test screenshots**: Saved to `.claude/agents/qa-tester/screenshots/`
 - **Naming**: `{feature}-{action}-{state}.png` (e.g., `student-create-success.png`)
-- **Retention**: Auto-delete screenshots older than 7 days from `tests/screenshots/`
+- **Retention**: Managed by QA tester agent, cleaned up after test runs
 
 ### Test Directory Structure
 ```
-tests/
-├── e2e/              # End-to-end Playwright tests
-├── integration/      # Integration tests
-├── unit/            # Unit tests
-├── fixtures/        # Test data and mocks
-├── screenshots/     # Test screenshots (gitignored)
-└── helpers/         # Shared test utilities
+.claude/agents/qa-tester/    # QA Tester agent workspace
+├── *.spec.ts                # All Playwright test files
+├── *.cjs                    # Node.js test scripts
+└── screenshots/             # Test screenshots (auto-generated)
 ```
+
+**Important**: QA tester agent creates and manages ALL tests in `.claude/agents/qa-tester/` directory.
 
 ### Before Git Commits
 1. Run `npm run cleanup` to remove temporary files
 2. Verify no test files in root: `ls *-test.js test-*.js 2>/dev/null`
 3. Check .gitignore covers test artifacts
-4. Commit only production tests in `tests/` directory
+4. QA tester agent tests are in `.claude/agents/qa-tester/` (not committed to git)
 
 ### Quick Cleanup Commands
 ```bash
