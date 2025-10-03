@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,13 +8,20 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Plus, Edit, Trash2, Eye, Search, Filter } from "lucide-react";
 import { exercisesDb } from "@/lib/database";
 import { useToast } from "@/hooks/use-toast";
 import { generateExerciseImage } from "@/components/ui/exercise-photos";
+import { MuscleGroupsManagement } from "./muscle-groups-management";
 import type { Exercise, InsertExercise } from "@shared/schema";
+
+interface MuscleGroup {
+  id: number;
+  name: string;
+}
 
 interface ExerciseFormData {
   name: string;
@@ -28,7 +36,6 @@ interface ExerciseFormData {
   techniqueImageUrl?: string;
 }
 
-const muscleGroups = ['грудь', 'спина', 'ноги', 'руки', 'плечи', 'ягодичные', 'живот'];
 const difficultyLevels = ['начинающий', 'средний', 'продвинутый'];
 
 export function ExerciseManagement() {
@@ -42,6 +49,21 @@ export function ExerciseManagement() {
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Load muscle groups from Supabase
+  const { data: muscleGroups = [] } = useQuery<MuscleGroup[]>({
+    queryKey: ['muscleGroups'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('muscle_groups')
+        .select('id, name')
+        .order('display_order', { ascending: true });
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  const muscleGroupNames = muscleGroups.map(g => g.name);
 
   const { data: exercises = [], isLoading, error } = useQuery<Exercise[]>({
     queryKey: ['exercises'],
@@ -105,32 +127,41 @@ export function ExerciseManagement() {
 
   const filteredExercises = exercises.filter(exercise => {
     const matchesSearch = !searchTerm || exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesMuscle = !filterMuscle || exercise.primaryMuscles.includes(filterMuscle);
+    const matchesMuscle = !filterMuscle || filterMuscle === 'all' || exercise.primaryMuscles.includes(filterMuscle);
     return matchesSearch && matchesMuscle;
   });
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <h2 className="text-2xl font-bold">Управление упражнениями</h2>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              Добавить упражнение
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Создать новое упражнение</DialogTitle>
-            </DialogHeader>
-            <ExerciseForm 
-              onSubmit={(data) => createMutation.mutate(data)}
-              isLoading={createMutation.isPending}
-            />
-          </DialogContent>
-        </Dialog>
-      </div>
+      <h2 className="text-2xl font-bold">Управление упражнениями</h2>
+
+      <Tabs defaultValue="exercises" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="exercises">Упражнения</TabsTrigger>
+          <TabsTrigger value="muscle-groups">Группы мышц</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="exercises" className="space-y-6">
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Добавить упражнение
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Создать новое упражнение</DialogTitle>
+                </DialogHeader>
+                <ExerciseForm
+                  onSubmit={(data) => createMutation.mutate(data)}
+                  isLoading={createMutation.isPending}
+                  muscleGroupNames={muscleGroupNames}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
 
       {/* Фильтры */}
       <Card>
@@ -153,8 +184,8 @@ export function ExerciseManagement() {
                   <SelectValue placeholder="Группа мышц" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Все группы</SelectItem>
-                  {muscleGroups.map(muscle => (
+                  <SelectItem value="all">Все группы</SelectItem>
+                  {muscleGroupNames.map(muscle => (
                     <SelectItem key={muscle} value={muscle}>{muscle}</SelectItem>
                   ))}
                 </SelectContent>
@@ -281,10 +312,11 @@ export function ExerciseManagement() {
             <DialogTitle>Редактировать упражнение</DialogTitle>
           </DialogHeader>
           {selectedExercise && (
-            <ExerciseForm 
+            <ExerciseForm
               exercise={selectedExercise}
               onSubmit={(data) => updateMutation.mutate({ id: selectedExercise.id, data })}
               isLoading={updateMutation.isPending}
+              muscleGroupNames={muscleGroupNames}
             />
           )}
         </DialogContent>
@@ -298,6 +330,12 @@ export function ExerciseManagement() {
           {selectedExercise && <ExerciseView exercise={selectedExercise} />}
         </DialogContent>
       </Dialog>
+        </TabsContent>
+
+        <TabsContent value="muscle-groups">
+          <MuscleGroupsManagement />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
@@ -306,9 +344,10 @@ interface ExerciseFormProps {
   exercise?: Exercise;
   onSubmit: (data: InsertExercise) => void;
   isLoading: boolean;
+  muscleGroupNames: string[];
 }
 
-function ExerciseForm({ exercise, onSubmit, isLoading }: ExerciseFormProps) {
+function ExerciseForm({ exercise, onSubmit, isLoading, muscleGroupNames }: ExerciseFormProps) {
   const [formData, setFormData] = useState<ExerciseFormData>({
     name: exercise?.name || "",
     primaryMuscles: exercise?.primaryMuscles || [],
@@ -428,7 +467,7 @@ function ExerciseForm({ exercise, onSubmit, isLoading }: ExerciseFormProps) {
       <div className="space-y-2">
         <Label>Основные группы мышц *</Label>
         <div className="flex flex-wrap gap-2">
-          {muscleGroups.map(muscle => (
+          {muscleGroupNames.map(muscle => (
             <Badge
               key={muscle}
               variant={formData.primaryMuscles.includes(muscle) ? "default" : "outline"}
@@ -452,7 +491,7 @@ function ExerciseForm({ exercise, onSubmit, isLoading }: ExerciseFormProps) {
       <div className="space-y-2">
         <Label>Вспомогательные группы мышц</Label>
         <div className="flex flex-wrap gap-2">
-          {muscleGroups.map(muscle => (
+          {muscleGroupNames.map(muscle => (
             <Badge
               key={muscle}
               variant={formData.secondaryMuscles.includes(muscle) ? "secondary" : "outline"}

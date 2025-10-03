@@ -6,9 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
-import { User, Filter, Search, Users, Dumbbell, Calendar, Upload, Edit2, Image } from "lucide-react";
+import { User, Filter, Search, Users, Dumbbell, Calendar, Upload, Edit2, Image, Settings } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { exercisesDb, studentsDb } from "@/lib/database";
+import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,6 +19,8 @@ import { getExercisePhoto } from "@/components/ui/exercise-photos";
 import { ExerciseDetail } from "@/components/exercise/exercise-detail";
 import { StudentsManagement } from "@/components/students/students-management";
 import { WorkoutsManagement } from "@/components/workouts/workouts-management";
+import { MuscleGroupsManagement } from "@/components/exercise/muscle-groups-management";
+import { ExerciseManagement } from "@/components/exercise/exercise-management";
 import { useLocation } from "wouter";
 
 export function ProfileView() {
@@ -27,6 +30,8 @@ export function ProfileView() {
   const [selectedExerciseForDetail, setSelectedExerciseForDetail] = useState<Exercise | null>(null);
   const [showImageUploadDialog, setShowImageUploadDialog] = useState(false);
   const [selectedMuscleForImageUpload, setSelectedMuscleForImageUpload] = useState<string>("");
+  const [showMuscleGroupManagement, setShowMuscleGroupManagement] = useState(false);
+  const [showExerciseManagement, setShowExerciseManagement] = useState(false);
   const [customMuscleImages, setCustomMuscleImages] = useState<Record<string, string>>({});
   const [selectedPupil, setSelectedPupil] = useState<Pupil | null>(null);
   const [selectedDateFromSchedule, setSelectedDateFromSchedule] = useState<string | null>(null);
@@ -39,21 +44,35 @@ export function ProfileView() {
   const [activeTab, setActiveTab] = useState<string>("profile");
   
   const { data: user } = useQuery<UserType>({
-    queryKey: ['user'],
-    queryFn: async () => ({
-      id: 1,
-      firstName: 'Test',
-      lastName: 'User',
-      email: 'test@fittrak.pro',
-      phone: '+7 (999) 123-45-67',
-      birthDate: '1990-01-01',
-      middleName: '',
-    } as UserType),
+    queryKey: ['user', 1],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', 1)
+        .single();
+
+      if (error) throw error;
+      return data as UserType;
+    },
   });
 
   const { data: exercises = [] } = useQuery<Exercise[]>({
     queryKey: ['exercises'],
     queryFn: () => exercisesDb.getAll(),
+  });
+
+  // Load muscle groups from database
+  const { data: muscleGroups = [] } = useQuery<{ id: number; name: string; description: string | null }[]>({
+    queryKey: ['muscleGroups'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('muscle_groups')
+        .select('id, name, description')
+        .order('display_order', { ascending: true });
+      if (error) throw error;
+      return data || [];
+    },
   });
 
   // Form schema for user profile editing
@@ -97,8 +116,22 @@ export function ProfileView() {
   // Mutation for updating user profile
   const updateUserMutation = useMutation({
     mutationFn: async (data: UserProfileForm) => {
-      // For now, just return success (no user table in Supabase yet)
-      return Promise.resolve(data);
+      const { data: updated, error } = await supabase
+        .from('users')
+        .update({
+          first_name: data.firstName,
+          last_name: data.lastName,
+          middle_name: data.middleName || null,
+          birth_date: data.birthDate,
+          email: data.email,
+          phone: data.phone,
+        })
+        .eq('id', 1)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return updated;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
@@ -259,6 +292,21 @@ export function ProfileView() {
     return customMuscleImages[muscleGroup] || null;
   };
 
+  // Get gradient color for muscle group
+  const getMuscleGroupGradient = (index: number) => {
+    const gradients = [
+      'from-red-400 to-red-600',      // грудь
+      'from-blue-400 to-blue-600',    // спина
+      'from-green-400 to-green-600',  // ноги
+      'from-purple-400 to-purple-600', // руки
+      'from-yellow-400 to-yellow-600', // плечи
+      'from-pink-400 to-pink-600',    // ягодичные
+      'from-orange-400 to-orange-600', // живот
+      'from-indigo-400 to-indigo-600', // кардио
+    ];
+    return gradients[index % gradients.length];
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
@@ -412,27 +460,45 @@ export function ProfileView() {
         <TabsContent value="exercises" className="space-y-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold text-gray-800">Группы мышц</h2>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowExerciseManagement(true)}
+                className="flex items-center gap-2"
+              >
+                <Dumbbell className="h-4 w-4" />
+                Управление упражнениями
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setShowMuscleGroupManagement(true)}
+                className="flex items-center gap-2"
+              >
+                <Settings className="h-4 w-4" />
+                Управление группами
+              </Button>
+            </div>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {/* Грудь */}
-            <Card 
-              className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'грудь' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
-              onClick={() => handleMuscleGroupClick('грудь')}
+            {muscleGroups.map((muscleGroup, index) => (
+              <Card
+                key={muscleGroup.id}
+                className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === muscleGroup.name ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
+                onClick={() => handleMuscleGroupClick(muscleGroup.name)}
             >
               <CardContent className="p-3">
                 <div className="relative overflow-hidden rounded-lg">
-                  {/* Верхняя часть с изображением */}
                   <div className="relative h-32 overflow-hidden rounded-lg">
-                    {getMuscleGroupImage('грудь') ? (
-                      <img 
-                        src={getMuscleGroupImage('грудь')!} 
-                        alt="Грудь" 
+                    {getMuscleGroupImage(muscleGroup.name) ? (
+                      <img
+                        src={getMuscleGroupImage(muscleGroup.name)!}
+                        alt={muscleGroup.name}
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
+                      <div className={`w-full h-full bg-gradient-to-br ${getMuscleGroupGradient(index)} flex items-center justify-center`}>
                         <div className="w-16 h-16 text-white">
-                          {getExercisePhoto('грудь', 'w-16 h-16')}
+                          {getExercisePhoto(muscleGroup.name, 'w-16 h-16')}
                         </div>
                       </div>
                     )}
@@ -440,277 +506,18 @@ export function ProfileView() {
                       variant="secondary"
                       size="sm"
                       className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
-                      onClick={(e) => handleImageUpload('грудь', e)}
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  {/* Нижняя часть с текстом */}
-                  <div className="p-3 bg-white text-center">
-                    <div className="text-lg font-semibold text-gray-800 uppercase">ГРУДЬ</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Спина */}
-            <Card 
-              className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'спина' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
-              onClick={() => handleMuscleGroupClick('спина')}
-            >
-              <CardContent className="p-3">
-                <div className="relative overflow-hidden rounded-lg">
-                  <div className="relative h-32 overflow-hidden rounded-lg">
-                    {getMuscleGroupImage('спина') ? (
-                      <img 
-                        src={getMuscleGroupImage('спина')!} 
-                        alt="Спина" 
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                        <div className="w-16 h-16 text-white">
-                          {getExercisePhoto('спина', 'w-16 h-16')}
-                        </div>
-                      </div>
-                    )}
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
-                      onClick={(e) => handleImageUpload('спина', e)}
+                      onClick={(e) => handleImageUpload(muscleGroup.name, e)}
                     >
                       <Edit2 className="h-4 w-4" />
                     </Button>
                   </div>
                   <div className="p-3 bg-white text-center">
-                    <div className="text-lg font-semibold text-gray-800 uppercase">СПИНА</div>
+                    <div className="text-lg font-semibold text-gray-800 uppercase">{muscleGroup.name}</div>
                   </div>
                 </div>
               </CardContent>
             </Card>
-
-            {/* Ноги */}
-            <Card 
-              className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'ноги' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
-              onClick={() => handleMuscleGroupClick('ноги')}
-            >
-              <CardContent className="p-3">
-                <div className="relative overflow-hidden rounded-lg">
-                  <div className="relative h-32 overflow-hidden rounded-lg">
-                    {getMuscleGroupImage('ноги') ? (
-                      <img 
-                        src={getMuscleGroupImage('ноги')!} 
-                        alt="Ноги" 
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
-                        <div className="w-16 h-16 text-white">
-                          {getExercisePhoto('ноги', 'w-16 h-16')}
-                        </div>
-                      </div>
-                    )}
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
-                      onClick={(e) => handleImageUpload('ноги', e)}
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="p-3 bg-white text-center">
-                    <div className="text-lg font-semibold text-gray-800 uppercase">НОГИ</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Руки */}
-            <Card 
-              className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'руки' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
-              onClick={() => handleMuscleGroupClick('руки')}
-            >
-              <CardContent className="p-3">
-                <div className="relative overflow-hidden rounded-lg">
-                  <div className="relative h-32 overflow-hidden rounded-lg">
-                    {getMuscleGroupImage('руки') ? (
-                      <img 
-                        src={getMuscleGroupImage('руки')!} 
-                        alt="Руки" 
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center rounded-lg">
-                        <div className="w-16 h-16 text-white">
-                          {getExercisePhoto('руки', 'w-16 h-16')}
-                        </div>
-                      </div>
-                    )}
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
-                      onClick={(e) => handleImageUpload('руки', e)}
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="p-3 bg-white text-center">
-                    <div className="text-lg font-semibold text-gray-800 uppercase">РУКИ</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Плечи */}
-            <Card 
-              className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'плечи' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
-              onClick={() => handleMuscleGroupClick('плечи')}
-            >
-              <CardContent className="p-3">
-                <div className="relative overflow-hidden rounded-lg">
-                  <div className="relative h-32 overflow-hidden rounded-lg">
-                    {getMuscleGroupImage('плечи') ? (
-                      <img 
-                        src={getMuscleGroupImage('плечи')!} 
-                        alt="Плечи" 
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
-                        <div className="w-16 h-16 text-white">
-                          {getExercisePhoto('плечи', 'w-16 h-16')}
-                        </div>
-                      </div>
-                    )}
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
-                      onClick={(e) => handleImageUpload('плечи', e)}
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="p-3 bg-white text-center">
-                    <div className="text-lg font-semibold text-gray-800 uppercase">ПЛЕЧИ</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Ягодичные */}
-            <Card 
-              className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'ягодичные' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
-              onClick={() => handleMuscleGroupClick('ягодичные')}
-            >
-              <CardContent className="p-3">
-                <div className="relative overflow-hidden rounded-lg">
-                  <div className="relative h-32 overflow-hidden rounded-lg">
-                    {getMuscleGroupImage('ягодичные') ? (
-                      <img 
-                        src={getMuscleGroupImage('ягодичные')!} 
-                        alt="Ягодичные" 
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center">
-                        <div className="w-16 h-16 text-white">
-                          {getExercisePhoto('ягодичные', 'w-16 h-16')}
-                        </div>
-                      </div>
-                    )}
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
-                      onClick={(e) => handleImageUpload('ягодичные', e)}
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="p-3 bg-white text-center">
-                    <div className="text-lg font-semibold text-gray-800 uppercase">ЯГОДИЧНЫЕ</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Живот */}
-            <Card 
-              className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'живот' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
-              onClick={() => handleMuscleGroupClick('живот')}
-            >
-              <CardContent className="p-3">
-                <div className="relative overflow-hidden rounded-lg">
-                  <div className="relative h-32 overflow-hidden rounded-lg">
-                    {getMuscleGroupImage('живот') ? (
-                      <img 
-                        src={getMuscleGroupImage('живот')!} 
-                        alt="Живот" 
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
-                        <div className="w-16 h-16 text-white">
-                          {getExercisePhoto('живот', 'w-16 h-16')}
-                        </div>
-                      </div>
-                    )}
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
-                      onClick={(e) => handleImageUpload('живот', e)}
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="p-3 bg-white text-center">
-                    <div className="text-lg font-semibold text-gray-800 uppercase">ЖИВОТ</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Кардио */}
-            <Card 
-              className={`group cursor-pointer hover:shadow-lg transition-all duration-300 border-2 ${selectedMuscleGroup === 'кардио' ? 'border-orange-500 bg-orange-50' : 'border-transparent hover:border-orange-200'}`}
-              onClick={() => handleMuscleGroupClick('кардио')}
-            >
-              <CardContent className="p-3">
-                <div className="relative overflow-hidden rounded-lg">
-                  <div className="relative h-32 overflow-hidden rounded-lg">
-                    {getMuscleGroupImage('кардио') ? (
-                      <img 
-                        src={getMuscleGroupImage('кардио')!} 
-                        alt="Кардио" 
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center">
-                        <div className="w-16 h-16 text-white">
-                          {getExercisePhoto('кардио', 'w-16 h-16')}
-                        </div>
-                      </div>
-                    )}
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
-                      onClick={(e) => handleImageUpload('кардио', e)}
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="p-3 bg-white text-center">
-                    <div className="text-lg font-semibold text-gray-800 uppercase">КАРДИО</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            ))}
           </div>
 
           {/* Панель выбора упражнений */}
@@ -834,6 +641,32 @@ export function ProfileView() {
               className="hidden"
             />
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Muscle Groups Management Dialog */}
+      <Dialog open={showMuscleGroupManagement} onOpenChange={setShowMuscleGroupManagement}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Управление группами мышц</DialogTitle>
+            <DialogDescription>
+              Добавляйте, редактируйте и удаляйте группы мышц
+            </DialogDescription>
+          </DialogHeader>
+          <MuscleGroupsManagement />
+        </DialogContent>
+      </Dialog>
+
+      {/* Exercise Management Dialog */}
+      <Dialog open={showExerciseManagement} onOpenChange={setShowExerciseManagement}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Управление упражнениями</DialogTitle>
+            <DialogDescription>
+              Добавляйте, редактируйте и удаляйте упражнения для каждой группы мышц
+            </DialogDescription>
+          </DialogHeader>
+          <ExerciseManagement />
         </DialogContent>
       </Dialog>
     </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronLeft, ChevronRight, Clock, Plus, Check, Trash2, Users, Search, AlertCircle, UserPlus, Dumbbell } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { studentsDb } from "@/lib/database";
+import { supabase } from "@/lib/supabase";
 import type { Pupil } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
@@ -44,18 +45,6 @@ export function NewSchedule() {
     phone: '',
     email: ''
   });
-  const [sessions, setSessions] = useState<ScheduleSession[]>([]);
-
-  // Загружаем сессии из localStorage при инициализации
-  useEffect(() => {
-    const savedSessions = JSON.parse(localStorage.getItem('schedule_sessions') || '[]');
-    setSessions(savedSessions);
-  }, []);
-
-  // Синхронизируем изменения сессий с localStorage
-  useEffect(() => {
-    localStorage.setItem('schedule_sessions', JSON.stringify(sessions));
-  }, [sessions]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ sessionId: number; pupilId: number } | null>(null);
   const queryClient = useQueryClient();
@@ -63,15 +52,67 @@ export function NewSchedule() {
   const { isWorkoutActive, getWorkoutProgramName } = useActiveWorkout();
   const [, setLocation] = useLocation();
 
-  // Загружаем учеников
+  // Load students
   const { data: pupils = [] } = useQuery<Pupil[]>({
     queryKey: ['students'],
-    queryFn: () => studentsDb.getAll(),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('students')
+        .select('*')
+        .eq('trainer_id', 1);
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Load appointments from Supabase
+  const { data: appointments = [] } = useQuery({
+    queryKey: ['appointments'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('appointments')
+        .select('*')
+        .eq('trainer_id', 1)
+        .order('date', { ascending: true })
+        .order('time', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Transform appointments to sessions format for UI
+  const sessions: ScheduleSession[] = appointments.map(apt => {
+    const pupil = pupils.find(p => p.id === apt.pupil_id);
+    return {
+      id: apt.id,
+      time: apt.time,
+      date: apt.date,
+      pupils: pupil ? [pupil] : [],
+      status: apt.status as 'confirmed' | 'pending'
+    };
   });
 
   // Мутация для создания нового ученика
   const createPupilMutation = useMutation({
-    mutationFn: (data: any) => studentsDb.create(data),
+    mutationFn: async (data: any) => {
+      const { data: newStudent, error } = await supabase
+        .from('students')
+        .insert({
+          trainer_id: data.trainerId,
+          first_name: data.firstName,
+          last_name: data.lastName,
+          phone: data.phone,
+          email: data.email,
+          birth_date: data.birthDate,
+          join_date: data.joinDate,
+          status: data.status
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return newStudent;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['students'] });
       setShowAddPupilForm(false);
@@ -80,6 +121,65 @@ export function NewSchedule() {
         title: "Успешно",
         description: "Ученик добавлен",
       });
+    },
+  });
+
+  // Appointment mutations
+  const createAppointmentMutation = useMutation({
+    mutationFn: async (data: { pupilId: number; date: string; time: string; status: string }) => {
+      const { data: appointment, error } = await supabase
+        .from('appointments')
+        .insert({
+          trainer_id: 1,
+          pupil_id: data.pupilId,
+          date: data.date,
+          time: data.time,
+          status: data.status
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return appointment;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      toast({
+        title: "Успешно",
+        description: "Занятие создано",
+      });
+    },
+  });
+
+  const deleteAppointmentMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const { error } = await supabase
+        .from('appointments')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      toast({
+        title: "Успешно",
+        description: "Занятие удалено",
+      });
+    },
+  });
+
+  const updateAppointmentMutation = useMutation({
+    mutationFn: async (data: { id: number; status?: string }) => {
+      const { error } = await supabase
+        .from('appointments')
+        .update({ status: data.status })
+        .eq('id', data.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
     },
   });
 
@@ -197,30 +297,16 @@ export function NewSchedule() {
     const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
     const day = String(selectedDate.getDate()).padStart(2, '0');
     const dateString = `${year}-${month}-${day}`;
-    
-    const existingSession = getSessionForTime(selectedTime);
-    const newPupils = pupils.filter(p => selectedPupils.includes(p.id));
 
-    if (existingSession) {
-      // Добавляем к существующей сессии
-      const updatedSession = {
-        ...existingSession,
-        pupils: [...existingSession.pupils, ...newPupils]
-      };
-      setSessions(prev => prev.map(s => 
-        s.id === existingSession.id ? updatedSession : s
-      ));
-    } else {
-      // Создаем новую сессию
-      const newSession: ScheduleSession = {
-        id: Date.now(),
-        time: selectedTime,
+    // Create appointment for each selected pupil
+    selectedPupils.forEach(pupilId => {
+      createAppointmentMutation.mutate({
+        pupilId,
         date: dateString,
-        pupils: newPupils,
+        time: selectedTime,
         status: 'pending'
-      };
-      setSessions(prev => [...prev, newSession]);
-    }
+      });
+    });
 
     setShowAddDialog(false);
     setSelectedPupils([]);
@@ -247,12 +333,13 @@ export function NewSchedule() {
   };
 
   const handleToggleSessionStatus = (sessionId: number) => {
-    setSessions(prev => prev.map(s => 
-      s.id === sessionId ? { 
-        ...s, 
-        status: s.status === 'confirmed' ? 'pending' : 'confirmed' 
-      } : s
-    ));
+    const session = appointments.find(s => s.id === sessionId);
+    if (!session) return;
+
+    updateAppointmentMutation.mutate({
+      id: sessionId,
+      status: session.status === 'confirmed' ? 'pending' : 'confirmed'
+    });
   };
 
   const handleDeleteClick = (sessionId: number, pupilId: number) => {
@@ -262,40 +349,31 @@ export function NewSchedule() {
 
   const handleDeleteOneSession = () => {
     if (!deleteTarget) return;
-    
-    setSessions(prev => prev.map(s => {
-      if (s.id === deleteTarget.sessionId) {
-        const updatedPupils = s.pupils.filter(p => p.id !== deleteTarget.pupilId);
-        if (updatedPupils.length === 0) {
-          return null; // Удаляем сессию если учеников не осталось
-        }
-        return { ...s, pupils: updatedPupils };
+
+    deleteAppointmentMutation.mutate(deleteTarget.sessionId, {
+      onSuccess: () => {
+        setShowDeleteDialog(false);
+        setDeleteTarget(null);
       }
-      return s;
-    }).filter(Boolean) as ScheduleSession[]);
-    
-    setShowDeleteDialog(false);
-    setDeleteTarget(null);
+    });
   };
 
   const handleDeleteTrainingPlan = () => {
     if (!deleteTarget) return;
-    
-    // Удаляем ученика из всех сессий (весь тренировочный план)
-    setSessions(prev => prev.map(s => {
-      const updatedPupils = s.pupils.filter(p => p.id !== deleteTarget.pupilId);
-      if (updatedPupils.length === 0) {
-        return null; // Удаляем сессию если учеников не осталось
-      }
-      return { ...s, pupils: updatedPupils };
-    }).filter(Boolean) as ScheduleSession[]);
-    
-    setShowDeleteDialog(false);
-    setDeleteTarget(null);
-    
-    toast({
-      title: "Успешно",
-      description: "Тренировочный план удален",
+
+    // Удаляем все сессии этого ученика
+    const sessionsToDelete = appointments.filter(s => s.pupil_id === deleteTarget.pupilId);
+
+    Promise.all(
+      sessionsToDelete.map(s => deleteAppointmentMutation.mutateAsync(s.id))
+    ).then(() => {
+      setShowDeleteDialog(false);
+      setDeleteTarget(null);
+
+      toast({
+        title: "Успешно",
+        description: "Тренировочный план удален",
+      });
     });
   };
 
