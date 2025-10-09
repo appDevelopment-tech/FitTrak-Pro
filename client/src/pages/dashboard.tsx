@@ -9,16 +9,23 @@ import { CalendarView } from "@/components/schedule/calendar-view";
 import { TodaySchedule } from "@/components/schedule/today-schedule";
 import { ProfileView } from "@/components/profile/profile-view";
 import { NewSchedule } from "@/components/schedule/new-schedule";
+import { BookingWidget } from "@/components/schedule/booking-widget";
 import { StudentsManagement } from "@/components/students/students-management";
-import { Plus, BarChart3, Search, Flame, Trash2, Users, LogOut } from "lucide-react";
+import { Plus, BarChart3, Search, Flame, Trash2, Users, LogOut, Bell, BellRing } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { useNotifications } from "@/hooks/use-notifications";
+import { useReminders } from "@/hooks/use-reminders";
+import { NotificationsPanel } from "@/components/ui/notifications-panel";
+import { PWAInstallBanner, OfflineIndicator } from "@/components/ui/pwa-install-banner";
+import { PageTransition } from "@/components/ui/page-transitions";
 import type { DashboardStats } from "@/lib/types";
 import type { WorkoutSession, WorkoutProgram, User } from "@shared/schema";
 
 export default function Dashboard() {
   const [activeView, setActiveView] = useState('schedule');
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [location] = useLocation();
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [location, setLocation] = useLocation();
 
   // Обработка URL при загрузке страницы
   useEffect(() => {
@@ -47,6 +54,9 @@ export default function Dashboard() {
   };
 
   const { user, signOut } = useAuth();
+  const isTrainer = Boolean(user?.user_metadata?.is_trainer);
+  const { unreadCount } = useNotifications();
+  const { getTodayAppointments, getTomorrowAppointments } = useReminders();
 
   const handleStartWorkout = (sessionId: number) => {
     // Handle workout start logic
@@ -74,7 +84,7 @@ export default function Dashboard() {
   const renderContent = () => {
     switch (activeView) {
       case 'schedule':
-        return <NewSchedule />;
+        return isTrainer ? <NewSchedule /> : <BookingWidget />;
       case 'profile':
         return <ProfileView />;
       case 'students':
@@ -106,69 +116,117 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+    <div className="min-h-screen animated-bg">
+      {/* Neon Header */}
+      <header className="glass-effect border-b border-border/20 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-8">
-              <div className="flex items-center">
-                <BarChart3 className="h-8 w-8 text-blue-600" />
-                <span className="ml-2 text-xl font-bold text-gray-900">FitTrak Pro</span>
+              <div className="flex items-center group">
+                <div className="relative">
+                  <BarChart3 className="h-8 w-8 text-gradient neon-text" />
+                  <div className="absolute inset-0 blur-xl opacity-50 group-hover:opacity-75 transition-opacity">
+                    <BarChart3 className="h-8 w-8 text-gradient" />
+                  </div>
+                </div>
+                <span className="ml-3 text-xl font-black text-gradient neon-text" style={{ fontFamily: 'Space Grotesk' }}>
+                  FitTrak Pro
+                </span>
               </div>
             </div>
 
             {/* User Profile */}
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <img
-                  src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=80&h=80"
-                  alt="User Profile"
-                  className="h-8 w-8 rounded-full"
-                />
-                <span className="text-sm font-medium text-gray-700">
+              <div className="flex items-center space-x-3 glass-effect px-4 py-2 rounded-full border border-border/20">
+                <div className="relative">
+                  <img
+                    src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=80&h=80"
+                    alt="User Profile"
+                    className="h-8 w-8 rounded-full border-2 border-primary/50"
+                  />
+                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-success rounded-full border-2 border-background"></div>
+                </div>
+                <span className="text-sm font-medium text-foreground">
                   {user?.email || 'User'}
                 </span>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => signOut()}>
+              
+              {/* Notifications Button */}
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setShowNotifications(true)}
+                className="relative text-muted-foreground hover:text-foreground hover:bg-accent/20 transition-all duration-300"
+              >
+                {unreadCount > 0 ? (
+                  <BellRing className="h-4 w-4" />
+                ) : (
+                  <Bell className="h-4 w-4" />
+                )}
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </Button>
+              
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={async () => { await signOut(); setLocation('/'); }}
+                className="text-muted-foreground hover:text-foreground hover:bg-accent/20 transition-all duration-300"
+              >
                 <LogOut className="h-4 w-4" />
               </Button>
             </div>
           </div>
 
-          {/* Navigation Menu */}
-          <div className="border-t border-gray-200">
-            <nav className="flex space-x-8 px-0 py-0">
-              <button
-                onClick={() => setActiveView('schedule')}
-                className={`${
-                  activeView === 'schedule'
-                    ? 'border-blue-500 text-blue-600 bg-blue-50'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'
-                } whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm transition-colors`}
-              >
-                Расписание
-              </button>
+          {/* Neon Navigation */}
+          <nav className="flex space-x-2">
+            <button
+              onClick={() => setActiveView('schedule')}
+              className={`${
+                activeView === 'schedule'
+                  ? 'neon-button text-primary-foreground px-6 py-2 rounded-full'
+                  : 'text-muted-foreground hover:text-foreground px-6 py-2 rounded-full hover:bg-accent/20 transition-all duration-300'
+              } font-medium text-sm`}
+            >
+              Расписание
+            </button>
 
-              <button
-                onClick={() => setActiveView('profile')}
-                className={`${
-                  activeView === 'profile'
-                    ? 'border-blue-500 text-blue-600 bg-blue-50'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'
-                } whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm transition-colors`}
-              >
-                Кабинет
-              </button>
-            </nav>
-          </div>
+            <button
+              onClick={() => setActiveView('profile')}
+              className={`${
+                activeView === 'profile'
+                  ? 'neon-button text-primary-foreground px-6 py-2 rounded-full'
+                  : 'text-muted-foreground hover:text-foreground px-6 py-2 rounded-full hover:bg-accent/20 transition-all duration-300'
+              } font-medium text-sm`}
+            >
+              Кабинет
+            </button>
+          </nav>
         </div>
-      </div>
+      </header>
 
       {/* Main Content Area */}
-      <main className="flex-1">
-        {renderContent()}
+      <main className="flex-1 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background/80 pointer-events-none"></div>
+        <div className="relative z-10">
+          <PageTransition>
+            {renderContent()}
+          </PageTransition>
+        </div>
       </main>
+
+      {/* Notifications Panel */}
+      <NotificationsPanel 
+        isOpen={showNotifications} 
+        onClose={() => setShowNotifications(false)} 
+      />
+
+      {/* PWA Components */}
+      <PWAInstallBanner />
+      <OfflineIndicator />
     </div>
   );
 }

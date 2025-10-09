@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -191,10 +191,10 @@ export function ComprehensiveStudentsManagement() {
     }
   });
 
-  // Получаем список учеников
+  // Получаем список учеников текущего тренера
   const { data: pupils = [], isLoading } = useQuery<Pupil[]>({
-    queryKey: ['students'],
-    queryFn: () => studentsDb.getAll(),
+    queryKey: ['students', trainerId],
+    queryFn: () => studentsDb.getByTrainerId(trainerId),
   });
 
   // Получаем упражнения для создания кастомных тренировок
@@ -280,7 +280,7 @@ export function ComprehensiveStudentsManagement() {
       addActiveWorkout(trainerId, selectedPupilForWorkout, workoutProgram);
 
       // Invalidate relevant queries to refresh UI
-      queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/pupils'] });
+      queryClient.invalidateQueries({ queryKey: ['students', trainerId] });
 
       toast({
         title: "План прикреплен!",
@@ -343,7 +343,7 @@ export function ComprehensiveStudentsManagement() {
       addActiveWorkout(trainerId, selectedPupilForWorkout, workoutProgram);
 
       // Invalidate relevant queries to refresh UI
-      queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/pupils'] });
+      queryClient.invalidateQueries({ queryKey: ['students', trainerId] });
 
       toast({
         title: "Тренировка создана!",
@@ -376,7 +376,7 @@ export function ComprehensiveStudentsManagement() {
   };
 
   // Группировка упражнений по группам мышц
-  const muscleGroups = React.useMemo(() => {
+  const muscleGroups = useMemo(() => {
     const groups: { [key: string]: Exercise[] } = {};
     
     exercises.forEach(exercise => {
@@ -394,17 +394,17 @@ export function ComprehensiveStudentsManagement() {
   }, [exercises]);
 
   // Функции для работы с упражнениями
-  const handleOpenExerciseSelector = () => {
+  const handleOpenExerciseSelector = useCallback(() => {
     setSelectedMuscleGroup('');
     setSelectedExercises([]);
     setShowExerciseSelector(true);
-  };
+  }, []);
 
-  const handleSelectMuscleGroup = (groupName: string) => {
+  const handleSelectMuscleGroup = useCallback((groupName: string) => {
     setSelectedMuscleGroup(groupName);
-  };
+  }, []);
 
-  const handleToggleExercise = (exerciseName: string) => {
+  const handleToggleExercise = useCallback((exerciseName: string) => {
     setSelectedExercises(prev => {
       if (prev.includes(exerciseName)) {
         return prev.filter(e => e !== exerciseName);
@@ -412,7 +412,7 @@ export function ComprehensiveStudentsManagement() {
         return [...prev, exerciseName];
       }
     });
-  };
+  }, []);
 
   const handleAddSelectedExercises = () => {
     if (selectedExercises.length === 0) return;
@@ -438,12 +438,14 @@ export function ComprehensiveStudentsManagement() {
   };
 
   // Фильтрация учеников по поисковому запросу
-  const filteredPupils = pupilsWithAge
-    .filter(pupil =>
-      `${pupil.firstName} ${pupil.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      pupil.phone.includes(searchTerm)
-    )
-    .sort((a, b) => (a.lastName || '').localeCompare(b.lastName || '', 'ru'));
+  const filteredPupils = useMemo(() => {
+    return pupilsWithAge
+      .filter(pupil =>
+        `${pupil.firstName} ${pupil.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        pupil.phone.includes(searchTerm)
+      )
+      .sort((a, b) => (a.lastName || '').localeCompare(b.lastName || '', 'ru'));
+  }, [pupilsWithAge, searchTerm]);
 
   // Мутация для создания ученика
   const createPupilMutation = useMutation({
@@ -451,7 +453,7 @@ export function ComprehensiveStudentsManagement() {
       return await studentsDb.create(newPupil);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['students'] });
+      queryClient.invalidateQueries({ queryKey: ['students', trainerId] });
       queryClient.invalidateQueries({ queryKey: ['pupils-stats'] });
       setShowAddDialog(false);
       toast({
@@ -474,7 +476,7 @@ export function ComprehensiveStudentsManagement() {
       return await studentsDb.update(id, updates);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['students'] });
+      queryClient.invalidateQueries({ queryKey: ['students', trainerId] });
       setShowEditDialog(false);
       setSelectedPupil(null);
       toast({
@@ -759,7 +761,17 @@ export function ComprehensiveStudentsManagement() {
                   
                   <Button 
                     variant="outline" 
-                    onClick={() => setShowEditDialog(true)}
+                    onClick={() => {
+                      if (selectedPupil) {
+                        setShowEditDialog(true);
+                      } else {
+                        toast({
+                          title: "Ошибка",
+                          description: "Ученик не выбран",
+                          variant: "destructive",
+                        });
+                      }
+                    }}
                   >
                     <Edit className="h-4 w-4 mr-2" />
                     Редактировать
@@ -860,8 +872,8 @@ export function ComprehensiveStudentsManagement() {
                                     // Удаляем из локального состояния activeWorkouts
                                     removeActiveWorkout(workout.trainerId, workout.pupilId);
                                     
-                                    // Invalidate relevant queries to refresh UI
-                                    queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/pupils'] });
+      // Invalidate relevant queries to refresh UI
+      queryClient.invalidateQueries({ queryKey: ['students', trainerId] });
                                     
                                     toast({
                                       title: "План удален",
@@ -1499,8 +1511,8 @@ export function ComprehensiveStudentsManagement() {
                       removeActiveWorkout(trainerId, selectedPupilForWorkout.id);
                       setShowActiveWorkoutDialog(false);
                       
-                      // Invalidate relevant queries to refresh UI
-                      queryClient.invalidateQueries({ queryKey: ['/api/trainers/1/pupils'] });
+      // Invalidate relevant queries to refresh UI
+      queryClient.invalidateQueries({ queryKey: ['students', trainerId] });
                       
                       toast({
                         title: "План удален",
@@ -2018,7 +2030,7 @@ export function ComprehensiveStudentsManagement() {
       </Dialog>
 
       {/* Edit Student Dialog */}
-      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+      <Dialog open={showEditDialog && !!selectedPupil} onOpenChange={setShowEditDialog}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">

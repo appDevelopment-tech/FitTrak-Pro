@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,9 +18,11 @@ import type { User as UserType, Exercise, Pupil } from "@shared/schema";
 import { getExercisePhoto } from "@/components/ui/exercise-photos";
 import { ExerciseDetail } from "@/components/exercise/exercise-detail";
 import { StudentsManagement } from "@/components/students/students-management";
-import { WorkoutsManagement } from "@/components/workouts/workouts-management";
-import { MuscleGroupsManagement } from "@/components/exercise/muscle-groups-management";
-import { ExerciseManagement } from "@/components/exercise/exercise-management";
+import { 
+  LazyWorkoutsManagement, 
+  LazyExerciseManagement, 
+  LazyMuscleGroupsManagement 
+} from "@/components/ui/lazy-component";
 import { useLocation } from "wouter";
 
 export function ProfileView() {
@@ -150,10 +152,12 @@ export function ProfileView() {
     },
   });
 
+  const trainerId = 1; // В реальном приложении это будет из контекста пользователя
+
   // Загружаем учеников для поиска выбранного ученика из URL
   const { data: pupils = [] } = useQuery<Pupil[]>({
-    queryKey: ['students'],
-    queryFn: () => studentsDb.getAll(),
+    queryKey: ['students', trainerId],
+    queryFn: () => studentsDb.getByTrainerId(trainerId),
   });
 
   // Обработка URL параметров
@@ -213,28 +217,30 @@ export function ProfileView() {
   });
 
   // Фильтрация и сортировка упражнений
-  const filteredExercises = exercises
-    .filter(exercise => {
-      const matchesMuscleGroup = !selectedMuscleGroup || exercise.primaryMuscles.includes(selectedMuscleGroup);
-      const matchesSearch = !searchTerm || exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesMuscleGroup && matchesSearch;
-    })
-    .sort((a, b) => {
-      // Определяем порядок сложности
-      const difficultyOrder = {
-        'легкий': 1,
-        'начинающий': 1,
-        'средний': 2,
-        'продвинутый': 3
-      };
-      
-      const aDifficulty = difficultyOrder[a.difficulty as keyof typeof difficultyOrder] || 2;
-      const bDifficulty = difficultyOrder[b.difficulty as keyof typeof difficultyOrder] || 2;
-      
-      return aDifficulty - bDifficulty;
-    });
+  const filteredExercises = useMemo(() => {
+    return exercises
+      .filter(exercise => {
+        const matchesMuscleGroup = !selectedMuscleGroup || exercise.primaryMuscles.includes(selectedMuscleGroup);
+        const matchesSearch = !searchTerm || exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
+        return matchesMuscleGroup && matchesSearch;
+      })
+      .sort((a, b) => {
+        // Определяем порядок сложности
+        const difficultyOrder = {
+          'легкий': 1,
+          'начинающий': 1,
+          'средний': 2,
+          'продвинутый': 3
+        };
+        
+        const aDifficulty = difficultyOrder[a.difficulty as keyof typeof difficultyOrder] || 2;
+        const bDifficulty = difficultyOrder[b.difficulty as keyof typeof difficultyOrder] || 2;
+        
+        return aDifficulty - bDifficulty;
+      });
+  }, [exercises, selectedMuscleGroup, searchTerm]);
 
-  const handleMuscleGroupClick = (muscleGroup: string) => {
+  const handleMuscleGroupClick = useCallback((muscleGroup: string) => {
     setSelectedMuscleGroup(muscleGroup);
     
     // Прокрутка к панели упражнений через небольшую задержку
@@ -247,13 +253,13 @@ export function ProfileView() {
         });
       }
     }, 100);
-  };
+  }, []);
 
-  const handleImageUpload = (muscleGroup: string, event: React.MouseEvent) => {
+  const handleImageUpload = useCallback((muscleGroup: string, event: React.MouseEvent) => {
     event.stopPropagation();
     setSelectedMuscleForImageUpload(muscleGroup);
     setShowImageUploadDialog(true);
-  };
+  }, []);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -454,7 +460,7 @@ export function ProfileView() {
         </TabsContent>
 
         <TabsContent value="programs">
-          <WorkoutsManagement activeTab={activeTab} />
+          <LazyWorkoutsManagement activeTab={activeTab} />
         </TabsContent>
 
         <TabsContent value="exercises" className="space-y-6">
@@ -653,7 +659,7 @@ export function ProfileView() {
               Добавляйте, редактируйте и удаляйте группы мышц
             </DialogDescription>
           </DialogHeader>
-          <MuscleGroupsManagement />
+          <LazyMuscleGroupsManagement />
         </DialogContent>
       </Dialog>
 
@@ -666,7 +672,7 @@ export function ProfileView() {
               Добавляйте, редактируйте и удаляйте упражнения для каждой группы мышц
             </DialogDescription>
           </DialogHeader>
-          <ExerciseManagement />
+          <LazyExerciseManagement />
         </DialogContent>
       </Dialog>
     </div>

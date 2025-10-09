@@ -5,7 +5,8 @@ import type {
   WorkoutProgram, InsertWorkoutProgram,
   PupilTrainingPlan, InsertPupilTrainingPlan,
   PupilWorkoutHistory, InsertPupilWorkoutHistory,
-  ActiveWorkout, InsertActiveWorkout
+  ActiveWorkout, InsertActiveWorkout,
+  Appointment, InsertAppointment
 } from '@shared/schema';
 
 // Helper to convert camelCase to snake_case for database inserts
@@ -322,6 +323,95 @@ export const activeWorkoutsDb = {
   async delete(id: number) {
     const { error } = await supabase
       .from('active_workouts')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+  },
+};
+
+// Appointments
+export const appointmentsDb = {
+  async getAll() {
+    const { data, error } = await supabase
+      .from('appointments')
+      .select(`
+        *,
+        students:pupil_id (
+          id,
+          first_name,
+          last_name,
+          email,
+          phone
+        )
+      `)
+      .order('date', { ascending: true })
+      .order('time', { ascending: true });
+    if (error) throw error;
+    return (data || []).map(toCamelCase) as Appointment[];
+  },
+
+  async getByTrainerId(trainerId: number) {
+    const { data, error } = await supabase
+      .from('appointments')
+      .select(`
+        *,
+        students:pupil_id (
+          id,
+          first_name,
+          last_name,
+          email,
+          phone
+        )
+      `)
+      .eq('trainer_id', trainerId)
+      .order('date', { ascending: true })
+      .order('time', { ascending: true });
+    if (error) throw error;
+    return (data || []).map(toCamelCase) as Appointment[];
+  },
+
+  async create(appointment: InsertAppointment) {
+    const { data, error } = await supabase
+      .from('appointments')
+      .insert(toSnakeCase(appointment))
+      .select(`
+        *,
+        students:pupil_id (
+          id,
+          first_name,
+          last_name,
+          email,
+          phone
+        )
+      `)
+      .single();
+    if (error) throw error;
+    return toCamelCase(data) as Appointment;
+  },
+
+  async update(id: number, appointment: Partial<InsertAppointment>) {
+    const { data, error } = await supabase
+      .from('appointments')
+      .update(toSnakeCase(appointment))
+      .eq('id', id)
+      .select(`
+        *,
+        students:pupil_id (
+          id,
+          first_name,
+          last_name,
+          email,
+          phone
+        )
+      `)
+      .single();
+    if (error) throw error;
+    return toCamelCase(data) as Appointment;
+  },
+
+  async delete(id: number) {
+    const { error } = await supabase
+      .from('appointments')
       .delete()
       .eq('id', id);
     if (error) throw error;

@@ -43,7 +43,7 @@ interface CalendarDay {
 export function TrainerSchedule() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [viewMode, setViewMode] = useState<'day' | 'month'>('day');
+  const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('day');
   const [activeTab, setActiveTab] = useState<'schedule' | 'students' | 'profile'>('schedule');
   const [selectedStudentProfile, setSelectedStudentProfile] = useState<Student | null>(null);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -966,27 +966,47 @@ export function TrainerSchedule() {
                       <div className="flex items-center space-x-4">
                         <div className="flex bg-gray-100 rounded-lg p-1">
                           <Button
-                            variant={(viewMode as string) === 'day' ? 'default' : 'ghost'}
+                            variant="ghost"
                             size="sm"
                             onClick={() => {
                               setViewMode('day');
                               setSelectedDate(new Date());
                             }}
-                            className="text-xs px-3 py-1 transition-all duration-200"
+                            className={`text-xs px-3 py-1 transition-all duration-200 ${
+                              (viewMode as string) === 'day'
+                                ? 'bg-blue-500 text-white hover:bg-blue-600'
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                            }`}
                           >
-                            Сегодня
+                            День
                           </Button>
                           <Button
-                            variant={(viewMode as string) === 'month' ? 'default' : 'ghost'}
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setViewMode('week')}
+                            className={`text-xs px-3 py-1 transition-all duration-200 ${
+                              (viewMode as string) === 'week'
+                                ? 'bg-orange-500 text-white hover:bg-orange-600'
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                            }`}
+                          >
+                            Неделя
+                          </Button>
+                          <Button
+                            variant="ghost"
                             size="sm"
                             onClick={() => setViewMode('month')}
-                            className="text-xs px-3 py-1 transition-all duration-200"
+                            className={`text-xs px-3 py-1 transition-all duration-200 ${
+                              (viewMode as string) === 'month'
+                                ? 'bg-green-500 text-white hover:bg-green-600'
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                            }`}
                           >
                             Месяц
                           </Button>
                         </div>
                         <CardTitle className="text-xl font-bold text-gray-800 capitalize">
-                          {formatDate(selectedDate)}
+                          {formatDate(selectedDate)}, день-неделя-месяц
                         </CardTitle>
                       </div>
                       <div className="flex items-center space-x-1">
@@ -1053,7 +1073,7 @@ export function TrainerSchedule() {
                                           session.status === 'confirmed' ? 'bg-green-500 hover:bg-green-600' : 
                                           session.status === 'pending' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-gray-400 hover:bg-gray-500'
                                         }`}
-                                        title={`Статус: ${session.status === 'confirmed' ? 'Подтверждено' : 'Ожидает'}. Нажмите для изменения`}
+                                        title={`Статус: ${session.status === 'confirmed' ? 'Подтверждено' : 'Не подтверждено'}. Нажмите для изменения`}
                                       ></button>
                                       <span className="text-sm font-medium text-gray-800">{session.studentName}</span>
                                       <Button 
@@ -1093,6 +1113,85 @@ export function TrainerSchedule() {
                     </div>
                   </CardContent>
                 </Card>
+              ) : viewMode === 'week' ? (
+                <Card>
+                  <CardHeader className="border-b border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className="flex bg-gray-100 rounded-lg p-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setViewMode('day');
+                              setSelectedDate(new Date());
+                            }}
+                            className={`text-xs px-3 py-1 transition-all duration-200 ${
+                              (viewMode as string) === 'day'
+                                ? 'bg-blue-500 text-white hover:bg-blue-600'
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                            }`}
+                          >
+                            День
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setViewMode('week')}
+                            className={`text-xs px-3 py-1 transition-all duration-200 ${
+                              (viewMode as string) === 'week'
+                                ? 'bg-orange-500 text-white hover:bg-orange-600'
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                            }`}
+                          >
+                            Неделя
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setViewMode('month')}
+                            className={`text-xs px-3 py-1 transition-all duration-200 ${
+                              (viewMode as string) === 'month'
+                                ? 'bg-green-500 text-white hover:bg-green-600'
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                            }`}
+                          >
+                            Месяц
+                          </Button>
+                        </div>
+                        <CardTitle className="text-xl font-bold text-gray-800 capitalize">
+                          Неделя: {formatDate(selectedDate)}, день-неделя-месяц
+                        </CardTitle>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedDate(new Date(selectedDate.getTime() - 7 * 24 * 60 * 60 * 1000))}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedDate(new Date(selectedDate.getTime() + 7 * 24 * 60 * 60 * 1000))}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="p-6">
+                    <div className="text-center py-8">
+                      <h3 className="text-lg font-medium text-gray-700 mb-2">Режим просмотра "Неделя"</h3>
+                      <p className="text-gray-500">Здесь будет отображаться расписание на неделю</p>
+                      <p className="text-sm text-gray-400 mt-4">Функциональность в разработке</p>
+                    </div>
+                  </CardContent>
+                </Card>
               ) : (
                 <Card>
                   <CardHeader className="border-b border-gray-100">
@@ -1100,21 +1199,41 @@ export function TrainerSchedule() {
                       <div className="flex items-center space-x-4">
                         <div className="flex bg-gray-100 rounded-lg p-1">
                           <Button
-                            variant={(viewMode as string) === 'day' ? 'default' : 'ghost'}
+                            variant="ghost"
                             size="sm"
                             onClick={() => {
                               setViewMode('day');
                               setSelectedDate(new Date());
                             }}
-                            className="text-xs px-3 py-1 transition-all duration-200"
+                            className={`text-xs px-3 py-1 transition-all duration-200 ${
+                              (viewMode as string) === 'day'
+                                ? 'bg-blue-500 text-white hover:bg-blue-600'
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                            }`}
                           >
-                            Сегодня
+                            День
                           </Button>
                           <Button
-                            variant={(viewMode as string) === 'month' ? 'default' : 'ghost'}
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setViewMode('week')}
+                            className={`text-xs px-3 py-1 transition-all duration-200 ${
+                              (viewMode as string) === 'week'
+                                ? 'bg-orange-500 text-white hover:bg-orange-600'
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                            }`}
+                          >
+                            Неделя
+                          </Button>
+                          <Button
+                            variant="ghost"
                             size="sm"
                             onClick={() => setViewMode('month')}
-                            className="text-xs px-3 py-1 transition-all duration-200"
+                            className={`text-xs px-3 py-1 transition-all duration-200 ${
+                              (viewMode as string) === 'month'
+                                ? 'bg-green-500 text-white hover:bg-green-600'
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                            }`}
                           >
                             Месяц
                           </Button>
@@ -1209,7 +1328,7 @@ export function TrainerSchedule() {
                     <p className="text-2xl font-bold text-yellow-500">
                       {sessions.filter(s => s.status === 'pending').length}
                     </p>
-                    <p className="text-sm text-gray-600">Ожидает</p>
+                    <p className="text-sm text-gray-600">Не подтверждено</p>
                   </div>
                 </Card>
               </div>

@@ -139,6 +139,18 @@ export const activeWorkouts = pgTable("active_workouts", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Записи на тренировки (appointments)
+export const appointments = pgTable("appointments", {
+  id: serial("id").primaryKey(),
+  trainerId: integer("trainer_id").notNull(),
+  pupilId: integer("pupil_id").notNull(),
+  date: text("date").notNull(),
+  time: text("time").notNull(),
+  status: text("status").notNull().default("pending"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
 });
@@ -178,6 +190,12 @@ export const insertActiveWorkoutSchema = createInsertSchema(activeWorkouts).omit
   createdAt: true,
 });
 
+export const insertAppointmentSchema = createInsertSchema(appointments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Pupil = typeof pupils.$inferSelect;
@@ -196,3 +214,5 @@ export type PupilWorkoutHistory = typeof pupilWorkoutHistory.$inferSelect;
 export type InsertPupilWorkoutHistory = z.infer<typeof insertPupilWorkoutHistorySchema>;
 export type ActiveWorkout = typeof activeWorkouts.$inferSelect;
 export type InsertActiveWorkout = z.infer<typeof insertActiveWorkoutSchema>;
+export type Appointment = typeof appointments.$inferSelect;
+export type InsertAppointment = z.infer<typeof insertAppointmentSchema>;

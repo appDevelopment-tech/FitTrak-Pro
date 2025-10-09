@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ActiveWorkoutProvider } from "@/contexts/ActiveWorkoutContext";
 import { useAuth } from "@/lib/auth";
 import Dashboard from "@/pages/dashboard";
+import PublicSchedule from "@/pages/public-schedule";
 import LoginPage from "@/pages/login";
 import NotFound from "@/pages/not-found";
 
@@ -31,9 +32,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/login" component={LoginPage} />
-      <Route path="/">
-        {() => <ProtectedRoute component={Dashboard} />}
-      </Route>
+      <Route path="/" component={PublicSchedule} />
       <Route path="/dashboard">
         {() => <ProtectedRoute component={Dashboard} />}
       </Route>

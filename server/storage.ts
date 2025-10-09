@@ -147,6 +147,9 @@ export class MemStorage implements IStorage {
       lastName: "Петров",
       email: "aleksandr@example.com",
       isTrainer: true,
+      middleName: null,
+      phone: null,
+      birthDate: null,
     };
     this.users.set(1, sampleUser);
     this.currentUserId = 2;
@@ -1208,7 +1211,10 @@ export class MemStorage implements IStorage {
     const user: User = { 
       ...insertUser, 
       id,
-      isTrainer: insertUser.isTrainer ?? false
+      isTrainer: insertUser.isTrainer ?? false,
+      middleName: insertUser.middleName ?? null,
+      phone: insertUser.phone ?? null,
+      birthDate: insertUser.birthDate ?? null,
     };
     this.users.set(id, user);
     return user;

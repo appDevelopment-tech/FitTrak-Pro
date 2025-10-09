@@ -12,6 +12,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Dumbbell, Plus, Edit, Calendar as CalendarIcon, Clock, Target, CheckCircle, AlertCircle, Users, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { studentsDb } from "@/lib/database";
 
 import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
 import type { Exercise, Pupil, WorkoutProgram, User as UserType } from "@/../../shared/schema";
@@ -57,13 +58,16 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const trainerId = 1; // В реальном приложении это будет из контекста пользователя
+
   // Загрузка данных пользователя и учеников
   const { data: user } = useQuery<UserType>({
-    queryKey: ['/api/user/1']
+    queryKey: ['user', trainerId]
   });
 
   const { data: pupils = [] } = useQuery<Pupil[]>({
-    queryKey: ['/api/trainers/1/pupils']
+    queryKey: ['students', trainerId],
+    queryFn: () => studentsDb.getByTrainerId(trainerId),
   });
 
   // Загрузка готовых планов тренировок из API
@@ -71,7 +75,7 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
     queryKey: ['/api/workout-programs']
   });
 
-  const trainerId = user?.id || 1;
+
 
   // Мутация для обновления планов тренировок
   const updateWorkoutProgramMutation = useMutation({
