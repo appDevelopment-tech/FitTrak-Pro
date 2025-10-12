@@ -215,10 +215,10 @@ export function ExerciseManagement() {
                   <div className="flex-1">
                     <CardTitle className="text-lg mb-2">{exercise.name}</CardTitle>
                     <div className="flex flex-wrap gap-1">
-                      {exercise.primaryMuscles.map(muscle => (
+                      {JSON.parse(exercise.primaryMuscles || '[]').map((muscle: string) => (
                         <Badge key={muscle} variant="default">{muscle}</Badge>
                       ))}
-                      {exercise.secondaryMuscles.map(muscle => (
+                      {JSON.parse(exercise.secondaryMuscles || '[]').map((muscle: string) => (
                         <Badge key={muscle} variant="secondary">{muscle}</Badge>
                       ))}
                     </div>
@@ -350,13 +350,13 @@ interface ExerciseFormProps {
 function ExerciseForm({ exercise, onSubmit, isLoading, muscleGroupNames }: ExerciseFormProps) {
   const [formData, setFormData] = useState<ExerciseFormData>({
     name: exercise?.name || "",
-    primaryMuscles: exercise?.primaryMuscles || [],
-    secondaryMuscles: exercise?.secondaryMuscles || [],
+    primaryMuscles: Array.isArray(exercise?.primaryMuscles) ? exercise.primaryMuscles : JSON.parse(exercise?.primaryMuscles || '[]'),
+    secondaryMuscles: Array.isArray(exercise?.secondaryMuscles) ? exercise.secondaryMuscles : JSON.parse(exercise?.secondaryMuscles || '[]'),
     difficulty: exercise?.difficulty || "",
     overview: exercise?.overview || "",
-    technique: exercise?.technique || [""],
-    commonMistakes: exercise?.commonMistakes || [""],
-    contraindications: exercise?.contraindications || [""],
+    technique: Array.isArray(exercise?.technique) ? exercise.technique : JSON.parse(exercise?.technique || '[""]'),
+    commonMistakes: Array.isArray(exercise?.commonMistakes) ? exercise.commonMistakes : JSON.parse(exercise?.commonMistakes || '[""]'),
+    contraindications: Array.isArray(exercise?.contraindications) ? exercise.contraindications : JSON.parse(exercise?.contraindications || '[""]'),
     muscleImageUrl: exercise?.muscleImageUrl || "",
     techniqueImageUrl: exercise?.techniqueImageUrl || "",
   });
@@ -366,9 +366,11 @@ function ExerciseForm({ exercise, onSubmit, isLoading, muscleGroupNames }: Exerc
     
     const submitData: InsertExercise = {
       ...formData,
-      technique: formData.technique.filter(item => item.trim() !== ""),
-      commonMistakes: formData.commonMistakes.filter(item => item.trim() !== ""),
-      contraindications: formData.contraindications.filter(item => item.trim() !== ""),
+      primaryMuscles: JSON.stringify(formData.primaryMuscles),
+      secondaryMuscles: JSON.stringify(formData.secondaryMuscles),
+      technique: JSON.stringify(formData.technique.filter(item => item.trim() !== "")),
+      commonMistakes: JSON.stringify(formData.commonMistakes.filter(item => item.trim() !== "")),
+      contraindications: JSON.stringify(formData.contraindications.filter(item => item.trim() !== "")),
       createdBy: 1, // ID текущего тренера
     };
 
@@ -668,7 +670,7 @@ function ExerciseView({ exercise }: ExerciseViewProps) {
             <div>
               <span className="font-medium text-sm">Основные:</span>
               <div className="flex flex-wrap gap-1 mt-1">
-                {exercise.primaryMuscles.map(muscle => (
+                {JSON.parse(exercise.primaryMuscles || '[]').map((muscle: string) => (
                   <Badge key={muscle} variant="default">{muscle}</Badge>
                 ))}
               </div>
@@ -676,7 +678,7 @@ function ExerciseView({ exercise }: ExerciseViewProps) {
             <div>
               <span className="font-medium text-sm">Вспомогательные:</span>
               <div className="flex flex-wrap gap-1 mt-1">
-                {exercise.secondaryMuscles.map(muscle => (
+                {JSON.parse(exercise.secondaryMuscles || '[]').map((muscle: string) => (
                   <Badge key={muscle} variant="secondary">{muscle}</Badge>
                 ))}
               </div>
@@ -704,7 +706,7 @@ function ExerciseView({ exercise }: ExerciseViewProps) {
       <div>
         <h3 className="font-semibold mb-2">Техника выполнения</h3>
         <ol className="list-decimal list-inside space-y-1 text-sm">
-          {exercise.technique.map((step, index) => (
+          {JSON.parse(exercise.technique || '[]').map((step: string, index: number) => (
             <li key={index}>{step}</li>
           ))}
         </ol>
@@ -713,7 +715,7 @@ function ExerciseView({ exercise }: ExerciseViewProps) {
       <div>
         <h3 className="font-semibold mb-2">Частые ошибки</h3>
         <ul className="list-disc list-inside space-y-1 text-sm">
-          {exercise.commonMistakes.map((mistake, index) => (
+          {JSON.parse(exercise.commonMistakes || '[]').map((mistake: string, index: number) => (
             <li key={index}>{mistake}</li>
           ))}
         </ul>
@@ -722,7 +724,7 @@ function ExerciseView({ exercise }: ExerciseViewProps) {
       <div>
         <h3 className="font-semibold mb-2">Противопоказания</h3>
         <ul className="list-disc list-inside space-y-1 text-sm">
-          {exercise.contraindications.map((contraindication, index) => (
+          {JSON.parse(exercise.contraindications || '[]').map((contraindication: string, index: number) => (
             <li key={index}>{contraindication}</li>
           ))}
         </ul>

@@ -147,7 +147,7 @@ export function ProgressAnalytics() {
       
       for (let i = 0; i < sortedSessions.length; i++) {
         const sessionDate = new Date(sortedSessions[i].date);
-        const expectedDate = new Date(now.getTime() - i * 7 * 24 * 60 * 60 * 1000);
+        const expectedDate = new Date(new Date().getTime() - i * 7 * 24 * 60 * 60 * 1000);
         
         if (Math.abs(sessionDate.getTime() - expectedDate.getTime()) < 3 * 24 * 60 * 60 * 1000) {
           streak++;

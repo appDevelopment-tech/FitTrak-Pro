@@ -95,12 +95,13 @@ export function ComprehensiveStudentsManagement() {
   const { isWorkoutActive, removeActiveWorkout, addActiveWorkout, getActiveWorkout, activeWorkouts, getWorkoutProgramName } = useActiveWorkout();
 
   // Form configurations
-  const addPupilForm = useForm<InsertPupil>({
+  const addPupilForm = useForm({
     resolver: zodResolver(insertPupilSchema),
     defaultValues: {
       trainerId: 1, // TODO: Get from auth context
       firstName: "",
       lastName: "",
+      password: "",
       middleName: "",
       phone: "",
       email: "",
@@ -111,10 +112,10 @@ export function ComprehensiveStudentsManagement() {
       medicalNotes: "",
       status: "active",
       joinDate: new Date().toISOString().split('T')[0],
-      applicationSubmitted: true,
-      applicationDate: new Date().toISOString().split('T')[0],
-      rulesAccepted: true,
-      rulesAcceptedDate: new Date().toISOString().split('T')[0],
+      // applicationSubmitted: true,
+      // applicationDate: new Date().toISOString().split('T')[0],
+      // rulesAccepted: true,
+      // rulesAcceptedDate: new Date().toISOString().split('T')[0],
       parentalConsent: false,
     }
   });
@@ -263,7 +264,7 @@ export function ComprehensiveStudentsManagement() {
         pupilId: selectedPupilForWorkout.id,
         name: selectedPlanForSchedule.name,
         exercises: selectedPlanForSchedule.exercises || [],
-        isActive: true,
+        isActive: 1,
       });
 
       // Добавляем в локальное состояние с ID из базы данных
@@ -325,8 +326,8 @@ export function ComprehensiveStudentsManagement() {
         trainerId: trainerId,
         pupilId: selectedPupilForWorkout.id,
         name: customWorkout.name,
-        exercises: customWorkout.exercises,
-        isActive: true,
+        exercises: JSON.stringify(customWorkout.exercises),
+        isActive: 1,
       });
 
       // Добавляем в локальное состояние с ID из базы данных
@@ -334,7 +335,7 @@ export function ComprehensiveStudentsManagement() {
         id: savedPlan.id,
         name: customWorkout.name,
         level: customWorkout.level,
-        exercises: customWorkout.exercises,
+        exercises: JSON.stringify(customWorkout.exercises),
         type: 'strength',
         duration: customWorkout.sessionsPerWeek,
         createdBy: trainerId,
@@ -536,19 +537,19 @@ export function ComprehensiveStudentsManagement() {
   };
 
   const getDocumentStatus = (pupil: PupilWithAge) => {
-    const statuses = [];
+    const statuses: Array<{label: string, status: string, date?: string}> = [];
     
-    if (pupil.applicationSubmitted) {
-      statuses.push({ label: "Заявление", status: "submitted", date: pupil.applicationDate });
-    }
+    // if (pupil.applicationSubmitted) {
+    //   statuses.push({ label: "Заявление", status: "submitted", date: pupil.applicationDate });
+    // }
     
-    if (pupil.rulesAccepted) {
-      statuses.push({ label: "Согласие с правилами", status: "accepted", date: pupil.rulesAcceptedDate });
-    }
+    // if (pupil.rulesAccepted) {
+    //   statuses.push({ label: "Согласие с правилами", status: "accepted", date: pupil.rulesAcceptedDate });
+    // }
     
-    if (pupil.isMinor && pupil.parentalConsent) {
-      statuses.push({ label: "Согласие родителей", status: "accepted", date: pupil.parentalConsentDate });
-    }
+    // if (pupil.isMinor && pupil.parentalConsent) {
+    //   statuses.push({ label: "Согласие родителей", status: "accepted", date: pupil.parentalConsentDate });
+    // }
     
     return statuses;
   };
@@ -949,14 +950,16 @@ export function ComprehensiveStudentsManagement() {
                         <div>
                           <h4 className="font-medium">Заявление на обучение</h4>
                           <p className="text-sm text-muted-foreground">
-                            {selectedPupil.applicationSubmitted 
+                            {/* {selectedPupil.applicationSubmitted 
                               ? `Подано: ${selectedPupil.applicationDate ? formatDate(selectedPupil.applicationDate) : 'Дата неизвестна'}`
                               : 'Не подано'
-                            }
+                            } */}
+                            Не подано
                           </p>
                         </div>
-                        <Badge variant={selectedPupil.applicationSubmitted ? "default" : "secondary"}>
-                          {selectedPupil.applicationSubmitted ? "Подано" : "Не подано"}
+                        <Badge variant="secondary">
+                          {/* {selectedPupil.applicationSubmitted ? "Подано" : "Не подано"} */}
+                          Не подано
                         </Badge>
                       </div>
                     </CardContent>
@@ -968,14 +971,16 @@ export function ComprehensiveStudentsManagement() {
                         <div>
                           <h4 className="font-medium">Согласие с правилами</h4>
                           <p className="text-sm text-muted-foreground">
-                            {selectedPupil.rulesAccepted 
+                            {/* {selectedPupil.rulesAccepted 
                               ? `Принято: ${selectedPupil.rulesAcceptedDate ? formatDate(selectedPupil.rulesAcceptedDate) : 'Дата неизвестна'}`
                               : 'Не принято'
-                            }
+                            } */}
+                            Не принято
                           </p>
                         </div>
-                        <Badge variant={selectedPupil.rulesAccepted ? "default" : "secondary"}>
-                          {selectedPupil.rulesAccepted ? "Принято" : "Не принято"}
+                        <Badge variant="secondary">
+                          {/* {selectedPupil.rulesAccepted ? "Принято" : "Не принято"} */}
+                          Не принято
                         </Badge>
                       </div>
                     </CardContent>
@@ -988,14 +993,16 @@ export function ComprehensiveStudentsManagement() {
                           <div>
                             <h4 className="font-medium">Согласие родителей</h4>
                             <p className="text-sm text-muted-foreground">
-                              {selectedPupil.parentalConsent 
+                              {/* {selectedPupil.parentalConsent 
                                 ? `Получено: ${selectedPupil.parentalConsentDate ? formatDate(selectedPupil.parentalConsentDate) : 'Дата неизвестна'}`
                                 : 'Не получено'
-                              }
+                              } */}
+                              Не получено
                             </p>
                           </div>
-                          <Badge variant={selectedPupil.parentalConsent ? "default" : "destructive"}>
-                            {selectedPupil.parentalConsent ? "Получено" : "Требуется"}
+                          <Badge variant="destructive">
+                            {/* {selectedPupil.parentalConsent ? "Получено" : "Требуется"} */}
+                            Требуется
                           </Badge>
                         </div>
                       </CardContent>

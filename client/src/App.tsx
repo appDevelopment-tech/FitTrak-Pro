@@ -5,9 +5,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ActiveWorkoutProvider } from "@/contexts/ActiveWorkoutContext";
 import { useAuth } from "@/lib/auth";
+import { RoleGuard } from "@/lib/role-guard";
 import Dashboard from "@/pages/dashboard";
 import PublicSchedule from "@/pages/public-schedule";
 import LoginPage from "@/pages/login";
+import AdminLoginPage from "@/pages/admin-login";
 import NotFound from "@/pages/not-found";
 
 function ProtectedRoute({ component: Component }: { component: () => JSX.Element }) {
@@ -28,17 +30,47 @@ function ProtectedRoute({ component: Component }: { component: () => JSX.Element
   return <Component />;
 }
 
+function PupilRoute({ component: Component }: { component: () => JSX.Element }) {
+  return (
+    <RoleGuard allowedRoles={['pupil']} fallbackPath="/admin/login">
+      <Component />
+    </RoleGuard>
+  );
+}
+
+function TrainerRoute({ component: Component }: { component: () => JSX.Element }) {
+  return (
+    <RoleGuard allowedRoles={['trainer']} fallbackPath="/login">
+      <Component />
+    </RoleGuard>
+  );
+}
+
 function Router() {
   return (
     <Switch>
-      <Route path="/login" component={LoginPage} />
+      {/* Публичные маршруты */}
       <Route path="/" component={PublicSchedule} />
+      
+      {/* Вход для учеников */}
+      <Route path="/login" component={LoginPage} />
+      
+      {/* Скрытый вход для тренеров/админов */}
+      <Route path="/admin/login" component={AdminLoginPage} />
+      
+      {/* Маршруты для учеников */}
       <Route path="/dashboard">
-        {() => <ProtectedRoute component={Dashboard} />}
+        {() => <PupilRoute component={Dashboard} />}
       </Route>
       <Route path="/cabinet">
-        {() => <ProtectedRoute component={Dashboard} />}
+        {() => <PupilRoute component={Dashboard} />}
       </Route>
+      
+      {/* Маршруты для тренеров/админов */}
+      <Route path="/admin/dashboard">
+        {() => <TrainerRoute component={Dashboard} />}
+      </Route>
+      
       <Route component={NotFound} />
     </Switch>
   );

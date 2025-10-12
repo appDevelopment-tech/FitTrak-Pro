@@ -3,18 +3,19 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatsCard } from "@/components/ui/stats-card";
-import { MobileNavigation } from "@/components/navigation/mobile-nav";
-import { DesktopSidebar } from "@/components/navigation/desktop-sidebar";
 import { CalendarView } from "@/components/schedule/calendar-view";
 import { TodaySchedule } from "@/components/schedule/today-schedule";
 import { ProfileView } from "@/components/profile/profile-view";
 import { NewSchedule } from "@/components/schedule/new-schedule";
 import { BookingWidget } from "@/components/schedule/booking-widget";
-import { StudentsManagement } from "@/components/students/students-management";
-import { Plus, BarChart3, Search, Flame, Trash2, Users, LogOut, Bell, BellRing } from "lucide-react";
+// import { RoleBasedSchedule } from "@/components/schedule/role-based-schedule";
+// import { RoleBasedProfile } from "@/components/profile/role-based-profile";
+// import { PermissionGuard, AdminGuard, PupilGuard } from "@/components/auth/permission-guard";
+import { Plus, BarChart3, Search, Flame, Trash2, LogOut, Bell, BellRing } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { useNotifications } from "@/hooks/use-notifications";
-import { useReminders } from "@/hooks/use-reminders";
+// import { usePermissions } from "@/hooks/use-permissions";
+// import { useNotifications } from "@/hooks/use-notifications";
+// import { useReminders } from "@/hooks/use-reminders";
 import { NotificationsPanel } from "@/components/ui/notifications-panel";
 import { PWAInstallBanner, OfflineIndicator } from "@/components/ui/pwa-install-banner";
 import { PageTransition } from "@/components/ui/page-transitions";
@@ -26,6 +27,7 @@ export default function Dashboard() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showNotifications, setShowNotifications] = useState(false);
   const [location, setLocation] = useLocation();
+  // const { userRole, isAdminOrTrainer } = usePermissions();
 
   // Обработка URL при загрузке страницы
   useEffect(() => {
@@ -42,21 +44,17 @@ export default function Dashboard() {
     setActiveView(view);
     // Обновляем URL параметры для корректной навигации
     const url = new URL(window.location.href);
-    if (view === 'students') {
-      url.searchParams.set('section', 'students');
-    } else if (view === 'profile') {
+    if (view === 'profile') {
       url.searchParams.set('section', 'profile');
     } else {
       url.searchParams.delete('section');
     }
     window.history.pushState({}, '', url);
-
   };
 
   const { user, signOut } = useAuth();
-  const isTrainer = Boolean(user?.user_metadata?.is_trainer);
-  const { unreadCount } = useNotifications();
-  const { getTodayAppointments, getTomorrowAppointments } = useReminders();
+  // const { unreadCount } = useNotifications();
+  // const { getTodayAppointments, getTomorrowAppointments } = useReminders();
 
   const handleStartWorkout = (sessionId: number) => {
     // Handle workout start logic
@@ -84,13 +82,23 @@ export default function Dashboard() {
   const renderContent = () => {
     switch (activeView) {
       case 'schedule':
-        return isTrainer ? <NewSchedule /> : <BookingWidget />;
+        return (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* <RoleBasedSchedule 
+              date={selectedDate.toISOString().split('T')[0]} 
+              trainerId={1}
+            /> */}
+            <BookingWidget />
+          </div>
+        );
       case 'profile':
-        return <ProfileView />;
-      case 'students':
-        return <StudentsManagement />;
+        return (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* <RoleBasedProfile /> */}
+            <ProfileView />
+          </div>
+        );
       case 'progress':
-        // Progress view is not implemented yet
         return (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="text-center py-16">
@@ -158,14 +166,17 @@ export default function Dashboard() {
                 onClick={() => setShowNotifications(true)}
                 className="relative text-muted-foreground hover:text-foreground hover:bg-accent/20 transition-all duration-300"
               >
-                {unreadCount > 0 ? (
+                {/* {unreadCount > 0 ? ( */}
+                {false ? (
                   <BellRing className="h-4 w-4" />
                 ) : (
                   <Bell className="h-4 w-4" />
                 )}
-                {unreadCount > 0 && (
+                {/* {unreadCount > 0 && ( */}
+                {false && (
                   <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                    {unreadCount > 9 ? '9+' : unreadCount}
+                    {/* {unreadCount > 9 ? '9+' : unreadCount} */}
+                    0
                   </span>
                 )}
               </Button>

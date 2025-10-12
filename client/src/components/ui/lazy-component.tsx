@@ -12,7 +12,7 @@ export function createLazyComponent<T extends ComponentType<any>>(
 ) {
   const LazyComponent = lazy(importFunc);
   
-  return function WrappedLazyComponent(props: React.ComponentProps<T> & LazyComponentProps) {
+  return function WrappedLazyComponent(props: any) {
     return (
       <Suspense fallback={fallback || <DefaultFallback />}>
         <LazyComponent {...props} />
@@ -39,7 +39,7 @@ function DefaultFallback() {
 
 // Предустановленные ленивые компоненты
 export const LazyStudentsManagement = createLazyComponent(
-  () => import('@/components/students/comprehensive-students-management'),
+  () => import('@/components/students/comprehensive-students-management').then(m => ({ default: m.ComprehensiveStudentsManagement })),
   <div className="flex items-center justify-center p-8">
     <div className="text-center">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -49,7 +49,7 @@ export const LazyStudentsManagement = createLazyComponent(
 );
 
 export const LazyWorkoutsManagement = createLazyComponent(
-  () => import('@/components/workouts/workouts-management'),
+  () => import('@/components/workouts/workouts-management').then(m => ({ default: m.WorkoutsManagement })),
   <div className="flex items-center justify-center p-8">
     <div className="text-center">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
@@ -59,7 +59,7 @@ export const LazyWorkoutsManagement = createLazyComponent(
 );
 
 export const LazyExerciseManagement = createLazyComponent(
-  () => import('@/components/exercise/exercise-management'),
+  () => import('@/components/exercise/exercise-management').then(m => ({ default: m.ExerciseManagement })),
   <div className="flex items-center justify-center p-8">
     <div className="text-center">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto mb-4"></div>
@@ -69,7 +69,7 @@ export const LazyExerciseManagement = createLazyComponent(
 );
 
 export const LazyMuscleGroupsManagement = createLazyComponent(
-  () => import('@/components/exercise/muscle-groups-management'),
+  () => import('@/components/exercise/muscle-groups-management').then(m => ({ default: m.MuscleGroupsManagement })),
   <div className="flex items-center justify-center p-8">
     <div className="text-center">
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>

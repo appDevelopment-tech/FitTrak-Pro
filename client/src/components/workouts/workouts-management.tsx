@@ -229,7 +229,7 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
       const newExercises = selectedExercises.map(name => ({ name }));
       setEditedPlan({
         ...editedPlan,
-        exercises: [...currentExercises, ...newExercises]
+        exercises: JSON.stringify([...currentExercises, ...newExercises])
       });
     } else {
       // Для создания новой тренировки
@@ -251,7 +251,7 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
     newExercises.splice(index, 1);
     setEditedPlan({
       ...editedPlan,
-      exercises: newExercises
+      exercises: JSON.stringify(newExercises)
     });
   };
 
@@ -263,7 +263,7 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
     newExercises.splice(toIndex, 0, moved);
     setEditedPlan({
       ...editedPlan,
-      exercises: newExercises
+      exercises: JSON.stringify(newExercises)
     });
   };
 
@@ -367,12 +367,12 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
                       <div>
                         <h4 className="text-sm font-medium mb-2">Упражнения:</h4>
                         <div className="flex flex-wrap gap-1">
-                          {exercisesArray.slice(0, 3).map((exercise: any, index) => (
+                          {Array.isArray(exercisesArray) ? (exercisesArray as any[]).slice(0, 3).map((exercise: any, index: number) => (
                             <Badge key={index} variant="outline" className="text-xs">
                               {exercise.name || exercise}
                             </Badge>
-                          ))}
-                          {exercisesArray.length > 3 && (
+                          )) : null}
+                          {Array.isArray(exercisesArray) && exercisesArray.length > 3 && (
                             <Badge variant="outline" className="text-xs">
                               +{exercisesArray.length - 3}
                             </Badge>

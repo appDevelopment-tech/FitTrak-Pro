@@ -48,6 +48,18 @@ export const studentsDb = {
     return (data || []).map(toCamelCase) as Pupil[];
   },
 
+  async getCurrentUser() {
+    // В реальном приложении здесь будет получение ID текущего пользователя из контекста авторизации
+    // Пока возвращаем первого ученика для тестирования
+    const { data, error } = await supabase
+      .from('students')
+      .select('*')
+      .limit(1)
+      .single();
+    if (error) throw error;
+    return toCamelCase(data) as Pupil;
+  },
+
   async getById(id: number) {
     const { data, error } = await supabase
       .from('students')
@@ -97,6 +109,9 @@ export const studentsDb = {
     if (error) throw error;
   },
 };
+
+// Alias for pupils (students)
+export const pupilsDb = studentsDb;
 
 // Exercises
 export const exercisesDb = {

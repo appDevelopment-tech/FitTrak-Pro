@@ -598,7 +598,14 @@ export function ProfileView() {
       {/* Диалог для отображения полного обзора упражнения */}
       {selectedExerciseForDetail && (
         <ExerciseDetail
-          exercise={selectedExerciseForDetail}
+          exercise={{
+            ...selectedExerciseForDetail,
+            primaryMuscles: JSON.parse(selectedExerciseForDetail.primaryMuscles || '[]'),
+            secondaryMuscles: JSON.parse(selectedExerciseForDetail.secondaryMuscles || '[]'),
+            technique: JSON.parse(selectedExerciseForDetail.technique || '[]'),
+            commonMistakes: JSON.parse(selectedExerciseForDetail.commonMistakes || '[]'),
+            contraindications: JSON.parse(selectedExerciseForDetail.contraindications || '[]')
+          }}
           onClose={() => setSelectedExerciseForDetail(null)}
           onDelete={(exerciseId) => {
             deleteMutation.mutate(exerciseId);

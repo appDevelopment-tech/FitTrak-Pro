@@ -10,6 +10,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { appointmentsDb, studentsDb } from "@/lib/database";
 import type { Appointment, Pupil, InsertPupil } from "@shared/schema";
 import { Calendar, Check, Clock, UserPlus } from "lucide-react";
+import { ScheduleSlot } from "./schedule-slot";
 
 const TIME_SLOTS = Array.from({ length: 13 }, (_, i) => `${(i + 8).toString().padStart(2, '0')}:00`);
 const TRAINER_ID = 1;
@@ -129,6 +130,7 @@ export function BookingWidget() {
       middleName: '',
       phone,
       email,
+      password: 'default_password', // TODO: Generate proper password
       birthDate,
       weight: null,
       height: null,
@@ -136,11 +138,11 @@ export function BookingWidget() {
       medicalNotes: '',
       status: 'active',
       joinDate: new Date().toISOString().split('T')[0],
-      applicationSubmitted: true,
-      applicationDate: new Date().toISOString().split('T')[0],
-      rulesAccepted: true,
-      rulesAcceptedDate: new Date().toISOString().split('T')[0],
-      parentalConsent: false,
+      // applicationSubmitted: true,
+      // applicationDate: new Date().toISOString().split('T')[0],
+      // rulesAccepted: true,
+      // rulesAcceptedDate: new Date().toISOString().split('T')[0],
+      // parentalConsent: false,
     };
     createPupilMutation.mutate(form);
   };
@@ -182,29 +184,19 @@ export function BookingWidget() {
         </CardHeader>
         <CardContent className="pt-0">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-            {TIME_SLOTS.map(time => {
-              const busy = isOccupied(selectedDate, time);
-              return (
-                <button
-                  key={time}
-                  onClick={() => handleSelectSlot(time)}
-                  className={`flex flex-col gap-1 p-2 rounded-lg transition-colors border aspect-[2/1] text-left ${
-                    busy ? 'bg-gray-100 border-gray-300 cursor-not-allowed' : 'bg-white hover:bg-blue-50 border-gray-200'
-                  }`}
-                  aria-label={`Слот ${time} ${busy ? 'занят' : 'свободен'}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm font-medium text-gray-700">{time}</div>
-                    <div className={`w-2 h-2 rounded-full ${busy ? 'bg-red-500' : 'bg-green-500'}`} />
-                  </div>
-                  <div className="flex-1 flex items-center justify-center">
-                    <div className={`text-xs font-medium ${busy ? 'text-gray-500' : 'text-blue-600'}`}>
-                      {busy ? 'Занято' : 'Свободно'}
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
+            {TIME_SLOTS.map(time => (
+              <ScheduleSlot
+                key={time}
+                time={time}
+                date={selectedDate}
+                appointments={appointments}
+                pupils={pupils}
+                currentPupil={currentPupil || undefined}
+                isTrainer={false}
+                maxSlots={2}
+                onSlotClick={handleSelectSlot}
+              />
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -289,6 +281,7 @@ export function BookingWidget() {
     </div>
   );
 }
+
 
 
 

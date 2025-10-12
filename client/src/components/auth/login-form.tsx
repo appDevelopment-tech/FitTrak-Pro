@@ -1,0 +1,135 @@
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/lib/auth';
+import { Eye, EyeOff, User } from 'lucide-react';
+
+// Схема валидации для входа
+const loginSchema = z.object({
+  emailOrPhone: z.string().min(1, 'Email или телефон обязательны'),
+  password: z.string().min(1, 'Пароль обязателен'),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
+
+interface LoginFormProps {
+  onSuccess?: () => void;
+  onForgotPassword?: () => void;
+}
+
+export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
+  const { toast } = useToast();
+  const { signIn } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = async (data: LoginFormData) => {
+    setIsSubmitting(true);
+    
+    try {
+      await signIn(data.emailOrPhone, data.password, 'pupil');
+      
+      toast({
+        title: 'Вход выполнен!',
+        description: 'Добро пожаловать в FitTrak-Pro!',
+      });
+      
+      onSuccess?.();
+    } catch (error: any) {
+      toast({
+        title: 'Ошибка входа',
+        description: error.message || 'Неверный email/телефон или пароль',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle>Вход в систему</CardTitle>
+        <CardDescription>
+          Войдите в свой аккаунт FitTrak-Pro
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="emailOrPhone" className="flex items-center gap-2">
+              <User className="w-4 h-4" />
+              Email или телефон
+            </Label>
+            <Input
+              id="emailOrPhone"
+              {...register('emailOrPhone')}
+              placeholder="example@email.com или +7 (999) 123-45-67"
+              type="text"
+            />
+            {errors.emailOrPhone && (
+              <p className="text-sm text-red-500">{errors.emailOrPhone.message}</p>
+            )}
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="password">Пароль</Label>
+            <div className="relative">
+              <Input
+                id="password"
+                {...register('password')}
+                placeholder="Введите пароль"
+                type={showPassword ? 'text' : 'password'}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            {errors.password && (
+              <p className="text-sm text-red-500">{errors.password.message}</p>
+            )}
+          </div>
+
+          <div className="flex items-center justify-between">
+            <Button
+              type="button"
+              variant="link"
+              className="p-0 h-auto text-sm"
+              onClick={onForgotPassword}
+            >
+              Забыли пароль?
+            </Button>
+          </div>
+
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? 'Вход...' : 'Войти'}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}

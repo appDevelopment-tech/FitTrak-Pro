@@ -3,8 +3,9 @@ import { User } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
+  pupil: any | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string, userType?: 'trainer' | 'pupil') => Promise<void>;
   signUp: (email: string, password: string, userData: any) => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -28,6 +29,7 @@ const TEST_USER: User = {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [pupil, setPupil] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -41,11 +43,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, userType?: 'trainer' | 'pupil') => {
     if (BYPASS_AUTH) {
       localStorage.setItem('test_user', 'true');
       setUser(TEST_USER);
       return;
+    }
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          emailOrPhone: email,
+          password: password,
+          userType: userType,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Ошибка входа');
+      }
+
+      const result = await response.json();
+
+      if (result.userType === 'trainer') {
+        setUser(result.user);
+        setPupil(null);
+      } else if (result.userType === 'pupil') {
+        setPupil(result.pupil);
+        setUser(null);
+      }
+    } catch (error) {
+      throw error;
     }
   };
 
@@ -61,12 +93,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (BYPASS_AUTH) {
       localStorage.removeItem('test_user');
       setUser(null);
+      setPupil(null);
       return;
     }
+
+    setUser(null);
+    setPupil(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, pupil, loading, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );

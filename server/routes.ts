@@ -44,6 +44,99 @@ function translateExerciseToEnglish(russianName: string): string {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Authentication routes
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { emailOrPhone, password, userType } = req.body;
+      
+      if (!emailOrPhone || !password) {
+        return res.status(400).json({ message: "Email/phone and password are required" });
+      }
+      
+      // Определяем тип пользователя и пытаемся авторизовать
+      if (userType === 'trainer' || !userType) {
+        // Сначала пробуем как тренера
+        const trainer = await storage.authenticateTrainer(emailOrPhone, password);
+        if (trainer) {
+          // Don't send password in response
+          const { password: _, ...trainerWithoutPassword } = trainer;
+          return res.json({ 
+            user: trainerWithoutPassword, 
+            userType: 'trainer' 
+          });
+        }
+      }
+      
+      if (userType === 'pupil' || !userType) {
+        // Затем пробуем как ученика
+        const pupil = await storage.authenticatePupil(emailOrPhone, password);
+        if (pupil) {
+          // Don't send password in response
+          const { password: _, ...pupilWithoutPassword } = pupil;
+          return res.json({ 
+            pupil: pupilWithoutPassword, 
+            userType: 'pupil' 
+          });
+        }
+      }
+      
+      return res.status(401).json({ message: "Invalid credentials" });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const pupilData = insertPupilSchema.parse(req.body);
+      
+      // Check if email already exists
+      const existingPupilByEmail = await storage.getPupilByEmail(pupilData.email);
+      if (existingPupilByEmail) {
+        return res.status(400).json({ message: "Email already registered" });
+      }
+      
+      // Check if phone already exists
+      const existingPupilByPhone = await storage.getPupilByPhone(pupilData.phone);
+      if (existingPupilByPhone) {
+        return res.status(400).json({ message: "Phone number already registered" });
+      }
+      
+      const newPupil = await storage.registerPupil(pupilData);
+      
+      // Don't send password in response
+      const { password: _, ...pupilWithoutPassword } = newPupil;
+      res.status(201).json({ pupil: pupilWithoutPassword });
+    } catch (error) {
+      res.status(400).json({ message: "Invalid data" });
+    }
+  });
+
+  app.post("/api/auth/forgot-password", async (req, res) => {
+    try {
+      const { emailOrPhone } = req.body;
+      
+      if (!emailOrPhone) {
+        return res.status(400).json({ message: "Email or phone is required" });
+      }
+      
+      // Check if pupil exists
+      const pupil = await storage.getPupilByEmail(emailOrPhone) || 
+                    await storage.getPupilByPhone(emailOrPhone);
+      
+      if (!pupil) {
+        // Don't reveal if email/phone exists or not for security
+        return res.json({ message: "If the email/phone exists, instructions have been sent" });
+      }
+      
+      // Here you would send password reset instructions
+      // For now, just return success
+      res.json({ message: "Password reset instructions sent" });
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // User routes
   app.get("/api/user/:id", async (req, res) => {
     try {

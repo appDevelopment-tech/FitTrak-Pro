@@ -1,136 +1,96 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/lib/auth';
+import { LoginForm } from '@/components/auth/login-form';
+import { RegistrationForm } from '@/components/auth/registration-form';
+import { ForgotPasswordForm } from '@/components/auth/forgot-password-form';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { User, Dumbbell } from 'lucide-react';
+
+type AuthMode = 'login' | 'register' | 'forgot-password';
 
 export default function LoginPage() {
   const [, setLocation] = useLocation();
-  const { signIn, signUp } = useAuth();
-  const { toast } = useToast();
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { signIn } = useAuth();
+  const [authMode, setAuthMode] = useState<AuthMode>('login');
 
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    firstName: '',
-    lastName: '',
-    username: '',
-  });
+  const handleLoginSuccess = () => {
+    setLocation('/dashboard');
+  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const handleRegistrationSuccess = () => {
+    setAuthMode('login');
+  };
 
-    try {
-      if (isSignUp) {
-        await signUp(formData.email, formData.password, {
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          username: formData.username || formData.email.split('@')[0],
-          is_trainer: true,
-        });
-        toast({
-          title: 'Аккаунт создан!',
-          description: 'Проверьте email для подтверждения',
-        });
-      } else {
-        await signIn(formData.email, formData.password);
-        setLocation('/dashboard');
-      }
-    } catch (error: any) {
-      toast({
-        title: 'Ошибка',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
+  const handleForgotPasswordSuccess = () => {
+    // Остаемся в режиме forgot-password для показа сообщения об успехе
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>{isSignUp ? 'Регистрация' : 'Вход'}</CardTitle>
-          <CardDescription>
-            {isSignUp
-              ? 'Создайте аккаунт тренера'
-              : 'Войдите в свой аккаунт'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {isSignUp && (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">Имя</Label>
-                  <Input
-                    id="firstName"
-                    value={formData.firstName}
-                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                    required={isSignUp}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Фамилия</Label>
-                  <Input
-                    id="lastName"
-                    value={formData.lastName}
-                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                    required={isSignUp}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="username">Имя пользователя</Label>
-                  <Input
-                    id="username"
-                    value={formData.username}
-                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                    placeholder="Опционально"
-                  />
-                </div>
-              </>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-              />
+      <div className="w-full max-w-4xl">
+        {/* Заголовок */}
+        <div className="text-center mb-8">
+          <div className="mx-auto w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+            <Dumbbell className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">FitTrak-Pro</h1>
+          <p className="text-gray-600">
+            Система управления фитнес-тренировками для учеников
+          </p>
+        </div>
+
+        {/* Формы авторизации */}
+        {authMode === 'login' && (
+          <div className="space-y-4">
+            <LoginForm
+              onSuccess={handleLoginSuccess}
+              onForgotPassword={() => setAuthMode('forgot-password')}
+            />
+            
+            <div className="text-center">
+              <Button
+                variant="link"
+                onClick={() => setAuthMode('register')}
+                className="p-0"
+              >
+                Нет аккаунта? Зарегистрироваться
+              </Button>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Пароль</Label>
-              <Input
-                id="password"
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                required
-              />
+          </div>
+        )}
+
+        {authMode === 'register' && (
+          <div className="space-y-4">
+            <RegistrationForm onSuccess={handleRegistrationSuccess} />
+            
+            <div className="text-center">
+              <Button
+                variant="link"
+                onClick={() => setAuthMode('login')}
+                className="p-0"
+              >
+                Уже есть аккаунт? Войти
+              </Button>
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Загрузка...' : isSignUp ? 'Зарегистрироваться' : 'Войти'}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full"
-              onClick={() => setIsSignUp(!isSignUp)}
-            >
-              {isSignUp ? 'Уже есть аккаунт? Войти' : 'Нет аккаунта? Зарегистрироваться'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+          </div>
+        )}
+
+        {authMode === 'forgot-password' && (
+          <ForgotPasswordForm
+            onBack={() => setAuthMode('login')}
+            onSuccess={handleForgotPasswordSuccess}
+          />
+        )}
+
+        {/* Информация для учеников */}
+        <div className="mt-8 text-center">
+          <div className="inline-flex items-center gap-2 text-sm text-gray-500">
+            <User className="w-4 h-4" />
+            Этот вход предназначен для учеников
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

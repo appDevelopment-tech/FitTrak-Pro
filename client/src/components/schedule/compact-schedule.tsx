@@ -11,6 +11,7 @@ import type { Pupil, Appointment } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
 import { useLocation } from "wouter";
+import { ScheduleSlot } from "./schedule-slot";
 
 interface ScheduleSession {
   id: number;
@@ -124,77 +125,23 @@ export function CompactSchedule() {
   // Render functions
   const renderDayView = () => (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-      {timeSlots.map(time => {
-        const session = getSessionForTime(selectedDate, time);
-        
-        return (
-          <div key={time} className="flex flex-col gap-1 p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200 hover:border-gray-300 aspect-[2/1]">
-            <div className="text-sm font-medium text-gray-600 text-center">{time}</div>
-            <div className="flex-1 min-h-0 min-w-0 overflow-hidden flex items-center justify-center">
-              {session ? (
-                <div className="flex flex-col items-center justify-center w-full h-full gap-2">
-                  <div className="text-center">
-                    <span className="text-xs font-medium truncate leading-tight max-w-full block">
-                      {session.pupils.map(p => {
-                        const firstName = p?.firstName || '';
-                        const lastName = p?.lastName || '';
-                        return firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName;
-                      }).join(', ')}
-                    </span>
-                    <div className={`text-xs mt-1 ${
-                      session.pupils.length >= 2 ? 'text-red-500 font-medium' : 'text-gray-500'
-                    }`}>
-                      {session.pupils.length}/2
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleToggleStatus(session.id)}
-                      className="h-6 w-6 p-0"
-                    >
-                      <div className={`w-4 h-4 rounded-full flex items-center justify-center ${
-                        session.status === 'confirmed' 
-                          ? 'border-2 border-green-500 bg-green-50' 
-                          : ''
-                      }`}>
-                        {session.status === 'confirmed' ? 
-                          <Check className="h-2.5 w-2.5 text-green-600" /> : 
-                          <Clock className="h-2.5 w-2.5 text-gray-400" />
-                        }
-                      </div>
-                    </Button>
-                     {isWorkoutActive(trainerId, session.pupils[0]?.id) && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setLocation(`/cabinet?tab=create-workout&pupilId=${session.pupils[0]?.id}&action=start`)}
-                        className="h-6 w-6 p-0"
-                      >
-                        <Dumbbell className="h-3 w-3" />
-                      </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleDeleteSession(session.id)}
-                      className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center">
-                  <div className="text-xs font-medium leading-tight text-blue-600">Свободно</div>
-                  <div className="text-xs text-blue-500 mt-1">0/2</div>
-                </div>
-              )}
-            </div>
-          </div>
-        );
-      })}
+      {timeSlots.map(time => (
+        <ScheduleSlot
+          key={time}
+          time={time}
+          date={selectedDate.toISOString().split('T')[0]}
+          appointments={appointments}
+          pupils={pupils}
+          currentPupil={undefined} // В компактном расписании нет текущего пользователя
+          isTrainer={true} // Это компонент для тренера
+          maxSlots={2}
+          onToggleStatus={handleToggleStatus}
+          onDeleteAppointment={handleDeleteSession}
+          onStartWorkout={(pupilId) => setLocation(`/cabinet?tab=create-workout&pupilId=${pupilId}&action=start`)}
+          isWorkoutActive={isWorkoutActive}
+          trainerId={trainerId}
+        />
+      ))}
     </div>
   );
 

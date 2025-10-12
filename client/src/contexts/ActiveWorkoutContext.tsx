@@ -22,7 +22,7 @@ export function ActiveWorkoutProvider({ children }: { children: ReactNode }) {
       trainerId,
       pupilId: pupil.id,
       workoutProgramId: program.id,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
       programName: program.name // Добавляем название программы
     };
     
