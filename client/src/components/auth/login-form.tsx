@@ -12,7 +12,7 @@ import { Eye, EyeOff, User } from 'lucide-react';
 
 // Схема валидации для входа
 const loginSchema = z.object({
-  emailOrPhone: z.string().min(1, 'Email или телефон обязательны'),
+  email: z.string().email('Введите корректный email адрес'),
   password: z.string().min(1, 'Пароль обязателен'),
 });
 
@@ -41,7 +41,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
     setIsSubmitting(true);
     
     try {
-      await signIn(data.emailOrPhone, data.password, 'pupil');
+      await signIn(data.email, data.password, 'pupil');
       
       toast({
         title: 'Вход выполнен!',
@@ -52,7 +52,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
     } catch (error: any) {
       toast({
         title: 'Ошибка входа',
-        description: error.message || 'Неверный email/телефон или пароль',
+        description: error.message || 'Неверный email или пароль',
         variant: 'destructive',
       });
     } finally {
@@ -71,18 +71,18 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="emailOrPhone" className="flex items-center gap-2">
+            <Label htmlFor="email" className="flex items-center gap-2">
               <User className="w-4 h-4" />
-              Email или телефон
+              Email
             </Label>
             <Input
-              id="emailOrPhone"
-              {...register('emailOrPhone')}
-              placeholder="example@email.com или +7 (999) 123-45-67"
-              type="text"
+              id="email"
+              {...register('email')}
+              placeholder="example@email.com"
+              type="email"
             />
-            {errors.emailOrPhone && (
-              <p className="text-sm text-red-500">{errors.emailOrPhone.message}</p>
+            {errors.email && (
+              <p className="text-sm text-red-500">{errors.email.message}</p>
             )}
           </div>
           

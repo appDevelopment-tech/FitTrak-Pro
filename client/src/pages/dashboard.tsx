@@ -20,6 +20,8 @@ import { useRoleCheck } from "@/lib/role-guard";
 import { NotificationsPanel } from "@/components/ui/notifications-panel";
 import { PWAInstallBanner, OfflineIndicator } from "@/components/ui/pwa-install-banner";
 import { PageTransition } from "@/components/ui/page-transitions";
+import { SupabaseConnectionCheck } from "@/components/debug/supabase-connection-check";
+import { AuthModeToggle } from "@/components/debug/auth-mode-toggle";
 import type { DashboardStats } from "@/lib/types";
 import type { WorkoutSession, WorkoutProgram, User } from "@shared/schema";
 
@@ -262,6 +264,12 @@ export default function Dashboard() {
       {/* PWA Components */}
       <PWAInstallBanner />
       <OfflineIndicator />
+      
+      {/* Supabase Connection Check */}
+      <SupabaseConnectionCheck />
+      
+      {/* Auth Mode Toggle */}
+      <AuthModeToggle />
     </div>
   );
 }

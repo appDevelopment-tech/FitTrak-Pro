@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 
 // Схема валидации для регистрации
@@ -103,8 +104,10 @@ interface RegistrationFormProps {
 
 export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
   const { toast } = useToast();
+  const { signUp } = useAuth();
   const [isMinor, setIsMinor] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
   const {
     register,
@@ -138,20 +141,17 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
   }, [birthDate, setValue]);
 
   const onSubmit = async (data: RegistrationFormData) => {
+    setHasAttemptedSubmit(true);
     setIsSubmitting(true);
     
     try {
-      // Подготавливаем данные для отправки
-      const registrationData = {
+      // Подготавливаем данные для регистрации
+      const userData = {
         firstName: data.firstName,
         lastName: data.lastName,
         middleName: data.middleName || '',
         birthDate: data.birthDate,
         phone: data.phone,
-        email: data.email,
-        password: data.password,
-        joinDate: new Date().toISOString().split('T')[0],
-        status: 'pending',
         
         // Поля для родителей (если несовершеннолетний)
         parentFirstName: data.parentFirstName || '',
@@ -163,31 +163,16 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         
         // Согласия
         privacyPolicyAccepted: data.privacyPolicyAccepted,
-        privacyPolicyAcceptedDate: new Date().toISOString().split('T')[0],
         contractAccepted: data.contractAccepted,
-        contractAcceptedDate: new Date().toISOString().split('T')[0],
         educationConsentAccepted: data.educationConsentAccepted,
-        educationConsentAcceptedDate: new Date().toISOString().split('T')[0],
       };
 
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(registrationData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Ошибка регистрации');
-      }
-
-      const result = await response.json();
+      // Используем функцию signUp из контекста аутентификации
+      await signUp(data.email, data.password, userData);
       
       toast({
         title: 'Регистрация успешна!',
-        description: 'Ваш аккаунт создан. Ожидайте подтверждения от администратора.',
+        description: 'Ваш аккаунт создан успешно!',
       });
       
       onSuccess?.();
@@ -383,7 +368,8 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="isParentRepresentative"
-                  {...register('isParentRepresentative')}
+                  checked={watch('isParentRepresentative')}
+                  onCheckedChange={(checked) => setValue('isParentRepresentative', checked === true)}
                 />
                 <Label htmlFor="isParentRepresentative">
                   Я являюсь родителем/законным представителем
@@ -400,7 +386,8 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
               <div className="flex items-start space-x-2">
                 <Checkbox
                   id="privacyPolicyAccepted"
-                  {...register('privacyPolicyAccepted')}
+                  checked={watch('privacyPolicyAccepted')}
+                  onCheckedChange={(checked) => setValue('privacyPolicyAccepted', checked === true)}
                 />
                 <Label htmlFor="privacyPolicyAccepted" className="text-sm">
                   Соглашаюсь с{' '}
@@ -410,14 +397,15 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                   *
                 </Label>
               </div>
-              {errors.privacyPolicyAccepted && (
+              {hasAttemptedSubmit && errors.privacyPolicyAccepted && (
                 <p className="text-sm text-red-500">{errors.privacyPolicyAccepted.message}</p>
               )}
               
               <div className="flex items-start space-x-2">
                 <Checkbox
                   id="contractAccepted"
-                  {...register('contractAccepted')}
+                  checked={watch('contractAccepted')}
+                  onCheckedChange={(checked) => setValue('contractAccepted', checked === true)}
                 />
                 <Label htmlFor="contractAccepted" className="text-sm">
                   Принимаю условия{' '}
@@ -427,14 +415,15 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                   *
                 </Label>
               </div>
-              {errors.contractAccepted && (
+              {hasAttemptedSubmit && errors.contractAccepted && (
                 <p className="text-sm text-red-500">{errors.contractAccepted.message}</p>
               )}
               
               <div className="flex items-start space-x-2">
                 <Checkbox
                   id="educationConsentAccepted"
-                  {...register('educationConsentAccepted')}
+                  checked={watch('educationConsentAccepted')}
+                  onCheckedChange={(checked) => setValue('educationConsentAccepted', checked === true)}
                 />
                 <Label htmlFor="educationConsentAccepted" className="text-sm">
                   Даю согласие на{' '}
@@ -444,7 +433,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                   *
                 </Label>
               </div>
-              {errors.educationConsentAccepted && (
+              {hasAttemptedSubmit && errors.educationConsentAccepted && (
                 <p className="text-sm text-red-500">{errors.educationConsentAccepted.message}</p>
               )}
             </div>

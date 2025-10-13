@@ -4,6 +4,7 @@ import { useAuth } from '@/lib/auth';
 import { LoginForm } from '@/components/auth/login-form';
 import { RegistrationForm } from '@/components/auth/registration-form';
 import { ForgotPasswordForm } from '@/components/auth/forgot-password-form';
+import { AuthModeSwitcher } from '@/components/auth/auth-mode-switcher';
 import { Button } from '@/components/ui/button';
 import { User, Dumbbell } from 'lucide-react';
 
@@ -13,6 +14,7 @@ export default function LoginPage() {
   const [, setLocation] = useLocation();
   const { signIn } = useAuth();
   const [authMode, setAuthMode] = useState<AuthMode>('login');
+  const [isRealAuth, setIsRealAuth] = useState(false); // По умолчанию тестовый режим
 
   const handleLoginSuccess = () => {
     setLocation('/dashboard');
@@ -39,6 +41,12 @@ export default function LoginPage() {
             Система управления фитнес-тренировками для учеников
           </p>
         </div>
+
+        {/* Переключатель режима аутентификации */}
+        <AuthModeSwitcher 
+          isRealAuth={isRealAuth} 
+          onToggle={() => setIsRealAuth(!isRealAuth)} 
+        />
 
         {/* Формы авторизации */}
         {authMode === 'login' && (

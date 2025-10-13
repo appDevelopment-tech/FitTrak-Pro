@@ -11,7 +11,9 @@
     "db:push": "drizzle-kit push",
     "cleanup": "bash scripts/cleanup.sh",
     "test:e2e": "playwright test",
-    "test:clean": "npm run cleanup && npm run test:e2e"
+    "test:clean": "npm run cleanup && npm run test:e2e",
+    "check:supabase": "node scripts/check-supabase.js",
+    "create:test-data": "node scripts/create-test-trainer.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

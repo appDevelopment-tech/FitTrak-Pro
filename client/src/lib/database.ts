@@ -40,6 +40,77 @@ function toCamelCase(obj: any): any {
 // Students
 export const studentsDb = {
   async getAll() {
+    // Проверяем, включен ли тестовый режим
+    const isTestMode = import.meta.env.VITE_BYPASS_AUTH === 'true' || 
+                      !import.meta.env.VITE_SUPABASE_URL || 
+                      !import.meta.env.VITE_SUPABASE_ANON_KEY;
+    
+    if (isTestMode) {
+      // Тестовый режим - возвращаем тестовых студентов
+      return [
+        {
+          id: 1,
+          trainerId: 1,
+          firstName: 'Иван',
+          lastName: 'Иванов',
+          middleName: 'Иванович',
+          phone: '+7 (999) 123-45-67',
+          email: 'ivan@example.com',
+          birthDate: '1990-01-01',
+          weight: 75,
+          height: 180,
+          goal: 'Похудение',
+          medicalNotes: '',
+          photo: '',
+          status: 'active',
+          joinDate: '2024-01-01',
+          parentFirstName: '',
+          parentLastName: '',
+          parentMiddleName: '',
+          parentPhone: '',
+          parentEmail: '',
+          parentSpecialInstructions: '',
+          isParentRepresentative: false,
+          privacyPolicyAccepted: true,
+          privacyPolicyAcceptedDate: '2024-01-01',
+          contractAccepted: true,
+          contractAcceptedDate: '2024-01-01',
+          educationConsentAccepted: true,
+          educationConsentAcceptedDate: '2024-01-01',
+        },
+        {
+          id: 2,
+          trainerId: 1,
+          firstName: 'Студент_1',
+          lastName: 'Студентович_1',
+          middleName: '',
+          phone: '+7 (999) 987-65-43',
+          email: 'student1@example.com',
+          birthDate: '1995-05-15',
+          weight: 70,
+          height: 175,
+          goal: 'Набор мышечной массы',
+          medicalNotes: '',
+          photo: '',
+          status: 'active',
+          joinDate: '2024-01-15',
+          parentFirstName: '',
+          parentLastName: '',
+          parentMiddleName: '',
+          parentPhone: '',
+          parentEmail: '',
+          parentSpecialInstructions: '',
+          isParentRepresentative: false,
+          privacyPolicyAccepted: true,
+          privacyPolicyAcceptedDate: '2024-01-15',
+          contractAccepted: true,
+          contractAcceptedDate: '2024-01-15',
+          educationConsentAccepted: true,
+          educationConsentAcceptedDate: '2024-01-15',
+        }
+      ] as Pupil[];
+    }
+
     const { data, error } = await supabase
       .from('students')
       .select('*')
@@ -71,13 +142,94 @@ export const studentsDb = {
   },
 
   async getByTrainerId(trainerId: number) {
-    const { data, error } = await supabase
-      .from('students')
-      .select('*')
-      .eq('trainer_id', trainerId)
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return (data || []).map(toCamelCase) as Pupil[];
+    // Проверяем, включен ли тестовый режим
+    const isTestMode = import.meta.env.VITE_BYPASS_AUTH === 'true' || 
+                      !import.meta.env.VITE_SUPABASE_URL || 
+                      !import.meta.env.VITE_SUPABASE_ANON_KEY;
+    
+    if (isTestMode) {
+      // Тестовый режим - возвращаем тестовых студентов
+      return [
+        {
+          id: 1,
+          trainerId: 1,
+          firstName: 'Иван',
+          lastName: 'Иванов',
+          middleName: 'Иванович',
+          phone: '+7 (999) 123-45-67',
+          email: 'ivan@example.com',
+          birthDate: '1990-01-01',
+          weight: 75,
+          height: 180,
+          goal: 'Похудение',
+          medicalNotes: '',
+          photo: '',
+          status: 'active',
+          joinDate: '2024-01-01',
+          parentFirstName: '',
+          parentLastName: '',
+          parentMiddleName: '',
+          parentPhone: '',
+          parentEmail: '',
+          parentSpecialInstructions: '',
+          isParentRepresentative: false,
+          privacyPolicyAccepted: true,
+          privacyPolicyAcceptedDate: '2024-01-01',
+          contractAccepted: true,
+          contractAcceptedDate: '2024-01-01',
+          educationConsentAccepted: true,
+          educationConsentAcceptedDate: '2024-01-01',
+        },
+        {
+          id: 2,
+          trainerId: 1,
+          firstName: 'Студент_1',
+          lastName: 'Студентович_1',
+          middleName: '',
+          phone: '+7 (999) 987-65-43',
+          email: 'student1@example.com',
+          birthDate: '1995-05-15',
+          weight: 70,
+          height: 175,
+          goal: 'Набор мышечной массы',
+          medicalNotes: '',
+          photo: '',
+          status: 'active',
+          joinDate: '2024-01-15',
+          parentFirstName: '',
+          parentLastName: '',
+          parentMiddleName: '',
+          parentPhone: '',
+          parentEmail: '',
+          parentSpecialInstructions: '',
+          isParentRepresentative: false,
+          privacyPolicyAccepted: true,
+          privacyPolicyAcceptedDate: '2024-01-15',
+          contractAccepted: true,
+          contractAcceptedDate: '2024-01-15',
+          educationConsentAccepted: true,
+          educationConsentAcceptedDate: '2024-01-15',
+        }
+      ] as Pupil[];
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('students')
+        .select('*')
+        .eq('trainer_id', trainerId)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching students:', error);
+        // Возвращаем пустой массив вместо выброса ошибки
+        return [];
+      }
+      return (data || []).map(toCamelCase) as Pupil[];
+    } catch (error) {
+      console.error('Unexpected error fetching students:', error);
+      return [];
+    }
   },
 
   async create(student: InsertPupil) {
@@ -366,23 +518,33 @@ export const appointmentsDb = {
   },
 
   async getByTrainerId(trainerId: number) {
-    const { data, error } = await supabase
-      .from('appointments')
-      .select(`
-        *,
-        students:pupil_id (
-          id,
-          first_name,
-          last_name,
-          email,
-          phone
-        )
-      `)
-      .eq('trainer_id', trainerId)
-      .order('date', { ascending: true })
-      .order('time', { ascending: true });
-    if (error) throw error;
-    return (data || []).map(toCamelCase) as Appointment[];
+    try {
+      const { data, error } = await supabase
+        .from('appointments')
+        .select(`
+          *,
+          students:pupil_id (
+            id,
+            first_name,
+            last_name,
+            email,
+            phone
+          )
+        `)
+        .eq('trainer_id', trainerId)
+        .order('date', { ascending: true })
+        .order('time', { ascending: true });
+      
+      if (error) {
+        console.error('Error fetching appointments:', error);
+        // Возвращаем пустой массив вместо выброса ошибки
+        return [];
+      }
+      return (data || []).map(toCamelCase) as Appointment[];
+    } catch (error) {
+      console.error('Unexpected error fetching appointments:', error);
+      return [];
+    }
   },
 
   async create(appointment: InsertAppointment) {

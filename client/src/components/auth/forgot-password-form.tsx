@@ -7,11 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/lib/auth';
 import { ArrowLeft } from 'lucide-react';
 
 // Схема валидации для восстановления пароля
 const forgotPasswordSchema = z.object({
-  emailOrPhone: z.string().min(1, 'Email или телефон обязательны'),
+  email: z.string().email('Введите корректный email адрес'),
 });
 
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
@@ -23,6 +24,7 @@ interface ForgotPasswordFormProps {
 
 export function ForgotPasswordForm({ onBack, onSuccess }: ForgotPasswordFormProps) {
   const { toast } = useToast();
+  const { resetPassword } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEmailSent, setIsEmailSent] = useState(false);
 
@@ -38,29 +40,11 @@ export function ForgotPasswordForm({ onBack, onSuccess }: ForgotPasswordFormProp
     setIsSubmitting(true);
     
     try {
-      const response = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Ошибка восстановления пароля');
-      }
-
-      const result = await response.json();
-      
-      // Определяем, что введено - email или телефон
-      const isEmail = data.emailOrPhone.includes('@');
+      await resetPassword(data.email);
       
       toast({
         title: 'Инструкции отправлены!',
-        description: isEmail 
-          ? 'Проверьте email для восстановления пароля'
-          : 'На ваш телефон отправлен код для восстановления пароля',
+        description: 'Проверьте email для восстановления пароля',
       });
       
       setIsEmailSent(true);
@@ -114,21 +98,21 @@ export function ForgotPasswordForm({ onBack, onSuccess }: ForgotPasswordFormProp
       <CardHeader>
         <CardTitle>Восстановление пароля</CardTitle>
         <CardDescription>
-          Введите email или телефон для восстановления пароля
+          Введите email для восстановления пароля
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="emailOrPhone">Email или телефон</Label>
+            <Label htmlFor="email">Email</Label>
             <Input
-              id="emailOrPhone"
-              {...register('emailOrPhone')}
-              placeholder="example@email.com или +7 (999) 123-45-67"
-              type="text"
+              id="email"
+              {...register('email')}
+              placeholder="example@email.com"
+              type="email"
             />
-            {errors.emailOrPhone && (
-              <p className="text-sm text-red-500">{errors.emailOrPhone.message}</p>
+            {errors.email && (
+              <p className="text-sm text-red-500">{errors.email.message}</p>
             )}
           </div>
 
