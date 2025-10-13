@@ -27,6 +27,14 @@ const TEST_USER: User = {
   created_at: new Date().toISOString(),
 } as User;
 
+const TEST_PUPIL = {
+  id: '1',
+  first_name: 'Test',
+  last_name: 'Pupil',
+  email: 'pupil@fittrak.pro',
+  phone: '+1234567890',
+};
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [pupil, setPupil] = useState<any | null>(null);
@@ -36,8 +44,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (BYPASS_AUTH) {
       // Simulate auth check delay
       setTimeout(() => {
-        const savedUser = localStorage.getItem('test_user');
-        setUser(savedUser ? TEST_USER : null);
+        const savedUserType = localStorage.getItem('test_user_type');
+        if (savedUserType === 'trainer') {
+          setUser(TEST_USER);
+          setPupil(null);
+        } else if (savedUserType === 'pupil') {
+          setPupil(TEST_PUPIL);
+          setUser(null);
+        }
         setLoading(false);
       }, 100);
     }
@@ -45,8 +59,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string, userType?: 'trainer' | 'pupil') => {
     if (BYPASS_AUTH) {
-      localStorage.setItem('test_user', 'true');
-      setUser(TEST_USER);
+      if (userType === 'trainer') {
+        localStorage.setItem('test_user_type', 'trainer');
+        setUser(TEST_USER);
+        setPupil(null);
+      } else {
+        localStorage.setItem('test_user_type', 'pupil');
+        setPupil(TEST_PUPIL);
+        setUser(null);
+      }
       return;
     }
 
@@ -91,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     if (BYPASS_AUTH) {
-      localStorage.removeItem('test_user');
+      localStorage.removeItem('test_user_type');
       setUser(null);
       setPupil(null);
       return;

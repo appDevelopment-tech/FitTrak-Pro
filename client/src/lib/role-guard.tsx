@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from './auth';
 
@@ -12,6 +12,39 @@ export function RoleGuard({ children, allowedRoles, fallbackPath = '/login' }: R
   const [, setLocation] = useLocation();
   const { user, pupil, loading } = useAuth();
 
+  // Определяем роль пользователя
+  let userRole: 'trainer' | 'pupil' | null = null;
+  if (user && (user as any).user_metadata?.is_trainer) {
+    userRole = 'trainer';
+  } else if (pupil) {
+    userRole = 'pupil';
+  }
+
+  // Обрабатываем редиректы в useEffect
+  useEffect(() => {
+    if (loading) return;
+
+    // Проверяем, есть ли авторизованный пользователь
+    if (!user && !pupil) {
+      setLocation(fallbackPath);
+      return;
+    }
+
+    if (!userRole) {
+      setLocation(fallbackPath);
+      return;
+    }
+
+    if (!allowedRoles.includes(userRole)) {
+      // Редирект в зависимости от роли
+      if (userRole === 'trainer') {
+        setLocation('/admin/dashboard');
+      } else {
+        setLocation('/dashboard');
+      }
+    }
+  }, [user, pupil, loading, userRole, allowedRoles, fallbackPath, setLocation]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -22,28 +55,14 @@ export function RoleGuard({ children, allowedRoles, fallbackPath = '/login' }: R
 
   // Проверяем, есть ли авторизованный пользователь
   if (!user && !pupil) {
-    setLocation(fallbackPath);
     return null;
   }
 
-  // Определяем роль пользователя
-  let userRole: 'trainer' | 'pupil';
-  if (user && (user as any).user_metadata?.is_trainer) {
-    userRole = 'trainer';
-  } else if (pupil) {
-    userRole = 'pupil';
-  } else {
-    setLocation(fallbackPath);
+  if (!userRole) {
     return null;
   }
 
   if (!allowedRoles.includes(userRole)) {
-    // Редирект в зависимости от роли
-    if (userRole === 'trainer') {
-      setLocation('/admin/dashboard');
-    } else {
-      setLocation('/dashboard');
-    }
     return null;
   }
 

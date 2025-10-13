@@ -62,12 +62,12 @@ function Router() {
       <Route path="/dashboard">
         {() => <PupilRoute component={Dashboard} />}
       </Route>
-      <Route path="/cabinet">
-        {() => <PupilRoute component={Dashboard} />}
-      </Route>
       
       {/* Маршруты для тренеров/админов */}
       <Route path="/admin/dashboard">
+        {() => <TrainerRoute component={Dashboard} />}
+      </Route>
+      <Route path="/cabinet">
         {() => <TrainerRoute component={Dashboard} />}
       </Route>
       

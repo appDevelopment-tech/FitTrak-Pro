@@ -13,6 +13,7 @@ import { BookingWidget } from "@/components/schedule/booking-widget";
 // import { PermissionGuard, AdminGuard, PupilGuard } from "@/components/auth/permission-guard";
 import { Plus, BarChart3, Search, Flame, Trash2, LogOut, Bell, BellRing } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { useRoleCheck } from "@/lib/role-guard";
 // import { usePermissions } from "@/hooks/use-permissions";
 // import { useNotifications } from "@/hooks/use-notifications";
 // import { useReminders } from "@/hooks/use-reminders";
@@ -27,6 +28,8 @@ export default function Dashboard() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showNotifications, setShowNotifications] = useState(false);
   const [location, setLocation] = useLocation();
+  const { user, signOut } = useAuth();
+  const { isTrainer } = useRoleCheck();
   // const { userRole, isAdminOrTrainer } = usePermissions();
 
   // Обработка URL при загрузке страницы
@@ -34,11 +37,18 @@ export default function Dashboard() {
     const currentPath = location.split('?')[0];
     
     if (currentPath === '/cabinet') {
-      setActiveView('profile');
+      // Проверяем, может ли пользователь получить доступ к кабинету
+      if (isTrainer) {
+        setActiveView('profile');
+      } else {
+        // Редиректим учеников на расписание
+        setActiveView('schedule');
+        setLocation('/dashboard');
+      }
     } else if (currentPath === '/dashboard' || currentPath === '/') {
       setActiveView('schedule');
     }
-  }, [location]);
+  }, [location, isTrainer, setLocation]);
 
   const handleViewChange = (view: string) => {
     setActiveView(view);
@@ -52,7 +62,6 @@ export default function Dashboard() {
     window.history.pushState({}, '', url);
   };
 
-  const { user, signOut } = useAuth();
   // const { unreadCount } = useNotifications();
   // const { getTodayAppointments, getTomorrowAppointments } = useReminders();
 
@@ -92,6 +101,19 @@ export default function Dashboard() {
           </div>
         );
       case 'profile':
+        // Дополнительная проверка доступа для раздела "Кабинет"
+        if (!isTrainer) {
+          return (
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              <div className="text-center py-16">
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                  Доступ запрещен
+                </h3>
+                <p className="text-gray-600">У вас нет прав для доступа к этому разделу</p>
+              </div>
+            </div>
+          );
+        }
         return (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* <RoleBasedProfile /> */}
@@ -205,16 +227,18 @@ export default function Dashboard() {
               Расписание
             </button>
 
-            <button
-              onClick={() => setActiveView('profile')}
-              className={`${
-                activeView === 'profile'
-                  ? 'neon-button text-primary-foreground px-6 py-2 rounded-full'
-                  : 'text-muted-foreground hover:text-foreground px-6 py-2 rounded-full hover:bg-accent/20 transition-all duration-300'
-              } font-medium text-sm`}
-            >
-              Кабинет
-            </button>
+            {isTrainer && (
+              <button
+                onClick={() => setActiveView('profile')}
+                className={`${
+                  activeView === 'profile'
+                    ? 'neon-button text-primary-foreground px-6 py-2 rounded-full'
+                    : 'text-muted-foreground hover:text-foreground px-6 py-2 rounded-full hover:bg-accent/20 transition-all duration-300'
+                } font-medium text-sm`}
+              >
+                Кабинет
+              </button>
+            )}
           </nav>
         </div>
       </header>
