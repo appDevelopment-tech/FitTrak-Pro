@@ -13,7 +13,7 @@ import { Calendar, Check, Clock, UserPlus } from "lucide-react";
 import { ScheduleSlot } from "./schedule-slot";
 
 const TIME_SLOTS = Array.from({ length: 13 }, (_, i) => `${(i + 8).toString().padStart(2, '0')}:00`);
-const TRAINER_ID = 1;
+const TRAINER_ID = "550e8400-e29b-41d4-a716-446655440000"; // TODO: Replace with actual trainer UUID
 
 export function BookingWidget() {
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
@@ -52,7 +52,7 @@ export function BookingWidget() {
   }, [appointments]);
 
   const createAppointmentMutation = useMutation({
-    mutationFn: async (payload: { date: string; time: string; pupilId: number }) => {
+    mutationFn: async (payload: { date: string; time: string; pupilId: string }) => {
       await appointmentsDb.create({
         trainerId: TRAINER_ID,
         pupilId: payload.pupilId,
@@ -127,22 +127,31 @@ export function BookingWidget() {
       trainerId: TRAINER_ID,
       firstName,
       lastName,
-      middleName: '',
+      middleName: null,
       phone,
       email,
       password: 'default_password', // TODO: Generate proper password
       birthDate,
       weight: null,
       height: null,
-      goal: '',
-      medicalNotes: '',
+      goal: null,
+      medicalNotes: null,
+      photo: null,
       status: 'active',
       joinDate: new Date().toISOString().split('T')[0],
-      // applicationSubmitted: true,
-      // applicationDate: new Date().toISOString().split('T')[0],
-      // rulesAccepted: true,
-      // rulesAcceptedDate: new Date().toISOString().split('T')[0],
-      // parentalConsent: false,
+      parentFirstName: null,
+      parentLastName: null,
+      parentMiddleName: null,
+      parentPhone: null,
+      parentEmail: null,
+      parentSpecialInstructions: null,
+      isParentRepresentative: false,
+      privacyPolicyAccepted: false,
+      privacyPolicyAcceptedDate: null,
+      contractAccepted: false,
+      contractAcceptedDate: null,
+      educationConsentAccepted: false,
+      educationConsentAcceptedDate: null,
     };
     createPupilMutation.mutate(form);
   };

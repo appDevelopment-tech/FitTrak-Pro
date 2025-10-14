@@ -28,5 +28,9 @@ supabase-test-*.png
 # Claude workspace (not committed)
 .claude/
 
-# Removed directories
-attached_assets/
+# Sensitive files with passwords and keys
+create-auth-users.js
+check-test-users.js
+create-test-users-uuid.sql
+test-auth-summary.js
+*.sql

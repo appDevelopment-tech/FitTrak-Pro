@@ -41,9 +41,9 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
 export function ProgressAnalytics() {
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
-  const [selectedPupil, setSelectedPupil] = useState<number | null>(null);
+  const [selectedPupil, setSelectedPupil] = useState<string | null>(null);
 
-  const trainerId = 1; // В реальном приложении это будет из контекста пользователя
+  const trainerId = "550e8400-e29b-41d4-a716-446655440000"; // Main trainer UUID
 
   // Получаем данные учеников
   const { data: pupils = [] } = useQuery<Pupil[]>({

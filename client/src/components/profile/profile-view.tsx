@@ -46,12 +46,12 @@ export function ProfileView() {
   const [activeTab, setActiveTab] = useState<string>("profile");
   
   const { data: user } = useQuery<UserType>({
-    queryKey: ['user', 1],
+    queryKey: ['user', '550e8400-e29b-41d4-a716-446655440000'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('users')
         .select('*')
-        .eq('id', 1)
+        .eq('id', '550e8400-e29b-41d4-a716-446655440000')
         .single();
 
       if (error) throw error;
@@ -65,7 +65,7 @@ export function ProfileView() {
   });
 
   // Load muscle groups from database
-  const { data: muscleGroups = [] } = useQuery<{ id: number; name: string; description: string | null }[]>({
+  const { data: muscleGroups = [] } = useQuery<{ id: string; name: string; description: string | null }[]>({
     queryKey: ['muscleGroups'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -128,7 +128,7 @@ export function ProfileView() {
           email: data.email,
           phone: data.phone,
         })
-        .eq('id', 1)
+        .eq('id', '550e8400-e29b-41d4-a716-446655440000')
         .select()
         .single();
 
@@ -152,7 +152,7 @@ export function ProfileView() {
     },
   });
 
-  const trainerId = 1; // В реальном приложении это будет из контекста пользователя
+  const trainerId = "00000000-0000-0000-0000-000000000000"; // В реальном приложении это будет из контекста пользователя
 
   // Загружаем учеников для поиска выбранного ученика из URL
   const { data: pupils = [] } = useQuery<Pupil[]>({
@@ -179,7 +179,7 @@ export function ProfileView() {
     // Не сбрасываем на profile если нет параметра - оставляем текущую вкладку
 
     if (pupilId && pupils.length > 0) {
-      const pupil = pupils.find(p => p.id === parseInt(pupilId));
+      const pupil = pupils.find(p => p.id === pupilId);
       if (pupil) {
         setSelectedPupil(pupil);
       }
@@ -199,7 +199,7 @@ export function ProfileView() {
   };
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => exercisesDb.delete(id),
+    mutationFn: (id: string) => exercisesDb.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['exercises'] });
       toast({
@@ -220,7 +220,8 @@ export function ProfileView() {
   const filteredExercises = useMemo(() => {
     return exercises
       .filter(exercise => {
-        const matchesMuscleGroup = !selectedMuscleGroup || exercise.primaryMuscles.includes(selectedMuscleGroup);
+        const primaryMuscles = Array.isArray(exercise.primaryMuscles) ? exercise.primaryMuscles : JSON.parse(exercise.primaryMuscles as string || '[]');
+        const matchesMuscleGroup = !selectedMuscleGroup || (primaryMuscles as string[]).includes(selectedMuscleGroup);
         const matchesSearch = !searchTerm || exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
         return matchesMuscleGroup && matchesSearch;
       })
@@ -600,11 +601,11 @@ export function ProfileView() {
         <ExerciseDetail
           exercise={{
             ...selectedExerciseForDetail,
-            primaryMuscles: JSON.parse(selectedExerciseForDetail.primaryMuscles || '[]'),
-            secondaryMuscles: JSON.parse(selectedExerciseForDetail.secondaryMuscles || '[]'),
-            technique: JSON.parse(selectedExerciseForDetail.technique || '[]'),
-            commonMistakes: JSON.parse(selectedExerciseForDetail.commonMistakes || '[]'),
-            contraindications: JSON.parse(selectedExerciseForDetail.contraindications || '[]')
+            primaryMuscles: Array.isArray(selectedExerciseForDetail.primaryMuscles) ? selectedExerciseForDetail.primaryMuscles : JSON.parse(selectedExerciseForDetail.primaryMuscles as string || '[]'),
+            secondaryMuscles: Array.isArray(selectedExerciseForDetail.secondaryMuscles) ? selectedExerciseForDetail.secondaryMuscles : JSON.parse(selectedExerciseForDetail.secondaryMuscles as string || '[]'),
+            technique: Array.isArray(selectedExerciseForDetail.technique) ? selectedExerciseForDetail.technique : JSON.parse(selectedExerciseForDetail.technique as string || '[]'),
+            commonMistakes: Array.isArray(selectedExerciseForDetail.commonMistakes) ? selectedExerciseForDetail.commonMistakes : JSON.parse(selectedExerciseForDetail.commonMistakes as string || '[]'),
+            contraindications: Array.isArray(selectedExerciseForDetail.contraindications) ? selectedExerciseForDetail.contraindications : JSON.parse(selectedExerciseForDetail.contraindications as string || '[]')
           }}
           onClose={() => setSelectedExerciseForDetail(null)}
           onDelete={(exerciseId) => {

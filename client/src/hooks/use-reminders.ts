@@ -26,7 +26,7 @@ export function useReminders() {
   });
 
   const { addNotification } = useNotifications();
-  const trainerId = 1; // В реальном приложении это будет из контекста пользователя
+  const trainerId = '550e8400-e29b-41d4-a716-446655440000'; // Main trainer UUID
 
   // Получаем все записи на тренировки
   const { data: appointments = [] } = useQuery<Appointment[]>({

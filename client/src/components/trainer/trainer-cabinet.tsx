@@ -81,7 +81,7 @@ export function TrainerCabinet() {
       type: programType,
       duration: parseInt(duration),
       level: level,
-      createdBy: 1, // Current user ID
+      createdBy: '550e8400-e29b-41d4-a716-446655440000', // Main trainer UUID
       exercises: exercises,
     };
 

@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { exercisesDb } from "@/lib/database";
 
 interface ExerciseImageManagerProps {
-  exerciseId: number;
+  exerciseId: string;
   exerciseName: string;
   currentImageUrl?: string | null;
   onClose: () => void;

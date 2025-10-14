@@ -98,10 +98,10 @@ export function ComprehensiveStudentsManagement() {
   const addPupilForm = useForm({
     resolver: zodResolver(insertPupilSchema),
     defaultValues: {
-      trainerId: 1, // TODO: Get from auth context
+      trainerId: '550e8400-e29b-41d4-a716-446655440000', // Main trainer UUID
       firstName: "",
       lastName: "",
-      password: "",
+      password: null, // Changed from "" to null to allow optional password
       middleName: "",
       phone: "",
       email: "",
@@ -124,7 +124,7 @@ export function ComprehensiveStudentsManagement() {
     resolver: zodResolver(insertPupilSchema.partial()),
   });
   
-  const trainerId = 1; // В реальном приложении это будет из контекста пользователя
+  const trainerId = '550e8400-e29b-41d4-a716-446655440000'; // Main trainer UUID
 
   // Готовые планы тренировок
   const readyPlans = [
@@ -264,7 +264,7 @@ export function ComprehensiveStudentsManagement() {
         pupilId: selectedPupilForWorkout.id,
         name: selectedPlanForSchedule.name,
         exercises: selectedPlanForSchedule.exercises || [],
-        isActive: 1,
+        isActive: true,
       });
 
       // Добавляем в локальное состояние с ID из базы данных
@@ -272,10 +272,12 @@ export function ComprehensiveStudentsManagement() {
         id: savedPlan.id,
         name: selectedPlanForSchedule.name,
         level: selectedPlanForSchedule.difficulty,
-        exercises: selectedPlanForSchedule.exercises || [],
+        exercises: selectedPlanForSchedule.exercises || [] as any,
         type: 'strength',
         duration: selectedPlanForSchedule.sessionsPerWeek,
         createdBy: trainerId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       addActiveWorkout(trainerId, selectedPupilForWorkout, workoutProgram);
@@ -327,7 +329,7 @@ export function ComprehensiveStudentsManagement() {
         pupilId: selectedPupilForWorkout.id,
         name: customWorkout.name,
         exercises: JSON.stringify(customWorkout.exercises),
-        isActive: 1,
+        isActive: true,
       });
 
       // Добавляем в локальное состояние с ID из базы данных
@@ -335,10 +337,12 @@ export function ComprehensiveStudentsManagement() {
         id: savedPlan.id,
         name: customWorkout.name,
         level: customWorkout.level,
-        exercises: JSON.stringify(customWorkout.exercises),
+        exercises: JSON.stringify(customWorkout.exercises) as any,
         type: 'strength',
         duration: customWorkout.sessionsPerWeek,
         createdBy: trainerId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       addActiveWorkout(trainerId, selectedPupilForWorkout, workoutProgram);
@@ -381,7 +385,8 @@ export function ComprehensiveStudentsManagement() {
     const groups: { [key: string]: Exercise[] } = {};
     
     exercises.forEach(exercise => {
-      const primaryMuscle = exercise.primaryMuscles?.[0]?.toLowerCase() || 'другое';
+      const primaryMusclesArray = (exercise.primaryMuscles as string[] | null) || [];
+      const primaryMuscle = primaryMusclesArray[0]?.toLowerCase() || 'другое';
       if (!groups[primaryMuscle]) {
         groups[primaryMuscle] = [];
       }
@@ -473,7 +478,7 @@ export function ComprehensiveStudentsManagement() {
 
   // Мутация для обновления ученика
   const updatePupilMutation = useMutation({
-    mutationFn: async ({ id, updates }: { id: number; updates: Partial<InsertPupil> }) => {
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<InsertPupil> }) => {
       return await studentsDb.update(id, updates);
     },
     onSuccess: () => {
@@ -495,8 +500,8 @@ export function ComprehensiveStudentsManagement() {
   });
 
   // Form submission handlers
-  const onAddPupil = (data: InsertPupil) => {
-    createPupilMutation.mutate(data);
+  const onAddPupil = (data: any) => {
+    createPupilMutation.mutate(data as InsertPupil);
   };
 
   const onEditPupil = (data: Partial<InsertPupil>) => {

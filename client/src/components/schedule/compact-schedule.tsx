@@ -14,7 +14,7 @@ import { useLocation } from "wouter";
 import { ScheduleSlot } from "./schedule-slot";
 
 interface ScheduleSession {
-  id: number;
+  id: string;
   time: string;
   date: string;
   pupils: Pupil[];
@@ -31,7 +31,7 @@ export function CompactSchedule() {
   const { isWorkoutActive, getWorkoutProgramName } = useActiveWorkout();
   const [, setLocation] = useLocation();
 
-  const trainerId = 1; // В реальном приложении это будет из контекста пользователя
+  const trainerId = "550e8400-e29b-41d4-a716-446655440000"; // TODO: Get from auth context
 
   // Load students - используем тот же метод что и в учениках
   const { data: pupils = [] } = useQuery<Pupil[]>({
@@ -63,7 +63,7 @@ export function CompactSchedule() {
 
 
   const deleteAppointmentMutation = useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       await appointmentsDb.delete(id);
     },
     onSuccess: () => {
@@ -73,7 +73,7 @@ export function CompactSchedule() {
   });
 
   const updateAppointmentMutation = useMutation({
-    mutationFn: async (data: { id: number; status: string }) => {
+    mutationFn: async (data: { id: string; status: string }) => {
       await appointmentsDb.update(data.id, { status: data.status });
     },
     onSuccess: () => {
@@ -99,7 +99,7 @@ export function CompactSchedule() {
 
 
 
-  const handleToggleStatus = (sessionId: number) => {
+  const handleToggleStatus = (sessionId: string) => {
     const session = appointments.find(s => s.id === sessionId);
     if (!session) return;
 
@@ -109,7 +109,7 @@ export function CompactSchedule() {
     });
   };
 
-  const handleDeleteSession = (sessionId: number) => {
+  const handleDeleteSession = (sessionId: string) => {
     deleteAppointmentMutation.mutate(sessionId);
   };
 

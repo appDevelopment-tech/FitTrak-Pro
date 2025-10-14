@@ -5,8 +5,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { ChevronLeft, ChevronRight, Clock, Plus, Check, Trash2, Dumbbell, Calendar, Settings } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabase";
-import { studentsDb, appointmentsDb } from "@/lib/database";
+import { api } from "@/lib/api";
 import type { Pupil, Appointment } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
@@ -15,7 +14,7 @@ import { useAuth } from "@/lib/auth";
 import { ScheduleSlot } from "./schedule-slot";
 
 interface ScheduleSession {
-  id: number;
+  id: string;
   time: string;
   date: string;
   pupils: Pupil[];
@@ -33,18 +32,18 @@ export function NewSchedule() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
 
-  const trainerId = 1; // В реальном приложении это будет из контекста пользователя
+  const trainerId = "550e8400-e29b-41d4-a716-446655440000"; // TODO: Get from auth context
 
   // Load students
   const { data: pupils = [] } = useQuery<Pupil[]>({
     queryKey: ['students', trainerId],
-    queryFn: () => studentsDb.getByTrainerId(trainerId),
+    queryFn: () => api.students.getByTrainerId(trainerId),
   });
 
   // Load appointments
   const { data: appointments = [] } = useQuery<Appointment[]>({
     queryKey: ['appointments', trainerId],
-    queryFn: () => appointmentsDb.getByTrainerId(trainerId),
+    queryFn: () => api.appointments.getByTrainerId(trainerId),
   });
 
   // Transform appointments to sessions
@@ -69,8 +68,8 @@ export function NewSchedule() {
   const isCurrentUserPupil = !isCurrentUserTrainer && currentPupil;
 
   const deleteAppointmentMutation = useMutation({
-    mutationFn: async (id: number) => {
-      await appointmentsDb.delete(id);
+    mutationFn: async (id: string) => {
+      await api.appointments.delete(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments', trainerId] });
@@ -79,8 +78,8 @@ export function NewSchedule() {
   });
 
   const updateAppointmentMutation = useMutation({
-    mutationFn: async (data: { id: number; status: string }) => {
-      await appointmentsDb.update(data.id, { status: data.status });
+    mutationFn: async (data: { id: string; status: string }) => {
+      await api.appointments.update(data.id, { status: data.status });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments', trainerId] });
@@ -101,7 +100,7 @@ export function NewSchedule() {
     return sessions.find(s => s.date === dateString && s.time === time);
   };
 
-  const handleToggleStatus = (sessionId: number) => {
+  const handleToggleStatus = (sessionId: string) => {
     const session = appointments.find(s => s.id === sessionId);
     if (!session) return;
 
@@ -111,7 +110,7 @@ export function NewSchedule() {
     });
   };
 
-  const handleDeleteSession = (sessionId: number) => {
+  const handleDeleteSession = (sessionId: string) => {
     deleteAppointmentMutation.mutate(sessionId);
   };
 

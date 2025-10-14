@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertWorkoutProgramSchema, insertWorkoutSessionSchema, insertExerciseProgressSchema, insertExerciseSchema, insertPupilTrainingPlanSchema, insertPupilSchema, insertActiveWorkoutSchema } from "@shared/schema";
+import { insertWorkoutProgramSchema, insertWorkoutSessionSchema, insertExerciseProgressSchema, insertExerciseSchema, insertPupilTrainingPlanSchema, insertPupilSchema, insertActiveWorkoutSchema, insertAppointmentSchema } from "@shared/schema";
 
 function translateExerciseToEnglish(russianName: string): string {
   const translations: Record<string, string> = {
@@ -102,7 +102,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Phone number already registered" });
       }
       
-      const newPupil = await storage.registerPupil(pupilData);
+      const newPupil = await storage.registerPupil(pupilData as any);
       
       // Don't send password in response
       const { password: _, ...pupilWithoutPassword } = newPupil;
@@ -140,7 +140,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User routes
   app.get("/api/user/:id", async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
       const user = await storage.getUser(userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -156,7 +156,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update user route
   app.put("/api/user/:id", async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
       const updates = req.body;
       
       const updatedUser = await storage.updateUser(userId, updates);
@@ -186,7 +186,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/workout-programs", async (req, res) => {
     try {
       const validatedData = insertWorkoutProgramSchema.parse(req.body);
-      const program = await storage.createWorkoutProgram(validatedData);
+      const program = await storage.createWorkoutProgram(validatedData as any);
       res.status(201).json(program);
     } catch (error) {
       res.status(400).json({ message: "Invalid data" });
@@ -195,7 +195,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/workout-programs/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const validatedData = insertWorkoutProgramSchema.partial().parse(req.body);
       const program = await storage.updateWorkoutProgram(id, validatedData);
       if (!program) {
@@ -210,7 +210,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Workout session routes
   app.get("/api/workout-sessions/:userId", async (req, res) => {
     try {
-      const userId = parseInt(req.params.userId);
+      const userId = req.params.userId;
       const sessions = await storage.getWorkoutSessions(userId);
       res.json(sessions);
     } catch (error) {
@@ -220,7 +220,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/workout-sessions/:userId/:date", async (req, res) => {
     try {
-      const userId = parseInt(req.params.userId);
+      const userId = req.params.userId;
       const date = req.params.date;
       const sessions = await storage.getWorkoutSessionsByDate(userId, date);
       
@@ -241,7 +241,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/workout-sessions", async (req, res) => {
     try {
       const validatedData = insertWorkoutSessionSchema.parse(req.body);
-      const session = await storage.createWorkoutSession(validatedData);
+      const session = await storage.createWorkoutSession(validatedData as any);
       res.status(201).json(session);
     } catch (error) {
       res.status(400).json({ message: "Invalid data" });
@@ -250,7 +250,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/workout-sessions/:id", async (req, res) => {
     try {
-      const sessionId = parseInt(req.params.id);
+      const sessionId = req.params.id;
       const session = await storage.updateWorkoutSession(sessionId, req.body);
       if (!session) {
         return res.status(404).json({ message: "Session not found" });
@@ -264,7 +264,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Exercise progress routes
   app.get("/api/exercise-progress/:userId", async (req, res) => {
     try {
-      const userId = parseInt(req.params.userId);
+      const userId = req.params.userId;
       const progress = await storage.getExerciseProgress(userId);
       res.json(progress);
     } catch (error) {
@@ -275,7 +275,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/exercise-progress", async (req, res) => {
     try {
       const validatedData = insertExerciseProgressSchema.parse(req.body);
-      const progress = await storage.createExerciseProgress(validatedData);
+      const progress = await storage.createExerciseProgress(validatedData as any);
       res.status(201).json(progress);
     } catch (error) {
       res.status(400).json({ message: "Invalid data" });
@@ -306,7 +306,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/exercises/:id", async (req, res) => {
     try {
-      const exerciseId = parseInt(req.params.id);
+      const exerciseId = req.params.id;
       const exercise = await storage.getExercise(exerciseId);
       if (!exercise) {
         return res.status(404).json({ message: "Exercise not found" });
@@ -320,7 +320,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/exercises", async (req, res) => {
     try {
       const validatedData = insertExerciseSchema.parse(req.body);
-      const exercise = await storage.createExercise(validatedData);
+      const exercise = await storage.createExercise(validatedData as any);
       res.status(201).json(exercise);
     } catch (error) {
       res.status(400).json({ message: "Invalid exercise data" });
@@ -329,7 +329,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/exercises/:id", async (req, res) => {
     try {
-      const exerciseId = parseInt(req.params.id);
+      const exerciseId = req.params.id;
       const updates = req.body;
       
       
@@ -345,7 +345,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/exercises/:id", async (req, res) => {
     try {
-      const exerciseId = parseInt(req.params.id);
+      const exerciseId = req.params.id;
       const success = await storage.deleteExercise(exerciseId);
       if (!success) {
         return res.status(404).json({ message: "Exercise not found" });
@@ -368,7 +368,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Manual image upload for exercises
   app.get("/api/exercises/:id/search-image", async (req, res) => {
     try {
-      const exerciseId = parseInt(req.params.id);
+      const exerciseId = req.params.id;
       const exercise = await storage.getExercise(exerciseId);
       
       if (!exercise) {
@@ -385,7 +385,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update exercise image
   app.patch("/api/exercises/:id/image", async (req, res) => {
     try {
-      const exerciseId = parseInt(req.params.id);
+      const exerciseId = req.params.id;
       const { imageUrl } = req.body;
       
       const exercise = await storage.updateExercise(exerciseId, { 
@@ -405,7 +405,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Dashboard stats
   app.get("/api/dashboard-stats/:userId", async (req, res) => {
     try {
-      const userId = parseInt(req.params.userId);
+      const userId = req.params.userId;
       const today = new Date().toISOString().split('T')[0];
       
       const [allSessions, todaySessions, allProgress] = await Promise.all([
@@ -438,7 +438,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Pupil routes
   app.get("/api/trainers/:trainerId/pupils", async (req, res) => {
     try {
-      const trainerId = parseInt(req.params.trainerId);
+      const trainerId = req.params.trainerId;
       const pupils = await storage.getPupils(trainerId);
       res.json(pupils);
     } catch (error) {
@@ -448,7 +448,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/pupils/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const pupil = await storage.getPupil(id);
       if (!pupil) {
         return res.status(404).json({ message: "Pupil not found" });
@@ -461,16 +461,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/trainers/:trainerId/pupils", async (req, res) => {
     try {
-      const trainerId = parseInt(req.params.trainerId);
+      const trainerId = req.params.trainerId;
       
       const pupilData = insertPupilSchema.parse({
         ...req.body,
         trainerId,
         joinDate: new Date().toISOString().split('T')[0]
       });
-      
-      const pupil = await storage.createPupil(pupilData);
-      
+
+      const pupil = await storage.createPupil(pupilData as any);
+
       res.json(pupil);
     } catch (error) {
       res.status(400).json({ message: "Failed to create pupil" });
@@ -479,7 +479,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/pupils/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const updates = req.body;
       
       const pupil = await storage.updatePupil(id, updates);
@@ -495,7 +495,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/pupils/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const success = await storage.deletePupil(id);
       if (!success) {
         return res.status(404).json({ message: "Pupil not found" });
@@ -509,7 +509,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Pupils statistics
   app.get("/api/pupils/stats/:trainerId", async (req, res) => {
     try {
-      const trainerId = parseInt(req.params.trainerId);
+      const trainerId = req.params.trainerId;
       const stats = await storage.getPupilsStats(trainerId);
       res.json(stats);
     } catch (error) {
@@ -520,7 +520,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Pupil training plan routes
   app.get("/api/pupils/:pupilId/training-plans", async (req, res) => {
     try {
-      const pupilId = parseInt(req.params.pupilId);
+      const pupilId = req.params.pupilId;
       const plans = await storage.getPupilTrainingPlans(pupilId);
       res.json(plans);
     } catch (error) {
@@ -530,7 +530,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/pupils/:pupilId/active-training-plan", async (req, res) => {
     try {
-      const pupilId = parseInt(req.params.pupilId);
+      const pupilId = req.params.pupilId;
       const plan = await storage.getActiveTrainingPlan(pupilId);
       res.json(plan || null);
     } catch (error) {
@@ -540,14 +540,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/pupils/:pupilId/training-plans", async (req, res) => {
     try {
-      const pupilId = parseInt(req.params.pupilId);
+      const pupilId = req.params.pupilId;
       
       const planData = insertPupilTrainingPlanSchema.parse({
         ...req.body,
         pupilId
       });
-      
-      const plan = await storage.createPupilTrainingPlan(planData);
+
+      const plan = await storage.createPupilTrainingPlan(planData as any);
       res.json(plan);
     } catch (error) {
       res.status(400).json({ 
@@ -559,7 +559,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/training-plans/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const updates = req.body;
       const plan = await storage.updatePupilTrainingPlan(id, updates);
       if (!plan) {
@@ -573,7 +573,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/training-plans/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const success = await storage.deletePupilTrainingPlan(id);
       if (!success) {
         return res.status(404).json({ message: "Training plan not found" });
@@ -587,7 +587,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Active workout routes
   app.get("/api/trainers/:trainerId/active-workouts", async (req, res) => {
     try {
-      const trainerId = parseInt(req.params.trainerId);
+      const trainerId = req.params.trainerId;
       const activeWorkouts = await storage.getActiveWorkouts(trainerId);
       res.json(activeWorkouts);
     } catch (error) {
@@ -597,8 +597,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/trainers/:trainerId/pupils/:pupilId/active-workout", async (req, res) => {
     try {
-      const trainerId = parseInt(req.params.trainerId);
-      const pupilId = parseInt(req.params.pupilId);
+      const trainerId = req.params.trainerId;
+      const pupilId = req.params.pupilId;
       const activeWorkout = await storage.getActiveWorkout(trainerId, pupilId);
       res.json(activeWorkout || null);
     } catch (error) {
@@ -609,7 +609,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/active-workouts", async (req, res) => {
     try {
       const workoutData = insertActiveWorkoutSchema.parse(req.body);
-      const activeWorkout = await storage.createActiveWorkout(workoutData);
+      const activeWorkout = await storage.createActiveWorkout(workoutData as any);
       res.json(activeWorkout);
     } catch (error) {
       res.status(400).json({ message: "Failed to create active workout" });
@@ -618,8 +618,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/trainers/:trainerId/pupils/:pupilId/active-workout", async (req, res) => {
     try {
-      const trainerId = parseInt(req.params.trainerId);
-      const pupilId = parseInt(req.params.pupilId);
+      const trainerId = req.params.trainerId;
+      const pupilId = req.params.pupilId;
       const success = await storage.deleteActiveWorkout(trainerId, pupilId);
       if (!success) {
         return res.status(404).json({ message: "Active workout not found" });
@@ -627,6 +627,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true });
     } catch (error) {
       res.status(400).json({ message: "Failed to delete active workout" });
+    }
+  });
+
+  // Appointment routes
+  app.get("/api/trainers/:trainerId/appointments", async (req, res) => {
+    try {
+      const trainerId = req.params.trainerId;
+      const appointments = await storage.getAppointments(trainerId);
+      res.json(appointments);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get appointments" });
+    }
+  });
+
+  app.get("/api/appointments/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const appointment = await storage.getAppointment(id);
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+      res.json(appointment);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get appointment" });
+    }
+  });
+
+  app.post("/api/appointments", async (req, res) => {
+    try {
+      const appointmentData = insertAppointmentSchema.parse(req.body);
+      const appointment = await storage.createAppointment(appointmentData as any);
+      res.status(201).json(appointment);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to create appointment" });
+    }
+  });
+
+  app.put("/api/appointments/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const updates = req.body;
+      const appointment = await storage.updateAppointment(id, updates);
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+      res.json(appointment);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to update appointment" });
+    }
+  });
+
+  app.delete("/api/appointments/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const success = await storage.deleteAppointment(id);
+      if (!success) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      res.status(400).json({ message: "Failed to delete appointment" });
     }
   });
 

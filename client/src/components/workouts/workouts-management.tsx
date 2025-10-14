@@ -18,7 +18,7 @@ import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
 import type { Exercise, Pupil, WorkoutProgram, User as UserType } from "@/../../shared/schema";
 
 interface WorkoutPlan {
-  id: number;
+  id: string;
   name: string;
   description: string;
   difficulty: string;
@@ -58,7 +58,7 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const trainerId = 1; // В реальном приложении это будет из контекста пользователя
+  const trainerId = '550e8400-e29b-41d4-a716-446655440000'; // Main trainer UUID
 
   // Загрузка данных пользователя и учеников
   const { data: user } = useQuery<UserType>({
@@ -79,7 +79,7 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
 
   // Мутация для обновления планов тренировок
   const updateWorkoutProgramMutation = useMutation({
-    mutationFn: async ({ id, updates }: { id: number; updates: Partial<WorkoutProgram> }) => {
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<WorkoutProgram> }) => {
       const response = await fetch(`/api/workout-programs/${id}`, {
         method: 'PUT',
         headers: {
@@ -129,10 +129,13 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
   // Группировка упражнений по группам мышц
   const muscleGroups = useMemo(() => {
     const groups: { [key: string]: Exercise[] } = {};
-    
+
     exercises.forEach(exercise => {
       // Используем первую группу мышц из primaryMuscles как основную группу
-      const primaryMuscle = exercise.primaryMuscles?.[0]?.toLowerCase() || 'другое';
+      const primaryMusclesArray = Array.isArray(exercise.primaryMuscles)
+        ? exercise.primaryMuscles
+        : (typeof exercise.primaryMuscles === 'string' ? JSON.parse(exercise.primaryMuscles as string) : []);
+      const primaryMuscle = (primaryMusclesArray[0] as string)?.toLowerCase() || 'другое';
       if (!groups[primaryMuscle]) {
         groups[primaryMuscle] = [];
       }

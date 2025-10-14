@@ -15,7 +15,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // TEMPORARY: Bypass auth for testing
-const BYPASS_AUTH = true; // Временно включим для тестирования
+const BYPASS_AUTH = false; // Disabled to use real Supabase authentication
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -81,6 +81,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Проверяем профиль ученика в базе данных
   const checkPupilProfile = async (user: User) => {
     try {
+      // Если пользователь - тренер, не ищем его в таблице students
+      if ((user as any).user_metadata?.is_trainer) {
+        setPupil(null);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('students')
         .select('*')
@@ -166,7 +172,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(testUser);
       setPupil({
         id: '1',
-        trainer_id: 1, // Привязываем к первому тренеру
+        trainer_id: '550e8400-e29b-41d4-a716-446655440000', // Main trainer UUID
         first_name: userData.firstName,
         last_name: userData.lastName,
         email: email,
@@ -199,7 +205,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { error: profileError } = await supabase
           .from('students')
           .insert({
-            trainer_id: 1, // Привязываем к первому тренеру (можно сделать динамическим)
+            trainer_id: '550e8400-e29b-41d4-a716-446655440000', // Main trainer UUID
             first_name: userData.firstName,
             last_name: userData.lastName,
             middle_name: userData.middleName || '',
@@ -215,12 +221,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             parent_middle_name: userData.parentMiddleName || '',
             parent_phone: userData.parentPhone || '',
             parent_email: userData.parentEmail || '',
+            is_parent_representative: userData.isParentRepresentative || false,
             
             // Согласия
-            rules_accepted: userData.contractAccepted,
-            rules_accepted_date: new Date().toISOString().split('T')[0],
-            parental_consent: userData.educationConsentAccepted,
-            parental_consent_date: new Date().toISOString().split('T')[0],
+            privacy_policy_accepted: userData.privacyPolicyAccepted,
+            privacy_policy_accepted_date: new Date().toISOString().split('T')[0],
+            contract_accepted: userData.contractAccepted,
+            contract_accepted_date: new Date().toISOString().split('T')[0],
+            education_consent_accepted: userData.educationConsentAccepted,
+            education_consent_accepted_date: new Date().toISOString().split('T')[0],
           });
 
         if (profileError) {

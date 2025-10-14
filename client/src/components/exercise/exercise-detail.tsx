@@ -15,7 +15,7 @@ import { exercisesDb } from "@/lib/database";
 import { useToast } from "@/hooks/use-toast";
 
 interface Exercise {
-  id: number;
+  id: string;
   name: string;
   primaryMuscles: string[];
   secondaryMuscles: string[];
@@ -32,7 +32,7 @@ interface ExerciseDetailProps {
   exercise: Exercise;
   onClose: () => void;
   onEdit?: (exercise: Exercise) => void;
-  onDelete?: (exerciseId: number) => void;
+  onDelete?: (exerciseId: string) => void;
 }
 
 export function ExerciseDetail({ exercise, onClose, onEdit, onDelete }: ExerciseDetailProps) {

@@ -5,7 +5,7 @@ import type { WorkoutSession, WorkoutProgram } from "@shared/schema";
 
 interface TodayScheduleProps {
   sessions: (WorkoutSession & { program?: WorkoutProgram })[];
-  onStartWorkout: (sessionId: number) => void;
+  onStartWorkout: (sessionId: string) => void;
 }
 
 export function TodaySchedule({ sessions, onStartWorkout }: TodayScheduleProps) {

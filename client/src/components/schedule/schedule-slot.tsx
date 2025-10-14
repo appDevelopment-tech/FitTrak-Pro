@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useAuth } from '@/lib/auth';
 import { useToast } from '@/hooks/use-toast';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { appointmentsDb } from '@/lib/database';
+import { api } from '@/lib/api';
 import type { Appointment, Pupil } from '@shared/schema';
 import { Calendar, UserPlus, UserMinus, Users, Check, Clock, Dumbbell, Trash2 } from 'lucide-react';
 
@@ -18,11 +18,11 @@ interface ScheduleSlotProps {
   isTrainer?: boolean;
   maxSlots?: number;
   onSlotClick?: (time: string) => void;
-  onToggleStatus?: (appointmentId: number) => void;
-  onDeleteAppointment?: (appointmentId: number) => void;
-  onStartWorkout?: (pupilId: number) => void;
-  isWorkoutActive?: (trainerId: number, pupilId: number) => boolean;
-  trainerId?: number;
+  onToggleStatus?: (appointmentId: string) => void;
+  onDeleteAppointment?: (appointmentId: string) => void;
+  onStartWorkout?: (pupilId: string) => void;
+  isWorkoutActive?: (trainerId: string, pupilId: string) => boolean;
+  trainerId?: string;
 }
 
 type SlotStatus = 'free' | 'available' | 'full' | 'user-booked';
@@ -48,7 +48,7 @@ export function ScheduleSlot({
   onDeleteAppointment,
   onStartWorkout,
   isWorkoutActive,
-  trainerId = 1
+  trainerId = "550e8400-e29b-41d4-a716-446655440000"
 }: ScheduleSlotProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -90,9 +90,9 @@ export function ScheduleSlot({
 
   // Мутации для управления записями
   const createAppointmentMutation = useMutation({
-    mutationFn: async (pupilId: number) => {
-      return await appointmentsDb.create({
-        trainerId: 1, // В реальном приложении из контекста
+    mutationFn: async (pupilId: string) => {
+      return await api.appointments.create({
+        trainerId: trainerId, // Use prop trainerId
         pupilId,
         date,
         time,
@@ -117,8 +117,8 @@ export function ScheduleSlot({
   });
 
   const deleteAppointmentMutation = useMutation({
-    mutationFn: async (appointmentId: number) => {
-      return await appointmentsDb.delete(appointmentId);
+    mutationFn: async (appointmentId: string) => {
+      return await api.appointments.delete(appointmentId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
