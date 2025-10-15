@@ -17,14 +17,15 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Проверяем, настроен ли Supabase
 const isSupabaseConfigured = !!import.meta.env.VITE_SUPABASE_URL && !!import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// TEMPORARY: Bypass auth for testing
-const BYPASS_AUTH = false; // Disabled to use real Supabase authentication
+// TEMPORARY: Bypass auth for testing (можно включить для тестирования без Supabase)
+const BYPASS_AUTH = import.meta.env.VITE_BYPASS_AUTH === 'true';
 
 // Дополнительная проверка для отладки
 console.log('Supabase configuration check:', {
   VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
   VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,
-  isSupabaseConfigured
+  isSupabaseConfigured,
+  BYPASS_AUTH
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -117,11 +118,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signIn = async (email: string, password: string, userType?: 'trainer' | 'pupil') => {
-    console.log('signIn called with:', { email, password, userType, isSupabaseConfigured });
+    console.log('signIn called with:', { email, password, userType, isSupabaseConfigured, BYPASS_AUTH });
     
-    if (!isSupabaseConfigured) {
-      console.log('Using test authentication mode');
-      // Если Supabase не настроен, используем тестовую аутентификацию
+    if (BYPASS_AUTH) {
+      console.log('Using test authentication mode (BYPASS_AUTH enabled)');
+      // Тестовый режим - используем тестовую аутентификацию
       const testUsers = {
         'petrusenko@fittrak.pro': { id: '1', name: 'Петрусенко Константин Владимирович', isTrainer: true },
         'ivanov@fittrak.pro': { id: '2', name: 'Иванов Иван', isTrainer: false },
@@ -174,13 +175,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    // Если дошли до сюда, значит Supabase настроен, но это не должно происходить
-    console.log('Supabase is configured, but this should not happen in test mode');
-    throw new Error('Supabase не настроен правильно');
+    // Режим Supabase - используем реальную аутентификацию
+    if (!isSupabaseConfigured) {
+      throw new Error('Supabase не настроен. Установите VITE_SUPABASE_URL и VITE_SUPABASE_ANON_KEY в файле .env');
+    }
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (data.user) {
+        setUser(data.user);
+        // Проверяем профиль ученика
+        await checkPupilProfile(data.user);
+      }
+    } catch (error: any) {
+      throw new Error(error.message || 'Ошибка входа');
+    }
   };
 
   const signUp = async (email: string, password: string, userData: any) => {
-    if (!isSupabaseConfigured) {
+    if (BYPASS_AUTH) {
       // Тестовый режим - симулируем успешную регистрацию
       const testUser = {
         id: Date.now().toString(), // Генерируем уникальный ID
@@ -208,6 +229,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         join_date: new Date().toISOString().split('T')[0],
       });
       return;
+    }
+
+    // Режим Supabase - используем реальную регистрацию
+    if (!isSupabaseConfigured) {
+      throw new Error('Supabase не настроен. Установите VITE_SUPABASE_URL и VITE_SUPABASE_ANON_KEY в файле .env');
     }
 
     try {
