@@ -20,6 +20,13 @@ const isSupabaseConfigured = !!import.meta.env.VITE_SUPABASE_URL && !!import.met
 // TEMPORARY: Bypass auth for testing
 const BYPASS_AUTH = false; // Disabled to use real Supabase authentication
 
+// Дополнительная проверка для отладки
+console.log('Supabase configuration check:', {
+  VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
+  VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,
+  isSupabaseConfigured
+});
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [pupil, setPupil] = useState<any | null>(null);
@@ -167,24 +174,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      if (data.user) {
-        setUser(data.user);
-        // Проверяем профиль ученика
-        await checkPupilProfile(data.user);
-      }
-    } catch (error: any) {
-      throw new Error(error.message || 'Ошибка входа');
-    }
+    // Если дошли до сюда, значит Supabase настроен, но это не должно происходить
+    console.log('Supabase is configured, but this should not happen in test mode');
+    throw new Error('Supabase не настроен правильно');
   };
 
   const signUp = async (email: string, password: string, userData: any) => {
