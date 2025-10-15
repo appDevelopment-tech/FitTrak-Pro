@@ -40,7 +40,7 @@ function PupilRoute({ component: Component }: { component: () => JSX.Element }) 
 
 function TrainerRoute({ component: Component }: { component: () => JSX.Element }) {
   return (
-    <RoleGuard allowedRoles={['trainer']} fallbackPath="/login">
+    <RoleGuard allowedRoles={['trainer']} fallbackPath="/admin/login">
       <Component />
     </RoleGuard>
   );
@@ -54,8 +54,9 @@ function Router() {
       
       {/* Вход для учеников */}
       <Route path="/login" component={LoginPage} />
-      
+
       {/* Вход для тренеров */}
+      <Route path="/admin/login" component={TrainerLoginPage} />
       <Route path="/login/trener" component={TrainerLoginPage} />
       
       {/* Маршруты для учеников */}
@@ -65,6 +66,14 @@ function Router() {
       
       {/* Маршруты для тренеров */}
       <Route path="/cabinet">
+        {() => <TrainerRoute component={Dashboard} />}
+      </Route>
+      
+      {/* Admin маршруты для тренеров */}
+      <Route path="/admin/dashboard">
+        {() => <TrainerRoute component={Dashboard} />}
+      </Route>
+      <Route path="/admin/dashboard/:tab">
         {() => <TrainerRoute component={Dashboard} />}
       </Route>
       

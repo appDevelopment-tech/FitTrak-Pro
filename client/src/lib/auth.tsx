@@ -17,17 +17,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Проверяем, настроен ли Supabase
 const isSupabaseConfigured = !!import.meta.env.VITE_SUPABASE_URL && !!import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// TEMPORARY: Bypass auth for testing (можно включить для тестирования без Supabase)
-const BYPASS_AUTH = import.meta.env.VITE_BYPASS_AUTH === 'true';
-
-// Дополнительная проверка для отладки
-console.log('Supabase configuration check:', {
-  VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
-  VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,
-  isSupabaseConfigured,
-  BYPASS_AUTH
-});
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [pupil, setPupil] = useState<any | null>(null);
@@ -44,7 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const getSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
-        
+
         if (error) {
           console.error('Error getting session:', error);
           setLoading(false);
@@ -69,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event: string, session: any) => {
         console.log('Auth state changed:', event, session?.user?.email);
-        
+
         if (event === 'SIGNED_IN' && session?.user) {
           setUser(session.user);
           await checkPupilProfile(session.user);
@@ -77,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(null);
           setPupil(null);
         }
-        
+
         setLoading(false);
       }
     );
@@ -118,66 +107,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signIn = async (email: string, password: string, userType?: 'trainer' | 'pupil') => {
-    console.log('signIn called with:', { email, password, userType, isSupabaseConfigured, BYPASS_AUTH });
-    
-    if (BYPASS_AUTH) {
-      console.log('Using test authentication mode (BYPASS_AUTH enabled)');
-      // Тестовый режим - используем тестовую аутентификацию
-      const testUsers = {
-        'petrusenko@fittrak.pro': { id: '1', name: 'Петрусенко Константин Владимирович', isTrainer: true },
-        'ivanov@fittrak.pro': { id: '2', name: 'Иванов Иван', isTrainer: false },
-        'student1@fittrak.pro': { id: '3', name: 'Студентович_1 Студент_1', isTrainer: false },
-      };
+    console.log('signIn called with:', { email, password, userType, isSupabaseConfigured });
 
-      const testPasswords = ['trainer123', 'student123'];
-      
-      const user = testUsers[email as keyof typeof testUsers];
-      console.log('Test user found:', user);
-      
-      if (user && testPasswords.includes(password)) {
-        console.log('Test authentication successful');
-        // Проверяем соответствие типа пользователя
-        if (userType === 'trainer' && !user.isTrainer) {
-          throw new Error('Ученики не могут войти через вход для тренеров');
-        }
-        if (userType === 'pupil' && user.isTrainer) {
-          throw new Error('Тренеры должны использовать вход для тренеров');
-        }
-
-        const testUser = {
-          id: user.id,
-          email: email,
-          app_metadata: {},
-          user_metadata: {
-            first_name: user.isTrainer ? 'Константин Владимирович' : user.name,
-            last_name: user.isTrainer ? 'Петрусенко' : 'Test',
-            is_trainer: user.isTrainer,
-          },
-          aud: 'authenticated',
-          created_at: new Date().toISOString(),
-        } as User;
-        
-        setUser(testUser);
-        
-        if (userType === 'pupil') {
-          setPupil({
-            id: user.id,
-            first_name: user.name.split(' ')[0],
-            last_name: user.name.split(' ')[1] || 'Test',
-            email: email,
-            phone: user.id === '2' ? '+7 (999) 123-45-67' : '+7 (999) 987-65-43',
-          });
-        }
-        return;
-      } else {
-        console.log('Test authentication failed');
-        throw new Error('Неверные данные для входа');
-      }
-    }
-
-    // Режим Supabase - используем реальную аутентификацию
     if (!isSupabaseConfigured) {
-      throw new Error('Supabase не настроен. Установите VITE_SUPABASE_URL и VITE_SUPABASE_ANON_KEY в файле .env');
+      throw new Error('Supabase is not configured. Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env file');
     }
 
     try {
@@ -201,37 +134,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, userData: any) => {
-    if (BYPASS_AUTH) {
-      // Тестовый режим - симулируем успешную регистрацию
-      const testUser = {
-        id: Date.now().toString(), // Генерируем уникальный ID
-        email: email,
-        app_metadata: {},
-        user_metadata: {
-          first_name: userData.firstName,
-          last_name: userData.lastName,
-          is_trainer: false,
-        },
-        aud: 'authenticated',
-        created_at: new Date().toISOString(),
-      } as User;
-      
-      setUser(testUser);
-      setPupil({
-        id: testUser.id,
-        trainer_id: '1', // Привязываем к тренеру Петрусенко
-        first_name: userData.firstName,
-        last_name: userData.lastName,
-        email: email,
-        phone: userData.phone || '+7 (999) 000-00-00',
-        birth_date: userData.birthDate || '1990-01-01',
-        status: 'active',
-        join_date: new Date().toISOString().split('T')[0],
-      });
-      return;
-    }
-
-    // Режим Supabase - используем реальную регистрацию
     if (!isSupabaseConfigured) {
       throw new Error('Supabase не настроен. Установите VITE_SUPABASE_URL и VITE_SUPABASE_ANON_KEY в файле .env');
     }
@@ -269,7 +171,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             email: email,
             join_date: new Date().toISOString().split('T')[0],
             status: 'pending',
-            
+
             // Поля для родителей (если несовершеннолетний)
             parent_first_name: userData.parentFirstName || '',
             parent_last_name: userData.parentLastName || '',
@@ -277,7 +179,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             parent_phone: userData.parentPhone || '',
             parent_email: userData.parentEmail || '',
             is_parent_representative: userData.isParentRepresentative || false,
-            
+
             // Согласия
             privacy_policy_accepted: userData.privacyPolicyAccepted,
             privacy_policy_accepted_date: new Date().toISOString().split('T')[0],
@@ -309,7 +211,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) {
         throw new Error(error.message);
       }
-      
+
       setUser(null);
       setPupil(null);
     } catch (error: any) {

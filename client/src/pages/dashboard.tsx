@@ -42,6 +42,8 @@ export default function Dashboard() {
   // Обработка URL при загрузке страницы
   useEffect(() => {
     const currentPath = location.split('?')[0];
+    const urlParams = new URLSearchParams(location.split('?')[1] || '');
+    const tab = urlParams.get('tab');
     
     if (currentPath === '/cabinet') {
       // Проверяем, может ли пользователь получить доступ к кабинету
@@ -49,6 +51,19 @@ export default function Dashboard() {
         setActiveView('profile');
       } else {
         // Редиректим учеников на расписание
+        setActiveView('schedule');
+        setLocation('/dashboard');
+      }
+    } else if (currentPath.startsWith('/admin/dashboard')) {
+      // Admin dashboard routes for trainers
+      if (isTrainerUser) {
+        if (tab) {
+          setActiveView(tab);
+        } else {
+          setActiveView('schedule');
+        }
+      } else {
+        // Redirect non-trainers to student dashboard
         setActiveView('schedule');
         setLocation('/dashboard');
       }

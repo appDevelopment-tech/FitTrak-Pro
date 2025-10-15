@@ -34,3 +34,6 @@ check-test-users.js
 create-test-users-uuid.sql
 test-auth-summary.js
 *.sql
+
+# Claude AI configuration
+CLAUDE.md

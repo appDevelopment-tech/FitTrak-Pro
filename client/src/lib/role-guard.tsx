@@ -38,7 +38,7 @@ export function RoleGuard({ children, allowedRoles, fallbackPath = '/login' }: R
     if (!allowedRoles.includes(userRole)) {
       // Редирект в зависимости от роли
       if (userRole === 'trainer') {
-        setLocation('/admin/dashboard');
+        setLocation('/cabinet');
       } else {
         setLocation('/dashboard');
       }

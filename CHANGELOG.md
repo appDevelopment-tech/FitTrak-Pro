@@ -15,6 +15,72 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2025-10-15] - Test Accounts & Authentication Cleanup
+
+### Removed
+- **Test Accounts Section**: Removed entire test accounts documentation from CLAUDE.md (lines 596-625)
+- **Mock Data**: Removed all hardcoded test data from codebase
+  - `auth.tsx`: Removed 53 lines of test user credentials and test authentication logic
+  - `database.ts`: Removed 283 lines of mock student and exercise data
+  - Removed `BYPASS_AUTH` constant (auth bypass mode no longer supported)
+- **Temporary Files**: Cleaned up test user creation scripts
+
+### Added
+- **Database Test Users**: Created proper test accounts using Supabase Admin API
+  - 1 trainer account: `petrusenko@fittrak.pro` (password: `trainer123`)
+  - 2 student accounts: `ivanov@fittrak.pro`, `student1@fittrak.pro` (password: `student123`)
+- **Admin Login Route**: Added `/admin/login` route for trainer authentication
+- **Supabase Service Key**: Added `SUPABASE_SERVICE_ROLE_KEY` to environment variables for admin operations
+
+### Changed
+- **Authentication**: All accounts now use real Supabase authentication (no bypass mode)
+- **Email Confirmation**: All test accounts have auto-confirmed emails
+- **Student Records**: Students properly linked to trainer in database with complete profiles
+- **Login URLs**:
+  - Trainer login: `http://localhost:5173/admin/login` (also aliased at `/login/trener`)
+  - Student login: `http://localhost:5173/login`
+
+### Fixed
+- **Trainer Redirect**: Fixed role guard redirect from `/admin/dashboard` → `/cabinet` for trainers
+- **Auth Error Handling**: Improved error messages when Supabase is not configured
+- **Route Aliases**: Added `/admin/dashboard` and `/admin/dashboard/:tab` routes for trainer dashboard
+
+### Technical Details
+
+#### Test User Creation
+```javascript
+// Created via Supabase Admin API
+const { data: trainer } = await supabaseAdmin.auth.admin.createUser({
+  email: 'petrusenko@fittrak.pro',
+  password: 'trainer123',
+  email_confirm: true,
+  user_metadata: {
+    first_name: 'Константин Владимирович',
+    last_name: 'Петрусенко',
+    is_trainer: true
+  }
+});
+```
+
+#### Files Modified
+- `client/src/lib/auth.tsx`: Removed test mode, improved error handling
+- `client/src/lib/database.ts`: Removed all mock data arrays
+- `client/src/lib/role-guard.tsx`: Fixed trainer redirect path
+- `client/src/App.tsx`: Added `/admin/login` route, added admin dashboard routes
+- `CLAUDE.md`: Removed outdated test accounts section
+
+#### Database Changes
+- Created 3 auth users with confirmed emails
+- Added 2 student records in `students` table
+- All UUIDs properly linked (students → trainer relationship)
+
+### Security Notes
+- Test credentials should only be used in development environment
+- Production should use real user registration flow
+- Service role key must be kept secure (already in `.gitignore`)
+
+---
+
 ## [2025-01-14] - Phase 9: Trainer Schedule Database Integration
 
 ### Changed
