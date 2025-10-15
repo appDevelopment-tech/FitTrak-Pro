@@ -189,7 +189,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string, userData: any) => {
     if (!isSupabaseConfigured) {
-      throw new Error('Регистрация недоступна без настройки Supabase');
+      // Тестовый режим - симулируем успешную регистрацию
+      const testUser = {
+        id: Date.now().toString(), // Генерируем уникальный ID
+        email: email,
+        app_metadata: {},
+        user_metadata: {
+          first_name: userData.firstName,
+          last_name: userData.lastName,
+          is_trainer: false,
+        },
+        aud: 'authenticated',
+        created_at: new Date().toISOString(),
+      } as User;
+      
+      setUser(testUser);
+      setPupil({
+        id: testUser.id,
+        trainer_id: '1', // Привязываем к тренеру Петрусенко
+        first_name: userData.firstName,
+        last_name: userData.lastName,
+        email: email,
+        phone: userData.phone || '+7 (999) 000-00-00',
+        birth_date: userData.birthDate || '1990-01-01',
+        status: 'active',
+        join_date: new Date().toISOString().split('T')[0],
+      });
+      return;
     }
 
     try {
