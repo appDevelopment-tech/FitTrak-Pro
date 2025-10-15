@@ -22,12 +22,8 @@ import {
   User, 
   Phone, 
   Mail, 
-  Calendar as CalendarIcon, 
   Heart, 
   Target, 
-  Users, 
-  CheckCircle, 
-  Clock, 
   AlertTriangle,
   Plus,
   Edit,
@@ -35,18 +31,12 @@ import {
   Shield,
   Activity,
   Dumbbell,
-  Trash2
+  Trash2,
+  Calendar as CalendarIcon
 } from "lucide-react";
 import { studentsDb, exercisesDb, trainingPlansDb } from "@/lib/database";
 import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
 import type { Pupil, InsertPupil, WorkoutProgram, Exercise } from "@shared/schema";
-
-interface PupilsStats {
-  totalPupils: number;
-  todayBookings: number;
-  confirmedToday: number;
-  pendingToday: number;
-}
 
 interface PupilWithAge extends Pupil {
   age: number;
@@ -177,20 +167,6 @@ export function ComprehensiveStudentsManagement() {
       exercises: ["Жим лежа", "Французский жим", "Тяга штанги", "Подъемы на бицепс", "Приседания", "Жим стоя"]
     }
   ];
-
-  // Получаем статистику учеников
-  const { data: stats } = useQuery<PupilsStats>({
-    queryKey: ['pupils-stats'],
-    queryFn: async () => {
-      const pupils = await studentsDb.getAll();
-      return {
-        totalPupils: pupils.length,
-        todayBookings: 0,
-        confirmedToday: 0,
-        pendingToday: 0
-      };
-    }
-  });
 
   // Получаем список учеников текущего тренера
   const { data: pupils = [], isLoading } = useQuery<Pupil[]>({
@@ -455,7 +431,6 @@ export function ComprehensiveStudentsManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['students', trainerId] });
-      queryClient.invalidateQueries({ queryKey: ['pupils-stats'] });
       setShowAddDialog(false);
       toast({
         title: "Успешно",
@@ -556,49 +531,6 @@ export function ComprehensiveStudentsManagement() {
 
   return (
     <div className="space-y-6">
-      {/* Статистика */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="flex items-center p-6">
-            <Users className="h-8 w-8 text-blue-500" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-muted-foreground">Всего учеников</p>
-              <p className="text-2xl font-bold">{stats?.totalPupils ?? 0}</p>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="flex items-center p-6">
-            <CalendarIcon className="h-8 w-8 text-green-500" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-muted-foreground">Записано на сегодня</p>
-              <p className="text-2xl font-bold">{stats?.todayBookings ?? 0}</p>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="flex items-center p-6">
-            <CheckCircle className="h-8 w-8 text-emerald-500" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-muted-foreground">Подтвердили</p>
-              <p className="text-2xl font-bold">{stats?.confirmedToday ?? 0}</p>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="flex items-center p-6">
-            <Clock className="h-8 w-8 text-orange-500" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-muted-foreground">Ожидают подтверждения</p>
-              <p className="text-2xl font-bold">{stats?.pendingToday ?? 0}</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Поиск и добавление */}
       <div className="flex items-center gap-4">
         <Input

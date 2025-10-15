@@ -1,0 +1,64 @@
+import { useState } from 'react';
+import { useLocation } from 'wouter';
+import { useAuth } from '@/lib/auth';
+import { LoginForm } from '@/components/auth/login-form';
+import { Button } from '@/components/ui/button';
+import { User, Dumbbell, ArrowLeft } from 'lucide-react';
+
+export default function TrainerLoginPage() {
+  const [, setLocation] = useLocation();
+  const { signIn } = useAuth();
+
+  const handleLoginSuccess = () => {
+    setLocation('/cabinet');
+  };
+
+  const handleBackToMain = () => {
+    setLocation('/login');
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <div className="w-full max-w-4xl">
+        {/* Заголовок */}
+        <div className="text-center mb-8">
+          <div className="mx-auto w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+            <Dumbbell className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">FitTrak-Pro</h1>
+          <p className="text-gray-600">
+            Вход для тренеров
+          </p>
+        </div>
+
+        {/* Форма входа для тренеров */}
+        <div className="space-y-4">
+          <LoginForm
+            onSuccess={handleLoginSuccess}
+            userType="trainer"
+          />
+          
+          <div className="text-center">
+            <Button
+              variant="link"
+              onClick={handleBackToMain}
+              className="p-0 flex items-center gap-2 mx-auto"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Вернуться к основному входу
+            </Button>
+          </div>
+        </div>
+
+        {/* Информация для тренеров */}
+        <div className="mt-8 text-center">
+          <div className="inline-flex items-center gap-2 text-sm text-gray-500">
+            <User className="w-4 h-4" />
+            Вход в кабинет тренера
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+

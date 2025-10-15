@@ -21,9 +21,10 @@ type LoginFormData = z.infer<typeof loginSchema>;
 interface LoginFormProps {
   onSuccess?: () => void;
   onForgotPassword?: () => void;
+  userType?: 'trainer' | 'pupil';
 }
 
-export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
+export function LoginForm({ onSuccess, onForgotPassword, userType }: LoginFormProps) {
   const { toast } = useToast();
   const { signIn } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,7 +42,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
     setIsSubmitting(true);
     
     try {
-      await signIn(data.email, data.password, 'pupil');
+      await signIn(data.email, data.password, userType);
       
       toast({
         title: 'Вход выполнен!',

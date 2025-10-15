@@ -6,11 +6,18 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 console.log('Supabase env check:', {
   hasUrl: !!supabaseUrl,
   hasKey: !!supabaseAnonKey,
-  url: supabaseUrl
+  url: supabaseUrl,
+  actualUrl: supabaseUrl,
+  actualKey: supabaseAnonKey ? '***' + supabaseAnonKey.slice(-4) : 'none'
 });
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables. Please check .env file.');
+// Создаем клиент только если переменные окружения настроены
+let supabase: any = null;
+
+if (supabaseUrl && supabaseAnonKey) {
+  supabase = createClient(supabaseUrl, supabaseAnonKey);
+} else {
+  console.warn('Supabase не настроен. Используется тестовый режим.');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export { supabase };

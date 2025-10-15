@@ -9,7 +9,7 @@ import { RoleGuard } from "@/lib/role-guard";
 import Dashboard from "@/pages/dashboard";
 import PublicSchedule from "@/pages/public-schedule";
 import LoginPage from "@/pages/login";
-import AdminLoginPage from "@/pages/admin-login";
+import TrainerLoginPage from "@/pages/trainer-login";
 import NotFound from "@/pages/not-found";
 
 function ProtectedRoute({ component: Component }: { component: () => JSX.Element }) {
@@ -32,7 +32,7 @@ function ProtectedRoute({ component: Component }: { component: () => JSX.Element
 
 function PupilRoute({ component: Component }: { component: () => JSX.Element }) {
   return (
-    <RoleGuard allowedRoles={['pupil']} fallbackPath="/admin/login">
+    <RoleGuard allowedRoles={['pupil']} fallbackPath="/login">
       <Component />
     </RoleGuard>
   );
@@ -55,18 +55,15 @@ function Router() {
       {/* Вход для учеников */}
       <Route path="/login" component={LoginPage} />
       
-      {/* Скрытый вход для тренеров/админов */}
-      <Route path="/admin/login" component={AdminLoginPage} />
+      {/* Вход для тренеров */}
+      <Route path="/login/trener" component={TrainerLoginPage} />
       
       {/* Маршруты для учеников */}
       <Route path="/dashboard">
         {() => <PupilRoute component={Dashboard} />}
       </Route>
       
-      {/* Маршруты для тренеров/админов */}
-      <Route path="/admin/dashboard">
-        {() => <TrainerRoute component={Dashboard} />}
-      </Route>
+      {/* Маршруты для тренеров */}
       <Route path="/cabinet">
         {() => <TrainerRoute component={Dashboard} />}
       </Route>

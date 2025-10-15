@@ -1,9 +1,5 @@
 -- Создание тестовых пользователей для системы авторизации
 
--- Тестовый тренер/админ
-INSERT INTO users (username, password, first_name, last_name, email, phone, is_trainer) 
-VALUES ('admin', 'admin123', 'Админ', 'Админов', 'admin@fittrak.pro', '+7 (999) 000-00-01', true);
-
 -- Тестовый тренер
 INSERT INTO users (username, password, first_name, last_name, email, phone, is_trainer) 
 VALUES ('trainer1', 'trainer123', 'Иван', 'Тренеров', 'trainer@fittrak.pro', '+7 (999) 000-00-02', true);

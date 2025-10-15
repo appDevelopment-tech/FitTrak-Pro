@@ -1,9 +1,11 @@
 const CACHE_NAME = 'fittrak-pro-v1';
 const urlsToCache = [
   '/',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
-  '/manifest.json'
+  '/manifest.json',
+  '/icons/icon-72x72.png',
+  '/icons/icon-96x96.png',
+  '/icons/icon-128x128.png',
+  '/icons/icon-144x144.png'
 ];
 
 // Установка Service Worker
@@ -12,7 +14,10 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('Opened cache');
-        return cache.addAll(urlsToCache);
+        return cache.addAll(urlsToCache).catch((error) => {
+          console.log('Cache addAll failed:', error);
+          // Продолжаем работу даже если кэширование не удалось
+        });
       })
   );
 });
@@ -35,6 +40,11 @@ self.addEventListener('activate', (event) => {
 
 // Перехват запросов
 self.addEventListener('fetch', (event) => {
+  // Игнорируем запросы к внешним ресурсам и API
+  if (!event.request.url.startsWith(self.location.origin)) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
@@ -42,9 +52,12 @@ self.addEventListener('fetch', (event) => {
         if (response) {
           return response;
         }
-        return fetch(event.request);
-      }
-    )
+        return fetch(event.request).catch((error) => {
+          console.log('Fetch failed:', error);
+          // Возвращаем fallback страницу или просто игнорируем ошибку
+          return new Response('Network error', { status: 408 });
+        });
+      })
   );
 });
 
@@ -52,7 +65,7 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('push', (event) => {
   const options = {
     body: event.data ? event.data.text() : 'Новое уведомление от FitTrak Pro',
-    icon: '/icons/icon-192x192.png',
+    icon: '/icons/icon-144x144.png',
     badge: '/icons/icon-72x72.png',
     vibrate: [100, 50, 100],
     data: {
@@ -88,17 +101,3 @@ self.addEventListener('notificationclick', (event) => {
     );
   }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-

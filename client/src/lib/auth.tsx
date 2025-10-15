@@ -14,8 +14,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// TEMPORARY: Bypass auth for testing
-const BYPASS_AUTH = true; // Временно включим для тестирования
+// Проверяем, настроен ли Supabase
+const isSupabaseConfigured = !!import.meta.env.VITE_SUPABASE_URL && !!import.meta.env.VITE_SUPABASE_ANON_KEY;
+
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -23,11 +24,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (BYPASS_AUTH) {
-      // Тестовый режим (можно оставить для разработки)
-      setTimeout(() => {
-        setLoading(false);
-      }, 100);
+    if (!isSupabaseConfigured) {
+      // Если Supabase не настроен, просто завершаем загрузку
+      setLoading(false);
       return;
     }
 
@@ -58,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Слушаем изменения аутентификации
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: string, session: any) => {
         console.log('Auth state changed:', event, session?.user?.email);
         
         if (event === 'SIGNED_IN' && session?.user) {
@@ -80,6 +79,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Проверяем профиль ученика в базе данных
   const checkPupilProfile = async (user: User) => {
+    if (!isSupabaseConfigured || !supabase) {
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('students')
@@ -99,32 +102,63 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signIn = async (email: string, password: string, userType?: 'trainer' | 'pupil') => {
-    if (BYPASS_AUTH) {
-      // Тестовый режим - симулируем успешный вход
-      const testUser = {
-        id: '1',
-        email: email,
-        app_metadata: {},
-        user_metadata: {
-          first_name: 'Test',
-          last_name: 'User',
-          is_trainer: userType === 'trainer',
-        },
-        aud: 'authenticated',
-        created_at: new Date().toISOString(),
-      } as User;
+    console.log('signIn called with:', { email, password, userType, isSupabaseConfigured });
+    
+    if (!isSupabaseConfigured) {
+      console.log('Using test authentication mode');
+      // Если Supabase не настроен, используем тестовую аутентификацию
+      const testUsers = {
+        'trainer1': { id: '2', name: 'Тренер', isTrainer: true },
+        'trainer@fittrak.pro': { id: '2', name: 'Тренер', isTrainer: true },
+        'student1@fittrak.pro': { id: '3', name: 'Студент', isTrainer: false },
+        'student2@fittrak.pro': { id: '4', name: 'Студент', isTrainer: false },
+        'student3@fittrak.pro': { id: '5', name: 'Студент', isTrainer: false },
+      };
+
+      const testPasswords = ['trainer123', 'student123'];
       
-      setUser(testUser);
-      if (userType === 'pupil') {
-        setPupil({
-          id: '1',
-          first_name: 'Test',
-          last_name: 'Pupil',
+      const user = testUsers[email as keyof typeof testUsers];
+      console.log('Test user found:', user);
+      
+      if (user && testPasswords.includes(password)) {
+        console.log('Test authentication successful');
+        // Проверяем соответствие типа пользователя
+        if (userType === 'trainer' && !user.isTrainer) {
+          throw new Error('Ученики не могут войти через вход для тренеров');
+        }
+        if (userType === 'pupil' && user.isTrainer) {
+          throw new Error('Тренеры должны использовать вход для тренеров');
+        }
+
+        const testUser = {
+          id: user.id,
           email: email,
-          phone: '+1234567890',
-        });
+          app_metadata: {},
+          user_metadata: {
+            first_name: user.name,
+            last_name: 'Test',
+            is_trainer: user.isTrainer,
+          },
+          aud: 'authenticated',
+          created_at: new Date().toISOString(),
+        } as User;
+        
+        setUser(testUser);
+        
+        if (userType === 'pupil') {
+          setPupil({
+            id: user.id,
+            first_name: user.name,
+            last_name: 'Test',
+            email: email,
+            phone: '+1234567890',
+          });
+        }
+        return;
+      } else {
+        console.log('Test authentication failed');
+        throw new Error('Неверные данные для входа');
       }
-      return;
     }
 
     try {
@@ -148,31 +182,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, userData: any) => {
-    if (BYPASS_AUTH) {
-      // Тестовый режим - симулируем успешную регистрацию
-      const testUser = {
-        id: '1',
-        email: email,
-        app_metadata: {},
-        user_metadata: {
-          first_name: userData.firstName,
-          last_name: userData.lastName,
-          is_trainer: false,
-        },
-        aud: 'authenticated',
-        created_at: new Date().toISOString(),
-      } as User;
-      
-      setUser(testUser);
-      setPupil({
-        id: '1',
-        trainer_id: 1, // Привязываем к первому тренеру
-        first_name: userData.firstName,
-        last_name: userData.lastName,
-        email: email,
-        phone: userData.phone,
-      });
-      return;
+    if (!isSupabaseConfigured) {
+      throw new Error('Регистрация недоступна без настройки Supabase');
     }
 
     try {
@@ -234,7 +245,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    if (BYPASS_AUTH) {
+    if (!isSupabaseConfigured) {
       setUser(null);
       setPupil(null);
       return;
@@ -254,9 +265,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const resetPassword = async (email: string) => {
-    if (BYPASS_AUTH) {
-      // Тестовый режим - симулируем успешную отправку
-      return;
+    if (!isSupabaseConfigured) {
+      throw new Error('Восстановление пароля недоступно без настройки Supabase');
     }
 
     try {

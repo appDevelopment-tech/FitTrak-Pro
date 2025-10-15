@@ -40,77 +40,6 @@ function toCamelCase(obj: any): any {
 // Students
 export const studentsDb = {
   async getAll() {
-    // Проверяем, включен ли тестовый режим
-    const isTestMode = import.meta.env.VITE_BYPASS_AUTH === 'true' || 
-                      !import.meta.env.VITE_SUPABASE_URL || 
-                      !import.meta.env.VITE_SUPABASE_ANON_KEY;
-    
-    if (isTestMode) {
-      // Тестовый режим - возвращаем тестовых студентов
-      return [
-        {
-          id: 1,
-          trainerId: 1,
-          firstName: 'Иван',
-          lastName: 'Иванов',
-          middleName: 'Иванович',
-          phone: '+7 (999) 123-45-67',
-          email: 'ivan@example.com',
-          birthDate: '1990-01-01',
-          weight: 75,
-          height: 180,
-          goal: 'Похудение',
-          medicalNotes: '',
-          photo: '',
-          status: 'active',
-          joinDate: '2024-01-01',
-          parentFirstName: '',
-          parentLastName: '',
-          parentMiddleName: '',
-          parentPhone: '',
-          parentEmail: '',
-          parentSpecialInstructions: '',
-          isParentRepresentative: false,
-          privacyPolicyAccepted: true,
-          privacyPolicyAcceptedDate: '2024-01-01',
-          contractAccepted: true,
-          contractAcceptedDate: '2024-01-01',
-          educationConsentAccepted: true,
-          educationConsentAcceptedDate: '2024-01-01',
-        },
-        {
-          id: 2,
-          trainerId: 1,
-          firstName: 'Студент_1',
-          lastName: 'Студентович_1',
-          middleName: '',
-          phone: '+7 (999) 987-65-43',
-          email: 'student1@example.com',
-          birthDate: '1995-05-15',
-          weight: 70,
-          height: 175,
-          goal: 'Набор мышечной массы',
-          medicalNotes: '',
-          photo: '',
-          status: 'active',
-          joinDate: '2024-01-15',
-          parentFirstName: '',
-          parentLastName: '',
-          parentMiddleName: '',
-          parentPhone: '',
-          parentEmail: '',
-          parentSpecialInstructions: '',
-          isParentRepresentative: false,
-          privacyPolicyAccepted: true,
-          privacyPolicyAcceptedDate: '2024-01-15',
-          contractAccepted: true,
-          contractAcceptedDate: '2024-01-15',
-          educationConsentAccepted: true,
-          educationConsentAcceptedDate: '2024-01-15',
-        }
-      ] as Pupil[];
-    }
-
     const { data, error } = await supabase
       .from('students')
       .select('*')
@@ -142,78 +71,94 @@ export const studentsDb = {
   },
 
   async getByTrainerId(trainerId: number) {
-    // Проверяем, включен ли тестовый режим
-    const isTestMode = import.meta.env.VITE_BYPASS_AUTH === 'true' || 
-                      !import.meta.env.VITE_SUPABASE_URL || 
-                      !import.meta.env.VITE_SUPABASE_ANON_KEY;
-    
-    if (isTestMode) {
-      // Тестовый режим - возвращаем тестовых студентов
-      return [
-        {
-          id: 1,
-          trainerId: 1,
-          firstName: 'Иван',
-          lastName: 'Иванов',
-          middleName: 'Иванович',
-          phone: '+7 (999) 123-45-67',
-          email: 'ivan@example.com',
-          birthDate: '1990-01-01',
-          weight: 75,
-          height: 180,
-          goal: 'Похудение',
-          medicalNotes: '',
-          photo: '',
-          status: 'active',
-          joinDate: '2024-01-01',
-          parentFirstName: '',
-          parentLastName: '',
-          parentMiddleName: '',
-          parentPhone: '',
-          parentEmail: '',
-          parentSpecialInstructions: '',
-          isParentRepresentative: false,
-          privacyPolicyAccepted: true,
-          privacyPolicyAcceptedDate: '2024-01-01',
-          contractAccepted: true,
-          contractAcceptedDate: '2024-01-01',
-          educationConsentAccepted: true,
-          educationConsentAcceptedDate: '2024-01-01',
-        },
-        {
-          id: 2,
-          trainerId: 1,
-          firstName: 'Студент_1',
-          lastName: 'Студентович_1',
-          middleName: '',
-          phone: '+7 (999) 987-65-43',
-          email: 'student1@example.com',
-          birthDate: '1995-05-15',
-          weight: 70,
-          height: 175,
-          goal: 'Набор мышечной массы',
-          medicalNotes: '',
-          photo: '',
-          status: 'active',
-          joinDate: '2024-01-15',
-          parentFirstName: '',
-          parentLastName: '',
-          parentMiddleName: '',
-          parentPhone: '',
-          parentEmail: '',
-          parentSpecialInstructions: '',
-          isParentRepresentative: false,
-          privacyPolicyAccepted: true,
-          privacyPolicyAcceptedDate: '2024-01-15',
-          contractAccepted: true,
-          contractAcceptedDate: '2024-01-15',
-          educationConsentAccepted: true,
-          educationConsentAcceptedDate: '2024-01-15',
-        }
-      ] as Pupil[];
-    }
-
     try {
+      if (!supabase) {
+        console.log('Supabase not configured, returning test students');
+        // Возвращаем тестовых учеников для тестового режима
+        return [
+          {
+            id: 1,
+            trainerId: 1,
+            firstName: 'Анна',
+            lastName: 'Студентова',
+            middleName: 'Петровна',
+            phone: '+7 (999) 111-11-11',
+            email: 'student1@fittrak.pro',
+            password: 'student123',
+            birthDate: '1995-05-15',
+            weight: 65,
+            height: 170,
+            goal: 'Похудение и укрепление мышц',
+            medicalNotes: 'Здоров, ограничений нет',
+            status: 'active',
+            joinDate: '2024-01-01',
+            privacyPolicyAccepted: true,
+            contractAccepted: true,
+            educationConsentAccepted: true,
+            privacyPolicyAcceptedDate: '2024-01-01',
+            contractAcceptedDate: '2024-01-01',
+            educationConsentAcceptedDate: '2024-01-01',
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z'
+          },
+          {
+            id: 2,
+            trainerId: 1,
+            firstName: 'Петр',
+            lastName: 'Учеников',
+            middleName: 'Иванович',
+            phone: '+7 (999) 222-22-22',
+            email: 'student2@fittrak.pro',
+            password: 'student123',
+            birthDate: '1998-08-22',
+            weight: 80,
+            height: 180,
+            goal: 'Набор мышечной массы',
+            medicalNotes: 'Здоров, ограничений нет',
+            status: 'active',
+            joinDate: '2024-01-01',
+            privacyPolicyAccepted: true,
+            contractAccepted: true,
+            educationConsentAccepted: true,
+            privacyPolicyAcceptedDate: '2024-01-01',
+            contractAcceptedDate: '2024-01-01',
+            educationConsentAcceptedDate: '2024-01-01',
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z'
+          },
+          {
+            id: 3,
+            trainerId: 1,
+            firstName: 'Мария',
+            lastName: 'Несовершеннолетняя',
+            middleName: 'Сергеевна',
+            phone: '+7 (999) 333-33-33',
+            email: 'student3@fittrak.pro',
+            password: 'student123',
+            birthDate: '2010-12-10',
+            weight: 45,
+            height: 150,
+            goal: 'Общее физическое развитие',
+            medicalNotes: 'Здоров, ограничений нет',
+            status: 'active',
+            joinDate: '2024-01-01',
+            privacyPolicyAccepted: true,
+            contractAccepted: true,
+            educationConsentAccepted: true,
+            privacyPolicyAcceptedDate: '2024-01-01',
+            contractAcceptedDate: '2024-01-01',
+            educationConsentAcceptedDate: '2024-01-01',
+            parentFirstName: 'Сергей',
+            parentLastName: 'Родителев',
+            parentPhone: '+7 (999) 444-44-44',
+            parentEmail: 'parent@fittrak.pro',
+            isParentRepresentative: true,
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z'
+          }
+        ] as Pupil[];
+      }
+      
       const { data, error } = await supabase
         .from('students')
         .select('*')
@@ -268,6 +213,79 @@ export const pupilsDb = studentsDb;
 // Exercises
 export const exercisesDb = {
   async getAll() {
+    if (!supabase) {
+      console.log('Supabase not configured, returning test exercises');
+      // Возвращаем тестовые упражнения для тестового режима
+      return [
+        {
+          id: 1,
+          name: 'Приседания',
+          description: 'Базовое упражнение для ног',
+          muscleGroup: 'Ноги',
+          difficulty: 'Начальный',
+          equipment: 'Без оборудования',
+          instructions: 'Встаньте прямо, ноги на ширине плеч. Опуститесь вниз, сгибая колени, затем вернитесь в исходное положение.',
+          createdAt: '2024-01-01T00:00:00Z',
+          updatedAt: '2024-01-01T00:00:00Z'
+        },
+        {
+          id: 2,
+          name: 'Отжимания',
+          description: 'Упражнение для груди и рук',
+          muscleGroup: 'Грудь',
+          difficulty: 'Начальный',
+          equipment: 'Без оборудования',
+          instructions: 'Примите упор лежа, руки на ширине плеч. Опуститесь вниз, затем отожмитесь в исходное положение.',
+          createdAt: '2024-01-01T00:00:00Z',
+          updatedAt: '2024-01-01T00:00:00Z'
+        },
+        {
+          id: 3,
+          name: 'Подтягивания',
+          description: 'Упражнение для спины и рук',
+          muscleGroup: 'Спина',
+          difficulty: 'Средний',
+          equipment: 'Турник',
+          instructions: 'Повисните на турнике, руки на ширине плеч. Подтянитесь вверх, затем опуститесь в исходное положение.',
+          createdAt: '2024-01-01T00:00:00Z',
+          updatedAt: '2024-01-01T00:00:00Z'
+        },
+        {
+          id: 4,
+          name: 'Планка',
+          description: 'Статическое упражнение для корпуса',
+          muscleGroup: 'Кор',
+          difficulty: 'Начальный',
+          equipment: 'Без оборудования',
+          instructions: 'Примите упор лежа на предплечьях. Держите тело прямо, напрягая мышцы корпуса.',
+          createdAt: '2024-01-01T00:00:00Z',
+          updatedAt: '2024-01-01T00:00:00Z'
+        },
+        {
+          id: 5,
+          name: 'Становая тяга',
+          description: 'Базовое упражнение для спины и ног',
+          muscleGroup: 'Спина',
+          difficulty: 'Средний',
+          equipment: 'Штанга',
+          instructions: 'Встаньте перед штангой, ноги на ширине плеч. Наклонитесь вперед, возьмите штангу и поднимите ее, выпрямляя спину.',
+          createdAt: '2024-01-01T00:00:00Z',
+          updatedAt: '2024-01-01T00:00:00Z'
+        },
+        {
+          id: 6,
+          name: 'Жим лежа',
+          description: 'Упражнение для груди',
+          muscleGroup: 'Грудь',
+          difficulty: 'Средний',
+          equipment: 'Штанга, скамья',
+          instructions: 'Лягте на скамью, возьмите штангу широким хватом. Опустите штангу к груди, затем выжмите вверх.',
+          createdAt: '2024-01-01T00:00:00Z',
+          updatedAt: '2024-01-01T00:00:00Z'
+        }
+      ] as Exercise[];
+    }
+    
     const { data, error } = await supabase
       .from('exercises')
       .select('*')
@@ -519,6 +537,11 @@ export const appointmentsDb = {
 
   async getByTrainerId(trainerId: number) {
     try {
+      if (!supabase) {
+        console.log('Supabase not configured, returning empty array');
+        return [];
+      }
+      
       const { data, error } = await supabase
         .from('appointments')
         .select(`

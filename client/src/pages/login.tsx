@@ -4,7 +4,6 @@ import { useAuth } from '@/lib/auth';
 import { LoginForm } from '@/components/auth/login-form';
 import { RegistrationForm } from '@/components/auth/registration-form';
 import { ForgotPasswordForm } from '@/components/auth/forgot-password-form';
-import { AuthModeSwitcher } from '@/components/auth/auth-mode-switcher';
 import { Button } from '@/components/ui/button';
 import { User, Dumbbell } from 'lucide-react';
 
@@ -14,7 +13,6 @@ export default function LoginPage() {
   const [, setLocation] = useLocation();
   const { signIn } = useAuth();
   const [authMode, setAuthMode] = useState<AuthMode>('login');
-  const [isRealAuth, setIsRealAuth] = useState(false); // По умолчанию тестовый режим
 
   const handleLoginSuccess = () => {
     setLocation('/dashboard');
@@ -38,15 +36,9 @@ export default function LoginPage() {
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">FitTrak-Pro</h1>
           <p className="text-gray-600">
-            Система управления фитнес-тренировками для учеников
+            Система управления фитнес-тренировками
           </p>
         </div>
-
-        {/* Переключатель режима аутентификации */}
-        <AuthModeSwitcher 
-          isRealAuth={isRealAuth} 
-          onToggle={() => setIsRealAuth(!isRealAuth)} 
-        />
 
         {/* Формы авторизации */}
         {authMode === 'login' && (
@@ -54,6 +46,7 @@ export default function LoginPage() {
             <LoginForm
               onSuccess={handleLoginSuccess}
               onForgotPassword={() => setAuthMode('forgot-password')}
+              userType="pupil"
             />
             
             <div className="text-center">
@@ -91,11 +84,11 @@ export default function LoginPage() {
           />
         )}
 
-        {/* Информация для учеников */}
+        {/* Информация для пользователей */}
         <div className="mt-8 text-center">
           <div className="inline-flex items-center gap-2 text-sm text-gray-500">
             <User className="w-4 h-4" />
-            Этот вход предназначен для учеников
+            Вход в систему FitTrak-Pro
           </div>
         </div>
       </div>
