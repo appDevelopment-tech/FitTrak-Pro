@@ -12,7 +12,7 @@ import { Plus, Edit, Trash2, GripVertical } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface MuscleGroup {
-  id: number;
+  id: string;
   name: string;
   description: string | null;
   display_order: number;
@@ -76,7 +76,7 @@ export function MuscleGroupsManagement() {
 
   // Update mutation
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: { name: string; description: string } }) => {
+    mutationFn: async ({ id, data }: { id: string; data: { name: string; description: string } }) => {
       const { data: updated, error } = await supabase
         .from('muscle_groups')
         .update({
@@ -108,7 +108,7 @@ export function MuscleGroupsManagement() {
 
   // Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       const { error } = await supabase
         .from('muscle_groups')
         .delete()

@@ -13,7 +13,7 @@ import type { Pupil } from '@shared/schema';
 import { User, Edit, Trash2, Save, X, Shield, Eye } from 'lucide-react';
 
 interface RoleBasedProfileProps {
-  pupilId?: number; // Для тренеров - ID ученика, для учеников - undefined (текущий)
+  pupilId?: string; // Для тренеров - ID ученика (UUID), для учеников - undefined (текущий)
 }
 
 export function RoleBasedProfile({ pupilId }: RoleBasedProfileProps) {
@@ -36,7 +36,7 @@ export function RoleBasedProfile({ pupilId }: RoleBasedProfileProps) {
       if (targetPupilId === 'current') {
         return pupilsDb.getCurrentUser(); // Нужно реализовать
       }
-      return pupilsDb.getById(targetPupilId as number);
+      return pupilsDb.getById(targetPupilId);
     },
     enabled: !!targetPupilId,
   });

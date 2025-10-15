@@ -19,7 +19,7 @@ import { MuscleGroupsManagement } from "./muscle-groups-management";
 import type { Exercise, InsertExercise } from "@shared/schema";
 
 interface MuscleGroup {
-  id: number;
+  id: string;
   name: string;
 }
 
@@ -91,7 +91,7 @@ export function ExerciseManagement() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: Partial<InsertExercise> }) => {
+    mutationFn: async ({ id, data }: { id: string; data: Partial<InsertExercise> }) => {
       return await exercisesDb.update(id, data);
     },
     onSuccess: () => {
@@ -109,7 +109,7 @@ export function ExerciseManagement() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       return await exercisesDb.delete(id);
     },
     onSuccess: () => {
@@ -127,7 +127,8 @@ export function ExerciseManagement() {
 
   const filteredExercises = exercises.filter(exercise => {
     const matchesSearch = !searchTerm || exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesMuscle = !filterMuscle || filterMuscle === 'all' || exercise.primaryMuscles.includes(filterMuscle);
+    const primaryMuscles = Array.isArray(exercise.primaryMuscles) ? exercise.primaryMuscles : JSON.parse(exercise.primaryMuscles as string || '[]');
+    const matchesMuscle = !filterMuscle || filterMuscle === 'all' || (primaryMuscles as string[]).includes(filterMuscle);
     return matchesSearch && matchesMuscle;
   });
 
@@ -215,10 +216,10 @@ export function ExerciseManagement() {
                   <div className="flex-1">
                     <CardTitle className="text-lg mb-2">{exercise.name}</CardTitle>
                     <div className="flex flex-wrap gap-1">
-                      {JSON.parse(exercise.primaryMuscles || '[]').map((muscle: string) => (
+                      {(Array.isArray(exercise.primaryMuscles) ? exercise.primaryMuscles : JSON.parse(exercise.primaryMuscles as string || '[]')).map((muscle: string) => (
                         <Badge key={muscle} variant="default">{muscle}</Badge>
                       ))}
-                      {JSON.parse(exercise.secondaryMuscles || '[]').map((muscle: string) => (
+                      {(Array.isArray(exercise.secondaryMuscles) ? exercise.secondaryMuscles : JSON.parse(exercise.secondaryMuscles as string || '[]')).map((muscle: string) => (
                         <Badge key={muscle} variant="secondary">{muscle}</Badge>
                       ))}
                     </div>
@@ -350,20 +351,20 @@ interface ExerciseFormProps {
 function ExerciseForm({ exercise, onSubmit, isLoading, muscleGroupNames }: ExerciseFormProps) {
   const [formData, setFormData] = useState<ExerciseFormData>({
     name: exercise?.name || "",
-    primaryMuscles: Array.isArray(exercise?.primaryMuscles) ? exercise.primaryMuscles : JSON.parse(exercise?.primaryMuscles || '[]'),
-    secondaryMuscles: Array.isArray(exercise?.secondaryMuscles) ? exercise.secondaryMuscles : JSON.parse(exercise?.secondaryMuscles || '[]'),
+    primaryMuscles: Array.isArray(exercise?.primaryMuscles) ? exercise.primaryMuscles : JSON.parse(exercise?.primaryMuscles as string || '[]'),
+    secondaryMuscles: Array.isArray(exercise?.secondaryMuscles) ? exercise.secondaryMuscles : JSON.parse(exercise?.secondaryMuscles as string || '[]'),
     difficulty: exercise?.difficulty || "",
     overview: exercise?.overview || "",
-    technique: Array.isArray(exercise?.technique) ? exercise.technique : JSON.parse(exercise?.technique || '[""]'),
-    commonMistakes: Array.isArray(exercise?.commonMistakes) ? exercise.commonMistakes : JSON.parse(exercise?.commonMistakes || '[""]'),
-    contraindications: Array.isArray(exercise?.contraindications) ? exercise.contraindications : JSON.parse(exercise?.contraindications || '[""]'),
+    technique: Array.isArray(exercise?.technique) ? exercise.technique : JSON.parse(exercise?.technique as string || '[""]'),
+    commonMistakes: Array.isArray(exercise?.commonMistakes) ? exercise.commonMistakes : JSON.parse(exercise?.commonMistakes as string || '[""]'),
+    contraindications: Array.isArray(exercise?.contraindications) ? exercise.contraindications : JSON.parse(exercise?.contraindications as string || '[""]'),
     muscleImageUrl: exercise?.muscleImageUrl || "",
     techniqueImageUrl: exercise?.techniqueImageUrl || "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const submitData: InsertExercise = {
       ...formData,
       primaryMuscles: JSON.stringify(formData.primaryMuscles),
@@ -371,7 +372,10 @@ function ExerciseForm({ exercise, onSubmit, isLoading, muscleGroupNames }: Exerc
       technique: JSON.stringify(formData.technique.filter(item => item.trim() !== "")),
       commonMistakes: JSON.stringify(formData.commonMistakes.filter(item => item.trim() !== "")),
       contraindications: JSON.stringify(formData.contraindications.filter(item => item.trim() !== "")),
-      createdBy: 1, // ID текущего тренера
+      createdBy: "00000000-0000-0000-0000-000000000000", // UUID placeholder - should be replaced with actual trainer ID
+      videoUrl: null,
+      muscleImageUrl: formData.muscleImageUrl || null,
+      techniqueImageUrl: formData.techniqueImageUrl || null,
     };
 
     onSubmit(submitData);
@@ -670,7 +674,7 @@ function ExerciseView({ exercise }: ExerciseViewProps) {
             <div>
               <span className="font-medium text-sm">Основные:</span>
               <div className="flex flex-wrap gap-1 mt-1">
-                {JSON.parse(exercise.primaryMuscles || '[]').map((muscle: string) => (
+                {(Array.isArray(exercise.primaryMuscles) ? exercise.primaryMuscles : JSON.parse(exercise.primaryMuscles as string || '[]')).map((muscle: string) => (
                   <Badge key={muscle} variant="default">{muscle}</Badge>
                 ))}
               </div>
@@ -678,7 +682,7 @@ function ExerciseView({ exercise }: ExerciseViewProps) {
             <div>
               <span className="font-medium text-sm">Вспомогательные:</span>
               <div className="flex flex-wrap gap-1 mt-1">
-                {JSON.parse(exercise.secondaryMuscles || '[]').map((muscle: string) => (
+                {(Array.isArray(exercise.secondaryMuscles) ? exercise.secondaryMuscles : JSON.parse(exercise.secondaryMuscles as string || '[]')).map((muscle: string) => (
                   <Badge key={muscle} variant="secondary">{muscle}</Badge>
                 ))}
               </div>
@@ -706,7 +710,7 @@ function ExerciseView({ exercise }: ExerciseViewProps) {
       <div>
         <h3 className="font-semibold mb-2">Техника выполнения</h3>
         <ol className="list-decimal list-inside space-y-1 text-sm">
-          {JSON.parse(exercise.technique || '[]').map((step: string, index: number) => (
+          {(Array.isArray(exercise.technique) ? exercise.technique : JSON.parse(exercise.technique as string || '[]')).map((step: string, index: number) => (
             <li key={index}>{step}</li>
           ))}
         </ol>
@@ -715,7 +719,7 @@ function ExerciseView({ exercise }: ExerciseViewProps) {
       <div>
         <h3 className="font-semibold mb-2">Частые ошибки</h3>
         <ul className="list-disc list-inside space-y-1 text-sm">
-          {JSON.parse(exercise.commonMistakes || '[]').map((mistake: string, index: number) => (
+          {(Array.isArray(exercise.commonMistakes) ? exercise.commonMistakes : JSON.parse(exercise.commonMistakes as string || '[]')).map((mistake: string, index: number) => (
             <li key={index}>{mistake}</li>
           ))}
         </ul>
@@ -724,7 +728,7 @@ function ExerciseView({ exercise }: ExerciseViewProps) {
       <div>
         <h3 className="font-semibold mb-2">Противопоказания</h3>
         <ul className="list-disc list-inside space-y-1 text-sm">
-          {JSON.parse(exercise.contraindications || '[]').map((contraindication: string, index: number) => (
+          {(Array.isArray(exercise.contraindications) ? exercise.contraindications : JSON.parse(exercise.contraindications as string || '[]')).map((contraindication: string, index: number) => (
             <li key={index}>{contraindication}</li>
           ))}
         </ul>

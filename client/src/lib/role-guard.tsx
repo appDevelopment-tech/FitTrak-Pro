@@ -16,7 +16,7 @@ export function RoleGuard({ children, allowedRoles, fallbackPath = '/login' }: R
   let userRole: 'trainer' | 'pupil' | null = null;
   if (user && (user as any).user_metadata?.is_trainer) {
     userRole = 'trainer';
-  } else if (pupil) {
+  } else if (user && pupil) {
     userRole = 'pupil';
   }
 
@@ -74,12 +74,12 @@ export function useRoleCheck() {
   const { user, pupil } = useAuth();
   
   const isTrainer = user && (user as any).user_metadata?.is_trainer;
-  const isPupil = pupil !== null;
+  const isPupil = user && pupil !== null;
   
   return {
     isTrainer,
     isPupil,
-    userRole: isTrainer ? 'trainer' : 'pupil',
+    userRole: isTrainer ? 'trainer' : (isPupil ? 'pupil' : null),
   };
 }
 

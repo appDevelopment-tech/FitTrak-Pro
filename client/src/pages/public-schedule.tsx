@@ -9,7 +9,7 @@ import type { Pupil, Appointment } from "@shared/schema";
 import { useLocation } from "wouter";
 
 interface ScheduleSession {
-  id: number;
+  id: string;
   time: string;
   date: string;
   pupils: Pupil[];
@@ -21,7 +21,7 @@ export default function PublicSchedule() {
   const [viewMode, setViewMode] = useState<'day' | 'month'>('day');
   const [, setLocation] = useLocation();
 
-  const trainerId = 1; // публично показываем расписание конкретного тренера
+  const trainerId = '550e8400-e29b-41d4-a716-446655440000'; // Main trainer UUID
 
   const { data: pupils = [] } = useQuery<Pupil[]>({
     queryKey: ['students', trainerId],
@@ -37,7 +37,7 @@ export default function PublicSchedule() {
     const pupilData = (apt as any)?.students;
     const pupil = Array.isArray(pupilData) && pupilData.length > 0 ? pupilData[0] : pupils?.find(p => p?.id === apt?.pupilId);
     return {
-      id: apt?.id || 0,
+      id: apt?.id || '',
       time: apt?.time || '',
       date: apt?.date || '',
       pupils: pupil ? [pupil] : [],

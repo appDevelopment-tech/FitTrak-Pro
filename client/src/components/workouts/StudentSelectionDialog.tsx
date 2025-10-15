@@ -14,7 +14,7 @@ interface StudentSelectionDialogProps {
   onClose: () => void;
   program: WorkoutProgram;
   pupils: Pupil[];
-  trainerId: number;
+  trainerId: string;
 }
 
 export function StudentSelectionDialog({

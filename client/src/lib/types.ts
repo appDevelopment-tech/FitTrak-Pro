@@ -14,7 +14,7 @@ export interface Exercise {
 }
 
 export interface DetailedExercise {
-  id: number;
+  id: string;
   name: string;
   category: string;
   primaryMuscles: string[];

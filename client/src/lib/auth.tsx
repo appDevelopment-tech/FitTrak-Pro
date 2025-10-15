@@ -17,6 +17,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Проверяем, настроен ли Supabase
 const isSupabaseConfigured = !!import.meta.env.VITE_SUPABASE_URL && !!import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// TEMPORARY: Bypass auth for testing
+const BYPASS_AUTH = false; // Disabled to use real Supabase authentication
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -84,6 +86,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
+      // Если пользователь - тренер, не ищем его в таблице students
+      if ((user as any).user_metadata?.is_trainer) {
+        setPupil(null);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('students')
         .select('*')
@@ -108,11 +116,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('Using test authentication mode');
       // Если Supabase не настроен, используем тестовую аутентификацию
       const testUsers = {
-        'trainer1': { id: '2', name: 'Тренер', isTrainer: true },
-        'trainer@fittrak.pro': { id: '2', name: 'Тренер', isTrainer: true },
-        'student1@fittrak.pro': { id: '3', name: 'Студент', isTrainer: false },
-        'student2@fittrak.pro': { id: '4', name: 'Студент', isTrainer: false },
-        'student3@fittrak.pro': { id: '5', name: 'Студент', isTrainer: false },
+        'petrusenko@fittrak.pro': { id: '1', name: 'Петрусенко Константин Владимирович', isTrainer: true },
+        'ivanov@fittrak.pro': { id: '2', name: 'Иванов Иван', isTrainer: false },
+        'student1@fittrak.pro': { id: '3', name: 'Студентович_1 Студент_1', isTrainer: false },
       };
 
       const testPasswords = ['trainer123', 'student123'];
@@ -135,8 +141,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: email,
           app_metadata: {},
           user_metadata: {
-            first_name: user.name,
-            last_name: 'Test',
+            first_name: user.isTrainer ? 'Константин Владимирович' : user.name,
+            last_name: user.isTrainer ? 'Петрусенко' : 'Test',
             is_trainer: user.isTrainer,
           },
           aud: 'authenticated',
@@ -148,10 +154,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (userType === 'pupil') {
           setPupil({
             id: user.id,
-            first_name: user.name,
-            last_name: 'Test',
+            first_name: user.name.split(' ')[0],
+            last_name: user.name.split(' ')[1] || 'Test',
             email: email,
-            phone: '+1234567890',
+            phone: user.id === '2' ? '+7 (999) 123-45-67' : '+7 (999) 987-65-43',
           });
         }
         return;
@@ -210,7 +216,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { error: profileError } = await supabase
           .from('students')
           .insert({
-            trainer_id: 1, // Привязываем к первому тренеру (можно сделать динамическим)
+            trainer_id: '550e8400-e29b-41d4-a716-446655440000', // Main trainer UUID
             first_name: userData.firstName,
             last_name: userData.lastName,
             middle_name: userData.middleName || '',
@@ -226,12 +232,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             parent_middle_name: userData.parentMiddleName || '',
             parent_phone: userData.parentPhone || '',
             parent_email: userData.parentEmail || '',
+            is_parent_representative: userData.isParentRepresentative || false,
             
             // Согласия
-            rules_accepted: userData.contractAccepted,
-            rules_accepted_date: new Date().toISOString().split('T')[0],
-            parental_consent: userData.educationConsentAccepted,
-            parental_consent_date: new Date().toISOString().split('T')[0],
+            privacy_policy_accepted: userData.privacyPolicyAccepted,
+            privacy_policy_accepted_date: new Date().toISOString().split('T')[0],
+            contract_accepted: userData.contractAccepted,
+            contract_accepted_date: new Date().toISOString().split('T')[0],
+            education_consent_accepted: userData.educationConsentAccepted,
+            education_consent_accepted_date: new Date().toISOString().split('T')[0],
           });
 
         if (profileError) {

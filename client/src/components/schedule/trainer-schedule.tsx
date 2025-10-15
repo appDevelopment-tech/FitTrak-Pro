@@ -7,26 +7,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight, Clock, User, Plus, Trash2, Edit, Calendar, Users, Save } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/lib/auth";
+import { useToast } from "@/hooks/use-toast";
+import { studentsDb, appointmentsDb } from "@/lib/database";
+import type { Pupil, Appointment } from "@shared/schema";
 
-interface Student {
-  id: number;
-  firstName: string;
-  lastName: string;
-  middleName?: string;
-  phone: string;
-  email: string;
-  birthDate?: string;
-  weight?: number;
-  height?: number;
-  goal?: string;
-  medicalNotes?: string;
-  photo?: string;
-  get name(): string;
-}
+// Use Pupil type from schema directly
+type Student = Pupil & { name: string };
 
 interface TrainerSession {
-  id: number;
+  id: string;
   time: string;
+  pupilId: string;
   studentName: string;
   status: 'confirmed' | 'pending' | 'free';
   date: string; // формат YYYY-MM-DD
@@ -112,113 +105,49 @@ export function TrainerSchedule() {
       window.history.pushState = originalPushState;
     };
   }, []);
-  const [sessions, setSessions] = useState<TrainerSession[]>([
-    { id: 1, time: '09:00', studentName: 'Анна Петрова', status: 'confirmed', date: new Date().toISOString().split('T')[0] },
-    { id: 2, time: '11:00', studentName: 'Михаил Сидоров', status: 'pending', date: new Date().toISOString().split('T')[0] },
-    { id: 3, time: '14:00', studentName: 'Елена Козлова', status: 'confirmed', date: new Date(Date.now() + 24*60*60*1000).toISOString().split('T')[0] },
-    { id: 4, time: '16:00', studentName: 'Дмитрий Волков', status: 'pending', date: new Date(Date.now() + 2*24*60*60*1000).toISOString().split('T')[0] },
-    { id: 5, time: '18:00', studentName: 'София Морозова', status: 'confirmed', date: new Date(Date.now() + 3*24*60*60*1000).toISOString().split('T')[0] },
-  ]);
-  const [students, setStudents] = useState<Student[]>([
-    { 
-      id: 1, 
-      name: 'Анна Петрова', 
-      firstName: 'Анна', 
-      lastName: 'Петрова', 
-      middleName: 'Ивановна',
-      phone: '+7 (999) 123-45-67', 
-      email: 'anna@email.com',
-      birthDate: '1990-05-15',
-      weight: 65,
-      height: 170,
-      goal: 'Похудение и укрепление мышц',
-      medicalNotes: 'Травма правого колена 2020г.'
-    },
-    { 
-      id: 2, 
-      name: 'Михаил Сидоров', 
-      firstName: 'Михаил', 
-      lastName: 'Сидоров', 
-      middleName: 'Александрович',
-      phone: '+7 (999) 234-56-78', 
-      email: 'mikhail@email.com',
-      birthDate: '1985-12-03',
-      weight: 85,
-      height: 180,
-      goal: 'Набор мышечной массы',
-      medicalNotes: 'Здоров'
-    },
-    { 
-      id: 3, 
-      name: 'Елена Козлова', 
-      firstName: 'Елена', 
-      lastName: 'Козлова', 
-      middleName: 'Дмитриевна',
-      phone: '+7 (999) 345-67-89', 
-      email: 'elena@email.com',
-      birthDate: '1992-08-20',
-      weight: 58,
-      height: 165,
-      goal: 'Улучшение выносливости',
-      medicalNotes: 'Артрит тазобедренного сустава'
-    },
-    { 
-      id: 4, 
-      name: 'Дмитрий Волков', 
-      firstName: 'Дмитрий', 
-      lastName: 'Волков', 
-      middleName: 'Сергеевич',
-      phone: '+7 (999) 456-78-90', 
-      email: 'dmitry@email.com',
-      birthDate: '1988-03-10',
-      weight: 90,
-      height: 185,
-      goal: 'Поддержание формы',
-      medicalNotes: 'Здоров'
-    },
-    { 
-      id: 5, 
-      name: 'София Морозова', 
-      firstName: 'София', 
-      lastName: 'Морозова', 
-      middleName: 'Андреевна',
-      phone: '+7 (999) 567-89-01', 
-      email: 'sofia@email.com',
-      birthDate: '1995-11-25',
-      weight: 62,
-      height: 168,
-      goal: 'Растяжка и йога',
-      medicalNotes: 'Сколиоз, рекомендована лечебная физкультура'
-    },
-    { 
-      id: 6, 
-      name: 'Алексей Иванов', 
-      firstName: 'Алексей', 
-      lastName: 'Иванов', 
-      middleName: 'Петрович',
-      phone: '+7 (999) 678-90-12', 
-      email: 'alexey@email.com',
-      birthDate: '1983-07-14',
-      weight: 78,
-      height: 175,
-      goal: 'Восстановление после травмы',
-      medicalNotes: 'Разрыв связок левого плеча, реабилитация'
-    },
-    { 
-      id: 7, 
-      name: 'Мария Смирнова', 
-      firstName: 'Мария', 
-      lastName: 'Смирнова', 
-      middleName: 'Владимировна',
-      phone: '+7 (999) 789-01-23', 
-      email: 'maria@email.com',
-      birthDate: '1991-01-30',
-      weight: 55,
-      height: 160,
-      goal: 'Общее укрепление здоровья',
-      medicalNotes: 'Здорова'
-    },
-  ]);
+
+  // Get auth context
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Get trainer ID from user (fallback to UUID if not available)
+  const trainerId = user?.id || "550e8400-e29b-41d4-a716-446655440000";
+
+  // Fetch pupils from database
+  const { data: pupils = [] } = useQuery<Pupil[]>({
+    queryKey: ['students', trainerId],
+    queryFn: () => studentsDb.getByTrainerId(trainerId),
+  });
+
+  // Transform pupils to include computed name property
+  const students: Student[] = pupils.map(pupil => ({
+    ...pupil,
+    name: `${pupil.lastName} ${pupil.firstName}${pupil.middleName ? ' ' + pupil.middleName : ''}`
+  }));
+
+  // Fetch appointments from database
+  const { data: appointments = [] } = useQuery<Appointment[]>({
+    queryKey: ['appointments', trainerId],
+    queryFn: () => appointmentsDb.getByTrainerId(trainerId),
+  });
+
+  // Transform appointments to TrainerSession format
+  const sessions: TrainerSession[] = appointments.map(apt => {
+    const pupil = pupils.find(p => p.id === apt.pupilId);
+    const studentName = pupil
+      ? `${pupil.lastName} ${pupil.firstName}${pupil.middleName ? ' ' + pupil.middleName : ''}`
+      : 'Неизвестный ученик';
+
+    return {
+      id: apt.id,
+      time: apt.time,
+      pupilId: apt.pupilId,
+      studentName,
+      status: apt.status as 'confirmed' | 'pending',
+      date: apt.date
+    };
+  });
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showConflictDialog, setShowConflictDialog] = useState(false);
   const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
@@ -251,94 +180,148 @@ export function TrainerSchedule() {
     setShowAddDialog(true);
   };
 
+  // Mutation to create appointment
+  const createAppointmentMutation = useMutation({
+    mutationFn: async (data: { time: string; pupilId: string; date: string; status: string }) => {
+      return await appointmentsDb.create({
+        trainerId,
+        pupilId: data.pupilId,
+        date: data.date,
+        time: data.time,
+        status: data.status
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments', trainerId] });
+      toast({ title: "Успешно", description: "Ученик добавлен в расписание" });
+      setShowAddDialog(false);
+      setShowConflictDialog(false);
+      setSelectedStudentId('');
+    },
+    onError: (error: any) => {
+      toast({ title: "Ошибка", description: error.message || "Не удалось добавить ученика", variant: "destructive" });
+    }
+  });
+
+  // Mutation to create student
+  const createStudentMutation = useMutation({
+    mutationFn: async (studentData: Partial<Pupil>) => {
+      return await studentsDb.create({
+        trainerId,
+        firstName: studentData.firstName || '',
+        lastName: studentData.lastName || '',
+        middleName: studentData.middleName || null,
+        phone: studentData.phone || '',
+        email: studentData.email || '',
+        password: 'default_password', // TODO: Generate proper password
+        birthDate: studentData.birthDate || new Date().toISOString().split('T')[0],
+        weight: studentData.weight || null,
+        height: studentData.height || null,
+        goal: studentData.goal || null,
+        medicalNotes: studentData.medicalNotes || null,
+        photo: studentData.photo || null,
+        status: 'active',
+        joinDate: new Date().toISOString().split('T')[0],
+        parentFirstName: null,
+        parentLastName: null,
+        parentMiddleName: null,
+        parentPhone: null,
+        parentEmail: null,
+        parentSpecialInstructions: null,
+        isParentRepresentative: false,
+        privacyPolicyAccepted: false,
+        privacyPolicyAcceptedDate: null,
+        contractAccepted: false,
+        contractAcceptedDate: null,
+        educationConsentAccepted: false,
+        educationConsentAcceptedDate: null,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['students', trainerId] });
+      toast({ title: "Успешно", description: "Ученик добавлен" });
+      setShowAddStudentDialog(false);
+      setNewStudentName('');
+      setNewStudentPhone('');
+      setNewStudentEmail('');
+    },
+    onError: (error: any) => {
+      toast({ title: "Ошибка", description: error.message || "Не удалось добавить ученика", variant: "destructive" });
+    }
+  });
+
   const checkForConflicts = (time: string, studentId: string) => {
-    const student = students.find(s => s.id.toString() === studentId);
+    const student = students.find(s => s.id === studentId);
     if (!student) return false;
-    
+
     const currentDateString = selectedDate.toISOString().split('T')[0];
     const existingSessions = getSessionsForTime(time);
-    
+
     // Проверка на дублирование ученика в этот же день на другое время
-    const duplicateInDay = sessions.find(session => 
-      session.date === currentDateString && 
+    const duplicateInDay = sessions.find(session =>
+      session.date === currentDateString &&
       session.studentName.toLowerCase() === student.name.toLowerCase() &&
       session.time !== time
     );
-    
+
     if (duplicateInDay) {
       setDuplicateMessage(`${student.name} уже записан на ${duplicateInDay.time} в этот день. Вы точно хотите добавить ученика на ${time}?`);
       setShowDuplicateDialog(true);
       return false;
     }
-    
+
     // Проверка на дублирование ученика на это же время
-    const duplicateAtTime = existingSessions.find(session => 
+    const duplicateAtTime = existingSessions.find(session =>
       session.studentName.toLowerCase() === student.name.toLowerCase()
     );
-    
+
     if (duplicateAtTime) {
       setDuplicateMessage(`${student.name} уже записан на ${time}`);
       setShowDuplicateDialog(true);
       return false;
     }
-    
+
     // Проверка на занятое время
     if (existingSessions.length > 0) {
       setConflictMessage(`Время ${time} занято! Добавить?`);
       setShowConflictDialog(true);
       return false;
     }
-    
+
     return true;
   };
 
   const addStudentToSchedule = () => {
     if (!selectedStudentId) return;
-    
+
     if (checkForConflicts(selectedTime, selectedStudentId)) {
       confirmAddStudent();
     }
   };
 
   const confirmAddStudent = () => {
-    const student = students.find(s => s.id.toString() === selectedStudentId);
+    const student = students.find(s => s.id === selectedStudentId);
     if (!student) return;
-    
-    const newId = Math.max(...sessions.map(s => s.id), 0) + 1;
-    const newSession: TrainerSession = {
-      id: newId,
+
+    createAppointmentMutation.mutate({
       time: selectedTime,
-      studentName: student.name,
-      status: 'confirmed',
-      date: selectedDate.toISOString().split('T')[0]
-    };
-    
-    setSessions([...sessions, newSession]);
-    setShowAddDialog(false);
-    setShowConflictDialog(false);
-    setSelectedStudentId('');
+      pupilId: student.id,
+      date: selectedDate.toISOString().split('T')[0],
+      status: 'confirmed'
+    });
   };
 
   const addNewStudent = () => {
     if (!newStudentName.trim()) return;
-    
+
     const nameParts = newStudentName.split(' ');
-    const newId = Math.max(...students.map(s => s.id), 0) + 1;
-    const newStudent: Student = {
-      id: newId,
-      name: newStudentName,
+    createStudentMutation.mutate({
       firstName: nameParts[1] || '',
       lastName: nameParts[0] || '',
       middleName: nameParts[2] || '',
       phone: newStudentPhone,
       email: newStudentEmail
-    };
-    
-    setStudents([...students, newStudent]);
-    setShowAddStudentDialog(false);
-    setNewStudentName('');
-    setNewStudentPhone('');
-    setNewStudentEmail('');
+    });
   };
 
   const openStudentProfile = (student: Student) => {
@@ -368,20 +351,38 @@ export function TrainerSchedule() {
 
   const openAddStudentForm = () => {
     // Создаем пустой профиль для нового ученика
-    const newStudentProfile: Student = {
-      id: 0, // Временный ID
+    const newStudentProfile = {
+      id: "0", // Временный ID
+      trainerId: trainerId,
       firstName: '',
       lastName: '',
       middleName: '',
       phone: '',
       email: '',
+      password: 'default_password',
       birthDate: '',
-      weight: undefined,
-      height: undefined,
-      goal: '',
-      medicalNotes: '',
+      weight: null,
+      height: null,
+      goal: null,
+      medicalNotes: null,
+      photo: null,
+      status: 'active' as const,
+      joinDate: new Date().toISOString().split('T')[0],
+      parentFirstName: null,
+      parentLastName: null,
+      parentMiddleName: null,
+      parentPhone: null,
+      parentEmail: null,
+      parentSpecialInstructions: null,
+      isParentRepresentative: false,
+      privacyPolicyAccepted: false,
+      privacyPolicyAcceptedDate: null,
+      contractAccepted: false,
+      contractAcceptedDate: null,
+      educationConsentAccepted: false,
+      educationConsentAcceptedDate: null,
       get name() { return `${this.firstName} ${this.lastName}`.trim(); }
-    };
+    } as Student;
     setSelectedStudentProfile(newStudentProfile);
     setEditedStudent({...newStudentProfile});
     setIsEditingProfile(true);
@@ -400,21 +401,37 @@ export function TrainerSchedule() {
     setIsEditingProfile(false);
   };
 
+  // Mutation to update student
+  const updateStudentMutation = useMutation({
+    mutationFn: async (data: { id: string; student: Partial<Pupil> }) => {
+      return await studentsDb.update(data.id, data.student);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['students', trainerId] });
+      toast({ title: "Успешно", description: "Профиль ученика обновлен" });
+    },
+    onError: (error: any) => {
+      toast({ title: "Ошибка", description: error.message || "Не удалось обновить профиль", variant: "destructive" });
+    }
+  });
+
   const saveStudentProfile = () => {
     if (!editedStudent) return;
-    
-    if (editedStudent.id === 0) {
+
+    if (editedStudent.id === "0") {
       // Создание нового ученика
-      const newId = Math.max(...students.map(s => s.id), 0) + 1;
-      const newStudent = {...editedStudent, id: newId};
-      setStudents([...students, newStudent]);
-      setSelectedStudentProfile(newStudent);
+      createStudentMutation.mutate(editedStudent);
+      setSelectedStudentProfile(null);
+      setActiveTab('students');
     } else {
       // Обновление существующего ученика
-      setStudents(students.map(s => s.id === editedStudent.id ? editedStudent : s));
+      updateStudentMutation.mutate({
+        id: editedStudent.id,
+        student: editedStudent
+      });
       setSelectedStudentProfile(editedStudent);
     }
-    
+
     setIsEditingProfile(false);
     setEditedStudent(null);
   };
@@ -428,17 +445,54 @@ export function TrainerSchedule() {
     }
   };
 
-  const removeStudentFromList = (studentId: number) => {
-    setStudents(students.filter(student => student.id !== studentId));
-    // Также удаляем из расписания
-    setSessions(sessions.filter(session => {
-      const student = students.find(s => s.name === session.studentName);
-      return !student || student.id !== studentId;
-    }));
+  // Mutation to delete student
+  const deleteStudentMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return await studentsDb.delete(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['students', trainerId] });
+      queryClient.invalidateQueries({ queryKey: ['appointments', trainerId] });
+      toast({ title: "Успешно", description: "Ученик удален" });
+    },
+    onError: (error: any) => {
+      toast({ title: "Ошибка", description: error.message || "Не удалось удалить ученика", variant: "destructive" });
+    }
+  });
+
+  // Mutation to delete appointment
+  const deleteAppointmentMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return await appointmentsDb.delete(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments', trainerId] });
+      toast({ title: "Успешно", description: "Запись удалена" });
+    },
+    onError: (error: any) => {
+      toast({ title: "Ошибка", description: error.message || "Не удалось удалить запись", variant: "destructive" });
+    }
+  });
+
+  // Mutation to update appointment status
+  const updateAppointmentMutation = useMutation({
+    mutationFn: async (data: { id: string; status: string }) => {
+      return await appointmentsDb.update(data.id, { status: data.status });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments', trainerId] });
+    },
+    onError: (error: any) => {
+      toast({ title: "Ошибка", description: error.message || "Не удалось обновить статус", variant: "destructive" });
+    }
+  });
+
+  const removeStudentFromList = (studentId: string) => {
+    deleteStudentMutation.mutate(studentId);
   };
 
-  const removeStudent = (sessionId: number) => {
-    setSessions(sessions.filter(session => session.id !== sessionId));
+  const removeStudent = (sessionId: string) => {
+    deleteAppointmentMutation.mutate(sessionId);
   };
 
   // Drag and Drop handlers
@@ -460,7 +514,7 @@ export function TrainerSchedule() {
   const handleDrop = (e: React.DragEvent, targetTime: string) => {
     e.preventDefault();
     setDragOverTime(null);
-    
+
     if (!draggedSession || draggedSession.time === targetTime) {
       setDraggedSession(null);
       return;
@@ -475,23 +529,19 @@ export function TrainerSchedule() {
       return;
     }
 
-    // Перемещаем ученика
-    setSessions(sessions.map(session => 
-      session.id === draggedSession.id 
-        ? { ...session, time: targetTime }
-        : session
-    ));
-    
+    // Перемещаем ученика - обновляем время в базе
+    appointmentsDb.update(draggedSession.id, { time: targetTime }).then(() => {
+      queryClient.invalidateQueries({ queryKey: ['appointments', trainerId] });
+    });
+
     setDraggedSession(null);
   };
 
   const confirmDragMove = () => {
     if (draggedSession) {
-      setSessions(sessions.map(session => 
-        session.id === draggedSession.id 
-          ? { ...session, time: conflictTime }
-          : session
-      ));
+      // Update appointment time in database
+      appointmentsDb.update(draggedSession.id, { time: conflictTime });
+      queryClient.invalidateQueries({ queryKey: ['appointments', trainerId] });
     }
     setShowConflictDialog(false);
     setDraggedSession(null);
@@ -499,14 +549,15 @@ export function TrainerSchedule() {
     setConflictMessage('');
   };
 
-  const toggleSessionStatus = (sessionId: number) => {
-    setSessions(sessions.map(session => {
-      if (session.id === sessionId) {
-        const newStatus = session.status === 'confirmed' ? 'pending' : 'confirmed';
-        return { ...session, status: newStatus };
-      }
-      return session;
-    }));
+  const toggleSessionStatus = (sessionId: string) => {
+    const session = sessions.find(s => s.id === sessionId);
+    if (!session) return;
+
+    const newStatus = session.status === 'confirmed' ? 'pending' : 'confirmed';
+    updateAppointmentMutation.mutate({
+      id: sessionId,
+      status: newStatus
+    });
   };
 
   const getDaysInMonth = (date: Date): CalendarDay[] => {
@@ -590,7 +641,7 @@ export function TrainerSchedule() {
     if (!selectedStudentProfile) return null;
     
     const student = isEditingProfile ? editedStudent! : selectedStudentProfile;
-    const isNewStudent = student.id === 0;
+    const isNewStudent = student.id === "0";
     
     const formatDate = (dateString?: string) => {
       if (!dateString) return 'Не указана';
@@ -1350,7 +1401,7 @@ export function TrainerSchedule() {
                 </SelectTrigger>
                 <SelectContent>
                   {students.map((student) => (
-                    <SelectItem key={student.id} value={student.id.toString()}>
+                    <SelectItem key={student.id} value={student.id}>
                       {student.name}
                     </SelectItem>
                   ))}

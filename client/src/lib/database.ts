@@ -40,6 +40,76 @@ function toCamelCase(obj: any): any {
 // Students
 export const studentsDb = {
   async getAll() {
+    // Проверяем, включен ли тестовый режим
+    const isTestMode = import.meta.env.VITE_BYPASS_AUTH === 'true' || 
+                      !import.meta.env.VITE_SUPABASE_URL || 
+                      !import.meta.env.VITE_SUPABASE_ANON_KEY;
+    
+    if (isTestMode) {
+      // Тестовый режим - возвращаем тестовых студентов
+      return [
+        {
+          id: '550e8400-e29b-41d4-a716-446655440000',
+          trainerId: '550e8400-e29b-41d4-a716-446655440000',
+          firstName: 'Иван',
+          lastName: 'Иванов',
+          middleName: 'Иванович',
+          phone: '+7 (999) 123-45-67',
+          email: 'ivan@example.com',
+          birthDate: '1990-01-01',
+          weight: 75,
+          height: 180,
+          goal: 'Похудение',
+          medicalNotes: '',
+          photo: '',
+          status: 'active',
+          joinDate: '2024-01-01',
+          parentFirstName: '',
+          parentLastName: '',
+          parentMiddleName: '',
+          parentPhone: '',
+          parentEmail: '',
+          parentSpecialInstructions: '',
+          isParentRepresentative: false,
+          privacyPolicyAccepted: true,
+          privacyPolicyAcceptedDate: '2024-01-01',
+          contractAccepted: true,
+          contractAcceptedDate: '2024-01-01',
+          educationConsentAccepted: true,
+          educationConsentAcceptedDate: '2024-01-01',
+        },
+        {
+          id: '00000000-0000-0000-0000-000000000002',
+          trainerId: '550e8400-e29b-41d4-a716-446655440000',
+          firstName: 'Студент_1',
+          lastName: 'Студентович_1',
+          middleName: '',
+          phone: '+7 (999) 987-65-43',
+          email: 'student1@example.com',
+          birthDate: '1995-05-15',
+          weight: 70,
+          height: 175,
+          goal: 'Набор мышечной массы',
+          medicalNotes: '',
+          photo: '',
+          status: 'active',
+          joinDate: '2024-01-15',
+          parentFirstName: '',
+          parentLastName: '',
+          parentMiddleName: '',
+          parentPhone: '',
+          parentEmail: '',
+          parentSpecialInstructions: '',
+          isParentRepresentative: false,
+          privacyPolicyAccepted: true,
+          privacyPolicyAcceptedDate: '2024-01-15',
+          contractAccepted: true,
+          contractAcceptedDate: '2024-01-15',
+          educationConsentAccepted: true,
+          educationConsentAcceptedDate: '2024-01-15',
+        }
+      ] as Pupil[];
+    }
     const { data, error } = await supabase
       .from('students')
       .select('*')
@@ -60,7 +130,7 @@ export const studentsDb = {
     return toCamelCase(data) as Pupil;
   },
 
-  async getById(id: number) {
+  async getById(id: string) {
     const { data, error } = await supabase
       .from('students')
       .select('*')
@@ -70,7 +140,77 @@ export const studentsDb = {
     return toCamelCase(data) as Pupil;
   },
 
-  async getByTrainerId(trainerId: number) {
+  async getByTrainerId(trainerId: string) {
+    // Проверяем, включен ли тестовый режим
+    const isTestMode = import.meta.env.VITE_BYPASS_AUTH === 'true' || 
+                      !import.meta.env.VITE_SUPABASE_URL || 
+                      !import.meta.env.VITE_SUPABASE_ANON_KEY;
+    
+    if (isTestMode) {
+      // Тестовый режим - возвращаем тестовых студентов
+      return [
+        {
+          id: '550e8400-e29b-41d4-a716-446655440000',
+          trainerId: '550e8400-e29b-41d4-a716-446655440000',
+          firstName: 'Иван',
+          lastName: 'Иванов',
+          middleName: 'Иванович',
+          phone: '+7 (999) 123-45-67',
+          email: 'ivan@example.com',
+          birthDate: '1990-01-01',
+          weight: 75,
+          height: 180,
+          goal: 'Похудение',
+          medicalNotes: '',
+          photo: '',
+          status: 'active',
+          joinDate: '2024-01-01',
+          parentFirstName: '',
+          parentLastName: '',
+          parentMiddleName: '',
+          parentPhone: '',
+          parentEmail: '',
+          parentSpecialInstructions: '',
+          isParentRepresentative: false,
+          privacyPolicyAccepted: true,
+          privacyPolicyAcceptedDate: '2024-01-01',
+          contractAccepted: true,
+          contractAcceptedDate: '2024-01-01',
+          educationConsentAccepted: true,
+          educationConsentAcceptedDate: '2024-01-01',
+        },
+        {
+          id: '00000000-0000-0000-0000-000000000002',
+          trainerId: '550e8400-e29b-41d4-a716-446655440000',
+          firstName: 'Студент_1',
+          lastName: 'Студентович_1',
+          middleName: '',
+          phone: '+7 (999) 987-65-43',
+          email: 'student1@example.com',
+          birthDate: '1995-05-15',
+          weight: 70,
+          height: 175,
+          goal: 'Набор мышечной массы',
+          medicalNotes: '',
+          photo: '',
+          status: 'active',
+          joinDate: '2024-01-15',
+          parentFirstName: '',
+          parentLastName: '',
+          parentMiddleName: '',
+          parentPhone: '',
+          parentEmail: '',
+          parentSpecialInstructions: '',
+          isParentRepresentative: false,
+          privacyPolicyAccepted: true,
+          privacyPolicyAcceptedDate: '2024-01-15',
+          contractAccepted: true,
+          contractAcceptedDate: '2024-01-15',
+          educationConsentAccepted: true,
+          educationConsentAcceptedDate: '2024-01-15',
+        }
+      ] as Pupil[];
+    }
     try {
       if (!supabase) {
         console.log('Supabase not configured, returning test students');
@@ -187,7 +327,7 @@ export const studentsDb = {
     return toCamelCase(data) as Pupil;
   },
 
-  async update(id: number, student: Partial<InsertPupil>) {
+  async update(id: string, student: Partial<InsertPupil>) {
     const { data, error } = await supabase
       .from('students')
       .update(toSnakeCase(student))
@@ -198,7 +338,7 @@ export const studentsDb = {
     return toCamelCase(data) as Pupil;
   },
 
-  async delete(id: number) {
+  async delete(id: string) {
     const { error } = await supabase
       .from('students')
       .delete()
@@ -294,7 +434,7 @@ export const exercisesDb = {
     return data as Exercise[];
   },
 
-  async getById(id: number) {
+  async getById(id: string) {
     const { data, error } = await supabase
       .from('exercises')
       .select('*')
@@ -314,7 +454,7 @@ export const exercisesDb = {
     return data as Exercise;
   },
 
-  async update(id: number, exercise: Partial<InsertExercise>) {
+  async update(id: string, exercise: Partial<InsertExercise>) {
     const { data, error } = await supabase
       .from('exercises')
       .update(exercise)
@@ -325,7 +465,7 @@ export const exercisesDb = {
     return data as Exercise;
   },
 
-  async delete(id: number) {
+  async delete(id: string) {
     const { error } = await supabase
       .from('exercises')
       .delete()
@@ -344,7 +484,7 @@ export const workoutProgramsDb = {
     return data as WorkoutProgram[];
   },
 
-  async getById(id: number) {
+  async getById(id: string) {
     const { data, error } = await supabase
       .from('workout_programs')
       .select('*')
@@ -354,7 +494,7 @@ export const workoutProgramsDb = {
     return data as WorkoutProgram;
   },
 
-  async getByCreatorId(creatorId: number) {
+  async getByCreatorId(creatorId: string) {
     const { data, error } = await supabase
       .from('workout_programs')
       .select('*')
@@ -373,7 +513,7 @@ export const workoutProgramsDb = {
     return data as WorkoutProgram;
   },
 
-  async update(id: number, program: Partial<InsertWorkoutProgram>) {
+  async update(id: string, program: Partial<InsertWorkoutProgram>) {
     const { data, error } = await supabase
       .from('workout_programs')
       .update(program)
@@ -384,7 +524,7 @@ export const workoutProgramsDb = {
     return data as WorkoutProgram;
   },
 
-  async delete(id: number) {
+  async delete(id: string) {
     const { error } = await supabase
       .from('workout_programs')
       .delete()
@@ -395,7 +535,7 @@ export const workoutProgramsDb = {
 
 // Pupil Training Plans
 export const trainingPlansDb = {
-  async getByPupilId(pupilId: number) {
+  async getByPupilId(pupilId: string) {
     const { data, error } = await supabase
       .from('pupil_training_plans')
       .select('*')
@@ -405,7 +545,7 @@ export const trainingPlansDb = {
     return data as PupilTrainingPlan[];
   },
 
-  async getActiveByPupilId(pupilId: number) {
+  async getActiveByPupilId(pupilId: string) {
     const { data, error } = await supabase
       .from('pupil_training_plans')
       .select('*')
@@ -426,7 +566,7 @@ export const trainingPlansDb = {
     return data as PupilTrainingPlan;
   },
 
-  async update(id: number, plan: Partial<InsertPupilTrainingPlan>) {
+  async update(id: string, plan: Partial<InsertPupilTrainingPlan>) {
     const { data, error } = await supabase
       .from('pupil_training_plans')
       .update(toSnakeCase(plan))
@@ -437,7 +577,7 @@ export const trainingPlansDb = {
     return data as PupilTrainingPlan;
   },
 
-  async delete(id: number) {
+  async delete(id: string) {
     const { error } = await supabase
       .from('pupil_training_plans')
       .delete()
@@ -448,7 +588,7 @@ export const trainingPlansDb = {
 
 // Workout History
 export const workoutHistoryDb = {
-  async getByPupilId(pupilId: number) {
+  async getByPupilId(pupilId: string) {
     const { data, error } = await supabase
       .from('pupil_workout_history')
       .select('*')
@@ -468,7 +608,7 @@ export const workoutHistoryDb = {
     return data as PupilWorkoutHistory;
   },
 
-  async update(id: number, history: Partial<InsertPupilWorkoutHistory>) {
+  async update(id: string, history: Partial<InsertPupilWorkoutHistory>) {
     const { data, error } = await supabase
       .from('pupil_workout_history')
       .update(toSnakeCase(history))
@@ -482,7 +622,7 @@ export const workoutHistoryDb = {
 
 // Active Workouts
 export const activeWorkoutsDb = {
-  async getByTrainerId(trainerId: number) {
+  async getByTrainerId(trainerId: string) {
     const { data, error } = await supabase
       .from('active_workouts')
       .select(`
@@ -505,7 +645,7 @@ export const activeWorkoutsDb = {
     return data as ActiveWorkout;
   },
 
-  async delete(id: number) {
+  async delete(id: string) {
     const { error } = await supabase
       .from('active_workouts')
       .delete()
@@ -535,7 +675,7 @@ export const appointmentsDb = {
     return (data || []).map(toCamelCase) as Appointment[];
   },
 
-  async getByTrainerId(trainerId: number) {
+  async getByTrainerId(trainerId: string) {
     try {
       if (!supabase) {
         console.log('Supabase not configured, returning empty array');
@@ -557,7 +697,7 @@ export const appointmentsDb = {
         .eq('trainer_id', trainerId)
         .order('date', { ascending: true })
         .order('time', { ascending: true });
-      
+
       if (error) {
         console.error('Error fetching appointments:', error);
         // Возвращаем пустой массив вместо выброса ошибки
@@ -589,7 +729,7 @@ export const appointmentsDb = {
     return toCamelCase(data) as Appointment;
   },
 
-  async update(id: number, appointment: Partial<InsertAppointment>) {
+  async update(id: string, appointment: Partial<InsertAppointment>) {
     const { data, error } = await supabase
       .from('appointments')
       .update(toSnakeCase(appointment))
@@ -609,7 +749,7 @@ export const appointmentsDb = {
     return toCamelCase(data) as Appointment;
   },
 
-  async delete(id: number) {
+  async delete(id: string) {
     const { error } = await supabase
       .from('appointments')
       .delete()

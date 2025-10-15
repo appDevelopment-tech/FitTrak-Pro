@@ -20,6 +20,9 @@ import { useRoleCheck } from "@/lib/role-guard";
 import { NotificationsPanel } from "@/components/ui/notifications-panel";
 import { PWAInstallBanner, OfflineIndicator } from "@/components/ui/pwa-install-banner";
 import { PageTransition } from "@/components/ui/page-transitions";
+// Debug components removed for production
+// import { SupabaseConnectionCheck } from "@/components/debug/supabase-connection-check";
+// import { AuthModeToggle } from "@/components/debug/auth-mode-toggle";
 import type { DashboardStats } from "@/lib/types";
 import type { WorkoutSession, WorkoutProgram, User } from "@shared/schema";
 
@@ -30,6 +33,10 @@ export default function Dashboard() {
   const [location, setLocation] = useLocation();
   const { user, signOut } = useAuth();
   const { isTrainer } = useRoleCheck();
+  
+  // Check if user is accessing via admin route (which means they're a trainer)
+  const isAdminRoute = location.includes('/admin/');
+  const isTrainerUser = isTrainer || isAdminRoute;
   // const { userRole, isAdminOrTrainer } = usePermissions();
 
   // Обработка URL при загрузке страницы
@@ -38,7 +45,7 @@ export default function Dashboard() {
     
     if (currentPath === '/cabinet') {
       // Проверяем, может ли пользователь получить доступ к кабинету
-      if (isTrainer) {
+      if (isTrainerUser) {
         setActiveView('profile');
       } else {
         // Редиректим учеников на расписание
@@ -48,7 +55,7 @@ export default function Dashboard() {
     } else if (currentPath === '/dashboard' || currentPath === '/') {
       setActiveView('schedule');
     }
-  }, [location, isTrainer, setLocation]);
+  }, [location, isTrainerUser, setLocation]);
 
   const handleViewChange = (view: string) => {
     setActiveView(view);
@@ -102,7 +109,7 @@ export default function Dashboard() {
         );
       case 'profile':
         // Дополнительная проверка доступа для раздела "Кабинет"
-        if (!isTrainer) {
+        if (!isTrainerUser) {
           return (
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               <div className="text-center py-16">
@@ -227,7 +234,7 @@ export default function Dashboard() {
               Расписание
             </button>
 
-            {isTrainer && (
+            {isTrainerUser && (
               <button
                 onClick={() => setActiveView('profile')}
                 className={`${

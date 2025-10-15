@@ -1,17 +1,24 @@
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import Database from 'better-sqlite3';
-import * as schema from "@shared/schema";
+import { PrismaClient } from '../generated/prisma';
 
-// Create SQLite database connection
-const sqlite = new Database('./dev.db');
-
-// Create drizzle instance
-export const db = drizzle(sqlite, { schema });
+// Initialize Prisma Client with PostgreSQL
+const prisma = new PrismaClient({
+  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+});
 
 // Test database connection on startup
-try {
-  sqlite.prepare('SELECT 1 as test').get();
-  console.log('✅ Database connection successful');
-} catch (error) {
-  console.error('❌ Database connection failed:', error);
-}
+prisma.$connect()
+  .then(() => {
+    console.log('✅ Database connection successful (Prisma + Supabase PostgreSQL)');
+  })
+  .catch((error) => {
+    console.error('❌ Database connection failed:', error);
+    process.exit(1);
+  });
+
+// Graceful shutdown
+process.on('beforeExit', async () => {
+  await prisma.$disconnect();
+});
+
+export { prisma as db };
+export default prisma;
