@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { studentsDb, exercisesDb, trainingPlansDb } from "@/lib/database";
 import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
+import { useAuth } from "@/lib/auth";
 import type { Pupil, InsertPupil, WorkoutProgram, Exercise } from "@shared/schema";
 
 interface PupilWithAge extends Pupil {
@@ -84,11 +85,15 @@ export function ComprehensiveStudentsManagement() {
   const queryClient = useQueryClient();
   const { isWorkoutActive, removeActiveWorkout, addActiveWorkout, getActiveWorkout, activeWorkouts, getWorkoutProgramName } = useActiveWorkout();
 
+  // Get the trainer ID from the authenticated user
+  const { user: authUser } = useAuth();
+  const trainerId = authUser?.id || '550e8400-e29b-41d4-a716-446655440000';
+
   // Form configurations
   const addPupilForm = useForm({
     resolver: zodResolver(insertPupilSchema),
     defaultValues: {
-      trainerId: '550e8400-e29b-41d4-a716-446655440000', // Main trainer UUID
+      trainerId: trainerId, // Use authenticated user's ID
       firstName: "",
       lastName: "",
       password: null, // Changed from "" to null to allow optional password
@@ -113,8 +118,6 @@ export function ComprehensiveStudentsManagement() {
   const editPupilForm = useForm<Partial<InsertPupil>>({
     resolver: zodResolver(insertPupilSchema.partial()),
   });
-  
-  const trainerId = '550e8400-e29b-41d4-a716-446655440000'; // Main trainer UUID
 
   // Готовые планы тренировок
   const readyPlans = [
@@ -172,6 +175,7 @@ export function ComprehensiveStudentsManagement() {
   const { data: pupils = [], isLoading } = useQuery<Pupil[]>({
     queryKey: ['students', trainerId],
     queryFn: () => studentsDb.getByTrainerId(trainerId),
+    enabled: !!authUser?.id, // Only run query if we have a user ID
   });
 
   // Получаем упражнения для создания кастомных тренировок
@@ -483,6 +487,13 @@ export function ComprehensiveStudentsManagement() {
     if (!selectedPupil) return;
     updatePupilMutation.mutate({ id: selectedPupil.id, updates: data });
   };
+
+  // Effect to update trainerId in the form when it changes
+  useEffect(() => {
+    if (trainerId) {
+      addPupilForm.setValue('trainerId', trainerId);
+    }
+  }, [trainerId, addPupilForm]);
 
   // Effect to populate edit form when selectedPupil changes
   useEffect(() => {

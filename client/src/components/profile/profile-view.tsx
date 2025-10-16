@@ -18,12 +18,13 @@ import type { User as UserType, Exercise, Pupil } from "@shared/schema";
 import { getExercisePhoto } from "@/components/ui/exercise-photos";
 import { ExerciseDetail } from "@/components/exercise/exercise-detail";
 import { StudentsManagement } from "@/components/students/students-management";
-import { 
-  LazyWorkoutsManagement, 
-  LazyExerciseManagement, 
-  LazyMuscleGroupsManagement 
+import {
+  LazyWorkoutsManagement,
+  LazyExerciseManagement,
+  LazyMuscleGroupsManagement
 } from "@/components/ui/lazy-component";
 import { useLocation } from "wouter";
+import { useAuth } from "@/lib/auth";
 
 export function ProfileView() {
   const [isEditing, setIsEditing] = useState(false);
@@ -44,20 +45,61 @@ export function ProfileView() {
   const [location] = useLocation();
   
   const [activeTab, setActiveTab] = useState<string>("profile");
-  
-  const { data: user } = useQuery<UserType>({
-    queryKey: ['user', '550e8400-e29b-41d4-a716-446655440000'],
+
+  // Get the trainer ID from the authenticated user
+  const { user: authUser } = useAuth();
+  const trainerId = authUser?.id || "00000000-0000-0000-0000-000000000000";
+
+  // Debug logging for auth user
+  useEffect(() => {
+    console.log('Auth user changed:', authUser);
+    console.log('Trainer ID:', trainerId);
+  }, [authUser, trainerId]);
+
+  const { data: user, error: userError, isLoading: userLoading } = useQuery<UserType>({
+    queryKey: ['user', trainerId],
     queryFn: async () => {
+      console.log('Fetching user profile for trainerId:', trainerId);
       const { data, error } = await supabase
         .from('users')
         .select('*')
-        .eq('id', '550e8400-e29b-41d4-a716-446655440000')
+        .eq('id', trainerId)
         .single();
 
-      if (error) throw error;
-      return data as UserType;
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        throw error;
+      }
+      console.log('User profile fetched (raw):', data);
+
+      // Transform snake_case to camelCase
+      const transformedData: UserType = {
+        id: data.id,
+        username: data.username,
+        password: data.password,
+        firstName: data.first_name,
+        lastName: data.last_name,
+        middleName: data.middle_name,
+        birthDate: data.birth_date,
+        email: data.email,
+        phone: data.phone,
+        isTrainer: data.is_trainer,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+      };
+
+      console.log('User profile transformed:', transformedData);
+      return transformedData;
     },
+    enabled: !!authUser?.id, // Only run query if we have a user ID
   });
+
+  // Log when user data changes
+  useEffect(() => {
+    console.log('User data changed:', user);
+    console.log('User error:', userError);
+    console.log('User loading:', userLoading);
+  }, [user, userError, userLoading]);
 
   const { data: exercises = [] } = useQuery<Exercise[]>({
     queryKey: ['exercises'],
@@ -103,7 +145,9 @@ export function ProfileView() {
 
   // Update form when user data loads
   useEffect(() => {
+    console.log('Form update effect - user:', user);
     if (user) {
+      console.log('Resetting form with user data:', user);
       form.reset({
         firstName: user.firstName || "",
         lastName: user.lastName || "",
@@ -118,6 +162,7 @@ export function ProfileView() {
   // Mutation for updating user profile
   const updateUserMutation = useMutation({
     mutationFn: async (data: UserProfileForm) => {
+      console.log('Updating user profile with:', data);
       const { data: updated, error } = await supabase
         .from('users')
         .update({
@@ -128,12 +173,33 @@ export function ProfileView() {
           email: data.email,
           phone: data.phone,
         })
-        .eq('id', '550e8400-e29b-41d4-a716-446655440000')
+        .eq('id', trainerId)
         .select()
         .single();
 
-      if (error) throw error;
-      return updated;
+      if (error) {
+        console.error('Error updating user profile:', error);
+        throw error;
+      }
+      console.log('User profile updated (raw):', updated);
+
+      // Transform snake_case to camelCase
+      const transformedData: UserType = {
+        id: updated.id,
+        username: updated.username,
+        password: updated.password,
+        firstName: updated.first_name,
+        lastName: updated.last_name,
+        middleName: updated.middle_name,
+        birthDate: updated.birth_date,
+        email: updated.email,
+        phone: updated.phone,
+        isTrainer: updated.is_trainer,
+        createdAt: updated.created_at,
+        updatedAt: updated.updated_at,
+      };
+
+      return transformedData;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
@@ -152,12 +218,11 @@ export function ProfileView() {
     },
   });
 
-  const trainerId = "00000000-0000-0000-0000-000000000000"; // В реальном приложении это будет из контекста пользователя
-
   // Загружаем учеников для поиска выбранного ученика из URL
   const { data: pupils = [] } = useQuery<Pupil[]>({
     queryKey: ['students', trainerId],
     queryFn: () => studentsDb.getByTrainerId(trainerId),
+    enabled: !!authUser?.id, // Only run query if we have a user ID
   });
 
   // Обработка URL параметров
@@ -345,12 +410,12 @@ export function ProfileView() {
                       <div>
                         <Label>Имя</Label>
                         {isEditing ? (
-                          <Input 
+                          <Input
                             {...form.register("firstName")}
                             className={form.formState.errors.firstName ? "border-red-500" : ""}
                           />
                         ) : (
-                          <div className="p-3 bg-gray-50 rounded-md">{user?.firstName || ""}</div>
+                          <div className="p-3 bg-gray-50 rounded-md text-gray-900 font-medium">{user?.firstName || ""}</div>
                         )}
                         {form.formState.errors.firstName && (
                           <p className="text-sm text-red-500 mt-1">{form.formState.errors.firstName.message}</p>
@@ -359,12 +424,12 @@ export function ProfileView() {
                       <div>
                         <Label>Фамилия</Label>
                         {isEditing ? (
-                          <Input 
+                          <Input
                             {...form.register("lastName")}
                             className={form.formState.errors.lastName ? "border-red-500" : ""}
                           />
                         ) : (
-                          <div className="p-3 bg-gray-50 rounded-md">{user?.lastName || ""}</div>
+                          <div className="p-3 bg-gray-50 rounded-md text-gray-900 font-medium">{user?.lastName || ""}</div>
                         )}
                         {form.formState.errors.lastName && (
                           <p className="text-sm text-red-500 mt-1">{form.formState.errors.lastName.message}</p>
@@ -375,19 +440,19 @@ export function ProfileView() {
                         {isEditing ? (
                           <Input {...form.register("middleName")} />
                         ) : (
-                          <div className="p-3 bg-gray-50 rounded-md">{user?.middleName || ""}</div>
+                          <div className="p-3 bg-gray-50 rounded-md text-gray-900 font-medium">{user?.middleName || ""}</div>
                         )}
                       </div>
                       <div>
                         <Label>Дата рождения</Label>
                         {isEditing ? (
-                          <Input 
-                            type="date" 
+                          <Input
+                            type="date"
                             {...form.register("birthDate")}
                             className={form.formState.errors.birthDate ? "border-red-500" : ""}
                           />
                         ) : (
-                          <div className="p-3 bg-gray-50 rounded-md">
+                          <div className="p-3 bg-gray-50 rounded-md text-gray-900 font-medium">
                             {user?.birthDate ? new Date(user.birthDate).toLocaleDateString('ru-RU', {
                               day: 'numeric',
                               month: 'long',
@@ -402,13 +467,13 @@ export function ProfileView() {
                       <div>
                         <Label>Email</Label>
                         {isEditing ? (
-                          <Input 
-                            type="email" 
+                          <Input
+                            type="email"
                             {...form.register("email")}
                             className={form.formState.errors.email ? "border-red-500" : ""}
                           />
                         ) : (
-                          <div className="p-3 bg-gray-50 rounded-md">{user?.email || ""}</div>
+                          <div className="p-3 bg-gray-50 rounded-md text-gray-900 font-medium">{user?.email || ""}</div>
                         )}
                         {form.formState.errors.email && (
                           <p className="text-sm text-red-500 mt-1">{form.formState.errors.email.message}</p>
@@ -417,12 +482,12 @@ export function ProfileView() {
                       <div>
                         <Label>Телефон</Label>
                         {isEditing ? (
-                          <Input 
+                          <Input
                             {...form.register("phone")}
                             className={form.formState.errors.phone ? "border-red-500" : ""}
                           />
                         ) : (
-                          <div className="p-3 bg-gray-50 rounded-md">{user?.phone || ""}</div>
+                          <div className="p-3 bg-gray-50 rounded-md text-gray-900 font-medium">{user?.phone || ""}</div>
                         )}
                         {form.formState.errors.phone && (
                           <p className="text-sm text-red-500 mt-1">{form.formState.errors.phone.message}</p>

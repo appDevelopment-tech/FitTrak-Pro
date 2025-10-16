@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/lib/auth';
 import { LoginForm } from '@/components/auth/login-form';
@@ -11,11 +11,24 @@ type AuthMode = 'login' | 'register' | 'forgot-password';
 
 export default function LoginPage() {
   const [, setLocation] = useLocation();
-  const { signIn } = useAuth();
+  const { user, pupil, loading } = useAuth();
   const [authMode, setAuthMode] = useState<AuthMode>('login');
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  // Monitor auth state and redirect when pupil is logged in
+  useEffect(() => {
+    if (!loading && user && pupil && !isRedirecting && authMode === 'login') {
+      setIsRedirecting(true);
+      // Use requestAnimationFrame to ensure auth state is fully settled
+      requestAnimationFrame(() => {
+        setLocation('/dashboard');
+      });
+    }
+  }, [user, pupil, loading, setLocation, isRedirecting, authMode]);
 
   const handleLoginSuccess = () => {
-    setLocation('/dashboard');
+    // Don't redirect immediately - let the useEffect handle it
+    // This ensures auth state is fully settled
   };
 
   const handleRegistrationSuccess = () => {

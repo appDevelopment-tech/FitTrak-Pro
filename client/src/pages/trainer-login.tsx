@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/lib/auth';
 import { LoginForm } from '@/components/auth/login-form';
@@ -7,10 +7,23 @@ import { User, Dumbbell, ArrowLeft } from 'lucide-react';
 
 export default function TrainerLoginPage() {
   const [, setLocation] = useLocation();
-  const { signIn } = useAuth();
+  const { user, loading } = useAuth();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  // Monitor auth state and redirect when trainer is logged in
+  useEffect(() => {
+    if (!loading && user && (user as any).user_metadata?.is_trainer && !isRedirecting) {
+      setIsRedirecting(true);
+      // Use requestAnimationFrame to ensure auth state is fully settled
+      requestAnimationFrame(() => {
+        setLocation('/cabinet');
+      });
+    }
+  }, [user, loading, setLocation, isRedirecting]);
 
   const handleLoginSuccess = () => {
-    setLocation('/cabinet');
+    // Don't redirect immediately - let the useEffect handle it
+    // This ensures auth state is fully settled
   };
 
   const handleBackToMain = () => {
