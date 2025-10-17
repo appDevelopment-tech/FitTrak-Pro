@@ -1,0 +1,264 @@
+// Prisma Schema for FitTrak-Pro
+// Database: Supabase PostgreSQL with UUIDs
+// Last Updated: January 13, 2025
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+  binaryTargets = ["native", "windows"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// Trainers and authentication
+model User {
+  id         String   @id @default(uuid())
+  username   String   @unique
+  password   String
+  firstName  String   @map("first_name")
+  lastName   String   @map("last_name")
+  middleName String?  @map("middle_name")
+  birthDate  String?  @map("birth_date")
+  email      String   @unique
+  phone      String?
+  isTrainer  Boolean  @default(false) @map("is_trainer")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  workoutPrograms       WorkoutProgram[]
+  exercises             Exercise[]
+  pupilTrainingPlans    PupilTrainingPlan[]
+  pupilWorkoutHistory   PupilWorkoutHistory[]
+  activeWorkouts        ActiveWorkout[]
+  appointmentsAsTrainer Appointment[]        @relation("TrainerAppointments")
+
+  @@map("users")
+}
+
+// Students/Pupils
+model Pupil {
+  id         String   @id @default(uuid())
+  trainerId  String?  @map("trainer_id")
+  firstName  String   @map("first_name")
+  lastName   String   @map("last_name")
+  middleName String?  @map("middle_name")
+  phone      String
+  email      String   @unique
+  password   String?
+  birthDate  String   @map("birth_date")
+  weight     Int?
+  height     Int?
+  goal       String?
+  medicalNotes String? @map("medical_notes")
+  photo      String?
+  status     String   @default("pending")
+  joinDate   String   @map("join_date")
+
+  // Parent/Guardian information (for minors under 16)
+  parentFirstName           String?  @map("parent_first_name")
+  parentLastName            String?  @map("parent_last_name")
+  parentMiddleName          String?  @map("parent_middle_name")
+  parentPhone               String?  @map("parent_phone")
+  parentEmail               String?  @map("parent_email")
+  parentSpecialInstructions String?  @map("parent_special_instructions")
+  isParentRepresentative    Boolean  @default(false) @map("is_parent_representative")
+
+  // Legal consents
+  privacyPolicyAccepted        Boolean  @default(false) @map("privacy_policy_accepted")
+  privacyPolicyAcceptedDate    String?  @map("privacy_policy_accepted_date")
+  contractAccepted             Boolean  @default(false) @map("contract_accepted")
+  contractAcceptedDate         String?  @map("contract_accepted_date")
+  educationConsentAccepted     Boolean  @default(false) @map("education_consent_accepted")
+  educationConsentAcceptedDate String?  @map("education_consent_accepted_date")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  workoutSessions  WorkoutSession[]
+  exerciseProgress ExerciseProgress[]
+  trainingPlans    PupilTrainingPlan[]
+  workoutHistory   PupilWorkoutHistory[]
+  activeWorkouts   ActiveWorkout[]
+  appointments     Appointment[]         @relation("PupilAppointments")
+
+  @@map("students")
+}
+
+// Exercise database
+model Exercise {
+  id                String   @id @default(uuid())
+  name              String
+  primaryMuscles    Json     @map("primaryMuscles") // JSON array
+  secondaryMuscles  Json     @default("[]") @map("secondaryMuscles") // JSON array
+  difficulty        String // 'начинающий', 'средний', 'продвинутый'
+  overview          String
+  technique         Json // JSON array
+  commonMistakes    Json     @map("commonMistakes") // JSON array
+  contraindications Json // JSON array
+  muscleImageUrl    String?  @map("muscleImageUrl")
+  videoUrl          String?  @map("videoUrl")
+  techniqueImageUrl String?  @map("techniqueImageUrl")
+  createdBy         String?  @map("createdBy")
+  createdAt         DateTime @default(now()) @map("createdAt")
+  updatedAt         DateTime @updatedAt @map("updatedAt")
+
+  // Relations
+  creator          User?              @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+  exerciseProgress ExerciseProgress[]
+
+  @@map("exercises")
+}
+
+// Workout programs created by trainers
+model WorkoutProgram {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  type      String // 'strength', 'cardio', 'functional', 'stretching'
+  duration  Int // minutes
+  level     String // 'beginner', 'intermediate', 'advanced'
+  createdBy String   @map("created_by") @db.Uuid
+  exercises Json // JSON array of exercises
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  creator         User             @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  workoutSessions WorkoutSession[]
+  activeWorkouts  ActiveWorkout[]
+
+  @@map("workout_programs")
+}
+
+// Scheduled workout sessions
+model WorkoutSession {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  programId     String   @map("program_id") @db.Uuid
+  scheduledDate String   @map("scheduled_date")
+  startTime     String   @map("start_time")
+  endTime       String   @map("end_time")
+  status        String   @default("scheduled") // 'scheduled', 'completed', 'missed'
+  completedAt   String?  @map("completed_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  pupil   Pupil          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  program WorkoutProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  @@map("workout_sessions")
+}
+
+// Exercise progress tracking
+model ExerciseProgress {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  exerciseId String   @map("exercise_id") @db.Uuid
+  weight     Int?
+  reps       Int?
+  sets       Int?
+  date       String
+  sessionId  String?  @map("session_id") @db.Uuid
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  pupil    Pupil    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@map("exercise_progress")
+}
+
+// Custom training plans for pupils
+model PupilTrainingPlan {
+  id        String   @id @default(uuid()) @db.Uuid
+  pupilId   String   @map("pupil_id") @db.Uuid
+  trainerId String   @map("trainer_id") @db.Uuid
+  name      String
+  exercises Json // JSON array
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  pupil   Pupil @relation(fields: [pupilId], references: [id], onDelete: Cascade)
+  trainer User  @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+
+  @@map("pupil_training_plans")
+}
+
+// Workout history for pupils
+model PupilWorkoutHistory {
+  id                 String   @id @default(uuid()) @db.Uuid
+  pupilId            String   @map("pupil_id") @db.Uuid
+  trainerId          String   @map("trainer_id") @db.Uuid
+  workoutDate        String   @map("workout_date")
+  workoutTime        String   @map("workout_time")
+  duration           Int? // minutes
+  exercises          Json // JSON array
+  notes              String?
+  pupilFeedback      String?  @map("pupil_feedback")
+  status             String   @default("completed") // 'completed', 'missed', 'cancelled'
+  confirmationStatus String   @default("pending") @map("confirmation_status") // 'pending', 'confirmed', 'declined'
+  confirmedAt        String?  @map("confirmed_at")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  pupil   Pupil @relation(fields: [pupilId], references: [id], onDelete: Cascade)
+  trainer User  @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+
+  @@map("pupil_workout_history")
+}
+
+// Currently active workouts
+model ActiveWorkout {
+  id               String   @id @default(uuid()) @db.Uuid
+  trainerId        String   @map("trainer_id") @db.Uuid
+  pupilId          String   @map("pupil_id") @db.Uuid
+  workoutProgramId String   @map("workout_program_id") @db.Uuid
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  trainer User           @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  pupil   Pupil          @relation(fields: [pupilId], references: [id], onDelete: Cascade)
+  program WorkoutProgram @relation(fields: [workoutProgramId], references: [id], onDelete: Cascade)
+
+  @@map("active_workouts")
+}
+
+// Appointment bookings
+model Appointment {
+  id        String   @id @default(uuid()) @db.Uuid
+  trainerId String   @map("trainer_id") @db.Uuid
+  pupilId   String   @map("pupil_id") @db.Uuid
+  date      String
+  time      String
+  status    String   @default("pending")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  trainer User  @relation("TrainerAppointments", fields: [trainerId], references: [id], onDelete: Cascade)
+  pupil   Pupil @relation("PupilAppointments", fields: [pupilId], references: [id], onDelete: Cascade)
+
+  @@map("appointments")
+}
+
+// Muscle groups lookup table
+model MuscleGroup {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String   @unique
+  description  String?
+  displayOrder Int      @unique @map("display_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("muscle_groups")
+}

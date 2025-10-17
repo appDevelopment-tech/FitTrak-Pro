@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, LogIn, ChevronLeft, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { appointmentsDb, studentsDb } from "@/lib/database";
+import { studentsDb } from "@/lib/database";
 import type { Pupil, Appointment } from "@shared/schema";
 import { useLocation } from "wouter";
 
@@ -25,12 +25,12 @@ export default function PublicSchedule() {
 
   const { data: pupils = [] } = useQuery<Pupil[]>({
     queryKey: ['students', trainerId],
-    queryFn: () => studentsDb.getByTrainerId(trainerId),
+    queryFn: () => fetch(`/api/trainers/${trainerId}/pupils`).then(res => res.json()),
   });
 
   const { data: appointments = [] } = useQuery<Appointment[]>({
     queryKey: ['appointments', trainerId],
-    queryFn: () => appointmentsDb.getByTrainerId(trainerId),
+    queryFn: () => Promise.resolve([]), // Пока нет API для записей, возвращаем пустой массив
   });
 
   const allSessions: ScheduleSession[] = (appointments || []).map(apt => {

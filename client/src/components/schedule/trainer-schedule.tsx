@@ -117,7 +117,7 @@ export function TrainerSchedule() {
   // Fetch pupils from database
   const { data: pupils = [] } = useQuery<Pupil[]>({
     queryKey: ['students', trainerId],
-    queryFn: () => studentsDb.getByTrainerId(trainerId),
+    queryFn: () => fetch(`/api/trainers/${trainerId}/pupils`).then(res => res.json()),
   });
 
   // Transform pupils to include computed name property

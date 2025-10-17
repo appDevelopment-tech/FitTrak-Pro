@@ -67,7 +67,7 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
 
   const { data: pupils = [] } = useQuery<Pupil[]>({
     queryKey: ['students', trainerId],
-    queryFn: () => studentsDb.getByTrainerId(trainerId),
+    queryFn: () => fetch(`/api/trainers/${trainerId}/pupils`).then(res => res.json()),
   });
 
   // Загрузка готовых планов тренировок из API

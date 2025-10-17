@@ -114,19 +114,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      // СНАЧАЛА пробуем через наш API (приоритет SQLite базе)
+      console.log('🔐 Попытка входа через API (SQLite)...');
+      
+      const response = await fetch('http://localhost:3001/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (error) {
-        throw new Error(error.message);
-      }
+      if (response.ok) {
+        // Успешный вход через наш API
+        const loginResult = await response.json();
+        console.log('✅ Успешный вход через API:', loginResult.pupil?.firstName, loginResult.pupil?.lastName);
+        
+        // Создаем фиктивный пользователь для совместимости
+        const mockUser = {
+          id: loginResult.pupil?.id || 'mock-id',
+          email: email,
+          user_metadata: {
+            first_name: loginResult.pupil?.firstName,
+            last_name: loginResult.pupil?.lastName,
+            is_trainer: false,
+          }
+        };
 
-      if (data.user) {
-        setUser(data.user);
-        // Проверяем профиль ученика
-        await checkPupilProfile(data.user);
+        setUser(mockUser as any);
+        setPupil(loginResult.pupil);
+        return;
+      } else {
+        // API не сработал, пробуем Supabase как fallback
+        console.log('⚠️ API вход не удался, пробуем Supabase...');
+        
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) {
+          throw new Error(error.message || 'Ошибка входа');
+        }
+
+        if (data.user) {
+          setUser(data.user);
+          // Проверяем профиль ученика
+          await checkPupilProfile(data.user);
+        }
       }
     } catch (error: any) {
       throw new Error(error.message || 'Ошибка входа');
@@ -139,61 +174,70 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      // Регистрируем пользователя в Supabase Auth
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            first_name: userData.firstName,
-            last_name: userData.lastName,
-            middle_name: userData.middleName,
-            phone: userData.phone,
-          }
-        }
+      // Сначала создаем профиль ученика в базе данных через API
+        const response = await fetch('http://localhost:3001/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          middleName: userData.middleName || '',
+          birthDate: userData.birthDate,
+          phone: userData.phone,
+          email: email,
+          password: password,
+          
+          // Поля для родителей (если несовершеннолетний)
+          parentFirstName: userData.parentFirstName || '',
+          parentLastName: userData.parentLastName || '',
+          parentMiddleName: userData.parentMiddleName || '',
+          parentPhone: userData.parentPhone || '',
+          parentEmail: userData.parentEmail || '',
+          isParentRepresentative: userData.isParentRepresentative || false,
+
+          // Согласия
+          privacyPolicyAccepted: userData.privacyPolicyAccepted,
+          contractAccepted: userData.contractAccepted,
+          educationConsentAccepted: userData.educationConsentAccepted,
+        }),
       });
 
-      if (error) {
-        throw new Error(error.message);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Ошибка создания профиля ученика');
       }
 
-      if (data.user) {
-        // Создаем профиль ученика в базе данных
-        const { error: profileError } = await supabase
-          .from('students')
-          .insert({
-            trainer_id: '550e8400-e29b-41d4-a716-446655440000', // Main trainer UUID
-            first_name: userData.firstName,
-            last_name: userData.lastName,
-            middle_name: userData.middleName || '',
-            birth_date: userData.birthDate,
-            phone: userData.phone,
-            email: email,
-            join_date: new Date().toISOString().split('T')[0],
-            status: 'pending',
+      const result = await response.json();
+      console.log('Профиль ученика создан:', result.pupil);
 
-            // Поля для родителей (если несовершеннолетний)
-            parent_first_name: userData.parentFirstName || '',
-            parent_last_name: userData.parentLastName || '',
-            parent_middle_name: userData.parentMiddleName || '',
-            parent_phone: userData.parentPhone || '',
-            parent_email: userData.parentEmail || '',
-            is_parent_representative: userData.isParentRepresentative || false,
+      // Теперь пытаемся создать пользователя в Supabase Auth (опционально)
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              first_name: userData.firstName,
+              last_name: userData.lastName,
+              middle_name: userData.middleName,
+              phone: userData.phone,
+            }
+          }
+        });
 
-            // Согласия
-            privacy_policy_accepted: userData.privacyPolicyAccepted,
-            privacy_policy_accepted_date: new Date().toISOString().split('T')[0],
-            contract_accepted: userData.contractAccepted,
-            contract_accepted_date: new Date().toISOString().split('T')[0],
-            education_consent_accepted: userData.educationConsentAccepted,
-            education_consent_accepted_date: new Date().toISOString().split('T')[0],
-          });
-
-        if (profileError) {
-          console.error('Error creating pupil profile:', profileError);
-          // Не прерываем процесс, так как пользователь уже создан в Auth
+        if (error) {
+          console.warn('Supabase Auth регистрация не удалась, но профиль создан:', error.message);
+          // Не прерываем процесс, так как профиль уже создан в базе данных
+        } else {
+          console.log('Supabase Auth пользователь создан:', data.user);
         }
+      } catch (supabaseError: any) {
+        console.warn('Ошибка Supabase Auth, но профиль создан:', supabaseError.message);
+        // Не прерываем процесс, так как профиль уже создан в базе данных
       }
+
     } catch (error: any) {
       throw new Error(error.message || 'Ошибка регистрации');
     }

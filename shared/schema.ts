@@ -204,7 +204,7 @@ export const insertPupilSchema = z.object({
   medicalNotes: z.string().nullable().optional(),
   photo: z.string().nullable().optional(),
   status: z.string().default("pending"),
-  joinDate: z.string().min(1),
+  joinDate: z.string().min(1).optional(),
   parentFirstName: z.string().nullable().optional(),
   parentLastName: z.string().nullable().optional(),
   parentMiddleName: z.string().nullable().optional(),

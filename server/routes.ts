@@ -102,12 +102,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Phone number already registered" });
       }
       
-      const newPupil = await storage.registerPupil(pupilData as any);
+      // Set default trainer_id if not provided
+      const pupilDataWithDefaults = {
+        ...pupilData,
+        trainerId: pupilData.trainerId || '550e8400-e29b-41d4-a716-446655440000', // Main trainer UUID
+        joinDate: pupilData.joinDate || new Date().toISOString().split('T')[0],
+        privacyPolicyAcceptedDate: pupilData.privacyPolicyAccepted ? new Date().toISOString().split('T')[0] : null,
+        contractAcceptedDate: pupilData.contractAccepted ? new Date().toISOString().split('T')[0] : null,
+        educationConsentAcceptedDate: pupilData.educationConsentAccepted ? new Date().toISOString().split('T')[0] : null,
+      };
+      
+      const newPupil = await storage.registerPupil(pupilDataWithDefaults as any);
       
       // Don't send password in response
       const { password: _, ...pupilWithoutPassword } = newPupil;
       res.status(201).json({ pupil: pupilWithoutPassword });
     } catch (error) {
+      console.error('Registration error:', error);
       res.status(400).json({ message: "Invalid data" });
     }
   });

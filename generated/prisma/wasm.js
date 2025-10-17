@@ -86,26 +86,8 @@ Prisma.NullTypes = {
  * Enums
  */
 exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
-  ReadUncommitted: 'ReadUncommitted',
-  ReadCommitted: 'ReadCommitted',
-  RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
 });
-
-exports.Prisma.UserScalarFieldEnum = {
-  id: 'id',
-  username: 'username',
-  password: 'password',
-  firstName: 'firstName',
-  lastName: 'lastName',
-  middleName: 'middleName',
-  birthDate: 'birthDate',
-  email: 'email',
-  phone: 'phone',
-  isTrainer: 'isTrainer',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
 
 exports.Prisma.PupilScalarFieldEnum = {
   id: 'id',
@@ -141,115 +123,17 @@ exports.Prisma.PupilScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.ExerciseScalarFieldEnum = {
+exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
-  name: 'name',
-  primaryMuscles: 'primaryMuscles',
-  secondaryMuscles: 'secondaryMuscles',
-  difficulty: 'difficulty',
-  overview: 'overview',
-  technique: 'technique',
-  commonMistakes: 'commonMistakes',
-  contraindications: 'contraindications',
-  muscleImageUrl: 'muscleImageUrl',
-  videoUrl: 'videoUrl',
-  techniqueImageUrl: 'techniqueImageUrl',
-  createdBy: 'createdBy',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.WorkoutProgramScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  type: 'type',
-  duration: 'duration',
-  level: 'level',
-  createdBy: 'createdBy',
-  exercises: 'exercises',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.WorkoutSessionScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  programId: 'programId',
-  scheduledDate: 'scheduledDate',
-  startTime: 'startTime',
-  endTime: 'endTime',
-  status: 'status',
-  completedAt: 'completedAt',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.ExerciseProgressScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  exerciseId: 'exerciseId',
-  weight: 'weight',
-  reps: 'reps',
-  sets: 'sets',
-  date: 'date',
-  sessionId: 'sessionId',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.PupilTrainingPlanScalarFieldEnum = {
-  id: 'id',
-  pupilId: 'pupilId',
-  trainerId: 'trainerId',
-  name: 'name',
-  exercises: 'exercises',
-  isActive: 'isActive',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.PupilWorkoutHistoryScalarFieldEnum = {
-  id: 'id',
-  pupilId: 'pupilId',
-  trainerId: 'trainerId',
-  workoutDate: 'workoutDate',
-  workoutTime: 'workoutTime',
-  duration: 'duration',
-  exercises: 'exercises',
-  notes: 'notes',
-  pupilFeedback: 'pupilFeedback',
-  status: 'status',
-  confirmationStatus: 'confirmationStatus',
-  confirmedAt: 'confirmedAt',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.ActiveWorkoutScalarFieldEnum = {
-  id: 'id',
-  trainerId: 'trainerId',
-  pupilId: 'pupilId',
-  workoutProgramId: 'workoutProgramId',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.AppointmentScalarFieldEnum = {
-  id: 'id',
-  trainerId: 'trainerId',
-  pupilId: 'pupilId',
-  date: 'date',
-  time: 'time',
-  status: 'status',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.MuscleGroupScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  description: 'description',
-  displayOrder: 'displayOrder',
+  username: 'username',
+  password: 'password',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  middleName: 'middleName',
+  birthDate: 'birthDate',
+  email: 'email',
+  phone: 'phone',
+  isTrainer: 'isTrainer',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -259,39 +143,15 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
-exports.Prisma.JsonNullValueInput = {
-  JsonNull: Prisma.JsonNull
-};
-
-exports.Prisma.QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
-};
-
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
 
-exports.Prisma.JsonNullValueFilter = {
-  DbNull: Prisma.DbNull,
-  JsonNull: Prisma.JsonNull,
-  AnyNull: Prisma.AnyNull
-};
-
 
 exports.Prisma.ModelName = {
-  User: 'User',
   Pupil: 'Pupil',
-  Exercise: 'Exercise',
-  WorkoutProgram: 'WorkoutProgram',
-  WorkoutSession: 'WorkoutSession',
-  ExerciseProgress: 'ExerciseProgress',
-  PupilTrainingPlan: 'PupilTrainingPlan',
-  PupilWorkoutHistory: 'PupilWorkoutHistory',
-  ActiveWorkout: 'ActiveWorkout',
-  Appointment: 'Appointment',
-  MuscleGroup: 'MuscleGroup'
+  User: 'User'
 };
 /**
  * Create the Client
@@ -304,7 +164,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/maxpetrusenko/Desktop/Projects/FitTrak-Pro/generated/prisma",
+      "value": "C:\\1. Kostya\\4. My papka\\8. Prilogeniya\\PrilogenieGitHab\\FitTrak-Pro\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -313,12 +173,16 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "darwin-arm64",
+        "value": "windows",
         "native": true
+      },
+      {
+        "fromEnvVar": null,
+        "value": "windows"
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/maxpetrusenko/Desktop/Projects/FitTrak-Pro/prisma/schema.prisma",
+    "sourceFilePath": "C:\\1. Kostya\\4. My papka\\8. Prilogeniya\\PrilogenieGitHab\\FitTrak-Pro\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -331,22 +195,22 @@ const config = {
   "datasourceNames": [
     "db"
   ],
-  "activeProvider": "postgresql",
+  "activeProvider": "sqlite",
   "inlineDatasources": {
     "db": {
       "url": {
-        "fromEnvVar": "DATABASE_URL",
-        "value": null
+        "fromEnvVar": null,
+        "value": "file:./dev.db"
       }
     }
   },
-  "inlineSchema": "// Prisma Schema for FitTrak-Pro\n// Database: Supabase PostgreSQL with UUIDs\n// Last Updated: January 13, 2025\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\n// Trainers and authentication\nmodel User {\n  id         String   @id @default(uuid()) @db.Uuid\n  username   String   @unique\n  password   String\n  firstName  String   @map(\"first_name\")\n  lastName   String   @map(\"last_name\")\n  middleName String?  @map(\"middle_name\")\n  birthDate  String?  @map(\"birth_date\")\n  email      String   @unique\n  phone      String?\n  isTrainer  Boolean  @default(false) @map(\"is_trainer\")\n  createdAt  DateTime @default(now()) @map(\"created_at\")\n  updatedAt  DateTime @updatedAt @map(\"updated_at\")\n\n  // Relations\n  workoutPrograms       WorkoutProgram[]\n  exercises             Exercise[]\n  pupilTrainingPlans    PupilTrainingPlan[]\n  pupilWorkoutHistory   PupilWorkoutHistory[]\n  activeWorkouts        ActiveWorkout[]\n  appointmentsAsTrainer Appointment[]         @relation(\"TrainerAppointments\")\n\n  @@map(\"users\")\n}\n\n// Students/Pupils\nmodel Pupil {\n  id           String  @id @default(uuid()) @db.Uuid\n  trainerId    String? @map(\"trainer_id\") @db.Uuid\n  firstName    String  @map(\"first_name\")\n  lastName     String  @map(\"last_name\")\n  middleName   String? @map(\"middle_name\")\n  phone        String\n  email        String  @unique\n  password     String?\n  birthDate    String  @map(\"birth_date\")\n  weight       Int?\n  height       Int?\n  goal         String?\n  medicalNotes String? @map(\"medical_notes\")\n  photo        String?\n  status       String  @default(\"pending\")\n  joinDate     String  @map(\"join_date\")\n\n  // Parent/Guardian information (for minors under 16)\n  parentFirstName           String? @map(\"parent_first_name\")\n  parentLastName            String? @map(\"parent_last_name\")\n  parentMiddleName          String? @map(\"parent_middle_name\")\n  parentPhone               String? @map(\"parent_phone\")\n  parentEmail               String? @map(\"parent_email\")\n  parentSpecialInstructions String? @map(\"parent_special_instructions\")\n  isParentRepresentative    Boolean @default(false) @map(\"is_parent_representative\")\n\n  // Legal consents\n  privacyPolicyAccepted        Boolean @default(false) @map(\"privacy_policy_accepted\")\n  privacyPolicyAcceptedDate    String? @map(\"privacy_policy_accepted_date\")\n  contractAccepted             Boolean @default(false) @map(\"contract_accepted\")\n  contractAcceptedDate         String? @map(\"contract_accepted_date\")\n  educationConsentAccepted     Boolean @default(false) @map(\"education_consent_accepted\")\n  educationConsentAcceptedDate String? @map(\"education_consent_accepted_date\")\n\n  createdAt DateTime @default(now()) @map(\"created_at\")\n  updatedAt DateTime @updatedAt @map(\"updated_at\")\n\n  // Relations\n  workoutSessions  WorkoutSession[]\n  exerciseProgress ExerciseProgress[]\n  trainingPlans    PupilTrainingPlan[]\n  workoutHistory   PupilWorkoutHistory[]\n  activeWorkouts   ActiveWorkout[]\n  appointments     Appointment[]         @relation(\"PupilAppointments\")\n\n  @@map(\"students\")\n}\n\n// Exercise database\nmodel Exercise {\n  id                String   @id @default(uuid()) @db.Uuid\n  name              String\n  primaryMuscles    Json     @map(\"primaryMuscles\") // JSON array\n  secondaryMuscles  Json     @default(\"[]\") @map(\"secondaryMuscles\") // JSON array\n  difficulty        String // 'начинающий', 'средний', 'продвинутый'\n  overview          String\n  technique         Json // JSON array\n  commonMistakes    Json     @map(\"commonMistakes\") // JSON array\n  contraindications Json // JSON array\n  muscleImageUrl    String?  @map(\"muscleImageUrl\")\n  videoUrl          String?  @map(\"videoUrl\")\n  techniqueImageUrl String?  @map(\"techniqueImageUrl\")\n  createdBy         String?  @map(\"createdBy\") @db.Uuid\n  createdAt         DateTime @default(now()) @map(\"createdAt\")\n  updatedAt         DateTime @updatedAt @map(\"updatedAt\")\n\n  // Relations\n  creator          User?              @relation(fields: [createdBy], references: [id], onDelete: SetNull)\n  exerciseProgress ExerciseProgress[]\n\n  @@map(\"exercises\")\n}\n\n// Workout programs created by trainers\nmodel WorkoutProgram {\n  id        String   @id @default(uuid()) @db.Uuid\n  name      String\n  type      String // 'strength', 'cardio', 'functional', 'stretching'\n  duration  Int // minutes\n  level     String // 'beginner', 'intermediate', 'advanced'\n  createdBy String   @map(\"created_by\") @db.Uuid\n  exercises Json // JSON array of exercises\n  createdAt DateTime @default(now()) @map(\"created_at\")\n  updatedAt DateTime @updatedAt @map(\"updated_at\")\n\n  // Relations\n  creator         User             @relation(fields: [createdBy], references: [id], onDelete: Cascade)\n  workoutSessions WorkoutSession[]\n  activeWorkouts  ActiveWorkout[]\n\n  @@map(\"workout_programs\")\n}\n\n// Scheduled workout sessions\nmodel WorkoutSession {\n  id            String   @id @default(uuid()) @db.Uuid\n  userId        String   @map(\"user_id\") @db.Uuid\n  programId     String   @map(\"program_id\") @db.Uuid\n  scheduledDate String   @map(\"scheduled_date\")\n  startTime     String   @map(\"start_time\")\n  endTime       String   @map(\"end_time\")\n  status        String   @default(\"scheduled\") // 'scheduled', 'completed', 'missed'\n  completedAt   String?  @map(\"completed_at\")\n  createdAt     DateTime @default(now()) @map(\"created_at\")\n  updatedAt     DateTime @updatedAt @map(\"updated_at\")\n\n  // Relations\n  pupil   Pupil          @relation(fields: [userId], references: [id], onDelete: Cascade)\n  program WorkoutProgram @relation(fields: [programId], references: [id], onDelete: Cascade)\n\n  @@map(\"workout_sessions\")\n}\n\n// Exercise progress tracking\nmodel ExerciseProgress {\n  id         String   @id @default(uuid()) @db.Uuid\n  userId     String   @map(\"user_id\") @db.Uuid\n  exerciseId String   @map(\"exercise_id\") @db.Uuid\n  weight     Int?\n  reps       Int?\n  sets       Int?\n  date       String\n  sessionId  String?  @map(\"session_id\") @db.Uuid\n  createdAt  DateTime @default(now()) @map(\"created_at\")\n  updatedAt  DateTime @updatedAt @map(\"updated_at\")\n\n  // Relations\n  pupil    Pupil    @relation(fields: [userId], references: [id], onDelete: Cascade)\n  exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)\n\n  @@map(\"exercise_progress\")\n}\n\n// Custom training plans for pupils\nmodel PupilTrainingPlan {\n  id        String   @id @default(uuid()) @db.Uuid\n  pupilId   String   @map(\"pupil_id\") @db.Uuid\n  trainerId String   @map(\"trainer_id\") @db.Uuid\n  name      String\n  exercises Json // JSON array\n  isActive  Boolean  @default(true) @map(\"is_active\")\n  createdAt DateTime @default(now()) @map(\"created_at\")\n  updatedAt DateTime @updatedAt @map(\"updated_at\")\n\n  // Relations\n  pupil   Pupil @relation(fields: [pupilId], references: [id], onDelete: Cascade)\n  trainer User  @relation(fields: [trainerId], references: [id], onDelete: Cascade)\n\n  @@map(\"pupil_training_plans\")\n}\n\n// Workout history for pupils\nmodel PupilWorkoutHistory {\n  id                 String   @id @default(uuid()) @db.Uuid\n  pupilId            String   @map(\"pupil_id\") @db.Uuid\n  trainerId          String   @map(\"trainer_id\") @db.Uuid\n  workoutDate        String   @map(\"workout_date\")\n  workoutTime        String   @map(\"workout_time\")\n  duration           Int? // minutes\n  exercises          Json // JSON array\n  notes              String?\n  pupilFeedback      String?  @map(\"pupil_feedback\")\n  status             String   @default(\"completed\") // 'completed', 'missed', 'cancelled'\n  confirmationStatus String   @default(\"pending\") @map(\"confirmation_status\") // 'pending', 'confirmed', 'declined'\n  confirmedAt        String?  @map(\"confirmed_at\")\n  createdAt          DateTime @default(now()) @map(\"created_at\")\n  updatedAt          DateTime @updatedAt @map(\"updated_at\")\n\n  // Relations\n  pupil   Pupil @relation(fields: [pupilId], references: [id], onDelete: Cascade)\n  trainer User  @relation(fields: [trainerId], references: [id], onDelete: Cascade)\n\n  @@map(\"pupil_workout_history\")\n}\n\n// Currently active workouts\nmodel ActiveWorkout {\n  id               String   @id @default(uuid()) @db.Uuid\n  trainerId        String   @map(\"trainer_id\") @db.Uuid\n  pupilId          String   @map(\"pupil_id\") @db.Uuid\n  workoutProgramId String   @map(\"workout_program_id\") @db.Uuid\n  createdAt        DateTime @default(now()) @map(\"created_at\")\n  updatedAt        DateTime @updatedAt @map(\"updated_at\")\n\n  // Relations\n  trainer User           @relation(fields: [trainerId], references: [id], onDelete: Cascade)\n  pupil   Pupil          @relation(fields: [pupilId], references: [id], onDelete: Cascade)\n  program WorkoutProgram @relation(fields: [workoutProgramId], references: [id], onDelete: Cascade)\n\n  @@map(\"active_workouts\")\n}\n\n// Appointment bookings\nmodel Appointment {\n  id        String   @id @default(uuid()) @db.Uuid\n  trainerId String   @map(\"trainer_id\") @db.Uuid\n  pupilId   String   @map(\"pupil_id\") @db.Uuid\n  date      String\n  time      String\n  status    String   @default(\"pending\")\n  createdAt DateTime @default(now()) @map(\"created_at\")\n  updatedAt DateTime @updatedAt @map(\"updated_at\")\n\n  // Relations\n  trainer User  @relation(\"TrainerAppointments\", fields: [trainerId], references: [id], onDelete: Cascade)\n  pupil   Pupil @relation(\"PupilAppointments\", fields: [pupilId], references: [id], onDelete: Cascade)\n\n  @@map(\"appointments\")\n}\n\n// Muscle groups lookup table\nmodel MuscleGroup {\n  id           String   @id @default(uuid()) @db.Uuid\n  name         String   @unique\n  description  String?\n  displayOrder Int      @unique @map(\"display_order\")\n  createdAt    DateTime @default(now()) @map(\"created_at\")\n  updatedAt    DateTime @updatedAt @map(\"updated_at\")\n\n  @@map(\"muscle_groups\")\n}\n",
-  "inlineSchemaHash": "c27f92f0a442776c31c181ae73e706e09921309ef512df8bcc3bfe60f6c0ca02",
+  "inlineSchema": "// Prisma Schema for FitTrak-Pro - SQLite Version\n// Database: SQLite for local development\n// Last Updated: January 17, 2025\n\ngenerator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../generated/prisma\"\n  binaryTargets = [\"native\", \"windows\"]\n}\n\ndatasource db {\n  provider = \"sqlite\"\n  url      = \"file:./dev.db\"\n}\n\n// Students/Pupils - основная модель для регистрации\nmodel Pupil {\n  id           String  @id @default(uuid())\n  trainerId    String? @map(\"trainer_id\")\n  firstName    String  @map(\"first_name\")\n  lastName     String  @map(\"last_name\")\n  middleName   String? @map(\"middle_name\")\n  phone        String\n  email        String  @unique\n  password     String?\n  birthDate    String  @map(\"birth_date\")\n  weight       Int?\n  height       Int?\n  goal         String?\n  medicalNotes String? @map(\"medical_notes\")\n  photo        String?\n  status       String  @default(\"pending\")\n  joinDate     String  @map(\"join_date\")\n\n  // Parent/Guardian information (for minors under 16)\n  parentFirstName           String? @map(\"parent_first_name\")\n  parentLastName            String? @map(\"parent_last_name\")\n  parentMiddleName          String? @map(\"parent_middle_name\")\n  parentPhone               String? @map(\"parent_phone\")\n  parentEmail               String? @map(\"parent_email\")\n  parentSpecialInstructions String? @map(\"parent_special_instructions\")\n  isParentRepresentative    Boolean @default(false) @map(\"is_parent_representative\")\n\n  // Legal consents\n  privacyPolicyAccepted        Boolean @default(false) @map(\"privacy_policy_accepted\")\n  privacyPolicyAcceptedDate    String? @map(\"privacy_policy_accepted_date\")\n  contractAccepted             Boolean @default(false) @map(\"contract_accepted\")\n  contractAcceptedDate         String? @map(\"contract_accepted_date\")\n  educationConsentAccepted     Boolean @default(false) @map(\"education_consent_accepted\")\n  educationConsentAcceptedDate String? @map(\"education_consent_accepted_date\")\n\n  createdAt DateTime @default(now()) @map(\"created_at\")\n  updatedAt DateTime @updatedAt @map(\"updated_at\")\n\n  @@map(\"students\")\n}\n\n// Trainers - упрощенная модель\nmodel User {\n  id         String   @id @default(uuid())\n  username   String   @unique\n  password   String\n  firstName  String   @map(\"first_name\")\n  lastName   String   @map(\"last_name\")\n  middleName String?  @map(\"middle_name\")\n  birthDate  String?  @map(\"birth_date\")\n  email      String   @unique\n  phone      String?\n  isTrainer  Boolean  @default(false) @map(\"is_trainer\")\n  createdAt  DateTime @default(now()) @map(\"created_at\")\n  updatedAt  DateTime @updatedAt @map(\"updated_at\")\n\n  @@map(\"users\")\n}\n",
+  "inlineSchemaHash": "8a0832f36864a234a2006bbfee7f8cbaafd76c9c297ae29c1830f058667ddce4",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"username\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"firstName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"first_name\"},{\"name\":\"lastName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"last_name\"},{\"name\":\"middleName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"middle_name\"},{\"name\":\"birthDate\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"birth_date\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phone\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isTrainer\",\"kind\":\"scalar\",\"type\":\"Boolean\",\"dbName\":\"is_trainer\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"created_at\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"updated_at\"},{\"name\":\"workoutPrograms\",\"kind\":\"object\",\"type\":\"WorkoutProgram\",\"relationName\":\"UserToWorkoutProgram\"},{\"name\":\"exercises\",\"kind\":\"object\",\"type\":\"Exercise\",\"relationName\":\"ExerciseToUser\"},{\"name\":\"pupilTrainingPlans\",\"kind\":\"object\",\"type\":\"PupilTrainingPlan\",\"relationName\":\"PupilTrainingPlanToUser\"},{\"name\":\"pupilWorkoutHistory\",\"kind\":\"object\",\"type\":\"PupilWorkoutHistory\",\"relationName\":\"PupilWorkoutHistoryToUser\"},{\"name\":\"activeWorkouts\",\"kind\":\"object\",\"type\":\"ActiveWorkout\",\"relationName\":\"ActiveWorkoutToUser\"},{\"name\":\"appointmentsAsTrainer\",\"kind\":\"object\",\"type\":\"Appointment\",\"relationName\":\"TrainerAppointments\"}],\"dbName\":\"users\"},\"Pupil\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"trainerId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"trainer_id\"},{\"name\":\"firstName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"first_name\"},{\"name\":\"lastName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"last_name\"},{\"name\":\"middleName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"middle_name\"},{\"name\":\"phone\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"birthDate\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"birth_date\"},{\"name\":\"weight\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"height\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"goal\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"medicalNotes\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"medical_notes\"},{\"name\":\"photo\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"joinDate\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"join_date\"},{\"name\":\"parentFirstName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"parent_first_name\"},{\"name\":\"parentLastName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"parent_last_name\"},{\"name\":\"parentMiddleName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"parent_middle_name\"},{\"name\":\"parentPhone\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"parent_phone\"},{\"name\":\"parentEmail\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"parent_email\"},{\"name\":\"parentSpecialInstructions\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"parent_special_instructions\"},{\"name\":\"isParentRepresentative\",\"kind\":\"scalar\",\"type\":\"Boolean\",\"dbName\":\"is_parent_representative\"},{\"name\":\"privacyPolicyAccepted\",\"kind\":\"scalar\",\"type\":\"Boolean\",\"dbName\":\"privacy_policy_accepted\"},{\"name\":\"privacyPolicyAcceptedDate\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"privacy_policy_accepted_date\"},{\"name\":\"contractAccepted\",\"kind\":\"scalar\",\"type\":\"Boolean\",\"dbName\":\"contract_accepted\"},{\"name\":\"contractAcceptedDate\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"contract_accepted_date\"},{\"name\":\"educationConsentAccepted\",\"kind\":\"scalar\",\"type\":\"Boolean\",\"dbName\":\"education_consent_accepted\"},{\"name\":\"educationConsentAcceptedDate\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"education_consent_accepted_date\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"created_at\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"updated_at\"},{\"name\":\"workoutSessions\",\"kind\":\"object\",\"type\":\"WorkoutSession\",\"relationName\":\"PupilToWorkoutSession\"},{\"name\":\"exerciseProgress\",\"kind\":\"object\",\"type\":\"ExerciseProgress\",\"relationName\":\"ExerciseProgressToPupil\"},{\"name\":\"trainingPlans\",\"kind\":\"object\",\"type\":\"PupilTrainingPlan\",\"relationName\":\"PupilToPupilTrainingPlan\"},{\"name\":\"workoutHistory\",\"kind\":\"object\",\"type\":\"PupilWorkoutHistory\",\"relationName\":\"PupilToPupilWorkoutHistory\"},{\"name\":\"activeWorkouts\",\"kind\":\"object\",\"type\":\"ActiveWorkout\",\"relationName\":\"ActiveWorkoutToPupil\"},{\"name\":\"appointments\",\"kind\":\"object\",\"type\":\"Appointment\",\"relationName\":\"PupilAppointments\"}],\"dbName\":\"students\"},\"Exercise\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"primaryMuscles\",\"kind\":\"scalar\",\"type\":\"Json\",\"dbName\":\"primaryMuscles\"},{\"name\":\"secondaryMuscles\",\"kind\":\"scalar\",\"type\":\"Json\",\"dbName\":\"secondaryMuscles\"},{\"name\":\"difficulty\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"overview\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"technique\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"commonMistakes\",\"kind\":\"scalar\",\"type\":\"Json\",\"dbName\":\"commonMistakes\"},{\"name\":\"contraindications\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"muscleImageUrl\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"muscleImageUrl\"},{\"name\":\"videoUrl\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"videoUrl\"},{\"name\":\"techniqueImageUrl\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"techniqueImageUrl\"},{\"name\":\"createdBy\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"createdBy\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"createdAt\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"updatedAt\"},{\"name\":\"creator\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"ExerciseToUser\"},{\"name\":\"exerciseProgress\",\"kind\":\"object\",\"type\":\"ExerciseProgress\",\"relationName\":\"ExerciseToExerciseProgress\"}],\"dbName\":\"exercises\"},\"WorkoutProgram\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"duration\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"level\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdBy\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"created_by\"},{\"name\":\"exercises\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"created_at\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"updated_at\"},{\"name\":\"creator\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"UserToWorkoutProgram\"},{\"name\":\"workoutSessions\",\"kind\":\"object\",\"type\":\"WorkoutSession\",\"relationName\":\"WorkoutProgramToWorkoutSession\"},{\"name\":\"activeWorkouts\",\"kind\":\"object\",\"type\":\"ActiveWorkout\",\"relationName\":\"ActiveWorkoutToWorkoutProgram\"}],\"dbName\":\"workout_programs\"},\"WorkoutSession\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"user_id\"},{\"name\":\"programId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"program_id\"},{\"name\":\"scheduledDate\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"scheduled_date\"},{\"name\":\"startTime\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"start_time\"},{\"name\":\"endTime\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"end_time\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"completedAt\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"completed_at\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"created_at\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"updated_at\"},{\"name\":\"pupil\",\"kind\":\"object\",\"type\":\"Pupil\",\"relationName\":\"PupilToWorkoutSession\"},{\"name\":\"program\",\"kind\":\"object\",\"type\":\"WorkoutProgram\",\"relationName\":\"WorkoutProgramToWorkoutSession\"}],\"dbName\":\"workout_sessions\"},\"ExerciseProgress\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"user_id\"},{\"name\":\"exerciseId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"exercise_id\"},{\"name\":\"weight\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"reps\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"sets\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"date\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sessionId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"session_id\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"created_at\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"updated_at\"},{\"name\":\"pupil\",\"kind\":\"object\",\"type\":\"Pupil\",\"relationName\":\"ExerciseProgressToPupil\"},{\"name\":\"exercise\",\"kind\":\"object\",\"type\":\"Exercise\",\"relationName\":\"ExerciseToExerciseProgress\"}],\"dbName\":\"exercise_progress\"},\"PupilTrainingPlan\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"pupilId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"pupil_id\"},{\"name\":\"trainerId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"trainer_id\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"exercises\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\",\"dbName\":\"is_active\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"created_at\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"updated_at\"},{\"name\":\"pupil\",\"kind\":\"object\",\"type\":\"Pupil\",\"relationName\":\"PupilToPupilTrainingPlan\"},{\"name\":\"trainer\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"PupilTrainingPlanToUser\"}],\"dbName\":\"pupil_training_plans\"},\"PupilWorkoutHistory\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"pupilId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"pupil_id\"},{\"name\":\"trainerId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"trainer_id\"},{\"name\":\"workoutDate\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"workout_date\"},{\"name\":\"workoutTime\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"workout_time\"},{\"name\":\"duration\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"exercises\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"notes\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"pupilFeedback\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"pupil_feedback\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"confirmationStatus\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"confirmation_status\"},{\"name\":\"confirmedAt\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"confirmed_at\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"created_at\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"updated_at\"},{\"name\":\"pupil\",\"kind\":\"object\",\"type\":\"Pupil\",\"relationName\":\"PupilToPupilWorkoutHistory\"},{\"name\":\"trainer\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"PupilWorkoutHistoryToUser\"}],\"dbName\":\"pupil_workout_history\"},\"ActiveWorkout\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"trainerId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"trainer_id\"},{\"name\":\"pupilId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"pupil_id\"},{\"name\":\"workoutProgramId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"workout_program_id\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"created_at\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"updated_at\"},{\"name\":\"trainer\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"ActiveWorkoutToUser\"},{\"name\":\"pupil\",\"kind\":\"object\",\"type\":\"Pupil\",\"relationName\":\"ActiveWorkoutToPupil\"},{\"name\":\"program\",\"kind\":\"object\",\"type\":\"WorkoutProgram\",\"relationName\":\"ActiveWorkoutToWorkoutProgram\"}],\"dbName\":\"active_workouts\"},\"Appointment\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"trainerId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"trainer_id\"},{\"name\":\"pupilId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"pupil_id\"},{\"name\":\"date\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"time\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"created_at\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"updated_at\"},{\"name\":\"trainer\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"TrainerAppointments\"},{\"name\":\"pupil\",\"kind\":\"object\",\"type\":\"Pupil\",\"relationName\":\"PupilAppointments\"}],\"dbName\":\"appointments\"},\"MuscleGroup\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"displayOrder\",\"kind\":\"scalar\",\"type\":\"Int\",\"dbName\":\"display_order\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"created_at\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"updated_at\"}],\"dbName\":\"muscle_groups\"}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"Pupil\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"trainerId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"trainer_id\"},{\"name\":\"firstName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"first_name\"},{\"name\":\"lastName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"last_name\"},{\"name\":\"middleName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"middle_name\"},{\"name\":\"phone\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"birthDate\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"birth_date\"},{\"name\":\"weight\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"height\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"goal\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"medicalNotes\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"medical_notes\"},{\"name\":\"photo\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"joinDate\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"join_date\"},{\"name\":\"parentFirstName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"parent_first_name\"},{\"name\":\"parentLastName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"parent_last_name\"},{\"name\":\"parentMiddleName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"parent_middle_name\"},{\"name\":\"parentPhone\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"parent_phone\"},{\"name\":\"parentEmail\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"parent_email\"},{\"name\":\"parentSpecialInstructions\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"parent_special_instructions\"},{\"name\":\"isParentRepresentative\",\"kind\":\"scalar\",\"type\":\"Boolean\",\"dbName\":\"is_parent_representative\"},{\"name\":\"privacyPolicyAccepted\",\"kind\":\"scalar\",\"type\":\"Boolean\",\"dbName\":\"privacy_policy_accepted\"},{\"name\":\"privacyPolicyAcceptedDate\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"privacy_policy_accepted_date\"},{\"name\":\"contractAccepted\",\"kind\":\"scalar\",\"type\":\"Boolean\",\"dbName\":\"contract_accepted\"},{\"name\":\"contractAcceptedDate\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"contract_accepted_date\"},{\"name\":\"educationConsentAccepted\",\"kind\":\"scalar\",\"type\":\"Boolean\",\"dbName\":\"education_consent_accepted\"},{\"name\":\"educationConsentAcceptedDate\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"education_consent_accepted_date\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"created_at\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"updated_at\"}],\"dbName\":\"students\"},\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"username\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"firstName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"first_name\"},{\"name\":\"lastName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"last_name\"},{\"name\":\"middleName\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"middle_name\"},{\"name\":\"birthDate\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"birth_date\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phone\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isTrainer\",\"kind\":\"scalar\",\"type\":\"Boolean\",\"dbName\":\"is_trainer\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"created_at\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"updated_at\"}],\"dbName\":\"users\"}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),
@@ -359,9 +223,7 @@ config.engineWasm = {
 config.compilerWasm = undefined
 
 config.injectableEdgeEnv = () => ({
-  parsed: {
-    DATABASE_URL: typeof globalThis !== 'undefined' && globalThis['DATABASE_URL'] || typeof process !== 'undefined' && process.env && process.env.DATABASE_URL || undefined
-  }
+  parsed: {}
 })
 
 if (typeof globalThis !== 'undefined' && globalThis['DEBUG'] || typeof process !== 'undefined' && process.env && process.env.DEBUG || undefined) {

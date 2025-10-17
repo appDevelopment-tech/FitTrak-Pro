@@ -221,7 +221,7 @@ export function ProfileView() {
   // Загружаем учеников для поиска выбранного ученика из URL
   const { data: pupils = [] } = useQuery<Pupil[]>({
     queryKey: ['students', trainerId],
-    queryFn: () => studentsDb.getByTrainerId(trainerId),
+    queryFn: () => fetch(`/api/trainers/${trainerId}/pupils`).then(res => res.json()),
     enabled: !!authUser?.id, // Only run query if we have a user ID
   });
 

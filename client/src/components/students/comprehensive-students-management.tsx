@@ -35,6 +35,7 @@ import {
   Calendar as CalendarIcon
 } from "lucide-react";
 import { studentsDb, exercisesDb, trainingPlansDb } from "@/lib/database";
+import { studentsAPI } from "@/lib/api";
 import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
 import { useAuth } from "@/lib/auth";
 import type { Pupil, InsertPupil, WorkoutProgram, Exercise } from "@shared/schema";
@@ -174,7 +175,7 @@ export function ComprehensiveStudentsManagement() {
   // Получаем список учеников текущего тренера
   const { data: pupils = [], isLoading } = useQuery<Pupil[]>({
     queryKey: ['students', trainerId],
-    queryFn: () => studentsDb.getByTrainerId(trainerId),
+    queryFn: () => fetch(`/api/trainers/${trainerId}/pupils`).then(res => res.json()),
     enabled: !!authUser?.id, // Only run query if we have a user ID
   });
 
@@ -478,6 +479,28 @@ export function ComprehensiveStudentsManagement() {
     }
   });
 
+  // Мутация для удаления ученика
+  const deletePupilMutation = useMutation({
+    mutationFn: async (pupilId: string) => {
+      return await studentsAPI.delete(pupilId);
+    },
+    onSuccess: (_, pupilId) => {
+      queryClient.invalidateQueries({ queryKey: ['students', trainerId] });
+      setSelectedPupil(null);
+      toast({
+        title: "Успешно",
+        description: "Ученик удален",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось удалить ученика",
+        variant: "destructive",
+      });
+    }
+  });
+
   // Form submission handlers
   const onAddPupil = (data: any) => {
     createPupilMutation.mutate(data as InsertPupil);
@@ -486,6 +509,12 @@ export function ComprehensiveStudentsManagement() {
   const onEditPupil = (data: Partial<InsertPupil>) => {
     if (!selectedPupil) return;
     updatePupilMutation.mutate({ id: selectedPupil.id, updates: data });
+  };
+
+  const onDeletePupil = (pupilId: string) => {
+    if (confirm('Вы уверены, что хотите удалить этого ученика? Это действие нельзя отменить.')) {
+      deletePupilMutation.mutate(pupilId);
+    }
   };
 
   // Effect to update trainerId in the form when it changes
@@ -636,6 +665,19 @@ export function ComprehensiveStudentsManagement() {
                       <Dumbbell className="h-4 w-4" />
                     </Button>
 
+                    {/* Кнопка удаления */}
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeletePupil(pupil.id);
+                      }}
+                      className="h-8 w-8 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                      title="Удалить ученика"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               </div>
