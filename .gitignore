@@ -35,5 +35,9 @@ create-test-users-uuid.sql
 test-auth-summary.js
 *.sql
 
+# Database files (should not be committed)
+prisma/dev.db
+*.db
+
 # Claude AI configuration
 CLAUDE.md
