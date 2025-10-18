@@ -196,7 +196,7 @@ export const insertPupilSchema = z.object({
   middleName: z.string().nullable().optional(),
   phone: z.string().min(1),
   email: z.string().email(),
-  password: z.string().min(6).nullable().optional(),
+  password: z.string().min(6),
   birthDate: z.string().min(1),
   weight: z.number().nullable().optional(),
   height: z.number().nullable().optional(),
@@ -218,6 +218,10 @@ export const insertPupilSchema = z.object({
   contractAcceptedDate: z.string().nullable().optional(),
   educationConsentAccepted: z.boolean().default(false),
   educationConsentAcceptedDate: z.string().nullable().optional(),
+});
+
+export const updatePupilSchema = insertPupilSchema.partial().extend({
+  password: z.string().min(6).optional(), // Optional for updates
 });
 
 export const insertExerciseSchema = z.object({

@@ -47,16 +47,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.post("/api/auth/login", async (req, res) => {
     try {
-      const { emailOrPhone, password, userType } = req.body;
+      const { email, emailOrPhone, password, userType } = req.body;
       
-      if (!emailOrPhone || !password) {
+      // Поддерживаем оба варианта для совместимости
+      const emailOrPhoneValue = email || emailOrPhone;
+      
+      if (!emailOrPhoneValue || !password) {
         return res.status(400).json({ message: "Email/phone and password are required" });
       }
       
       // Определяем тип пользователя и пытаемся авторизовать
       if (userType === 'trainer' || !userType) {
         // Сначала пробуем как тренера
-        const trainer = await storage.authenticateTrainer(emailOrPhone, password);
+        const trainer = await storage.authenticateTrainer(emailOrPhoneValue, password);
         if (trainer) {
           // Don't send password in response
           const { password: _, ...trainerWithoutPassword } = trainer;
@@ -69,7 +72,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (userType === 'pupil' || !userType) {
         // Затем пробуем как ученика
-        const pupil = await storage.authenticatePupil(emailOrPhone, password);
+        const pupil = await storage.authenticatePupil(emailOrPhoneValue, password);
         if (pupil) {
           // Don't send password in response
           const { password: _, ...pupilWithoutPassword } = pupil;
@@ -105,7 +108,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Set default trainer_id if not provided
       const pupilDataWithDefaults = {
         ...pupilData,
-        trainerId: pupilData.trainerId || '550e8400-e29b-41d4-a716-446655440000', // Main trainer UUID
+        trainerId: pupilData.trainerId || '2e6d1673-205a-4200-bc04-249dc2af269b', // Петрусенко К.В. UUID
         joinDate: pupilData.joinDate || new Date().toISOString().split('T')[0],
         privacyPolicyAcceptedDate: pupilData.privacyPolicyAccepted ? new Date().toISOString().split('T')[0] : null,
         contractAcceptedDate: pupilData.contractAccepted ? new Date().toISOString().split('T')[0] : null,

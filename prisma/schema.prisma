@@ -1,10 +1,6 @@
-// Prisma Schema for FitTrak-Pro - SQLite Version
-// Database: SQLite for local development
-// Last Updated: January 17, 2025
-
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  provider      = "prisma-client-js"
+  output        = "../generated/prisma"
   binaryTargets = ["native", "windows"]
 }
 
@@ -13,49 +9,42 @@ datasource db {
   url      = "file:./dev.db"
 }
 
-// Students/Pupils - основная модель для регистрации
 model Pupil {
-  id         String   @id @default(uuid())
-  trainerId  String?  @map("trainer_id")
-  firstName  String   @map("first_name")
-  lastName   String   @map("last_name")
-  middleName String?  @map("middle_name")
-  phone      String
-  email      String   @unique
-  password   String?
-  birthDate  String   @map("birth_date")
-  weight     Int?
-  height     Int?
-  goal       String?
-  medicalNotes String? @map("medical_notes")
-  photo      String?
-  status     String   @default("pending")
-  joinDate   String   @map("join_date")
-
-  // Parent/Guardian information (for minors under 16)
-  parentFirstName           String?  @map("parent_first_name")
-  parentLastName            String?  @map("parent_last_name")
-  parentMiddleName          String?  @map("parent_middle_name")
-  parentPhone               String?  @map("parent_phone")
-  parentEmail               String?  @map("parent_email")
-  parentSpecialInstructions String?  @map("parent_special_instructions")
-  isParentRepresentative    Boolean  @default(false) @map("is_parent_representative")
-
-  // Legal consents
+  id                           String   @id @default(uuid())
+  trainerId                    String?  @map("trainer_id")
+  firstName                    String   @map("first_name")
+  lastName                     String   @map("last_name")
+  middleName                   String?  @map("middle_name")
+  phone                        String
+  email                        String   @unique
+  password                     String?
+  birthDate                    String   @map("birth_date")
+  weight                       Int?
+  height                       Int?
+  goal                         String?
+  medicalNotes                 String?  @map("medical_notes")
+  photo                        String?
+  status                       String   @default("pending")
+  joinDate                     String   @map("join_date")
+  parentFirstName              String?  @map("parent_first_name")
+  parentLastName               String?  @map("parent_last_name")
+  parentMiddleName             String?  @map("parent_middle_name")
+  parentPhone                  String?  @map("parent_phone")
+  parentEmail                  String?  @map("parent_email")
+  parentSpecialInstructions    String?  @map("parent_special_instructions")
+  isParentRepresentative       Boolean  @default(false) @map("is_parent_representative")
   privacyPolicyAccepted        Boolean  @default(false) @map("privacy_policy_accepted")
   privacyPolicyAcceptedDate    String?  @map("privacy_policy_accepted_date")
   contractAccepted             Boolean  @default(false) @map("contract_accepted")
   contractAcceptedDate         String?  @map("contract_accepted_date")
   educationConsentAccepted     Boolean  @default(false) @map("education_consent_accepted")
   educationConsentAcceptedDate String?  @map("education_consent_accepted_date")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt                    DateTime @default(now()) @map("created_at")
+  updatedAt                    DateTime @updatedAt @map("updated_at")
 
   @@map("students")
 }
 
-// Trainers - упрощенная модель
 model User {
   id         String   @id @default(uuid())
   username   String   @unique

@@ -117,7 +117,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // СНАЧАЛА пробуем через наш API (приоритет SQLite базе)
       console.log('🔐 Попытка входа через API (SQLite)...');
       
-      const response = await fetch('http://localhost:3001/api/auth/login', {
+      const response = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -128,21 +128,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.ok) {
         // Успешный вход через наш API
         const loginResult = await response.json();
-        console.log('✅ Успешный вход через API:', loginResult.pupil?.firstName, loginResult.pupil?.lastName);
+        console.log('✅ Успешный вход через API:', loginResult.user?.firstName, loginResult.user?.lastName);
         
         // Создаем фиктивный пользователь для совместимости
         const mockUser = {
-          id: loginResult.pupil?.id || 'mock-id',
+          id: loginResult.user?.id || 'mock-id',
           email: email,
           user_metadata: {
-            first_name: loginResult.pupil?.firstName,
-            last_name: loginResult.pupil?.lastName,
-            is_trainer: false,
+            first_name: loginResult.user?.firstName,
+            last_name: loginResult.user?.lastName,
+            is_trainer: loginResult.user?.isTrainer || false,
           }
         };
 
         setUser(mockUser as any);
-        setPupil(loginResult.pupil);
+        setPupil(loginResult.pupil || null);
         return;
       } else {
         // API не сработал, пробуем Supabase как fallback
@@ -175,7 +175,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     try {
       // Сначала создаем профиль ученика в базе данных через API
-        const response = await fetch('http://localhost:3001/api/auth/register', {
+        const response = await fetch('http://localhost:8080/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

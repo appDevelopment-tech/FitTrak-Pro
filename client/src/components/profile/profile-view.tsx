@@ -48,7 +48,7 @@ export function ProfileView() {
 
   // Get the trainer ID from the authenticated user
   const { user: authUser } = useAuth();
-  const trainerId = authUser?.id || "00000000-0000-0000-0000-000000000000";
+  const trainerId = authUser?.id || "2e6d1673-205a-4200-bc04-249dc2af269b";
 
   // Debug logging for auth user
   useEffect(() => {

@@ -17,7 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { insertPupilSchema } from "@shared/schema";
+import { insertPupilSchema, updatePupilSchema } from "@shared/schema";
 import { 
   User, 
   Phone, 
@@ -88,7 +88,7 @@ export function ComprehensiveStudentsManagement() {
 
   // Get the trainer ID from the authenticated user
   const { user: authUser } = useAuth();
-  const trainerId = authUser?.id || '550e8400-e29b-41d4-a716-446655440000';
+  const trainerId = authUser?.id || '2e6d1673-205a-4200-bc04-249dc2af269b';
 
   // Form configurations
   const addPupilForm = useForm({
@@ -97,7 +97,7 @@ export function ComprehensiveStudentsManagement() {
       trainerId: trainerId, // Use authenticated user's ID
       firstName: "",
       lastName: "",
-      password: null, // Changed from "" to null to allow optional password
+      password: "", // Required password for new pupils
       middleName: "",
       phone: "",
       email: "",
@@ -117,7 +117,7 @@ export function ComprehensiveStudentsManagement() {
   });
 
   const editPupilForm = useForm<Partial<InsertPupil>>({
-    resolver: zodResolver(insertPupilSchema.partial()),
+    resolver: zodResolver(updatePupilSchema),
   });
 
   // Готовые планы тренировок
@@ -437,7 +437,20 @@ export function ComprehensiveStudentsManagement() {
   // Мутация для создания ученика
   const createPupilMutation = useMutation({
     mutationFn: async (newPupil: InsertPupil) => {
-      return await studentsDb.create(newPupil);
+      const response = await fetch(`/api/trainers/${trainerId}/pupils`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newPupil),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create pupil');
+      }
+      
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['students', trainerId] });
@@ -459,7 +472,20 @@ export function ComprehensiveStudentsManagement() {
   // Мутация для обновления ученика
   const updatePupilMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<InsertPupil> }) => {
-      return await studentsDb.update(id, updates);
+      const response = await fetch(`/api/pupils/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updates),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update pupil');
+      }
+      
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['students', trainerId] });
@@ -1958,6 +1984,20 @@ export function ComprehensiveStudentsManagement() {
                 
                 <FormField
                   control={addPupilForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Пароль *</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="Минимум 6 символов" {...field} value={field.value || ''} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={addPupilForm.control}
                   name="weight"
                   render={({ field }) => (
                     <FormItem>
@@ -2117,6 +2157,20 @@ export function ComprehensiveStudentsManagement() {
                       <FormLabel>Email *</FormLabel>
                       <FormControl>
                         <Input type="email" placeholder="example@email.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={editPupilForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Пароль</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="Оставьте пустым, чтобы не изменять" {...field} value={field.value || ''} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
