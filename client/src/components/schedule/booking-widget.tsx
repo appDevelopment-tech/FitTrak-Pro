@@ -5,12 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { appointmentsDb, studentsDb } from "@/lib/database";
 import type { Appointment, Pupil, InsertPupil } from "@shared/schema";
-import { Calendar, Check, Clock, UserPlus, LogIn } from "lucide-react";
+import { Calendar, Check, Clock, UserPlus, LogIn, ChevronLeft, ChevronRight } from "lucide-react";
 import { ScheduleSlot } from "./schedule-slot";
 
 const TIME_SLOTS = Array.from({ length: 13 }, (_, i) => `${(i + 8).toString().padStart(2, '0')}:00`);
@@ -18,6 +19,8 @@ const TRAINER_ID = "550e8400-e29b-41d4-a716-446655440000"; // TODO: Replace with
 
 export function BookingWidget() {
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [viewMode, setViewMode] = useState<'day' | 'month'>('day');
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -165,6 +168,7 @@ export function BookingWidget() {
   };
 
   const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+  const weekDays = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
 
   const changeDay = (dir: -1 | 1) => {
     const d = new Date(selectedDate);
@@ -172,43 +176,209 @@ export function BookingWidget() {
     setSelectedDate(d.toISOString().split('T')[0]);
   };
 
+  const changeMonth = (dir: -1 | 1) => {
+    const d = new Date(currentMonth);
+    d.setMonth(d.getMonth() + dir);
+    setCurrentMonth(d);
+  };
+
+  // Генерация дней месяца для календаря
+  const getMonthDays = () => {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    
+    const days = [];
+    const startPadding = firstDay.getDay(); // 0 = Sunday
+    
+    // Добавляем пустые ячейки для выравнивания
+    for (let i = 0; i < startPadding; i++) {
+      days.push(null);
+    }
+    
+    // Добавляем все дни месяца
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const appointmentsCount = appointments.filter(a => a.date === dateStr).length;
+      const isToday = dateStr === new Date().toISOString().split('T')[0];
+      const isSelected = dateStr === selectedDate;
+      
+      days.push({
+        date: day,
+        dateStr,
+        appointmentsCount,
+        isToday,
+        isSelected
+      });
+    }
+    
+    return days;
+  };
+
+  const handleDayClick = (dateStr: string) => {
+    setSelectedDate(dateStr);
+    setViewMode('day');
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-4">
       <Card>
         <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Calendar className="h-5 w-5 text-blue-600" />
-              <div>
-                <CardTitle className="text-lg">Запись на занятие</CardTitle>
-                <div className="text-xs text-muted-foreground">Выберите удобное время</div>
+          <div className="space-y-3">
+            {/* Заголовок с переключателем режимов */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Calendar className="h-5 w-5 text-blue-600" />
+                <div>
+                  <CardTitle className="text-lg">Запись на занятие</CardTitle>
+                  <div className="text-xs text-muted-foreground">Выберите удобное время</div>
+                </div>
+              </div>
+              
+              {/* Переключатель режимов */}
+              <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setViewMode('day')}
+                  className={`text-xs px-3 py-1 h-7 ${
+                    viewMode === 'day'
+                      ? 'bg-white shadow-sm text-blue-600 font-semibold'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  День
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setViewMode('month')}
+                  className={`text-xs px-3 py-1 h-7 ${
+                    viewMode === 'month'
+                      ? 'bg-white shadow-sm text-blue-600 font-semibold'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Месяц
+                </Button>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" onClick={() => changeDay(-1)} className="h-7 w-7 p-0">◀</Button>
-              <span className="text-sm font-medium min-w-[160px] text-center">
-                {new Date(selectedDate).getDate()} {monthNames[new Date(selectedDate).getMonth()]} {new Date(selectedDate).getFullYear()}
+
+            {/* Навигация по датам */}
+            <div className="flex items-center justify-center gap-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => viewMode === 'day' ? changeDay(-1) : changeMonth(-1)} 
+                className="h-8 w-8 p-0"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-sm font-semibold min-w-[180px] text-center">
+                {viewMode === 'day' 
+                  ? `${new Date(selectedDate).getDate()} ${monthNames[new Date(selectedDate).getMonth()]} ${new Date(selectedDate).getFullYear()}`
+                  : `${monthNames[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`
+                }
               </span>
-              <Button variant="ghost" size="sm" onClick={() => changeDay(1)} className="h-7 w-7 p-0">▶</Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => viewMode === 'day' ? changeDay(1) : changeMonth(1)} 
+                className="h-8 w-8 p-0"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-            {TIME_SLOTS.map(time => (
-              <ScheduleSlot
-                key={time}
-                time={time}
-                date={selectedDate}
-                appointments={appointments}
-                pupils={pupils}
-                currentPupil={currentPupil || undefined}
-                isTrainer={false}
-                maxSlots={2}
-                onSlotClick={handleSelectSlot}
-              />
-            ))}
-          </div>
+          {viewMode === 'day' ? (
+            // Вид по дням - сетка временных слотов
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+              {TIME_SLOTS.map(time => (
+                <ScheduleSlot
+                  key={time}
+                  time={time}
+                  date={selectedDate}
+                  appointments={appointments}
+                  pupils={pupils}
+                  currentPupil={currentPupil || undefined}
+                  isTrainer={false}
+                  maxSlots={2}
+                  onSlotClick={handleSelectSlot}
+                />
+              ))}
+            </div>
+          ) : (
+            // Календарный вид на месяц
+            <div className="space-y-3">
+              {/* Дни недели */}
+              <div className="grid grid-cols-7 gap-2">
+                {weekDays.map(day => (
+                  <div key={day} className="text-center text-xs font-semibold text-gray-500 py-1">
+                    {day}
+                  </div>
+                ))}
+              </div>
+              
+              {/* Дни месяца */}
+              <div className="grid grid-cols-7 gap-2">
+                {getMonthDays().map((day, index) => (
+                  <div key={index}>
+                    {day ? (
+                      <button
+                        onClick={() => handleDayClick(day.dateStr)}
+                        className={`
+                          w-full h-14 rounded-lg px-2 py-1.5 text-sm font-medium transition-all relative
+                          flex flex-col items-center justify-center gap-0.5
+                          ${day.isToday ? 'ring-2 ring-green-400' : ''}
+                          ${day.isSelected 
+                            ? 'bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-lg scale-105' 
+                            : day.appointmentsCount > 0
+                              ? 'bg-gradient-to-br from-yellow-50 to-yellow-100 text-yellow-700 border border-yellow-200 hover:from-yellow-100 hover:to-yellow-200'
+                              : 'bg-gradient-to-br from-green-50 to-green-100 text-green-700 border border-green-200 hover:from-green-100 hover:to-green-200'
+                          }
+                        `}
+                      >
+                        <span className="text-sm font-semibold">{day.date}</span>
+                        {day.appointmentsCount > 0 && (
+                          <Badge 
+                            variant="outline"
+                            className={`text-[9px] h-3.5 px-1 border-0 ${
+                              day.isSelected 
+                                ? 'bg-white/90 text-blue-600' 
+                                : 'bg-yellow-500 text-white'
+                            }`}
+                          >
+                            {day.appointmentsCount}
+                          </Badge>
+                        )}
+                      </button>
+                    ) : (
+                      <div className="w-full h-14"></div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              
+              {/* Легенда */}
+              <div className="flex items-center justify-center gap-4 pt-2 text-xs text-gray-600 border-t">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded bg-gradient-to-br from-green-50 to-green-100 border border-green-200"></div>
+                  <span>Свободно</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded bg-gradient-to-br from-yellow-50 to-yellow-100 border border-yellow-200"></div>
+                  <span>Есть записи</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded bg-gradient-to-br from-blue-400 to-blue-600"></div>
+                  <span>Выбран</span>
+                </div>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
