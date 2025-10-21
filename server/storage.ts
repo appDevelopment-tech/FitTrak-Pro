@@ -1,4 +1,5 @@
 import { db } from "./db";
+import bcrypt from "bcrypt";
 import type {
   User,
   Pupil,
@@ -174,11 +175,16 @@ export class DatabaseStorage implements IStorage {
         OR: [
           { email: emailOrPhone },
           { phone: emailOrPhone }
-        ],
-        password
+        ]
       }
     });
-    return pupil || undefined;
+    
+    if (!pupil || !pupil.password) {
+      return undefined;
+    }
+    
+    const isPasswordValid = await bcrypt.compare(password, pupil.password);
+    return isPasswordValid ? pupil : undefined;
   }
 
   async registerPupil(pupil: InsertPupil): Promise<Pupil> {
@@ -202,11 +208,16 @@ export class DatabaseStorage implements IStorage {
         OR: [
           { email: emailOrUsername },
           { username: emailOrUsername }
-        ],
-        password
+        ]
       }
     });
-    return user || undefined;
+    
+    if (!user || !user.password) {
+      return undefined;
+    }
+    
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    return isPasswordValid ? user : undefined;
   }
 
   async getTrainerByEmail(email: string): Promise<User | undefined> {

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -9,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { appointmentsDb, studentsDb } from "@/lib/database";
 import type { Appointment, Pupil, InsertPupil } from "@shared/schema";
-import { Calendar, Check, Clock, UserPlus } from "lucide-react";
+import { Calendar, Check, Clock, UserPlus, LogIn } from "lucide-react";
 import { ScheduleSlot } from "./schedule-slot";
 
 const TIME_SLOTS = Array.from({ length: 13 }, (_, i) => `${(i + 8).toString().padStart(2, '0')}:00`);
@@ -25,6 +26,7 @@ export function BookingWidget() {
   const { user, signIn, signUp } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
 
   const { data: pupils = [] } = useQuery<Pupil[]>({
     queryKey: ['students', TRAINER_ID],
@@ -214,14 +216,29 @@ export function BookingWidget() {
       <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Войдите, чтобы записаться</DialogTitle>
-            <DialogDescription>Создайте аккаунт или войдите, чтобы подтвердить запись на выбранное время</DialogDescription>
+            <DialogTitle>Требуется авторизация</DialogTitle>
+            <DialogDescription>Войдите или зарегистрируйтесь, чтобы записаться на выбранное время</DialogDescription>
           </DialogHeader>
-          <div className="space-y-2">
-            <Button onClick={async () => { await signIn('', ''); setShowAuthDialog(false); if (!currentPupil) { setShowCreatePupil(true); } else { setShowConfirmDialog(true); } }} className="w-full">
-              Войти как тест-пользователь
+          <div className="space-y-3">
+            <Button 
+              onClick={() => {
+                setShowAuthDialog(false);
+                setLocation('/login');
+              }} 
+              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+            >
+              <LogIn className="h-4 w-4 mr-2" />
+              Войти
             </Button>
-            <Button variant="outline" onClick={async () => { await signUp('', '', {}); setShowAuthDialog(false); setShowCreatePupil(true); }} className="w-full">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setShowAuthDialog(false);
+                setLocation('/register');
+              }} 
+              className="w-full"
+            >
+              <UserPlus className="h-4 w-4 mr-2" />
               Зарегистрироваться
             </Button>
           </div>

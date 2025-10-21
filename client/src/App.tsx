@@ -7,7 +7,6 @@ import { ActiveWorkoutProvider } from "@/contexts/ActiveWorkoutContext";
 import { useAuth } from "@/lib/auth";
 import { RoleGuard } from "@/lib/role-guard";
 import Dashboard from "@/pages/dashboard";
-import HomePage from "@/pages/home";
 import PublicSchedule from "@/pages/public-schedule";
 import LoginPage from "@/pages/login";
 import RegisterPage from "@/pages/register";
@@ -51,7 +50,7 @@ function TrainerRoute({ component: Component }: { component: () => JSX.Element }
 function Router() {
   return (
     <Switch>
-      {/* Публичные маршруты */}
+      {/* Главная страница - публичное расписание */}
       <Route path="/" component={PublicSchedule} />
       
       {/* Вход для учеников */}
@@ -59,9 +58,6 @@ function Router() {
 
       {/* Регистрация */}
       <Route path="/register" component={RegisterPage} />
-
-      {/* Публичное расписание (дублируем для совместимости) */}
-      <Route path="/schedule" component={PublicSchedule} />
 
       {/* Вход для тренеров */}
       <Route path="/admin/login" component={TrainerLoginPage} />
