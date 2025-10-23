@@ -42,7 +42,7 @@ export function LoginForm({ onSuccess, onForgotPassword, userType }: LoginFormPr
     setIsSubmitting(true);
     
     try {
-      await signIn(data.email, data.password, userType);
+      await signIn(data.email, data.password);
       
       toast({
         title: 'Вход выполнен!',

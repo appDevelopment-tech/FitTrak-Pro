@@ -11,20 +11,20 @@ type AuthMode = 'login' | 'register' | 'forgot-password';
 
 export default function LoginPage() {
   const [, setLocation] = useLocation();
-  const { user, pupil, loading } = useAuth();
+  const { user, userProfile, loading } = useAuth();
   const [authMode, setAuthMode] = useState<AuthMode>('login');
   const [isRedirecting, setIsRedirecting] = useState(false);
 
-  // Monitor auth state and redirect when pupil is logged in
+  // Monitor auth state and redirect when user is logged in
   useEffect(() => {
-    if (!loading && user && pupil && !isRedirecting && authMode === 'login') {
+    if (!loading && user && userProfile && !isRedirecting && authMode === 'login') {
       setIsRedirecting(true);
       // Use requestAnimationFrame to ensure auth state is fully settled
       requestAnimationFrame(() => {
         setLocation('/dashboard');
       });
     }
-  }, [user, pupil, loading, setLocation, isRedirecting, authMode]);
+  }, [user, userProfile, loading, setLocation, isRedirecting, authMode]);
 
   const handleLoginSuccess = () => {
     // Don't redirect immediately - let the useEffect handle it

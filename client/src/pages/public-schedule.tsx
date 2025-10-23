@@ -1,15 +1,13 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { LogIn, Calendar, Dumbbell } from "lucide-react";
-import { useAuth } from "@/lib/auth";
+import { LogIn, Dumbbell } from "lucide-react";
 import { BookingWidget } from "@/components/schedule/booking-widget";
 import { PWAInstallBanner, OfflineIndicator } from "@/components/ui/pwa-install-banner";
 
 export default function PublicSchedule() {
   const [, setLocation] = useLocation();
-  const { user } = useAuth();
 
-        return (
+  return (
     <div className="min-h-screen animated-bg">
       {/* Простой заголовок без кабинета */}
       <header className="glass-effect border-b border-border/20 sticky top-0 z-50">
@@ -28,33 +26,14 @@ export default function PublicSchedule() {
               </span>
             </div>
 
-            {/* Кнопка ВХОД */}
-            {!user && (
-              <Button 
-                onClick={() => setLocation('/login')}
-                className="neon-button bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                <LogIn className="h-4 w-4 mr-2" />
-                ВХОД
-              </Button>
-            )}
-
-            {/* Если пользователь авторизован - показываем его имя и кнопку выхода в кабинет */}
-            {user && (
-              <div className="flex items-center space-x-3">
-                <div className="glass-effect px-4 py-2 rounded-full border border-border/20">
-                  <span className="text-sm font-medium text-foreground">
-                    {user.email}
-                  </span>
-                </div>
-                <Button 
-                  onClick={() => setLocation('/dashboard')}
-                  className="neon-button bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white font-semibold px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-                >
-                  Мой кабинет
-                </Button>
-                </div>
-              )}
+            {/* Кнопка ВХОД - всегда видна для неавторизованных */}
+            <Button 
+              onClick={() => setLocation('/login')}
+              className="neon-button bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              <LogIn className="h-4 w-4 mr-2" />
+              ВХОД
+            </Button>
             </div>
         </div>
       </header>
