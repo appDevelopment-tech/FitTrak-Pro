@@ -66,7 +66,7 @@ export function LoginForm({ onSuccess, onForgotPassword, userType }: LoginFormPr
       <CardHeader>
         <CardTitle>Вход в систему</CardTitle>
         <CardDescription>
-          Войдите в свой аккаунт FitTrak-Pro
+          Войдите в свой аккаунт
         </CardDescription>
       </CardHeader>
       <CardContent>

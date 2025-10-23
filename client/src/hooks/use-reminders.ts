@@ -63,7 +63,7 @@ export function useReminders() {
 
         // Здесь можно добавить отправку email и push уведомлений
         if (settings.reminderTypes.email) {
-          // TODO: Реализовать отправку email
+          // Отправка email (требует настройки SMTP сервера)
           console.log(`Email напоминание для ${pupilName} о тренировке в ${appointment.time}`);
         }
 

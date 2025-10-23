@@ -11,7 +11,7 @@ import { BookingWidget } from "@/components/schedule/booking-widget";
 // import { RoleBasedSchedule } from "@/components/schedule/role-based-schedule";
 // import { RoleBasedProfile } from "@/components/profile/role-based-profile";
 // import { PermissionGuard, AdminGuard, PupilGuard } from "@/components/auth/permission-guard";
-import { Plus, BarChart3, Search, Flame, Trash2, LogOut, Bell, BellRing } from "lucide-react";
+import { Plus, Dumbbell, Search, Flame, Trash2, LogOut, Bell, BellRing } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useRoleCheck } from "@/lib/role-guard";
 // import { usePermissions } from "@/hooks/use-permissions";
@@ -176,13 +176,13 @@ export default function Dashboard() {
             <div className="flex items-center space-x-8">
               <div className="flex items-center group">
                 <div className="relative">
-                  <BarChart3 className="h-8 w-8 text-gradient neon-text" />
+                  <Dumbbell className="h-8 w-8 text-gradient neon-text" />
                   <div className="absolute inset-0 blur-xl opacity-50 group-hover:opacity-75 transition-opacity">
-                    <BarChart3 className="h-8 w-8 text-gradient" />
+                    <Dumbbell className="h-8 w-8 text-gradient" />
                   </div>
                 </div>
                 <span className="ml-3 text-xl font-black text-gradient neon-text" style={{ fontFamily: 'Space Grotesk' }}>
-                  FitTrak Pro
+                  Тренер Константин
                 </span>
               </div>
             </div>
@@ -238,16 +238,18 @@ export default function Dashboard() {
 
           {/* Neon Navigation */}
           <nav className="flex space-x-2">
-            <button
-              onClick={() => setActiveView('schedule')}
-              className={`${
-                activeView === 'schedule'
-                  ? 'neon-button text-primary-foreground px-6 py-2 rounded-full'
-                  : 'text-muted-foreground hover:text-foreground px-6 py-2 rounded-full hover:bg-accent/20 transition-all duration-300'
-              } font-medium text-sm`}
-            >
-              Расписание
-            </button>
+            {isTrainerUser && (
+              <button
+                onClick={() => setActiveView('schedule')}
+                className={`${
+                  activeView === 'schedule'
+                    ? 'neon-button text-primary-foreground px-6 py-2 rounded-full'
+                    : 'text-muted-foreground hover:text-foreground px-6 py-2 rounded-full hover:bg-accent/20 transition-all duration-300'
+                } font-medium text-sm`}
+              >
+                Расписание
+              </button>
+            )}
 
             {isTrainerUser && (
               <button

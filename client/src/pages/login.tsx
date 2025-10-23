@@ -47,10 +47,7 @@ export default function LoginPage() {
           <div className="mx-auto w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-4">
             <Dumbbell className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">FitTrak-Pro</h1>
-          <p className="text-gray-600">
-            Система управления фитнес-тренировками
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Тренер Константин</h1>
         </div>
 
         {/* Формы авторизации */}
@@ -99,10 +96,6 @@ export default function LoginPage() {
 
         {/* Информация для пользователей */}
         <div className="mt-8 text-center">
-          <div className="inline-flex items-center gap-2 text-sm text-gray-500">
-            <User className="w-4 h-4" />
-            Вход в систему FitTrak-Pro
-          </div>
         </div>
       </div>
     </div>

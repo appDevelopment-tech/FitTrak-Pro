@@ -32,7 +32,8 @@ import {
   Activity,
   Dumbbell,
   Trash2,
-  Calendar as CalendarIcon
+  Calendar as CalendarIcon,
+  CheckCircle
 } from "lucide-react";
 import { studentsDb, exercisesDb, trainingPlansDb } from "@/lib/database";
 import { studentsAPI } from "@/lib/api";
@@ -173,10 +174,29 @@ export function ComprehensiveStudentsManagement() {
   ];
 
   // Получаем список учеников текущего тренера
-  const { data: pupils = [], isLoading } = useQuery<Pupil[]>({
+  const { data: pupils = [], isLoading, error, refetch } = useQuery<Pupil[]>({
     queryKey: ['students', trainerId],
-    queryFn: () => fetch(`/api/trainers/${trainerId}/pupils`).then(res => res.json()),
-    enabled: !!authUser?.id, // Only run query if we have a user ID
+    queryFn: async () => {
+      try {
+        const response = await fetch(`http://localhost:8080/api/trainers/${trainerId}/pupils`);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Failed to fetch pupils:', response.status, errorText);
+          throw new Error(`Failed to fetch pupils: ${response.status} ${errorText}`);
+        }
+        
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Error fetching pupils:', error);
+        throw error;
+      }
+    },
+    enabled: !!trainerId, // Only run query if we have a trainer ID
+    staleTime: 0, // Always consider data stale
+    gcTime: 0, // Don't cache the data
+    refetchOnWindowFocus: false, // Don't refetch on window focus
   });
 
   // Получаем упражнения для создания кастомных тренировок
@@ -186,7 +206,7 @@ export function ComprehensiveStudentsManagement() {
   });
 
   // Вычисляем возраст и статус несовершеннолетия для каждого ученика
-  const pupilsWithAge: PupilWithAge[] = pupils.map(pupil => {
+  const pupilsWithAge: PupilWithAge[] = (pupils || []).map((pupil: Pupil) => {
     // Validate birth date before calculation
     if (!pupil.birthDate || isNaN(new Date(pupil.birthDate).getTime())) {
       return {

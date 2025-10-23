@@ -1,6 +1,6 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { LogIn, Calendar } from "lucide-react";
+import { LogIn, Calendar, Dumbbell } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { BookingWidget } from "@/components/schedule/booking-widget";
 import { PWAInstallBanner, OfflineIndicator } from "@/components/ui/pwa-install-banner";
@@ -18,13 +18,13 @@ export default function PublicSchedule() {
             {/* Логотип */}
             <div className="flex items-center space-x-3 group">
               <div className="relative">
-                <Calendar className="h-8 w-8 text-gradient neon-text" />
+                <Dumbbell className="h-8 w-8 text-gradient neon-text" />
                 <div className="absolute inset-0 blur-xl opacity-50 group-hover:opacity-75 transition-opacity">
-                  <Calendar className="h-8 w-8 text-gradient" />
-            </div>
+                  <Dumbbell className="h-8 w-8 text-gradient" />
+                </div>
               </div>
               <span className="text-xl font-black text-gradient neon-text" style={{ fontFamily: 'Space Grotesk' }}>
-                Запись на тренировку
+                Тренер Константин
               </span>
             </div>
 

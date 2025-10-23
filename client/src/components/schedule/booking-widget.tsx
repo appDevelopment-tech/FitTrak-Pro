@@ -13,9 +13,9 @@ import { appointmentsDb, studentsDb } from "@/lib/database";
 import type { Appointment, Pupil, InsertPupil } from "@shared/schema";
 import { Calendar, Check, Clock, UserPlus, LogIn, ChevronLeft, ChevronRight } from "lucide-react";
 import { ScheduleSlot } from "./schedule-slot";
+import { generatePassword } from "@/lib/utils";
 
 const TIME_SLOTS = Array.from({ length: 13 }, (_, i) => `${(i + 8).toString().padStart(2, '0')}:00`);
-const TRAINER_ID = "550e8400-e29b-41d4-a716-446655440000"; // TODO: Replace with actual trainer UUID
 
 export function BookingWidget() {
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
@@ -31,9 +31,12 @@ export function BookingWidget() {
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
 
+  // Получаем ID тренера из auth context (с fallback на UUID по умолчанию)
+  const trainerId = user?.id || "b55005cc-2362-4faa-80e4-406bafbbe76b";
+
   const { data: pupils = [] } = useQuery<Pupil[]>({
-    queryKey: ['students', TRAINER_ID],
-    queryFn: () => studentsDb.getByTrainerId(TRAINER_ID),
+    queryKey: ['students', trainerId],
+    queryFn: () => studentsDb.getByTrainerId(trainerId),
   });
 
   const currentPupil = useMemo(() => {
@@ -42,8 +45,8 @@ export function BookingWidget() {
   }, [user, pupils]);
 
   const { data: appointments = [] } = useQuery<Appointment[]>({
-    queryKey: ['appointments', TRAINER_ID],
-    queryFn: () => appointmentsDb.getByTrainerId(TRAINER_ID),
+    queryKey: ['appointments', trainerId],
+    queryFn: () => appointmentsDb.getByTrainerId(trainerId),
   });
 
   const occupiedTimes = useMemo(() => {
@@ -59,7 +62,7 @@ export function BookingWidget() {
   const createAppointmentMutation = useMutation({
     mutationFn: async (payload: { date: string; time: string; pupilId: string }) => {
       await appointmentsDb.create({
-        trainerId: TRAINER_ID,
+        trainerId,
         pupilId: payload.pupilId,
         date: payload.date,
         time: payload.time,
@@ -67,7 +70,7 @@ export function BookingWidget() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments', TRAINER_ID] });
+      queryClient.invalidateQueries({ queryKey: ['appointments', trainerId] });
       toast({ title: 'Готово', description: 'Вы записаны на выбранное время' });
       setShowConfirmDialog(false);
       setSelectedSlot(null);
@@ -82,7 +85,7 @@ export function BookingWidget() {
       return await studentsDb.create(form);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['students', TRAINER_ID] });
+      queryClient.invalidateQueries({ queryKey: ['students', trainerId] });
       toast({ title: 'Профиль создан', description: 'Продолжите запись на выбранное время' });
       setShowCreatePupil(false);
       setShowConfirmDialog(true);
@@ -129,13 +132,13 @@ export function BookingWidget() {
       return;
     }
     const form: InsertPupil = {
-      trainerId: TRAINER_ID,
+      trainerId,
       firstName,
       lastName,
       middleName: null,
       phone,
       email,
-      password: 'default_password', // TODO: Generate proper password
+      password: generatePassword(12),
       birthDate,
       weight: null,
       height: null,
@@ -226,15 +229,38 @@ export function BookingWidget() {
       <Card>
         <CardHeader className="pb-3">
           <div className="space-y-3">
-            {/* Заголовок с переключателем режимов */}
-            <div className="flex items-center justify-between">
+            {/* Заголовок по центру */}
+            <div className="flex items-center justify-center">
               <div className="flex items-center gap-3">
                 <Calendar className="h-5 w-5 text-blue-600" />
-                <div>
-                  <CardTitle className="text-lg">Запись на занятие</CardTitle>
-                  <div className="text-xs text-muted-foreground">Выберите удобное время</div>
-                </div>
+                <CardTitle className="text-lg">Запись на занятие</CardTitle>
               </div>
+            </div>
+
+            {/* Навигация по датам с переключателем режимов */}
+            <div className="flex items-center justify-center gap-4">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => viewMode === 'day' ? changeDay(-1) : changeMonth(-1)} 
+                className="h-8 w-8 p-0"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-sm font-semibold min-w-[180px] text-center">
+                {viewMode === 'day' 
+                  ? `${new Date(selectedDate).getDate()} ${monthNames[new Date(selectedDate).getMonth()]} ${new Date(selectedDate).getFullYear()}`
+                  : `${monthNames[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`
+                }
+              </span>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => viewMode === 'day' ? changeDay(1) : changeMonth(1)} 
+                className="h-8 w-8 p-0"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
               
               {/* Переключатель режимов */}
               <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
@@ -263,32 +289,6 @@ export function BookingWidget() {
                   Месяц
                 </Button>
               </div>
-            </div>
-
-            {/* Навигация по датам */}
-            <div className="flex items-center justify-center gap-2">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => viewMode === 'day' ? changeDay(-1) : changeMonth(-1)} 
-                className="h-8 w-8 p-0"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <span className="text-sm font-semibold min-w-[180px] text-center">
-                {viewMode === 'day' 
-                  ? `${new Date(selectedDate).getDate()} ${monthNames[new Date(selectedDate).getMonth()]} ${new Date(selectedDate).getFullYear()}`
-                  : `${monthNames[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`
-                }
-              </span>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => viewMode === 'day' ? changeDay(1) : changeMonth(1)} 
-                className="h-8 w-8 p-0"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
             </div>
           </div>
         </CardHeader>

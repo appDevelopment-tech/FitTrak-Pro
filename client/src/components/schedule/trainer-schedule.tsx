@@ -12,6 +12,7 @@ import { useAuth } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 import { studentsDb, appointmentsDb } from "@/lib/database";
 import type { Pupil, Appointment } from "@shared/schema";
+import { generatePassword } from "@/lib/utils";
 
 // Use Pupil type from schema directly
 type Student = Pupil & { name: string };
@@ -112,12 +113,12 @@ export function TrainerSchedule() {
   const queryClient = useQueryClient();
 
   // Get trainer ID from user (fallback to UUID if not available)
-  const trainerId = user?.id || "550e8400-e29b-41d4-a716-446655440000";
+  const trainerId = user?.id || "b55005cc-2362-4faa-80e4-406bafbbe76b";
 
   // Fetch pupils from database
   const { data: pupils = [] } = useQuery<Pupil[]>({
     queryKey: ['students', trainerId],
-    queryFn: () => fetch(`/api/trainers/${trainerId}/pupils`).then(res => res.json()),
+    queryFn: () => studentsDb.getByTrainerId(trainerId),
   });
 
   // Transform pupils to include computed name property
@@ -213,7 +214,7 @@ export function TrainerSchedule() {
         middleName: studentData.middleName || null,
         phone: studentData.phone || '',
         email: studentData.email || '',
-        password: 'default_password', // TODO: Generate proper password
+        password: generatePassword(12),
         birthDate: studentData.birthDate || new Date().toISOString().split('T')[0],
         weight: studentData.weight || null,
         height: studentData.height || null,
@@ -359,7 +360,7 @@ export function TrainerSchedule() {
       middleName: '',
       phone: '',
       email: '',
-      password: 'default_password',
+      password: generatePassword(12),
       birthDate: '',
       weight: null,
       height: null,

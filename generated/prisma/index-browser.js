@@ -117,6 +117,21 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
+  username: 'username',
+  password: 'password',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  middleName: 'middleName',
+  birthDate: 'birthDate',
+  email: 'email',
+  phone: 'phone',
+  isTrainer: 'isTrainer',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.PupilScalarFieldEnum = {
   id: 'id',
   trainerId: 'trainerId',
@@ -151,17 +166,115 @@ exports.Prisma.PupilScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.UserScalarFieldEnum = {
+exports.Prisma.ExerciseScalarFieldEnum = {
   id: 'id',
-  username: 'username',
-  password: 'password',
-  firstName: 'firstName',
-  lastName: 'lastName',
-  middleName: 'middleName',
-  birthDate: 'birthDate',
-  email: 'email',
-  phone: 'phone',
-  isTrainer: 'isTrainer',
+  name: 'name',
+  primaryMuscles: 'primaryMuscles',
+  secondaryMuscles: 'secondaryMuscles',
+  difficulty: 'difficulty',
+  overview: 'overview',
+  technique: 'technique',
+  commonMistakes: 'commonMistakes',
+  contraindications: 'contraindications',
+  muscleImageUrl: 'muscleImageUrl',
+  videoUrl: 'videoUrl',
+  techniqueImageUrl: 'techniqueImageUrl',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.WorkoutProgramScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  type: 'type',
+  duration: 'duration',
+  level: 'level',
+  createdBy: 'createdBy',
+  exercises: 'exercises',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.WorkoutSessionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  programId: 'programId',
+  scheduledDate: 'scheduledDate',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  status: 'status',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ExerciseProgressScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  exerciseId: 'exerciseId',
+  weight: 'weight',
+  reps: 'reps',
+  sets: 'sets',
+  date: 'date',
+  sessionId: 'sessionId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PupilTrainingPlanScalarFieldEnum = {
+  id: 'id',
+  pupilId: 'pupilId',
+  trainerId: 'trainerId',
+  name: 'name',
+  exercises: 'exercises',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PupilWorkoutHistoryScalarFieldEnum = {
+  id: 'id',
+  pupilId: 'pupilId',
+  trainerId: 'trainerId',
+  workoutDate: 'workoutDate',
+  workoutTime: 'workoutTime',
+  duration: 'duration',
+  exercises: 'exercises',
+  notes: 'notes',
+  pupilFeedback: 'pupilFeedback',
+  status: 'status',
+  confirmationStatus: 'confirmationStatus',
+  confirmedAt: 'confirmedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ActiveWorkoutScalarFieldEnum = {
+  id: 'id',
+  trainerId: 'trainerId',
+  pupilId: 'pupilId',
+  workoutProgramId: 'workoutProgramId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AppointmentScalarFieldEnum = {
+  id: 'id',
+  trainerId: 'trainerId',
+  pupilId: 'pupilId',
+  date: 'date',
+  time: 'time',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MuscleGroupScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  displayOrder: 'displayOrder',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -171,15 +284,39 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
 
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+};
+
 
 exports.Prisma.ModelName = {
+  User: 'User',
   Pupil: 'Pupil',
-  User: 'User'
+  Exercise: 'Exercise',
+  WorkoutProgram: 'WorkoutProgram',
+  WorkoutSession: 'WorkoutSession',
+  ExerciseProgress: 'ExerciseProgress',
+  PupilTrainingPlan: 'PupilTrainingPlan',
+  PupilWorkoutHistory: 'PupilWorkoutHistory',
+  ActiveWorkout: 'ActiveWorkout',
+  Appointment: 'Appointment',
+  MuscleGroup: 'MuscleGroup'
 };
 
 /**

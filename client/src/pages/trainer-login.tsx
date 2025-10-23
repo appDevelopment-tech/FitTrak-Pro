@@ -3,7 +3,7 @@ import { useLocation } from 'wouter';
 import { useAuth } from '@/lib/auth';
 import { LoginForm } from '@/components/auth/login-form';
 import { Button } from '@/components/ui/button';
-import { User, Dumbbell, ArrowLeft } from 'lucide-react';
+import { User, Handshake, ArrowLeft } from 'lucide-react';
 
 export default function TrainerLoginPage() {
   const [, setLocation] = useLocation();
@@ -35,13 +35,15 @@ export default function TrainerLoginPage() {
       <div className="w-full max-w-4xl">
         {/* Заголовок */}
         <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-4">
-            <Dumbbell className="w-8 h-8 text-white" />
+          <div className="flex items-center justify-center group mb-4">
+            <div className="relative">
+              <Handshake className="h-8 w-8 text-blue-700 neon-text" />
+              <div className="absolute inset-0 blur-xl opacity-50 group-hover:opacity-75 transition-opacity">
+                <Handshake className="h-8 w-8 text-blue-700" />
+              </div>
+            </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">FitTrak-Pro</h1>
-          <p className="text-gray-600">
-            Вход для тренеров
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Константин, привет!</h1>
         </div>
 
         {/* Форма входа для тренеров */}
@@ -65,10 +67,6 @@ export default function TrainerLoginPage() {
 
         {/* Информация для тренеров */}
         <div className="mt-8 text-center">
-          <div className="inline-flex items-center gap-2 text-sm text-gray-500">
-            <User className="w-4 h-4" />
-            Вход в кабинет тренера
-          </div>
         </div>
       </div>
     </div>

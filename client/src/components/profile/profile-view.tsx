@@ -48,7 +48,7 @@ export function ProfileView() {
 
   // Get the trainer ID from the authenticated user
   const { user: authUser } = useAuth();
-  const trainerId = authUser?.id || "2e6d1673-205a-4200-bc04-249dc2af269b";
+  const trainerId = authUser?.id || "b55005cc-2362-4faa-80e4-406bafbbe76b";
 
   // Debug logging for auth user
   useEffect(() => {
@@ -221,7 +221,7 @@ export function ProfileView() {
   // Загружаем учеников для поиска выбранного ученика из URL
   const { data: pupils = [] } = useQuery<Pupil[]>({
     queryKey: ['students', trainerId],
-    queryFn: () => fetch(`/api/trainers/${trainerId}/pupils`).then(res => res.json()),
+    queryFn: () => studentsDb.getByTrainerId(trainerId),
     enabled: !!authUser?.id, // Only run query if we have a user ID
   });
 
