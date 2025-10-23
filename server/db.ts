@@ -1,6 +1,6 @@
 import { PrismaClient } from '../generated/prisma';
 
-// Initialize Prisma Client with SQLite
+// Initialize Prisma Client with PostgreSQL (Supabase)
 const prisma = new PrismaClient({
   log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
 });
@@ -8,7 +8,7 @@ const prisma = new PrismaClient({
 // Test database connection on startup
 prisma.$connect()
   .then(() => {
-    console.log('✅ Database connection successful (Prisma + SQLite)');
+    console.log('✅ Database connection successful (Prisma + PostgreSQL/Supabase)');
   })
   .catch((error) => {
     console.error('❌ Database connection failed:', error);
