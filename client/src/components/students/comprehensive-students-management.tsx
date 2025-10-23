@@ -194,8 +194,8 @@ export function ComprehensiveStudentsManagement() {
       }
     },
     enabled: !!trainerId, // Only run query if we have a trainer ID
-    staleTime: 0, // Always consider data stale
-    gcTime: 0, // Don't cache the data
+    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+    gcTime: 10 * 60 * 1000, // Keep data in cache for 10 minutes
     refetchOnWindowFocus: false, // Don't refetch on window focus
   });
 
@@ -570,6 +570,14 @@ export function ComprehensiveStudentsManagement() {
     }
   }, [trainerId, addPupilForm]);
 
+  // Effect to auto-refresh pupils data if empty on mount
+  useEffect(() => {
+    if (trainerId && pupils.length === 0 && !isLoading && !error) {
+      console.log('🔄 Auto-refreshing pupils data on mount');
+      refetch();
+    }
+  }, [trainerId, pupils.length, isLoading, error, refetch]);
+
   // Effect to populate edit form when selectedPupil changes
   useEffect(() => {
     if (selectedPupil && showEditDialog) {
@@ -637,7 +645,27 @@ export function ComprehensiveStudentsManagement() {
       </div>
 
       {/* Список учеников */}
-      <div className="grid grid-cols-1 gap-2">
+      {isLoading && pupils.length === 0 ? (
+        <div className="flex items-center justify-center py-8">
+          <div className="flex items-center gap-3">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"></div>
+            <span className="text-gray-600">Загрузка учеников...</span>
+          </div>
+        </div>
+      ) : error ? (
+        <div className="flex items-center justify-center py-8">
+          <div className="text-center">
+            <div className="text-red-600">Ошибка загрузки учеников</div>
+          </div>
+        </div>
+      ) : filteredPupils.length === 0 ? (
+        <div className="flex items-center justify-center py-8">
+          <div className="text-center text-gray-600">
+            {searchTerm ? 'Ученики не найдены' : 'Ученики не добавлены'}
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-2">
         {filteredPupils.map((pupil) => (
           <Card 
             key={pupil.id} 
@@ -730,7 +758,8 @@ export function ComprehensiveStudentsManagement() {
             </CardContent>
           </Card>
         ))}
-      </div>
+        </div>
+      )}
 
       {/* Диалог с профилем ученика */}
       <Dialog open={!!selectedPupil} onOpenChange={() => setSelectedPupil(null)}>

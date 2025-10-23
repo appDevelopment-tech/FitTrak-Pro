@@ -64,7 +64,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Don't send password in response
           const { password: _, ...trainerWithoutPassword } = trainer;
           return res.json({ 
-            user: trainerWithoutPassword, 
+            user: { ...trainerWithoutPassword, isTrainer: true }, 
             userType: 'trainer' 
           });
         }

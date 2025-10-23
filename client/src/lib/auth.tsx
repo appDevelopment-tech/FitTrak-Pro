@@ -23,6 +23,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Сначала проверяем localStorage для локального API
+    const savedUser = localStorage.getItem('fitTrakUser');
+    const savedPupil = localStorage.getItem('fitTrakPupil');
+    const savedUserType = localStorage.getItem('fitTrakUserType');
+    
+    if (savedUser && savedUserType) {
+      console.log('🔄 Restoring user from localStorage:', JSON.parse(savedUser));
+      setUser(JSON.parse(savedUser));
+      setPupil(savedPupil ? JSON.parse(savedPupil) : null);
+      setLoading(false);
+      return;
+    }
+
     if (!isSupabaseConfigured) {
       // Если Supabase не настроен, просто завершаем загрузку
       setLoading(false);
@@ -141,6 +154,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         };
 
+        console.log('🔍 Mock user created:', {
+          id: mockUser.id,
+          email: mockUser.email,
+          is_trainer: mockUser.user_metadata.is_trainer,
+          userType: loginResult.userType
+        });
+
+        // Сохраняем пользователя в localStorage для восстановления при обновлении страницы
+        localStorage.setItem('fitTrakUser', JSON.stringify(mockUser));
+        localStorage.setItem('fitTrakPupil', JSON.stringify(loginResult.pupil || null));
+        localStorage.setItem('fitTrakUserType', loginResult.userType);
+
         setUser(mockUser as any);
         setPupil(loginResult.pupil || null);
         return;
@@ -244,6 +269,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
+    // Очищаем localStorage
+    localStorage.removeItem('fitTrakUser');
+    localStorage.removeItem('fitTrakPupil');
+    localStorage.removeItem('fitTrakUserType');
+    
     if (!isSupabaseConfigured) {
       setUser(null);
       setPupil(null);

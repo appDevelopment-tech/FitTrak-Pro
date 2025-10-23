@@ -31,7 +31,7 @@ export default function Dashboard() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showNotifications, setShowNotifications] = useState(false);
   const [location, setLocation] = useLocation();
-  const { user, signOut } = useAuth();
+  const { user, signOut, loading } = useAuth();
   const { isTrainer } = useRoleCheck();
   
   // Check if user is accessing via admin route (which means they're a trainer)
@@ -41,6 +41,9 @@ export default function Dashboard() {
 
   // Обработка URL при загрузке страницы
   useEffect(() => {
+    // Ждем завершения загрузки аутентификации
+    if (loading) return;
+    
     const currentPath = location.split('?')[0];
     const urlParams = new URLSearchParams(location.split('?')[1] || '');
     const tab = urlParams.get('tab');
@@ -70,7 +73,7 @@ export default function Dashboard() {
     } else if (currentPath === '/dashboard' || currentPath === '/') {
       setActiveView('schedule');
     }
-  }, [location, isTrainerUser, setLocation]);
+  }, [location, isTrainerUser, setLocation, loading]);
 
   const handleViewChange = (view: string) => {
     setActiveView(view);
@@ -109,6 +112,15 @@ export default function Dashboard() {
     schedule: 'Расписание',
     profile: 'Кабинет',
   };
+
+  // Показываем индикатор загрузки пока идет проверка аутентификации
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Загрузка...</div>
+      </div>
+    );
+  }
 
   const renderContent = () => {
     switch (activeView) {

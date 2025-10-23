@@ -11,37 +11,60 @@ interface RoleGuardProps {
 export function RoleGuard({ children, allowedRoles, fallbackPath = '/login' }: RoleGuardProps) {
   const [, setLocation] = useLocation();
   const { user, pupil, loading } = useAuth();
-
-  // Определяем роль пользователя
-  let userRole: 'trainer' | 'pupil' | null = null;
-  if (user && (user as any).user_metadata?.is_trainer) {
-    userRole = 'trainer';
-  } else if (user && pupil) {
-    userRole = 'pupil';
-  }
+  const { userRole } = useRoleCheck();
 
   // Обрабатываем редиректы в useEffect
   useEffect(() => {
+    console.log('🔍 RoleGuard useEffect:', {
+      loading,
+      user: user ? { id: user.id, email: user.email } : null,
+      pupil: pupil ? { id: pupil.id, email: pupil.email } : null,
+      userRole,
+      allowedRoles,
+      fallbackPath
+    });
+
     if (loading) return;
 
     // Проверяем, есть ли авторизованный пользователь
     if (!user && !pupil) {
+      console.log('❌ No user or pupil, redirecting to:', fallbackPath);
       setLocation(fallbackPath);
       return;
+    }
+
+    // Даем больше времени на определение роли пользователя
+    if (!userRole && user) {
+      console.log('⏳ User exists but role not determined, waiting...');
+      // Если пользователь есть, но роль еще не определена, ждем еще немного
+      const timer = setTimeout(() => {
+        if (!userRole) {
+          console.log('❌ Role still not determined after timeout, redirecting to:', fallbackPath);
+          setLocation(fallbackPath);
+        }
+      }, 2000); // Увеличиваем время ожидания до 2 секунд
+      
+      return () => clearTimeout(timer);
     }
 
     if (!userRole) {
+      console.log('❌ No userRole, redirecting to:', fallbackPath);
       setLocation(fallbackPath);
       return;
     }
 
-    if (!allowedRoles.includes(userRole)) {
+    if (!allowedRoles.includes(userRole as 'trainer' | 'pupil')) {
+      console.log('❌ User role not allowed:', userRole, 'allowed:', allowedRoles);
       // Редирект в зависимости от роли
       if (userRole === 'trainer') {
+        console.log('🔄 Redirecting trainer to /cabinet');
         setLocation('/cabinet');
       } else {
+        console.log('🔄 Redirecting pupil to /dashboard');
         setLocation('/dashboard');
       }
+    } else {
+      console.log('✅ User role allowed:', userRole);
     }
   }, [user, pupil, loading, userRole, allowedRoles, fallbackPath, setLocation]);
 
@@ -62,7 +85,7 @@ export function RoleGuard({ children, allowedRoles, fallbackPath = '/login' }: R
     return null;
   }
 
-  if (!allowedRoles.includes(userRole)) {
+  if (!allowedRoles.includes(userRole as 'trainer' | 'pupil')) {
     return null;
   }
 
@@ -75,6 +98,15 @@ export function useRoleCheck() {
   
   const isTrainer = user && (user as any).user_metadata?.is_trainer;
   const isPupil = user && pupil !== null;
+  
+  console.log('🔍 Role check:', {
+    user: user ? { id: user.id, email: user.email } : null,
+    user_metadata: user ? (user as any).user_metadata : null,
+    pupil: pupil ? { id: pupil.id, email: pupil.email } : null,
+    isTrainer,
+    isPupil,
+    userRole: isTrainer ? 'trainer' : (isPupil ? 'pupil' : null)
+  });
   
   return {
     isTrainer,
