@@ -33,7 +33,7 @@ FitTrak-Pro is a full-stack web application built with React, TypeScript, and Su
 
 ### Backend
 - **Database:** PostgreSQL (Supabase)
-- **ORM:** Drizzle ORM
+- **ORM:** Prisma Client
 - **API:** Supabase client-side SDK
 - **Authentication:** Supabase Auth (session-based)
 
@@ -60,8 +60,9 @@ FitTrak-Pro/
 │   │   ├── hooks/           # Custom React hooks
 │   │   └── pages/           # Page components
 │   └── public/              # Static assets
-├── shared/                   # Shared code between frontend/backend
-│   └── schema.ts            # Database schema and TypeScript types
+├── prisma/                   # Prisma schema and migrations
+│   ├── schema.prisma        # Database schema definition
+│   └── migrations/          # Database migrations
 ├── docs/                     # Documentation
 │   ├── API_MUSCLE_GROUPS.md              # API documentation
 │   ├── COMPONENTS_EXERCISE_MANAGEMENT.md # Component documentation
@@ -98,13 +99,15 @@ Create a `.env` file in the root directory:
 ```env
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+DATABASE_URL=postgresql://postgres:[password]@db.[project-ref].supabase.co:5432/postgres
 ```
 
 Get these values from your Supabase project settings.
 
 4. **Initialize the database:**
 ```bash
-npm run db:push
+npm run db:migrate
+npm run db:generate
 ```
 
 This will create all necessary tables and seed initial data.
@@ -127,6 +130,11 @@ npm run build
 
 # Run TypeScript type checking
 npm run check
+
+# Database operations
+npm run db:migrate    # Run migrations
+npm run db:generate   # Generate Prisma client
+npm run db:studio     # Open Prisma Studio
 
 # Run E2E tests
 npm run test:e2e
@@ -205,12 +213,12 @@ Schedule and track training sessions.
 
 ### Database Layer
 
-FitTrak-Pro uses Supabase (PostgreSQL) with Drizzle ORM:
+FitTrak-Pro uses Supabase (PostgreSQL) with Prisma Client:
 
-- **Schema Definition:** `shared/schema.ts`
-- **Type Safety:** TypeScript types auto-generated from schema
+- **Schema Definition:** `prisma/schema.prisma`
+- **Type Safety:** TypeScript types auto-generated from Prisma schema
 - **Validation:** Zod schemas for runtime validation
-- **Client:** Supabase JavaScript client for real-time operations
+- **Client:** Prisma Client for database operations + Supabase JavaScript client for auth
 
 **Key Tables:**
 - `users` - Trainer accounts
@@ -221,7 +229,7 @@ FitTrak-Pro uses Supabase (PostgreSQL) with Drizzle ORM:
 - `pupil_workout_history` - Workout history
 - `appointments` - Session scheduling
 
-See [DATABASE.md](./docs/DATABASE.md) for complete schema documentation.
+See [DATABASE_SUPABASE_ONLY.md](./docs/DATABASE_SUPABASE_ONLY.md) for complete schema documentation.
 
 ### Frontend Architecture
 
@@ -249,7 +257,7 @@ Comprehensive documentation is available in the `/docs` directory:
 - **[USER_GUIDE.md](./docs/USER_GUIDE.md)** - Complete user guide with screenshots and workflows
 - **[API_MUSCLE_GROUPS.md](./docs/API_MUSCLE_GROUPS.md)** - API documentation for muscle groups and exercises
 - **[COMPONENTS_EXERCISE_MANAGEMENT.md](./docs/COMPONENTS_EXERCISE_MANAGEMENT.md)** - Component architecture and usage
-- **[DATABASE.md](./docs/DATABASE.md)** - Database schema and migration guide
+- **[DATABASE_SUPABASE_ONLY.md](./docs/DATABASE_SUPABASE_ONLY.md)** - Database schema and migration guide (Supabase + Prisma)
 - **[CLAUDE.md](./CLAUDE.md)** - Development guide for Claude Code
 
 ## Development Workflow
@@ -257,11 +265,16 @@ Comprehensive documentation is available in the `/docs` directory:
 ### Adding a New Feature
 
 1. **Update Schema** (if needed)
-   - Modify `shared/schema.ts`
-   - Run `npm run db:push`
+   - Modify `prisma/schema.prisma`
+   - Run `npm run db:migrate`
 
 2. **Create Database Operations** (if needed)
    - Add functions to `client/src/lib/database.ts`
+   - Use Prisma Client for database operations
+   - Import from `@/lib/database` (Prisma client)
+   - Use generated types from Prisma
+   - Follow Prisma best practices for queries
+   - Handle errors appropriately
 
 3. **Build UI Components**
    - Create components in appropriate directory
@@ -326,6 +339,7 @@ Production environment requires:
 ```env
 VITE_SUPABASE_URL=production_url
 VITE_SUPABASE_ANON_KEY=production_key
+DATABASE_URL=production_database_url
 ```
 
 ### Hosting
@@ -340,21 +354,21 @@ Supabase handles the backend infrastructure.
 
 ## Database Migrations
 
-Migrations are stored in `/migrations` and documented in `docs/DATABASE.md`.
+Migrations are managed by Prisma and documented in `docs/DATABASE_SUPABASE_ONLY.md`.
 
 **Creating a Migration:**
-1. Update `shared/schema.ts`
-2. Create SQL file in `/migrations`
+1. Update `prisma/schema.prisma`
+2. Run `npx prisma migrate dev --name migration_name`
 3. Test migration on development database
-4. Document in `DATABASE.md`
+4. Document in `DATABASE_SUPABASE_ONLY.md`
 
 **Applying Migrations:**
 ```bash
 # Development
-npm run db:push
+npm run db:migrate
 
 # Production
-# Use Supabase dashboard or CLI
+npm run db:migrate
 ```
 
 ## Security
@@ -384,8 +398,10 @@ npm run db:push
 
 **Database connection errors:**
 - Verify `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+- Check `DATABASE_URL` in `.env` file
 - Check Supabase project status
 - Ensure database is not paused
+- Run `npm run db:generate` to regenerate Prisma client
 
 **Build errors:**
 - Clear node_modules: `rm -rf node_modules && npm install`

@@ -11,28 +11,41 @@ import { BookingWidget } from "@/components/schedule/booking-widget";
 // import { RoleBasedSchedule } from "@/components/schedule/role-based-schedule";
 // import { RoleBasedProfile } from "@/components/profile/role-based-profile";
 // import { PermissionGuard, AdminGuard, PupilGuard } from "@/components/auth/permission-guard";
-import { Plus, Dumbbell, Search, Flame, Trash2, LogOut, Bell, BellRing } from "lucide-react";
+import { Plus, Dumbbell, Search, Flame, Trash2, LogOut } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useRoleCheck } from "@/lib/role-guard";
 // import { usePermissions } from "@/hooks/use-permissions";
 // import { useNotifications } from "@/hooks/use-notifications";
 // import { useReminders } from "@/hooks/use-reminders";
-import { NotificationsPanel } from "@/components/ui/notifications-panel";
 import { PWAInstallBanner, OfflineIndicator } from "@/components/ui/pwa-install-banner";
 import { PageTransition } from "@/components/ui/page-transitions";
 // Debug components removed for production
 // import { SupabaseConnectionCheck } from "@/components/debug/supabase-connection-check";
 // import { AuthModeToggle } from "@/components/debug/auth-mode-toggle";
 import type { DashboardStats } from "@/lib/types";
-import type { WorkoutSession, WorkoutProgram, User } from "@shared/schema";
+import type { WorkoutSession, WorkoutProgram, User, Pupil } from "@shared/schema";
 
 export default function Dashboard() {
   const [activeView, setActiveView] = useState('schedule');
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [showNotifications, setShowNotifications] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<Pupil | null>(null);
   const [location, setLocation] = useLocation();
-  const { user, signOut, loading } = useAuth();
+  const { user, userProfile, signOut, loading } = useAuth();
   const { isTrainer } = useRoleCheck();
+  
+  // Debug logging for userProfile changes
+  useEffect(() => {
+    console.log('Dashboard userProfile changed:', {
+      hasPhoto: !!userProfile?.photo,
+      firstName: userProfile?.first_name,
+      lastName: userProfile?.last_name,
+      middleName: userProfile?.middle_name,
+      displayName: userProfile?.first_name && userProfile?.last_name
+        ? `${userProfile.first_name} ${userProfile.last_name}`
+        : user?.email || 'User',
+      fullProfile: userProfile
+    });
+  }, [userProfile]);
   
   // Check if user is accessing via admin route (which means they're a trainer)
   const isAdminRoute = location.includes('/admin/');
@@ -135,25 +148,42 @@ export default function Dashboard() {
           </div>
         );
       case 'profile':
-        // Дополнительная проверка доступа для раздела "Кабинет"
-        if (!isTrainerUser) {
+        if (selectedStudent) {
+          // Профиль выбранного ученика (тренер редактирует)
           return (
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <div className="text-center py-16">
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  Доступ запрещен
-                </h3>
-                <p className="text-gray-600">У вас нет прав для доступа к этому разделу</p>
-              </div>
+              <ProfileView 
+                isStudent={false}
+                selectedStudent={selectedStudent}
+                onClose={() => {
+                  setSelectedStudent(null);
+                  setActiveView('profile');
+                }}
+              />
+            </div>
+          );
+        } else if (isTrainerUser) {
+          return (
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              <ProfileView 
+                onSelectStudent={(student) => {
+                  setSelectedStudent(student);
+                  setActiveView('profile');
+                }}
+              />
+            </div>
+          );
+        } else {
+          // Профиль ученика
+          return (
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              <ProfileView 
+                isStudent={true} 
+                onClose={() => setActiveView('schedule')}
+              />
             </div>
           );
         }
-        return (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {/* <RoleBasedProfile /> */}
-            <ProfileView />
-          </div>
-        );
       case 'progress':
         return (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -204,38 +234,27 @@ export default function Dashboard() {
               <div className="flex items-center space-x-3 glass-effect px-4 py-2 rounded-full border border-border/20">
                 <div className="relative">
                   <img
-                    src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=80&h=80"
+                    src={userProfile?.photo || "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=80&h=80"}
                     alt="User Profile"
                     className="h-8 w-8 rounded-full border-2 border-primary/50"
+                    onLoad={() => console.log('Header photo loaded:', userProfile?.photo ? 'custom photo' : 'default photo')}
+                    onError={() => console.log('Header photo failed to load:', userProfile?.photo)}
                   />
-                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-success rounded-full border-2 border-background"></div>
                 </div>
-                <span className="text-sm font-medium text-foreground">
-                  {user?.email || 'User'}
+                <span 
+                  className="text-sm font-medium text-foreground cursor-pointer hover:text-primary transition-colors"
+                  onClick={() => {
+                    if (!isTrainerUser) {
+                      setActiveView('profile');
+                    }
+                  }}
+                >
+                  {userProfile?.first_name && userProfile?.last_name
+                    ? `${userProfile.first_name} ${userProfile.last_name}`
+                    : user?.email || 'User'
+                  }
                 </span>
               </div>
-              
-              {/* Notifications Button */}
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => setShowNotifications(true)}
-                className="relative text-muted-foreground hover:text-foreground hover:bg-accent/20 transition-all duration-300"
-              >
-                {/* {unreadCount > 0 ? ( */}
-                {false ? (
-                  <BellRing className="h-4 w-4" />
-                ) : (
-                  <Bell className="h-4 w-4" />
-                )}
-                {/* {unreadCount > 0 && ( */}
-                {false && (
-                  <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                    {/* {unreadCount > 9 ? '9+' : unreadCount} */}
-                    0
-                  </span>
-                )}
-              </Button>
               
               <Button 
                 variant="ghost" 
@@ -250,6 +269,7 @@ export default function Dashboard() {
 
           {/* Neon Navigation */}
           <nav className="flex space-x-2">
+            {/* Показываем расписание только для тренеров */}
             {isTrainerUser && (
               <button
                 onClick={() => setActiveView('schedule')}
@@ -263,6 +283,7 @@ export default function Dashboard() {
               </button>
             )}
 
+            {/* Показываем профиль только для тренеров */}
             {isTrainerUser && (
               <button
                 onClick={() => setActiveView('profile')}
@@ -288,12 +309,6 @@ export default function Dashboard() {
           </PageTransition>
         </div>
       </main>
-
-      {/* Notifications Panel */}
-      <NotificationsPanel 
-        isOpen={showNotifications} 
-        onClose={() => setShowNotifications(false)} 
-      />
 
       {/* PWA Components */}
       <PWAInstallBanner />

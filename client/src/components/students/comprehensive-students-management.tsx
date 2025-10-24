@@ -40,13 +40,18 @@ import { studentsAPI } from "@/lib/api";
 import { useActiveWorkout } from "@/contexts/ActiveWorkoutContext";
 import { useAuth } from "@/lib/auth";
 import type { Pupil, InsertPupil, WorkoutProgram, Exercise } from "@shared/schema";
+import { ProfileView } from "@/components/profile/profile-view";
 
 interface PupilWithAge extends Pupil {
   age: number;
   isMinor: boolean;
 }
 
-export function ComprehensiveStudentsManagement() {
+interface ComprehensiveStudentsManagementProps {
+  onSelectStudent?: (student: PupilWithAge) => void;
+}
+
+export function ComprehensiveStudentsManagement({ onSelectStudent }: ComprehensiveStudentsManagementProps) {
   const [selectedPupil, setSelectedPupil] = useState<PupilWithAge | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -679,7 +684,16 @@ export function ComprehensiveStudentsManagement() {
                     {filteredPupils.findIndex(p => p.id === pupil.id) + 1}
                   </div>
                   <div className="flex flex-col">
-                    <div className="font-medium text-sm">
+                    <div 
+                      className="font-medium text-sm cursor-pointer hover:text-blue-600 transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onSelectStudent) {
+                          onSelectStudent(pupil);
+                        }
+                      }}
+                      title="Кликните для редактирования профиля"
+                    >
                       {pupil.lastName} {pupil.firstName} • {pupil.age} лет • {pupil.phone}
                     </div>
                     {isWorkoutActive(trainerId, pupil.id) && (
@@ -763,11 +777,11 @@ export function ComprehensiveStudentsManagement() {
 
       {/* Диалог с профилем ученика */}
       <Dialog open={!!selectedPupil} onOpenChange={() => setSelectedPupil(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              Профиль ученика
+              Редактирование профиля ученика
             </DialogTitle>
           </DialogHeader>
           
@@ -2295,6 +2309,7 @@ export function ComprehensiveStudentsManagement() {
           </Form>
         </DialogContent>
       </Dialog>
+
     </div>
   );
 }

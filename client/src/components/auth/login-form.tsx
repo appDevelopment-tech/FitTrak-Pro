@@ -45,8 +45,7 @@ export function LoginForm({ onSuccess, onForgotPassword, userType }: LoginFormPr
       await signIn(data.email, data.password);
       
       toast({
-        title: 'Вход выполнен!',
-        description: 'Добро пожаловать в FitTrak-Pro!',
+        description: 'Добро пожаловать в расписание Константина!',
       });
       
       onSuccess?.();

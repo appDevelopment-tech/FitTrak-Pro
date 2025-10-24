@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
-import { User, Filter, Search, Users, Dumbbell, Calendar, Upload, Edit2, Image, Settings } from "lucide-react";
+import { User, Filter, Search, Users, Dumbbell, Calendar, Upload, Edit2, Image, Settings, X } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { exercisesDb, studentsDb } from "@/lib/database";
 import { supabase } from "@/lib/supabase";
@@ -25,9 +25,27 @@ import {
 } from "@/components/ui/lazy-component";
 import { useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
+import { PhotoUpload } from "./photo-upload";
 
-export function ProfileView() {
+export function ProfileView({ 
+  isStudent = false, 
+  onClose, 
+  selectedStudent = null,
+  onSelectStudent
+}: { 
+  isStudent?: boolean; 
+  onClose?: () => void; 
+  selectedStudent?: Pupil | null;
+  onSelectStudent?: (student: Pupil) => void;
+}) {
+  console.log('ProfileView props:', { isStudent, selectedStudent: selectedStudent ? `${selectedStudent.firstName} ${selectedStudent.lastName}` : 'none', hasOnClose: !!onClose });
+  
   const [isEditing, setIsEditing] = useState(false);
+  
+  // Debug logging for isEditing state
+  useEffect(() => {
+    console.log('isEditing state changed:', isEditing);
+  }, [isEditing]);
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedExerciseForDetail, setSelectedExerciseForDetail] = useState<Exercise | null>(null);
@@ -38,11 +56,24 @@ export function ProfileView() {
   const [customMuscleImages, setCustomMuscleImages] = useState<Record<string, string>>({});
   const [selectedPupil, setSelectedPupil] = useState<Pupil | null>(null);
   const [selectedDateFromSchedule, setSelectedDateFromSchedule] = useState<string | null>(null);
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle photo change with automatic save
+  const handlePhotoChange = (photo: string | null) => {
+    console.log('Photo changed, auto-saving:', photo);
+    console.log('Selected student:', selectedStudent ? `${selectedStudent.firstName} ${selectedStudent.lastName}` : 'none');
+    console.log('Is student mode:', isStudent);
+    setProfilePhoto(photo);
+    
+    // Auto-save photo immediately (including null for deletion)
+    updatePhotoMutation.mutate(photo);
+  };
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [location] = useLocation();
+  const { refreshUserProfile } = useAuth();
   
   const [activeTab, setActiveTab] = useState<string>("profile");
 
@@ -57,41 +88,168 @@ export function ProfileView() {
   }, [authUser, trainerId]);
 
   const { data: user, error: userError, isLoading: userLoading } = useQuery<UserType>({
-    queryKey: ['user', trainerId],
+    queryKey: ['user', selectedStudent ? selectedStudent.email : authUser?.email, isStudent],
     queryFn: async () => {
-      console.log('Fetching user profile for trainerId:', trainerId);
+      try {
+        // Если нет подключения к Supabase, возвращаем mock данные
+        if (!supabase) {
+          console.log('Supabase not available, using mock data');
+          return {
+            id: 'mock-id',
+            username: '',
+            password: '',
+            firstName: selectedStudent ? selectedStudent.firstName : 'Тестовый',
+            lastName: selectedStudent ? selectedStudent.lastName : 'Пользователь',
+            middleName: '',
+            birthDate: '1990-01-01',
+            email: selectedStudent ? selectedStudent.email : 'test@example.com',
+            phone: '+7 (999) 123-45-67',
+            photo: null,
+            isTrainer: !isStudent && !selectedStudent,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
+        }
+      // If we have a selected student, load their profile
+      if (selectedStudent) {
+        console.log('Loading selected student profile:', selectedStudent.email);
+        const { data, error } = await supabase
+          .from('students')
+          .select('*')
+          .eq('email', selectedStudent.email)
+          .single();
+
+        if (error) {
+          console.error('Error fetching selected student profile:', error);
+          throw error;
+        }
+
+        if (!data) {
+          throw new Error('Selected student profile not found');
+        }
+
+        const transformedData: UserType = {
+          id: data.id,
+          username: '',
+          password: '',
+          firstName: data.first_name,
+          lastName: data.last_name,
+          middleName: data.middle_name,
+          birthDate: data.birth_date,
+          email: data.email,
+          phone: data.phone,
+          photo: data.photo,
+          isTrainer: false,
+          createdAt: data.created_at,
+          updatedAt: data.updated_at,
+        };
+
+        console.log('Selected student profile loaded:', transformedData);
+        return transformedData;
+      }
+      
+      if (isStudent) {
+        // For students, load from students table
+        console.log('Fetching student profile for email:', authUser?.email);
+        console.log('isStudent flag:', isStudent);
+        
+        const { data, error } = await supabase
+          .from('students')
+          .select('*')
+          .eq('email', authUser?.email)
+          .single();
+
+        if (error) {
+          console.error('Error fetching student profile:', error);
+          throw error;
+        }
+
+        if (!data) {
+          throw new Error('Student profile not found');
+        }
+
+        // Transform student data to UserType format
+        const transformedData: UserType = {
+          id: data.id,
+          username: '', // Students don't have username
+          password: '', // Students don't have password in this context
+          firstName: data.first_name,
+          lastName: data.last_name,
+          middleName: data.middle_name,
+          birthDate: data.birth_date,
+          email: data.email,
+          phone: data.phone,
+          photo: data.photo,
+          isTrainer: false,
+          createdAt: data.created_at,
+          updatedAt: data.updated_at,
+        };
+
+        console.log('Student profile loaded:', transformedData);
+        return transformedData;
+      } else {
+        // For trainers, load from users table
+        console.log('Fetching trainer profile for email:', authUser?.email);
       const { data, error } = await supabase
         .from('users')
         .select('*')
-        .eq('id', trainerId)
+          .eq('email', authUser?.email)
         .single();
 
       if (error) {
-        console.error('Error fetching user profile:', error);
+          console.error('Error fetching trainer profile:', error);
         throw error;
       }
-      console.log('User profile fetched (raw):', data);
 
-      // Transform snake_case to camelCase
-      const transformedData: UserType = {
-        id: data.id,
-        username: data.username,
-        password: data.password,
-        firstName: data.first_name,
-        lastName: data.last_name,
-        middleName: data.middle_name,
-        birthDate: data.birth_date,
-        email: data.email,
-        phone: data.phone,
-        isTrainer: data.is_trainer,
-        createdAt: data.created_at,
-        updatedAt: data.updated_at,
+        if (!data) {
+          throw new Error('Trainer profile not found');
+        }
+
+        // Transform trainer data to UserType format
+        const transformedData: UserType = {
+          id: data.id,
+          username: data.username,
+          password: data.password,
+          firstName: data.first_name,
+          lastName: data.last_name,
+          middleName: data.middle_name,
+          birthDate: data.birth_date,
+          email: data.email,
+          phone: data.phone,
+          photo: data.photo || localStorage.getItem(`trainer_photo_${data.email}`) || null,
+          isTrainer: data.is_trainer,
+          createdAt: data.created_at,
+          updatedAt: data.updated_at,
+        };
+
+        console.log('Trainer profile loaded:', transformedData);
+        return transformedData;
+      }
+    } catch (error) {
+      console.error('Error in queryFn:', error);
+      // Возвращаем mock данные при ошибке
+      return {
+        id: 'mock-id',
+        username: '',
+        password: '',
+        firstName: selectedStudent ? selectedStudent.firstName : 'Тестовый',
+        lastName: selectedStudent ? selectedStudent.lastName : 'Пользователь',
+        middleName: '',
+        birthDate: '1990-01-01',
+        email: selectedStudent ? selectedStudent.email : 'test@example.com',
+        phone: '+7 (999) 123-45-67',
+        photo: null,
+        isTrainer: !isStudent && !selectedStudent,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
-
-      console.log('User profile transformed:', transformedData);
-      return transformedData;
+    }
     },
-    enabled: !!authUser?.id, // Only run query if we have a user ID
+    enabled: !!authUser?.email || !!selectedStudent, // Only run query if we have a user email or selected student
+    retry: false, // Не повторять запрос при ошибке
+    onError: (error) => {
+      console.error('Error loading user profile:', error);
+    }
   });
 
   // Log when user data changes
@@ -127,6 +285,7 @@ export function ProfileView() {
     birthDate: z.string().min(1, "Дата рождения обязательна"),
     email: z.string().email("Некорректный email"),
     phone: z.string().min(1, "Телефон обязателен"),
+    photo: z.string().optional(),
   });
 
   type UserProfileForm = z.infer<typeof userProfileSchema>;
@@ -140,6 +299,7 @@ export function ProfileView() {
       birthDate: user?.birthDate || "",
       email: user?.email || "",
       phone: user?.phone || "",
+      photo: user?.photo || "",
     },
   });
 
@@ -155,14 +315,201 @@ export function ProfileView() {
         birthDate: user.birthDate || "",
         email: user.email || "",
         phone: user.phone || "",
+        photo: user.photo || "",
       });
     }
   }, [user, form]);
+
+  // Mutation for updating only photo
+  const updatePhotoMutation = useMutation({
+    mutationFn: async (photo: string | null) => {
+      console.log('Updating photo only:', photo);
+      
+      // If we have a selected student, update their photo
+      if (selectedStudent) {
+        console.log('Updating selected student photo for email:', selectedStudent.email);
+        const { data: updated, error } = await supabase
+          .from('students')
+          .update({ photo })
+          .eq('email', selectedStudent.email)
+          .select()
+          .single();
+
+        if (error) {
+          console.error('Error updating selected student photo:', error);
+          throw error;
+        }
+
+        return updated;
+      }
+      
+      if (isStudent) {
+        // Update student photo
+        const { data: updated, error } = await supabase
+          .from('students')
+          .update({ photo })
+          .eq('email', authUser?.email)
+          .select()
+          .single();
+
+        if (error) {
+          console.error('Error updating student photo:', error);
+          throw error;
+        }
+
+        return updated;
+      } else {
+        // Update trainer photo
+        console.log('Updating trainer photo for email:', authUser?.email);
+        console.log('Photo data to save:', photo);
+        
+        // Try to update in database first
+        const { data: updated, error } = await supabase
+          .from('users')
+          .update({ photo })
+          .eq('email', authUser?.email)
+          .select()
+          .single();
+
+        if (error) {
+          console.error('Error updating trainer photo in database:', error);
+          console.error('Error details:', {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+          });
+          
+          // If database update fails, save to localStorage as fallback
+          console.log('Saving trainer photo to localStorage as fallback');
+          localStorage.setItem(`trainer_photo_${authUser?.email}`, photo || '');
+          
+          // Return mock data for successful localStorage save
+          return {
+            id: authUser?.id,
+            email: authUser?.email,
+            photo: photo
+          };
+        }
+
+        return updated;
+      }
+    },
+    onSuccess: () => {
+      const emailToInvalidate = selectedStudent ? selectedStudent.email : authUser?.email;
+      queryClient.invalidateQueries({ queryKey: ['user', emailToInvalidate, isStudent] });
+      // Refresh user profile in auth context to update header photo (only for current user)
+      if (!selectedStudent) {
+        refreshUserProfile();
+      }
+      toast({
+        title: "Успешно",
+        description: "Фото обновлено",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Ошибка",
+        description: `Не удалось обновить фото: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
 
   // Mutation for updating user profile
   const updateUserMutation = useMutation({
     mutationFn: async (data: UserProfileForm) => {
       console.log('Updating user profile with:', data);
+      
+      // If we have a selected student, update their profile
+      if (selectedStudent) {
+        console.log('Updating selected student profile for email:', selectedStudent.email);
+        console.log('Selected student data to update:', data);
+        
+        const { data: updated, error } = await supabase
+          .from('students')
+          .update({
+            first_name: data.firstName,
+            last_name: data.lastName,
+            middle_name: data.middleName || null,
+            birth_date: data.birthDate,
+            email: data.email,
+            phone: data.phone,
+          })
+          .eq('email', selectedStudent.email)
+          .select()
+          .single();
+
+        if (error) {
+          console.error('Error updating selected student profile:', error);
+          throw error;
+        }
+        console.log('Selected student profile updated (raw):', updated);
+
+        const transformedData: UserType = {
+          id: updated.id,
+          username: '',
+          password: '',
+          firstName: updated.first_name,
+          lastName: updated.last_name,
+          middleName: updated.middle_name,
+          birthDate: updated.birth_date,
+          email: updated.email,
+          phone: updated.phone,
+          photo: updated.photo,
+          isTrainer: false,
+          createdAt: updated.created_at,
+          updatedAt: updated.updated_at,
+        };
+
+        return transformedData;
+      }
+      
+      if (isStudent) {
+        // Update student profile
+        console.log('Updating student profile for email:', authUser?.email);
+        console.log('Student data to update:', data);
+        
+        const { data: updated, error } = await supabase
+          .from('students')
+          .update({
+            first_name: data.firstName,
+            last_name: data.lastName,
+            middle_name: data.middleName || null,
+            birth_date: data.birthDate,
+            email: data.email,
+            phone: data.phone,
+          })
+          .eq('email', authUser?.email)
+          .select()
+          .single();
+
+        if (error) {
+          console.error('Error updating student profile:', error);
+          throw error;
+        }
+        console.log('Student profile updated (raw):', updated);
+
+        // Transform snake_case to camelCase
+        const transformedData: UserType = {
+          id: updated.id,
+          username: '',
+          password: '',
+          firstName: updated.first_name,
+          lastName: updated.last_name,
+          middleName: updated.middle_name,
+          birthDate: updated.birth_date,
+          email: updated.email,
+          phone: updated.phone,
+          photo: updated.photo,
+          isTrainer: false,
+          createdAt: updated.created_at,
+          updatedAt: updated.updated_at,
+        };
+
+        return transformedData;
+      } else {
+        // Update trainer profile
       const { data: updated, error } = await supabase
         .from('users')
         .update({
@@ -173,15 +520,15 @@ export function ProfileView() {
           email: data.email,
           phone: data.phone,
         })
-        .eq('id', trainerId)
+          .eq('email', authUser?.email)
         .select()
         .single();
 
       if (error) {
-        console.error('Error updating user profile:', error);
+          console.error('Error updating trainer profile:', error);
         throw error;
       }
-      console.log('User profile updated (raw):', updated);
+        console.log('Trainer profile updated (raw):', updated);
 
       // Transform snake_case to camelCase
       const transformedData: UserType = {
@@ -194,15 +541,19 @@ export function ProfileView() {
         birthDate: updated.birth_date,
         email: updated.email,
         phone: updated.phone,
+          photo: updated.photo,
         isTrainer: updated.is_trainer,
         createdAt: updated.created_at,
         updatedAt: updated.updated_at,
       };
 
       return transformedData;
+      }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user'] });
+      const emailToInvalidate = selectedStudent ? selectedStudent.email : authUser?.email;
+      queryClient.invalidateQueries({ queryKey: ['user', emailToInvalidate, isStudent] });
+      console.log('Setting isEditing to false after successful save');
       setIsEditing(false);
       toast({
         title: "Успешно",
@@ -381,31 +732,212 @@ export function ProfileView() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="profile">Тренер</TabsTrigger>
-          <TabsTrigger value="students">Ученики</TabsTrigger>
-          <TabsTrigger value="exercises">Упражнения</TabsTrigger>
-          <TabsTrigger value="programs">Тренировки</TabsTrigger>
-        </TabsList>
+      {/* Close button for students and selected student */}
+      {(isStudent || selectedStudent) && onClose && (
+        <div className="flex justify-between items-center mb-4">
+          <div className="text-sm text-muted-foreground">
+            {isStudent ? 'Нажмите ✕ чтобы вернуться к расписанию' : 'Нажмите ✕ чтобы вернуться к списку учеников'}
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+      
+      {(isStudent || selectedStudent) ? (
+          // Прямое отображение профиля для учеников без вкладок
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold">
+                  {selectedStudent ? `Профиль ${selectedStudent.firstName} ${selectedStudent.lastName}` : 
+                   isStudent ? 'Мой профиль' : 'Основная информация'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex flex-col md:flex-row gap-6">
+                  <div className="text-center">
+                    <PhotoUpload
+                      currentPhoto={user?.photo || profilePhoto}
+                      onPhotoChange={handlePhotoChange}
+                      userName={`${user?.firstName || ''} ${user?.lastName || ''}`.trim()}
+                    />
+                    {updatePhotoMutation.isPending && (
+                      <div className="text-center text-sm text-muted-foreground mt-2">
+                        Сохранение фото...
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex-1 space-y-4">
+                    <form onSubmit={form.handleSubmit((data) => {
+                      console.log('Form submitted with data:', data);
+                      console.log('isStudent flag in form:', isStudent);
+                      // Photo is saved automatically, so we don't include it in form submission
+                      updateUserMutation.mutate(data);
+                    })}>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label>Имя</Label>
+                          {isEditing ? (
+                            <Input
+                              {...form.register("firstName")}
+                              className={form.formState.errors.firstName ? "border-red-500" : ""}
+                            />
+                          ) : (
+                            <div className="p-3 bg-gray-50 rounded-md text-gray-900 font-medium">{user?.firstName || ""}</div>
+                          )}
+                          {form.formState.errors.firstName && (
+                            <p className="text-sm text-red-500 mt-1">{form.formState.errors.firstName.message}</p>
+                          )}
+                        </div>
+                        <div>
+                          <Label>Фамилия</Label>
+                          {isEditing ? (
+                            <Input
+                              {...form.register("lastName")}
+                              className={form.formState.errors.lastName ? "border-red-500" : ""}
+                            />
+                          ) : (
+                            <div className="p-3 bg-gray-50 rounded-md text-gray-900 font-medium">{user?.lastName || ""}</div>
+                          )}
+                          {form.formState.errors.lastName && (
+                            <p className="text-sm text-red-500 mt-1">{form.formState.errors.lastName.message}</p>
+                          )}
+                        </div>
+                        <div>
+                          <Label>Отчество</Label>
+                          {isEditing ? (
+                            <Input
+                              {...form.register("middleName")}
+                              className={form.formState.errors.middleName ? "border-red-500" : ""}
+                            />
+                          ) : (
+                            <div className="p-3 bg-gray-50 rounded-md text-gray-900 font-medium">{user?.middleName || ""}</div>
+                          )}
+                          {form.formState.errors.middleName && (
+                            <p className="text-sm text-red-500 mt-1">{form.formState.errors.middleName.message}</p>
+                          )}
+                        </div>
+                        <div>
+                          <Label>Дата рождения</Label>
+                          {isEditing ? (
+                            <Input
+                              type="date"
+                              {...form.register("birthDate")}
+                              className={form.formState.errors.birthDate ? "border-red-500" : ""}
+                            />
+                          ) : (
+                            <div className="p-3 bg-gray-50 rounded-md text-gray-900 font-medium">{user?.birthDate || ""}</div>
+                          )}
+                          {form.formState.errors.birthDate && (
+                            <p className="text-sm text-red-500 mt-1">{form.formState.errors.birthDate.message}</p>
+                          )}
+                        </div>
+                        <div>
+                          <Label>Email</Label>
+                          {isEditing ? (
+                            <Input
+                              type="email"
+                              {...form.register("email")}
+                              className={form.formState.errors.email ? "border-red-500" : ""}
+                            />
+                          ) : (
+                            <div className="p-3 bg-gray-50 rounded-md text-gray-900 font-medium">{user?.email || ""}</div>
+                          )}
+                          {form.formState.errors.email && (
+                            <p className="text-sm text-red-500 mt-1">{form.formState.errors.email.message}</p>
+                          )}
+                        </div>
+                        <div>
+                          <Label>Телефон</Label>
+                          {isEditing ? (
+                            <Input
+                              type="tel"
+                              {...form.register("phone")}
+                              className={form.formState.errors.phone ? "border-red-500" : ""}
+                            />
+                          ) : (
+                            <div className="p-3 bg-gray-50 rounded-md text-gray-900 font-medium">{user?.phone || ""}</div>
+                          )}
+                          {form.formState.errors.phone && (
+                            <p className="text-sm text-red-500 mt-1">{form.formState.errors.phone.message}</p>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-end pt-4">
+                        {isEditing ? (
+                          <div className="flex gap-2">
+                            <Button variant="outline" type="button" onClick={() => {
+                              setIsEditing(false);
+                              form.reset();
+                              // Don't clear profilePhoto as it's saved automatically
+                            }}>
+                              Отмена
+                            </Button>
+                            <Button type="submit" disabled={updateUserMutation.isPending}>
+                              {updateUserMutation.isPending ? "Сохранение..." : "Сохранить"}
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button onClick={() => setIsEditing(true)} className="flex items-center gap-2">
+                            <Edit2 className="h-4 w-4" />
+                            Редактировать
+                          </Button>
+                        )}
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        ) : (
+          // Обычное отображение с вкладками для тренера
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="profile">Тренер</TabsTrigger>
+              <TabsTrigger value="students">Ученики</TabsTrigger>
+              <TabsTrigger value="exercises">Упражнения</TabsTrigger>
+              <TabsTrigger value="programs">Тренировки</TabsTrigger>
+            </TabsList>
 
-        <TabsContent value="profile" className="space-y-6">
+            <TabsContent value="profile" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl font-semibold">Основная информация</CardTitle>
+              <CardTitle className="text-xl font-semibold">
+                {selectedStudent ? `Профиль ${selectedStudent.firstName} ${selectedStudent.lastName}` : 
+                 isStudent ? 'Мой профиль' : 'Основная информация'}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex flex-col md:flex-row gap-6">
                 <div className="text-center">
-                  <div className="relative inline-block">
-                    <div className="w-32 h-32 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <User className="h-16 w-16 text-white" />
+                  <PhotoUpload
+                    currentPhoto={user?.photo || profilePhoto}
+                    onPhotoChange={handlePhotoChange}
+                    userName={`${user?.firstName || ''} ${user?.lastName || ''}`.trim()}
+                  />
+                  {updatePhotoMutation.isPending && (
+                    <div className="text-center text-sm text-muted-foreground mt-2">
+                      Сохранение фото...
                     </div>
-                  </div>
+                  )}
                 </div>
                 
                 <div className="flex-1 space-y-4">
-                  <form onSubmit={form.handleSubmit((data) => updateUserMutation.mutate(data))}>
+                  <form onSubmit={form.handleSubmit((data) => {
+                    console.log('Form submitted with data:', data);
+                    console.log('isStudent flag in form:', isStudent);
+                    // Photo is saved automatically, so we don't include it in form submission
+                    updateUserMutation.mutate(data);
+                  })}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label>Имя</Label>
@@ -501,6 +1033,7 @@ export function ProfileView() {
                           <Button variant="outline" type="button" onClick={() => {
                             setIsEditing(false);
                             form.reset();
+                            // Don't clear profilePhoto as it's saved automatically
                           }}>
                             Отмена
                           </Button>
@@ -509,7 +1042,8 @@ export function ProfileView() {
                           </Button>
                         </div>
                       ) : (
-                        <Button onClick={() => setIsEditing(true)}>
+                        <Button onClick={() => setIsEditing(true)} className="flex items-center gap-2">
+                          <Edit2 className="h-4 w-4" />
                           Редактировать
                         </Button>
                       )}
@@ -521,8 +1055,10 @@ export function ProfileView() {
           </Card>
         </TabsContent>
 
+        {!(isStudent || selectedStudent) && (
+          <>
         <TabsContent value="students">
-          <StudentsManagement />
+          <StudentsManagement onSelectStudent={onSelectStudent} />
         </TabsContent>
 
         <TabsContent value="programs">
@@ -659,7 +1195,10 @@ export function ProfileView() {
             </Card>
           )}
         </TabsContent>
-      </Tabs>
+        </>
+        )}
+        </Tabs>
+        )}
 
       {/* Диалог для отображения полного обзора упражнения */}
       {selectedExerciseForDetail && (

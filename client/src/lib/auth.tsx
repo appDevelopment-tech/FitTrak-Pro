@@ -139,13 +139,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           is_trainer: false,
           role: 'student'
         };
-        console.log('✅ Student profile loaded:', { id: data.id, email: data.email, role: data.role });
+        console.log('✅ Student profile loaded:', { 
+          id: data.id, 
+          email: data.email, 
+          role: data.role, 
+          photo: data.photo ? 'present' : 'missing',
+          firstName: data.first_name,
+          lastName: data.last_name,
+          middleName: data.middle_name,
+          rawData: data
+        });
       } else {
         data = {
           ...data,
-          role: data.is_trainer ? 'admin' : 'student'
+          role: data.is_trainer ? 'admin' : 'student',
+          photo: data.photo || localStorage.getItem(`trainer_photo_${data.email}`) || null
         };
-        console.log('✅ Trainer profile loaded:', { id: data.id, email: data.email, role: data.role, is_trainer: data.is_trainer });
+        console.log('✅ Trainer profile loaded:', { 
+          id: data.id, 
+          email: data.email, 
+          role: data.role, 
+          is_trainer: data.is_trainer, 
+          photo: data.photo ? 'present' : 'missing',
+          firstName: data.first_name,
+          lastName: data.last_name,
+          middleName: data.middle_name,
+          rawData: data
+        });
       }
 
       setUserProfile(data);

@@ -72,6 +72,11 @@ export const studentsDb = {
 
   async getByTrainerId(trainerId: string) {
     try {
+      if (!supabase) {
+        console.log('Supabase not available, returning empty array');
+        return [];
+      }
+      
       const { data, error } = await supabase
         .from('students')
         .select('*')
@@ -376,6 +381,11 @@ export const appointmentsDb = {
 
   async getByTrainerId(trainerId: string) {
     try {
+      if (!supabase) {
+        console.log('Supabase not available, returning empty array for appointments');
+        return [];
+      }
+      
       const { data, error } = await supabase
         .from('appointments')
         .select(`
