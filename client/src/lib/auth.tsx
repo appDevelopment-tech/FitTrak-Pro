@@ -9,12 +9,26 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, userData: any) => Promise<void>;
   signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   refreshUserProfile: () => Promise<void>;
   isAdmin: boolean;
   isStudent: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Константы для ролей
+const ADMIN_EMAILS = ['petrusenko@fittrak.pro']; // Можно расширить список
+const TRAINER_EMAILS = ['petrusenko@fittrak.pro']; // Можно расширить список
+
+// Функция для определения роли пользователя
+const getUserRole = (email: string) => {
+  if (ADMIN_EMAILS.includes(email)) return 'admin';
+  if (TRAINER_EMAILS.includes(email)) return 'trainer';
+  return 'student';
+};
+
+const isTrainerEmail = (email: string) => TRAINER_EMAILS.includes(email);
 
 const isSupabaseConfigured = !!import.meta.env.VITE_SUPABASE_URL && !!import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -52,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     getSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
       console.log('Auth state changed:', event, session?.user?.email);
       
       if (session?.user) {
@@ -125,8 +139,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             email: authUser.email,
             first_name: authUser.user_metadata?.first_name || 'Пользователь',
             last_name: authUser.user_metadata?.last_name || '',
-            is_trainer: authUser.email === 'petrusenko@fittrak.pro', // Hardcoded for now
-            role: authUser.email === 'petrusenko@fittrak.pro' ? 'admin' : 'student'
+            is_trainer: isTrainerEmail(authUser.email || ''),
+            role: getUserRole(authUser.email || '')
           };
           
           console.log('✅ Fallback profile created:', fallbackProfile);
@@ -178,8 +192,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: authUser.email,
         first_name: authUser.user_metadata?.first_name || 'Пользователь',
         last_name: authUser.user_metadata?.last_name || '',
-        is_trainer: authUser.email === 'petrusenko@fittrak.pro',
-        role: authUser.email === 'petrusenko@fittrak.pro' ? 'admin' : 'student'
+        is_trainer: isTrainerEmail(authUser.email || ''),
+        role: getUserRole(authUser.email || '')
       };
       
       console.log('✅ Fallback profile created:', fallbackProfile);
@@ -299,6 +313,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const resetPassword = async (email: string) => {
+    if (!isSupabaseConfigured) {
+      throw new Error('Supabase is not configured. Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env file');
+    }
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Password reset failed');
+      }
+    } catch (error: any) {
+      throw new Error(error.message || 'Password reset failed');
+    }
+  };
+
   const signOut = async () => {
     if (!isSupabaseConfigured) {
       setUser(null);
@@ -329,6 +361,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signIn,
     signUp,
     signOut,
+    resetPassword,
     refreshUserProfile,
     isAdmin,
     isStudent,

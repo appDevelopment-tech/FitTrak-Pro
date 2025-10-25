@@ -142,7 +142,7 @@ export default function Dashboard() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* <RoleBasedSchedule 
               date={selectedDate.toISOString().split('T')[0]} 
-              trainerId={1}
+              trainerId={userProfile?.id || ''}
             /> */}
             <BookingWidget />
           </div>

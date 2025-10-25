@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/lib/auth";
 
 import { ChevronLeft, ChevronRight, Clock, Plus, Check, Trash2, Dumbbell, Calendar, Users, Settings } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -31,7 +32,8 @@ export function CompactSchedule() {
   const { isWorkoutActive, getWorkoutProgramName } = useActiveWorkout();
   const [, setLocation] = useLocation();
 
-  const trainerId = "550e8400-e29b-41d4-a716-446655440000"; // TODO: Get from auth context
+  const { user: authUser } = useAuth();
+  const trainerId = authUser?.id || '';
 
   // Load students - используем тот же метод что и в учениках
   const { data: pupils = [] } = useQuery<Pupil[]>({

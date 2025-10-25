@@ -10,7 +10,7 @@ interface RoleGuardProps {
 
 export function RoleGuard({ children, allowedRoles, fallbackPath = '/login' }: RoleGuardProps) {
   const [, setLocation] = useLocation();
-  const { user, pupil, loading } = useAuth();
+  const { user, userProfile, loading } = useAuth();
   const { userRole } = useRoleCheck();
 
   // Обрабатываем редиректы в useEffect
@@ -18,7 +18,7 @@ export function RoleGuard({ children, allowedRoles, fallbackPath = '/login' }: R
     console.log('🔍 RoleGuard useEffect:', {
       loading,
       user: user ? { id: user.id, email: user.email } : null,
-      pupil: pupil ? { id: pupil.id, email: pupil.email } : null,
+      userProfile: userProfile ? { id: userProfile.id, email: userProfile.email, role: userProfile.role } : null,
       userRole,
       allowedRoles,
       fallbackPath
@@ -27,8 +27,8 @@ export function RoleGuard({ children, allowedRoles, fallbackPath = '/login' }: R
     if (loading) return;
 
     // Проверяем, есть ли авторизованный пользователь
-    if (!user && !pupil) {
-      console.log('❌ No user or pupil, redirecting to:', fallbackPath);
+    if (!user && !userProfile) {
+      console.log('❌ No user or userProfile, redirecting to:', fallbackPath);
       setLocation(fallbackPath);
       return;
     }
@@ -66,7 +66,7 @@ export function RoleGuard({ children, allowedRoles, fallbackPath = '/login' }: R
     } else {
       console.log('✅ User role allowed:', userRole);
     }
-  }, [user, pupil, loading, userRole, allowedRoles, fallbackPath, setLocation]);
+  }, [user, userProfile, loading, userRole, allowedRoles, fallbackPath, setLocation]);
 
   if (loading) {
     return (
@@ -77,7 +77,7 @@ export function RoleGuard({ children, allowedRoles, fallbackPath = '/login' }: R
   }
 
   // Проверяем, есть ли авторизованный пользователь
-  if (!user && !pupil) {
+  if (!user && !userProfile) {
     return null;
   }
 
@@ -94,15 +94,15 @@ export function RoleGuard({ children, allowedRoles, fallbackPath = '/login' }: R
 
 // Хук для проверки роли
 export function useRoleCheck() {
-  const { user, pupil } = useAuth();
+  const { user, userProfile } = useAuth();
   
   const isTrainer = user && (user as any).user_metadata?.is_trainer;
-  const isPupil = user && pupil !== null;
+  const isPupil = user && userProfile?.role === 'student';
   
   console.log('🔍 Role check:', {
     user: user ? { id: user.id, email: user.email } : null,
     user_metadata: user ? (user as any).user_metadata : null,
-    pupil: pupil ? { id: pupil.id, email: pupil.email } : null,
+    userProfile: userProfile ? { id: userProfile.id, email: userProfile.email, role: userProfile.role } : null,
     isTrainer,
     isPupil,
     userRole: isTrainer ? 'trainer' : (isPupil ? 'pupil' : null)

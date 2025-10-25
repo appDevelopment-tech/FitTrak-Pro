@@ -1,6 +1,9 @@
 import { z } from "zod";
 import type { Prisma } from "../generated/prisma";
 
+// UUID validation helper
+const uuidSchema = z.string().uuid("Некорректный формат UUID");
+
 // Re-export Prisma types with app-friendly names
 export type User = {
   id: string;
@@ -190,16 +193,16 @@ export const insertUserSchema = z.object({
 });
 
 export const insertPupilSchema = z.object({
-  trainerId: z.string().uuid().nullable().optional(),
-  firstName: z.string().min(1),
-  lastName: z.string().min(1),
+  trainerId: uuidSchema.nullable().optional(),
+  firstName: z.string().min(1, "Имя обязательно"),
+  lastName: z.string().min(1, "Фамилия обязательна"),
   middleName: z.string().nullable().optional(),
-  phone: z.string().min(1),
-  email: z.string().email(),
-  password: z.string().min(6),
-  birthDate: z.string().min(1),
-  weight: z.number().nullable().optional(),
-  height: z.number().nullable().optional(),
+  phone: z.string().min(1, "Телефон обязателен"),
+  email: z.string().email("Некорректный email"),
+  password: z.string().min(6, "Пароль должен содержать минимум 6 символов"),
+  birthDate: z.string().min(1, "Дата рождения обязательна"),
+  weight: z.number().positive("Вес должен быть положительным числом").nullable().optional(),
+  height: z.number().positive("Рост должен быть положительным числом").nullable().optional(),
   goal: z.string().nullable().optional(),
   medicalNotes: z.string().nullable().optional(),
   photo: z.string().nullable().optional(),
@@ -209,7 +212,7 @@ export const insertPupilSchema = z.object({
   parentLastName: z.string().nullable().optional(),
   parentMiddleName: z.string().nullable().optional(),
   parentPhone: z.string().nullable().optional(),
-  parentEmail: z.string().nullable().optional(),
+  parentEmail: z.string().email("Некорректный email родителя").nullable().optional(),
   parentSpecialInstructions: z.string().nullable().optional(),
   isParentRepresentative: z.boolean().default(false),
   privacyPolicyAccepted: z.boolean().default(false),
@@ -225,63 +228,65 @@ export const updatePupilSchema = insertPupilSchema.partial().extend({
 });
 
 export const insertExerciseSchema = z.object({
-  name: z.string().min(1),
-  primaryMuscles: z.any(), // JSON
-  secondaryMuscles: z.any().optional(), // JSON
-  difficulty: z.string().min(1),
-  overview: z.string().min(1),
-  technique: z.any(), // JSON
-  commonMistakes: z.any(), // JSON
-  contraindications: z.any(), // JSON
-  muscleImageUrl: z.string().nullable().optional(),
-  videoUrl: z.string().nullable().optional(),
-  techniqueImageUrl: z.string().nullable().optional(),
-  createdBy: z.string().uuid().nullable().optional(),
+  name: z.string().min(1, "Название упражнения обязательно"),
+  primaryMuscles: z.array(z.string()).min(1, "Выберите хотя бы одну основную группу мышц"),
+  secondaryMuscles: z.array(z.string()).optional(),
+  difficulty: z.enum(['начинающий', 'средний', 'продвинутый'], {
+    errorMap: () => ({ message: "Выберите уровень сложности" })
+  }),
+  overview: z.string().min(10, "Описание должно содержать минимум 10 символов"),
+  technique: z.array(z.string()).min(1, "Добавьте хотя бы один шаг техники"),
+  commonMistakes: z.array(z.string()).optional(),
+  contraindications: z.array(z.string()).optional(),
+  muscleImageUrl: z.string().url("Некорректный URL изображения").nullable().optional(),
+  videoUrl: z.string().url("Некорректный URL видео").nullable().optional(),
+  techniqueImageUrl: z.string().url("Некорректный URL изображения техники").nullable().optional(),
+  createdBy: uuidSchema.nullable().optional(),
 });
 
 export const insertWorkoutProgramSchema = z.object({
-  name: z.string().min(1),
-  type: z.string().min(1),
-  duration: z.number().min(1),
-  level: z.string().min(1),
-  createdBy: z.string().uuid(),
+  name: z.string().min(1, "Название программы обязательно"),
+  type: z.string().min(1, "Тип программы обязателен"),
+  duration: z.number().min(1, "Длительность должна быть больше 0"),
+  level: z.string().min(1, "Уровень программы обязателен"),
+  createdBy: uuidSchema,
   exercises: z.any(), // JSON
 });
 
 export const insertWorkoutSessionSchema = z.object({
-  userId: z.string().uuid(),
-  programId: z.string().uuid(),
-  scheduledDate: z.string(),
-  startTime: z.string(),
-  endTime: z.string(),
+  userId: uuidSchema,
+  programId: uuidSchema,
+  scheduledDate: z.string().min(1, "Дата тренировки обязательна"),
+  startTime: z.string().min(1, "Время начала обязательно"),
+  endTime: z.string().min(1, "Время окончания обязательно"),
   status: z.string().default("scheduled"),
   completedAt: z.string().nullable().optional(),
 });
 
 export const insertExerciseProgressSchema = z.object({
-  userId: z.string().uuid(),
-  exerciseId: z.string().uuid(),
-  weight: z.number().nullable().optional(),
-  reps: z.number().nullable().optional(),
-  sets: z.number().nullable().optional(),
-  date: z.string(),
-  sessionId: z.string().uuid().nullable().optional(),
+  userId: uuidSchema,
+  exerciseId: uuidSchema,
+  weight: z.number().positive("Вес должен быть положительным").nullable().optional(),
+  reps: z.number().positive("Количество повторений должно быть положительным").nullable().optional(),
+  sets: z.number().positive("Количество подходов должно быть положительным").nullable().optional(),
+  date: z.string().min(1, "Дата обязательна"),
+  sessionId: uuidSchema.nullable().optional(),
 });
 
 export const insertPupilTrainingPlanSchema = z.object({
-  pupilId: z.string().uuid(),
-  trainerId: z.string().uuid(),
-  name: z.string().min(1),
+  pupilId: uuidSchema,
+  trainerId: uuidSchema,
+  name: z.string().min(1, "Название плана обязательно"),
   exercises: z.any(), // JSON
   isActive: z.boolean().default(true),
 });
 
 export const insertPupilWorkoutHistorySchema = z.object({
-  pupilId: z.string().uuid(),
-  trainerId: z.string().uuid(),
-  workoutDate: z.string(),
-  workoutTime: z.string(),
-  duration: z.number().nullable().optional(),
+  pupilId: uuidSchema,
+  trainerId: uuidSchema,
+  workoutDate: z.string().min(1, "Дата тренировки обязательна"),
+  workoutTime: z.string().min(1, "Время тренировки обязательно"),
+  duration: z.number().positive("Длительность должна быть положительной").nullable().optional(),
   exercises: z.any(), // JSON
   notes: z.string().nullable().optional(),
   pupilFeedback: z.string().nullable().optional(),
@@ -291,15 +296,15 @@ export const insertPupilWorkoutHistorySchema = z.object({
 });
 
 export const insertActiveWorkoutSchema = z.object({
-  trainerId: z.string().uuid(),
-  pupilId: z.string().uuid(),
-  workoutProgramId: z.string().uuid(),
+  trainerId: uuidSchema,
+  pupilId: uuidSchema,
+  workoutProgramId: uuidSchema,
 });
 
 export const insertAppointmentSchema = z.object({
-  trainerId: z.string().uuid(),
-  pupilId: z.string().uuid(),
-  date: z.string(),
-  time: z.string(),
+  trainerId: uuidSchema,
+  pupilId: uuidSchema,
+  date: z.string().min(1, "Дата записи обязательна"),
+  time: z.string().min(1, "Время записи обязательно"),
   status: z.string().default("pending"),
 });

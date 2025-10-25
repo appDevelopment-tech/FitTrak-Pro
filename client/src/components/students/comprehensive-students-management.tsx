@@ -129,7 +129,7 @@ export function ComprehensiveStudentsManagement({ onSelectStudent }: Comprehensi
   // Готовые планы тренировок
   const readyPlans = [
     {
-      id: 1,
+      id: 'plan-1',
       name: "Все тело",
       description: "Комплексная тренировка всех групп мышц за одну сессию",
       difficulty: "начальный",
@@ -137,7 +137,7 @@ export function ComprehensiveStudentsManagement({ onSelectStudent }: Comprehensi
       exercises: ["Приседания", "Отжимания", "Подтягивания", "Планка"]
     },
     {
-      id: 2,
+      id: 'plan-2',
       name: "Тяни-толкай",
       description: "Разделение на тянущие и толкающие движения",
       difficulty: "базовый",
@@ -145,7 +145,7 @@ export function ComprehensiveStudentsManagement({ onSelectStudent }: Comprehensi
       exercises: ["Становая тяга", "Жим лежа", "Тяга штанги", "Жим стоя"]
     },
     {
-      id: 3,
+      id: 'plan-3',
       name: "Верх-низ",
       description: "Разделение тренировок на верх и низ тела",
       difficulty: "средний",
@@ -153,7 +153,7 @@ export function ComprehensiveStudentsManagement({ onSelectStudent }: Comprehensi
       exercises: ["Приседания", "Жим лежа", "Становая тяга", "Подтягивания"]
     },
     {
-      id: 4,
+      id: 'plan-4',
       name: "Грудь-спина-ноги",
       description: "Классический трехдневный сплит по группам мышц",
       difficulty: "средний",
@@ -161,7 +161,7 @@ export function ComprehensiveStudentsManagement({ onSelectStudent }: Comprehensi
       exercises: ["Жим лежа", "Тяга штанги", "Приседания", "Жим стоя", "Подъемы на бицепс"]
     },
     {
-      id: 5,
+      id: 'plan-5',
       name: "Силовой марафон",
       description: "Интенсивная программа для опытных спортсменов",
       difficulty: "высокий",
@@ -169,7 +169,7 @@ export function ComprehensiveStudentsManagement({ onSelectStudent }: Comprehensi
       exercises: ["Становая тяга", "Приседания со штангой", "Жим лежа", "Подтягивания с весом", "Жим стоя"]
     },
     {
-      id: 6,
+      id: 'plan-6',
       name: "Грудь-трицепс / Спина-бицепс / Ноги-плечи-живот",
       description: "Классический трехдневный сплит по группам мышц",
       difficulty: "высокий",

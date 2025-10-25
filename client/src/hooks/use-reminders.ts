@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { appointmentsDb } from '@/lib/database';
+import { useAuth } from '@/lib/auth';
 import { useNotifications } from './use-notifications';
 import type { Appointment, Pupil } from '@shared/schema';
 
@@ -26,7 +27,8 @@ export function useReminders() {
   });
 
   const { addNotification } = useNotifications();
-  const trainerId = '550e8400-e29b-41d4-a716-446655440000'; // Main trainer UUID
+  const { user: authUser } = useAuth();
+  const trainerId = authUser?.id || '';
 
   // Получаем все записи на тренировки
   const { data: appointments = [] } = useQuery<Appointment[]>({

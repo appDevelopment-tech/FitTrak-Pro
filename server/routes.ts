@@ -2,6 +2,41 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertWorkoutProgramSchema, insertWorkoutSessionSchema, insertExerciseProgressSchema, insertExerciseSchema, insertPupilTrainingPlanSchema, insertPupilSchema, insertActiveWorkoutSchema, insertAppointmentSchema } from "@shared/schema";
+import { 
+  validateBody, 
+  validateParams, 
+  validateQuery,
+  uuidParamSchema,
+  trainerIdParamSchema,
+  pupilIdParamSchema,
+  userIdParamSchema,
+  exerciseIdParamSchema,
+  sessionIdParamSchema,
+  appointmentIdParamSchema,
+  dateQuerySchema,
+  muscleGroupQuerySchema,
+  loginSchema,
+  forgotPasswordSchema,
+  updateUserSchema,
+  updatePupilSchema,
+  updateExerciseSchema,
+  updateWorkoutProgramSchema,
+  updateAppointmentSchema,
+  updateExerciseImageSchema,
+  updateWorkoutSessionSchema,
+  updateTrainingPlanSchema,
+  type ValidatedRequest
+} from "./validation";
+import { 
+  logger, 
+  AppError, 
+  AppErrorType, 
+  ErrorHandler, 
+  requestLogger, 
+  errorHandler,
+  createRequestContext,
+  LogLevel
+} from "./logger";
 
 function translateExerciseToEnglish(russianName: string): string {
   const translations: Record<string, string> = {
@@ -44,23 +79,28 @@ function translateExerciseToEnglish(russianName: string): string {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Добавляем middleware для логирования запросов
+  app.use(requestLogger);
+  
+  // Добавляем middleware для обработки ошибок
+  app.use(errorHandler);
+
   // Authentication routes
-  app.post("/api/auth/login", async (req, res) => {
+  app.post("/api/auth/login", validateBody(loginSchema), async (req: ValidatedRequest, res) => {
+    const context = createRequestContext(req);
+    
     try {
-      const { email, emailOrPhone, password, userType } = req.body;
+      const { email, password, userType } = req.validatedData!;
       
-      // Поддерживаем оба варианта для совместимости
-      const emailOrPhoneValue = email || emailOrPhone;
-      
-      if (!emailOrPhoneValue || !password) {
-        return res.status(400).json({ message: "Email/phone and password are required" });
-      }
+      logger.info('Login attempt', context, { email, userType });
       
       // Определяем тип пользователя и пытаемся авторизовать
       if (userType === 'trainer' || !userType) {
         // Сначала пробуем как тренера
-        const trainer = await storage.authenticateTrainer(emailOrPhoneValue, password);
+        const trainer = await storage.authenticateTrainer(email, password);
         if (trainer) {
+          logger.info('Trainer login successful', context, { userId: trainer.id });
+          
           // Don't send password in response
           const { password: _, ...trainerWithoutPassword } = trainer;
           return res.json({ 
@@ -72,8 +112,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (userType === 'pupil' || !userType) {
         // Затем пробуем как ученика
-        const pupil = await storage.authenticatePupil(emailOrPhoneValue, password);
+        const pupil = await storage.authenticatePupil(email, password);
         if (pupil) {
+          logger.info('Pupil login successful', context, { userId: pupil.id });
+          
           // Don't send password in response
           const { password: _, ...pupilWithoutPassword } = pupil;
           return res.json({ 
@@ -83,26 +125,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      return res.status(401).json({ message: "Invalid credentials" });
+      logger.warn('Login failed - invalid credentials', context, { email });
+      throw ErrorHandler.handleAuthenticationError("Неверные учетные данные", req);
+      
     } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
+      if (error instanceof AppError) {
+        throw error;
+      }
+      
+      logger.error('Login error', error as Error, context);
+      throw ErrorHandler.handleUnexpectedError(error as Error, req);
     }
   });
 
-  app.post("/api/auth/register", async (req, res) => {
+  app.post("/api/auth/register", validateBody(insertPupilSchema), async (req: ValidatedRequest, res) => {
+    const context = createRequestContext(req);
+    
     try {
-      const pupilData = insertPupilSchema.parse(req.body);
+      const pupilData = req.validatedData!;
+      
+      logger.info('Registration attempt', context, { email: pupilData.email });
       
       // Check if email already exists
       const existingPupilByEmail = await storage.getPupilByEmail(pupilData.email);
       if (existingPupilByEmail) {
-        return res.status(400).json({ message: "Email already registered" });
+        logger.warn('Registration failed - email already exists', context, { email: pupilData.email });
+        throw new AppError(
+          "Email уже зарегистрирован",
+          AppErrorType.VALIDATION_ERROR,
+          400,
+          true,
+          { field: 'email', message: 'Email уже зарегистрирован' }
+        );
       }
       
       // Check if phone already exists
       const existingPupilByPhone = await storage.getPupilByPhone(pupilData.phone);
       if (existingPupilByPhone) {
-        return res.status(400).json({ message: "Phone number already registered" });
+        logger.warn('Registration failed - phone already exists', context, { phone: pupilData.phone });
+        throw new AppError(
+          "Номер телефона уже зарегистрирован",
+          AppErrorType.VALIDATION_ERROR,
+          400,
+          true,
+          { field: 'phone', message: 'Номер телефона уже зарегистрирован' }
+        );
       }
       
       // Set default trainer_id if not provided
@@ -115,24 +182,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         educationConsentAcceptedDate: pupilData.educationConsentAccepted ? new Date().toISOString().split('T')[0] : null,
       };
       
-      const newPupil = await storage.registerPupil(pupilDataWithDefaults as any);
+      const newPupil = await storage.registerPupil(pupilDataWithDefaults);
+      
+      logger.info('Registration successful', context, { userId: newPupil.id, email: newPupil.email });
       
       // Don't send password in response
       const { password: _, ...pupilWithoutPassword } = newPupil;
       res.status(201).json({ pupil: pupilWithoutPassword });
+      
     } catch (error) {
-      console.error('Registration error:', error);
-      res.status(400).json({ message: "Invalid data" });
+      if (error instanceof AppError) {
+        throw error;
+      }
+      
+      logger.error('Registration error', error as Error, context);
+      throw ErrorHandler.handleUnexpectedError(error as Error, req);
     }
   });
 
-  app.post("/api/auth/forgot-password", async (req, res) => {
+  app.post("/api/auth/forgot-password", validateBody(forgotPasswordSchema), async (req: ValidatedRequest, res) => {
     try {
-      const { emailOrPhone } = req.body;
-      
-      if (!emailOrPhone) {
-        return res.status(400).json({ message: "Email or phone is required" });
-      }
+      const { emailOrPhone } = req.validatedData!;
       
       // Check if pupil exists
       const pupil = await storage.getPupilByEmail(emailOrPhone) || 
@@ -140,50 +210,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!pupil) {
         // Don't reveal if email/phone exists or not for security
-        return res.json({ message: "If the email/phone exists, instructions have been sent" });
+        return res.json({ message: "Если email/телефон существует, инструкции были отправлены" });
       }
       
       // Here you would send password reset instructions
       // For now, just return success
-      res.json({ message: "Password reset instructions sent" });
+      res.json({ message: "Инструкции по сбросу пароля отправлены" });
     } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: "Внутренняя ошибка сервера" });
     }
   });
 
   // User routes
-  app.get("/api/user/:id", async (req, res) => {
+  app.get("/api/user/:id", validateParams(uuidParamSchema), async (req: ValidatedRequest, res) => {
     try {
-      const userId = req.params.id;
+      const { id: userId } = req.validatedData!;
       const user = await storage.getUser(userId);
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(404).json({ message: "Пользователь не найден" });
       }
       // Don't send password
       const { password, ...userWithoutPassword } = user;
       res.json(userWithoutPassword);
     } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: "Внутренняя ошибка сервера" });
     }
   });
 
   // Update user route
-  app.put("/api/user/:id", async (req, res) => {
+  app.put("/api/user/:id", validateParams(uuidParamSchema), validateBody(updateUserSchema), async (req: ValidatedRequest, res) => {
     try {
-      const userId = req.params.id;
+      const { id: userId } = req.validatedData!;
       const updates = req.body;
       
       const updatedUser = await storage.updateUser(userId, updates);
       
       if (!updatedUser) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(404).json({ message: "Пользователь не найден" });
       }
       
       // Don't send password
       const { password, ...userWithoutPassword } = updatedUser;
       res.json(userWithoutPassword);
     } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: "Внутренняя ошибка сервера" });
     }
   });
 
@@ -193,50 +263,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const programs = await storage.getWorkoutPrograms();
       res.json(programs);
     } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: "Внутренняя ошибка сервера" });
     }
   });
 
-  app.post("/api/workout-programs", async (req, res) => {
+  app.post("/api/workout-programs", validateBody(insertWorkoutProgramSchema), async (req: ValidatedRequest, res) => {
     try {
-      const validatedData = insertWorkoutProgramSchema.parse(req.body);
-      const program = await storage.createWorkoutProgram(validatedData as any);
+      const validatedData = req.validatedData!;
+      const program = await storage.createWorkoutProgram(validatedData);
       res.status(201).json(program);
     } catch (error) {
-      res.status(400).json({ message: "Invalid data" });
+      res.status(400).json({ message: "Некорректные данные программы" });
     }
   });
 
-  app.put("/api/workout-programs/:id", async (req, res) => {
+  app.put("/api/workout-programs/:id", validateParams(uuidParamSchema), validateBody(updateWorkoutProgramSchema), async (req: ValidatedRequest, res) => {
     try {
-      const id = req.params.id;
-      const validatedData = insertWorkoutProgramSchema.partial().parse(req.body);
+      const { id } = req.validatedData!;
+      const validatedData = req.body;
       const program = await storage.updateWorkoutProgram(id, validatedData);
       if (!program) {
-        return res.status(404).json({ message: "Workout program not found" });
+        return res.status(404).json({ message: "Программа тренировки не найдена" });
       }
       res.json(program);
     } catch (error) {
-      res.status(400).json({ message: "Invalid data" });
+      res.status(400).json({ message: "Некорректные данные программы" });
     }
   });
 
   // Workout session routes
-  app.get("/api/workout-sessions/:userId", async (req, res) => {
+  app.get("/api/workout-sessions/:userId", validateParams(userIdParamSchema), async (req: ValidatedRequest, res) => {
     try {
-      const userId = req.params.userId;
+      const { userId } = req.validatedData!;
       const sessions = await storage.getWorkoutSessions(userId);
       res.json(sessions);
     } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: "Внутренняя ошибка сервера" });
     }
   });
 
-  app.get("/api/workout-sessions/:userId/:date", async (req, res) => {
+  app.get("/api/workout-sessions/:userId/:date", validateParams(userIdParamSchema), validateQuery(dateQuerySchema), async (req: ValidatedRequest, res) => {
     try {
-      const userId = req.params.userId;
-      const date = req.params.date;
-      const sessions = await storage.getWorkoutSessionsByDate(userId, date);
+      const { userId } = req.validatedData!;
+      const { date } = req.query;
+      const sessions = await storage.getWorkoutSessionsByDate(userId, date as string);
       
       // Enrich sessions with program data
       const enrichedSessions = await Promise.all(
@@ -248,30 +318,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(enrichedSessions);
     } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: "Внутренняя ошибка сервера" });
     }
   });
 
-  app.post("/api/workout-sessions", async (req, res) => {
+  app.post("/api/workout-sessions", validateBody(insertWorkoutSessionSchema), async (req: ValidatedRequest, res) => {
     try {
-      const validatedData = insertWorkoutSessionSchema.parse(req.body);
-      const session = await storage.createWorkoutSession(validatedData as any);
+      const validatedData = req.validatedData!;
+      const session = await storage.createWorkoutSession(validatedData);
       res.status(201).json(session);
     } catch (error) {
-      res.status(400).json({ message: "Invalid data" });
+      res.status(400).json({ message: "Некорректные данные сессии" });
     }
   });
 
-  app.patch("/api/workout-sessions/:id", async (req, res) => {
+  app.patch("/api/workout-sessions/:id", validateParams(sessionIdParamSchema), validateBody(updateWorkoutSessionSchema), async (req: ValidatedRequest, res) => {
     try {
-      const sessionId = req.params.id;
+      const { id: sessionId } = req.validatedData!;
       const session = await storage.updateWorkoutSession(sessionId, req.body);
       if (!session) {
-        return res.status(404).json({ message: "Session not found" });
+        return res.status(404).json({ message: "Сессия не найдена" });
       }
       res.json(session);
     } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: "Внутренняя ошибка сервера" });
     }
   });
 
@@ -289,7 +359,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/exercise-progress", async (req, res) => {
     try {
       const validatedData = insertExerciseProgressSchema.parse(req.body);
-      const progress = await storage.createExerciseProgress(validatedData as any);
+      const progress = await storage.createExerciseProgress(validatedData);
       res.status(201).json(progress);
     } catch (error) {
       res.status(400).json({ message: "Invalid data" });
@@ -334,7 +404,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/exercises", async (req, res) => {
     try {
       const validatedData = insertExerciseSchema.parse(req.body);
-      const exercise = await storage.createExercise(validatedData as any);
+      const exercise = await storage.createExercise(validatedData);
       res.status(201).json(exercise);
     } catch (error) {
       res.status(400).json({ message: "Invalid exercise data" });
@@ -483,7 +553,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         joinDate: new Date().toISOString().split('T')[0]
       });
 
-      const pupil = await storage.createPupil(pupilData as any);
+      const pupil = await storage.createPupil(pupilData);
 
       res.json(pupil);
     } catch (error) {
@@ -561,7 +631,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         pupilId
       });
 
-      const plan = await storage.createPupilTrainingPlan(planData as any);
+      const plan = await storage.createPupilTrainingPlan(planData);
       res.json(plan);
     } catch (error) {
       res.status(400).json({ 
@@ -623,7 +693,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/active-workouts", async (req, res) => {
     try {
       const workoutData = insertActiveWorkoutSchema.parse(req.body);
-      const activeWorkout = await storage.createActiveWorkout(workoutData as any);
+      const activeWorkout = await storage.createActiveWorkout(workoutData);
       res.json(activeWorkout);
     } catch (error) {
       res.status(400).json({ message: "Failed to create active workout" });
@@ -671,7 +741,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/appointments", async (req, res) => {
     try {
       const appointmentData = insertAppointmentSchema.parse(req.body);
-      const appointment = await storage.createAppointment(appointmentData as any);
+      const appointment = await storage.createAppointment(appointmentData);
       res.status(201).json(appointment);
     } catch (error) {
       res.status(400).json({ message: "Failed to create appointment" });
@@ -702,6 +772,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true });
     } catch (error) {
       res.status(400).json({ message: "Failed to delete appointment" });
+    }
+  });
+
+  // Logs endpoint (for monitoring)
+  app.get("/api/logs", async (req, res) => {
+    const context = createRequestContext(req);
+    
+    try {
+      const { level, limit = 100 } = req.query;
+      
+      logger.info('Logs requested', context, { level, limit });
+      
+      const logs = logger.getLogs(level as LogLevel, parseInt(limit as string));
+      
+      res.json({
+        logs,
+        total: logs.length,
+        level: level || 'all',
+        limit: parseInt(limit as string)
+      });
+      
+    } catch (error) {
+      logger.error('Error fetching logs', error as Error, context);
+      throw ErrorHandler.handleUnexpectedError(error as Error, req);
+    }
+  });
+
+  // Health check endpoint
+  app.get("/api/health", async (req, res) => {
+    const context = createRequestContext(req);
+    
+    try {
+      logger.debug('Health check requested', context);
+      
+      // Здесь можно добавить проверки состояния системы
+      // например, подключение к базе данных, внешним сервисам и т.д.
+      
+      res.json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        version: process.env.npm_package_version || '1.0.0',
+        environment: process.env.NODE_ENV || 'development'
+      });
+      
+    } catch (error) {
+      logger.error('Health check failed', error as Error, context);
+      res.status(503).json({
+        status: 'unhealthy',
+        timestamp: new Date().toISOString(),
+        error: 'Service unavailable'
+      });
     }
   });
 

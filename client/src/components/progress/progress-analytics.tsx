@@ -1,4 +1,8 @@
 import { useState, useMemo } from 'react';
+import { useQuery } from "@tanstack/react-query";
+import { studentsDb } from "@/lib/database";
+import { Pupil } from "@shared/schema";
+import { useAuth } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,9 +20,8 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
-import { useQuery } from '@tanstack/react-query';
-import { studentsDb, appointmentsDb } from '@/lib/database';
-import type { Pupil, Appointment } from '@shared/schema';
+import { appointmentsDb } from '@/lib/database';
+import type { Appointment } from '@shared/schema';
 
 interface ProgressData {
   date: string;
@@ -43,7 +46,8 @@ export function ProgressAnalytics() {
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
   const [selectedPupil, setSelectedPupil] = useState<string | null>(null);
 
-  const trainerId = "550e8400-e29b-41d4-a716-446655440000"; // Main trainer UUID
+  const { user: authUser } = useAuth();
+  const trainerId = authUser?.id || '';
 
   // Получаем данные учеников
   const { data: pupils = [] } = useQuery<Pupil[]>({

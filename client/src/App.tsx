@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ActiveWorkoutProvider } from "@/contexts/ActiveWorkoutContext";
+import { ErrorProvider, ErrorBoundary, GlobalErrorDisplay } from "@/components/providers/error-provider";
 import { useAuth } from "@/lib/auth";
 import { RoleGuard } from "@/lib/role-guard";
 import Dashboard from "@/pages/dashboard";
@@ -88,14 +89,19 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ActiveWorkoutProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </ActiveWorkoutProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ErrorProvider>
+          <ActiveWorkoutProvider>
+            <TooltipProvider>
+              <Toaster />
+              <GlobalErrorDisplay />
+              <Router />
+            </TooltipProvider>
+          </ActiveWorkoutProvider>
+        </ErrorProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

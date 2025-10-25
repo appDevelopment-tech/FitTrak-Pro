@@ -123,7 +123,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(user: InsertUser): Promise<User> {
-    return await db.user.create({ data: user as any });
+    const prismaData = user as any;
+    return await db.user.create({ data: prismaData });
   }
 
   async updateUser(id: string, updates: Partial<InsertUser>): Promise<User | undefined> {

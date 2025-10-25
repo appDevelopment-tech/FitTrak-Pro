@@ -32,7 +32,8 @@ export function NewSchedule() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
 
-  const trainerId = "550e8400-e29b-41d4-a716-446655440000"; // TODO: Get from auth context
+  const { user: authUser } = useAuth();
+  const trainerId = authUser?.id || '';
 
   // Load students
   const { data: pupils = [] } = useQuery<Pupil[]>({

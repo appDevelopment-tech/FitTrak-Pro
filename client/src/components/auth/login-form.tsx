@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,14 +8,9 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/lib/auth';
 import { Eye, EyeOff, User } from 'lucide-react';
-
-// Схема валидации для входа
-const loginSchema = z.object({
-  email: z.string().email('Введите корректный email адрес'),
-  password: z.string().min(1, 'Пароль обязателен'),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
+import { clientValidationSchemas, type LoginFormData, useFormValidation } from '@/lib/validation';
+import { FormErrors, FieldError } from '@/components/ui/validation-errors';
+import { useErrorContext } from '@/components/providers/error-provider';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -29,17 +23,20 @@ export function LoginForm({ onSuccess, onForgotPassword, userType }: LoginFormPr
   const { signIn } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { validationErrors, setErrors, clearErrors } = useFormValidation();
+  const { handleApiError } = useErrorContext();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(clientValidationSchemas.login),
   });
 
   const onSubmit = async (data: LoginFormData) => {
     setIsSubmitting(true);
+    clearErrors();
     
     try {
       await signIn(data.email, data.password);
@@ -50,11 +47,13 @@ export function LoginForm({ onSuccess, onForgotPassword, userType }: LoginFormPr
       
       onSuccess?.();
     } catch (error: any) {
-      toast({
-        title: 'Ошибка входа',
-        description: error.message || 'Неверный email или пароль',
-        variant: 'destructive',
-      });
+      // Используем глобальную обработку ошибок
+      const clientError = handleApiError(error);
+      
+      // Если это ошибка валидации, показываем в форме
+      if (clientError.type === 'VALIDATION_ERROR' && clientError.details?.errors) {
+        setErrors(clientError.details.errors);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -70,6 +69,9 @@ export function LoginForm({ onSuccess, onForgotPassword, userType }: LoginFormPr
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* Общие ошибки формы */}
+          <FormErrors errors={validationErrors} />
+          
           <div className="space-y-2">
             <Label htmlFor="email" className="flex items-center gap-2">
               <User className="w-4 h-4" />
@@ -81,6 +83,9 @@ export function LoginForm({ onSuccess, onForgotPassword, userType }: LoginFormPr
               placeholder="example@email.com"
               type="email"
             />
+            {/* Ошибки валидации поля */}
+            <FieldError errors={validationErrors} fieldName="email" />
+            {/* Ошибки React Hook Form */}
             {errors.email && (
               <p className="text-sm text-red-500">{errors.email.message}</p>
             )}
@@ -109,6 +114,9 @@ export function LoginForm({ onSuccess, onForgotPassword, userType }: LoginFormPr
                 )}
               </Button>
             </div>
+            {/* Ошибки валидации поля */}
+            <FieldError errors={validationErrors} fieldName="password" />
+            {/* Ошибки React Hook Form */}
             {errors.password && (
               <p className="text-sm text-red-500">{errors.password.message}</p>
             )}

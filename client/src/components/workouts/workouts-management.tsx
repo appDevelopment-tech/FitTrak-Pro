@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -58,7 +59,8 @@ export function WorkoutsManagement({ activeTab }: WorkoutsManagementProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const trainerId = '550e8400-e29b-41d4-a716-446655440000'; // Main trainer UUID
+  const { user: authUser } = useAuth();
+  const trainerId = authUser?.id || '';
 
   // Загрузка данных пользователя и учеников
   const { data: user } = useQuery<UserType>({

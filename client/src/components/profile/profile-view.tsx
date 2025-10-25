@@ -18,6 +18,20 @@ import type { User as UserType, Exercise, Pupil } from "@shared/schema";
 import { getExercisePhoto } from "@/components/ui/exercise-photos";
 import { ExerciseDetail } from "@/components/exercise/exercise-detail";
 import { StudentsManagement } from "@/components/students/students-management";
+
+// Интерфейс для пользователя в профиле
+interface UserProfile {
+  id: string;
+  firstName: string;
+  lastName: string;
+  middleName?: string;
+  birthDate?: string;
+  email: string;
+  phone?: string;
+  photo?: string;
+  isTrainer?: boolean;
+  role?: string;
+}
 import {
   LazyWorkoutsManagement,
   LazyExerciseManagement,
@@ -87,7 +101,7 @@ export function ProfileView({
     console.log('Trainer ID:', trainerId);
   }, [authUser, trainerId]);
 
-  const { data: user, error: userError, isLoading: userLoading } = useQuery<UserType>({
+  const { data: user, error: userError, isLoading: userLoading } = useQuery<any>({
     queryKey: ['user', selectedStudent ? selectedStudent.email : authUser?.email, isStudent],
     queryFn: async () => {
       try {
@@ -247,7 +261,7 @@ export function ProfileView({
     },
     enabled: !!authUser?.email || !!selectedStudent, // Only run query if we have a user email or selected student
     retry: false, // Не повторять запрос при ошибке
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error loading user profile:', error);
     }
   });
