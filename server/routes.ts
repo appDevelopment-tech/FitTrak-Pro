@@ -578,16 +578,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/pupils/:id", async (req, res) => {
+  app.delete("/api/pupils/:id", async (req: ValidatedRequest, res) => {
+    const context = createRequestContext(req);
+    
     try {
-      const id = req.params.id;
+      const { id } = req.params;
+      logger.info('Deleting pupil attempt', context, { pupilId: id });
+      
       const success = await storage.deletePupil(id);
       if (!success) {
+        logger.warn('Pupil not found or delete failed', context, { pupilId: id });
         return res.status(404).json({ message: "Pupil not found" });
       }
+      
+      logger.info('Pupil deleted successfully', context, { pupilId: id });
       res.json({ success: true });
     } catch (error) {
-      res.status(400).json({ message: "Failed to delete pupil" });
+      logger.error('Error deleting pupil', error as Error, context);
+      throw ErrorHandler.handleUnexpectedError(error as Error, req);
     }
   });
 

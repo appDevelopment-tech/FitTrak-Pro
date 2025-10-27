@@ -162,10 +162,13 @@ export class DatabaseStorage implements IStorage {
 
   async deletePupil(id: string): Promise<boolean> {
     try {
+      console.log('Deleting pupil with ID:', id);
       await db.pupil.delete({ where: { id } });
+      console.log('Pupil deleted successfully');
       return true;
-    } catch {
-      return false;
+    } catch (error) {
+      console.error('Error deleting pupil:', error);
+      throw error; // Пробрасываем ошибку для логирования
     }
   }
 
