@@ -15,7 +15,16 @@ console.log('Supabase env check:', {
 let supabase: any = null;
 
 if (supabaseUrl && supabaseAnonKey) {
-  supabase = createClient(supabaseUrl, supabaseAnonKey);
+  supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    db: {
+      schema: 'public',
+    },
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true
+    }
+  });
 } else {
   console.warn('Supabase не настроен. Используется тестовый режим.');
 }

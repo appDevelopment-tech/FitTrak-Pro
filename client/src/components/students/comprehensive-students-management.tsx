@@ -563,9 +563,11 @@ export function ComprehensiveStudentsManagement({ onSelectStudent }: Comprehensi
   };
 
   const onDeletePupil = (pupilId: string) => {
-    if (confirm('Вы уверены, что хотите удалить этого ученика? Это действие нельзя отменить.')) {
-      deletePupilMutation.mutate(pupilId);
-    }
+    alert('Функция удаления временно отключена. Пожалуйста, используйте Supabase Dashboard для удаления учеников.');
+    return;
+    // if (confirm('Вы уверены, что хотите удалить этого ученика? Это действие нельзя отменить.')) {
+    //   deletePupilMutation.mutate(pupilId);
+    // }
   };
 
   // Effect to update trainerId in the form when it changes

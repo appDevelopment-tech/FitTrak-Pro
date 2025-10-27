@@ -162,13 +162,29 @@ export class DatabaseStorage implements IStorage {
 
   async deletePupil(id: string): Promise<boolean> {
     try {
-      console.log('Deleting pupil with ID:', id);
-      await db.pupil.delete({ where: { id } });
-      console.log('Pupil deleted successfully');
+      console.log('=== DELETE PUPIL DEBUG ===');
+      console.log('ID to delete:', id);
+      
+      // Проверяем, есть ли ученик
+      const exists = await db.pupil.findUnique({ where: { id } });
+      console.log('Pupil exists:', !!exists);
+      
+      if (!exists) {
+        console.log('Pupil not found in database');
+        return false;
+      }
+      
+      console.log('Attempting delete...');
+      const result = await db.pupil.delete({ where: { id } });
+      console.log('Delete successful');
+      
       return true;
     } catch (error) {
-      console.error('Error deleting pupil:', error);
-      throw error; // Пробрасываем ошибку для логирования
+      console.error('=== DELETE ERROR ===');
+      console.error('Error type:', (error as Error).constructor.name);
+      console.error('Error message:', (error as Error).message);
+      console.error('Full error:', error);
+      return false;
     }
   }
 
