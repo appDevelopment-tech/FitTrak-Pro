@@ -133,6 +133,11 @@ export function TrainerSchedule() {
     queryFn: () => appointmentsDb.getByTrainerId(trainerId),
   });
 
+  // Логирование pending записей
+  const pendingCount = appointments.filter(a => a.status === 'pending').length;
+  console.log(`🔍 Всего записей: ${appointments.length}, Pending: ${pendingCount}`);
+  console.log(`📝 Статусы всех записей:`, appointments.map(a => ({ id: a.id, date: a.date, time: a.time, status: a.status })));
+
   // Transform appointments to TrainerSession format
   const sessions: TrainerSession[] = appointments.map(apt => {
     const pupil = pupils.find(p => p.id === apt.pupilId);
@@ -480,8 +485,47 @@ export function TrainerSchedule() {
     mutationFn: async (data: { id: string; status: string }) => {
       return await appointmentsDb.update(data.id, { status: data.status });
     },
-    onSuccess: () => {
+    onSuccess: async (updatedAppointment, variables) => {
       queryClient.invalidateQueries({ queryKey: ['appointments', trainerId] });
+      
+      // Отправляем уведомление при подтверждении
+      if (variables.status === 'confirmed') {
+        const appointment = appointments.find(a => a.id === variables.id);
+        if (appointment && pupils.length > 0) {
+          const pupil = pupils.find(p => p.id === appointment.pupilId);
+          if (pupil) {
+            try {
+              await fetch('/api/notifications/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  type: 'confirmed',
+                  appointment: updatedAppointment,
+                  student: {
+                    firstName: pupil.firstName,
+                    lastName: pupil.lastName,
+                    email: pupil.email,
+                    phone: pupil.phone
+                  }
+                })
+              });
+              console.log('✅ Уведомление ученику отправлено');
+            } catch (error) {
+              console.error('❌ Ошибка отправки уведомления:', error);
+            }
+          }
+        }
+        
+        toast({ 
+          title: "Заявка подтверждена", 
+          description: "Ученик получит уведомление о подтверждении записи" 
+        });
+      } else if (variables.status === 'pending') {
+        toast({ 
+          title: "Статус изменен", 
+          description: "Заявка возвращена в статус ожидания" 
+        });
+      }
     },
     onError: (error: any) => {
       toast({ title: "Ошибка", description: error.message || "Не удалось обновить статус", variant: "destructive" });
@@ -1011,6 +1055,86 @@ export function TrainerSchedule() {
             <>
 
 
+              {/* Блок с заявками на подтверждение */}
+              {(() => {
+                const pendingAppointments = appointments.filter(a => a.status === 'pending');
+                console.log('📋 Проверка pending записей:', pendingAppointments.length, pendingAppointments);
+                return pendingAppointments.length > 0;
+              })() && (
+                <Card className="mb-4 border-yellow-400 border-2">
+                  <CardHeader className="bg-yellow-50 border-b border-yellow-200">
+                    <CardTitle className="text-lg text-yellow-800 flex items-center gap-2">
+                      <Clock className="h-5 w-5 text-yellow-600" />
+                      Заявки на подтверждение ({appointments.filter(a => a.status === 'pending').length})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4">
+                    <div className="space-y-3">
+                      {appointments
+                        .filter(a => a.status === 'pending')
+                        .sort((a, b) => {
+                          const dateTimeA = new Date(`${a.date} ${a.time}`);
+                          const dateTimeB = new Date(`${b.date} ${b.time}`);
+                          return dateTimeA.getTime() - dateTimeB.getTime();
+                        })
+                        .map(apt => {
+                          const pupil = pupils.find(p => p.id === apt.pupilId);
+                          const studentName = pupil
+                            ? `${pupil.lastName} ${pupil.firstName}${pupil.middleName ? ' ' + pupil.middleName : ''}`
+                            : 'Неизвестный ученик';
+                          
+                          return (
+                            <div 
+                              key={apt.id} 
+                              className="flex items-center justify-between p-3 bg-yellow-50 border border-yellow-200 rounded-lg"
+                            >
+                              <div className="flex items-center gap-3 flex-1">
+                                <Clock className="h-4 w-4 text-yellow-600" />
+                                <span className="font-medium text-gray-800">{studentName}</span>
+                                <span className="text-sm text-gray-600">
+                                  {new Date(apt.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })} в {apt.time}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Button 
+                                  size="sm"
+                                  variant="default"
+                                  onClick={() => {
+                                    console.log("✅ Подтверждаем заявку:", apt.id);
+                                    updateAppointmentMutation.mutate({ id: apt.id, status: 'confirmed' });
+                                  }}
+                                  className="bg-green-500 hover:bg-green-600 text-white"
+                                  disabled={updateAppointmentMutation.isPending}
+                                >
+                                  {updateAppointmentMutation.isPending ? "..." : "Подтвердить"}
+                                </Button>
+                                <Button 
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={async () => {
+                                    console.log("❌ Отклоняем заявку:", apt.id);
+                                    try {
+                                      await appointmentsDb.delete(apt.id);
+                                      queryClient.invalidateQueries({ queryKey: ['appointments', trainerId] });
+                                      toast({ title: "Заявка отклонена", variant: "default" });
+                                    } catch (error: any) {
+                                      console.error("Ошибка при отклонении:", error);
+                                      toast({ title: "Ошибка", description: error.message || "Не удалось отклонить заявку", variant: "destructive" });
+                                    }
+                                  }}
+                                  className="text-red-500 border-red-300 hover:bg-red-50"
+                                >
+                                  Отклонить
+                                </Button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               {viewMode === 'day' ? (
                 <Card>
                   <CardHeader className="border-b border-gray-100">
@@ -1128,6 +1252,19 @@ export function TrainerSchedule() {
                                         title={`Статус: ${session.status === 'confirmed' ? 'Подтверждено' : 'Не подтверждено'}. Нажмите для изменения`}
                                       ></button>
                                       <span className="text-sm font-medium text-gray-800">{session.studentName}</span>
+                                      {session.status === 'pending' && (
+                                        <Button 
+                                          size="sm" 
+                                          variant="default"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            updateAppointmentMutation.mutate({ id: session.id, status: 'confirmed' });
+                                          }}
+                                          className="ml-2 h-6 px-2 text-xs bg-green-500 hover:bg-green-600 text-white"
+                                        >
+                                          Подтвердить
+                                        </Button>
+                                      )}
                                       <Button 
                                         size="sm" 
                                         variant="ghost" 

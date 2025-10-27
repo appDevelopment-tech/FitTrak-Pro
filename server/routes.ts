@@ -37,6 +37,7 @@ import {
   createRequestContext,
   LogLevel
 } from "./logger";
+import { notifyTrainerNewBooking, notifyStudentBookingConfirmed, notifyCancellation } from "./notifications";
 
 function translateExerciseToEnglish(russianName: string): string {
   const translations: Record<string, string> = {
@@ -772,6 +773,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true });
     } catch (error) {
       res.status(400).json({ message: "Failed to delete appointment" });
+    }
+  });
+
+  // Send notification endpoint
+  app.post("/api/notifications/send", async (req, res) => {
+    try {
+      const { type, appointment, student, trainerEmail } = req.body;
+      console.log('📧 ===== ПОПЫТКА ОТПРАВКИ УВЕДОМЛЕНИЯ =====');
+      console.log('📧 Type:', type);
+      console.log('📧 Appointment:', appointment);
+      console.log('📧 Student:', student);
+      console.log('📧 Trainer Email:', trainerEmail);
+
+      if (type === 'new-booking') {
+        console.log('📧 Вызываем notifyTrainerNewBooking');
+        await notifyTrainerNewBooking(appointment, student, trainerEmail || 'petrusenkokv@yandex.ru');
+        console.log('✅ notifyTrainerNewBooking выполнен');
+      } else if (type === 'confirmed') {
+        console.log('📧 Вызываем notifyStudentBookingConfirmed');
+        await notifyStudentBookingConfirmed(appointment, student);
+        console.log('✅ notifyStudentBookingConfirmed выполнен');
+      }
+
+      console.log('📧 ===== УВЕДОМЛЕНИЕ ОТПРАВЛЕНО УСПЕШНО =====');
+      res.json({ success: true, message: 'Notification sent' });
+    } catch (error) {
+      console.error('❌ ===== ОШИБКА ОТПРАВКИ УВЕДОМЛЕНИЯ =====');
+      console.error('❌ Error:', error);
+      console.error('❌ Stack:', (error as Error).stack);
+      res.status(500).json({ message: 'Failed to send notification', error: (error as Error).message });
     }
   });
 

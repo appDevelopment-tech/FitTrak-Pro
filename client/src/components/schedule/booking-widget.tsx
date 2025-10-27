@@ -26,13 +26,22 @@ export function BookingWidget() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showCreatePupil, setShowCreatePupil] = useState(false);
 
-  const { user, signIn, signUp } = useAuth();
+  const { user, signIn, signUp, userProfile } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
 
-  // Получаем ID тренера из auth context (с fallback на UUID по умолчанию)
-  const trainerId = user?.id || "b55005cc-2362-4faa-80e4-406bafbbe76b";
+  // Получаем ID тренера из профиля ученика
+  const trainerId = useMemo(() => {
+    // Если есть userProfile с trainer_id - используем его
+    if (userProfile?.trainer_id) {
+      console.log('✅ Using trainer_id from userProfile:', userProfile.trainer_id);
+      return userProfile.trainer_id;
+    }
+    // Fallback на дефолтный ID тренера
+    console.log('⚠️ Using fallback trainer ID');
+    return "48938b26-eafd-494b-98d7-1eaffe36f758";
+  }, [userProfile]);
 
   const { data: pupils = [] } = useQuery<Pupil[]>({
     queryKey: ['students', trainerId],
@@ -50,10 +59,12 @@ export function BookingWidget() {
   });
 
   const occupiedTimes = useMemo(() => {
-    const map = new Set<string>();
+    // Создаем Map для подсчета количества записей на каждое время
+    const map = new Map<string, number>();
     appointments.forEach(a => {
       if (a.date && a.time) {
-        map.add(`${a.date}|${a.time}`);
+        const key = `${a.date}|${a.time}`;
+        map.set(key, (map.get(key) || 0) + 1);
       }
     });
     return map;
@@ -61,7 +72,7 @@ export function BookingWidget() {
 
   const createAppointmentMutation = useMutation({
     mutationFn: async (payload: { date: string; time: string; pupilId: string }) => {
-      await appointmentsDb.create({
+      return await appointmentsDb.create({
         trainerId,
         pupilId: payload.pupilId,
         date: payload.date,
@@ -69,9 +80,37 @@ export function BookingWidget() {
         status: 'pending',
       });
     },
-    onSuccess: () => {
+    onSuccess: async (appointment) => {
       queryClient.invalidateQueries({ queryKey: ['appointments', trainerId] });
-      toast({ title: 'Готово', description: 'Вы записаны на выбранное время' });
+      
+      // Отправляем уведомление тренеру о новой заявке
+      if (currentPupil) {
+        try {
+          await fetch('/api/notifications/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'new-booking',
+              appointment: appointment,
+              student: {
+                firstName: currentPupil.firstName,
+                lastName: currentPupil.lastName,
+                email: currentPupil.email,
+                phone: currentPupil.phone
+              },
+              trainerEmail: 'petrusenkokv@yandex.ru'
+            })
+          });
+          console.log('✅ Уведомление тренеру отправлено');
+        } catch (error) {
+          console.error('❌ Ошибка отправки уведомления:', error);
+        }
+      }
+      
+      toast({ 
+        title: 'Заявка отправлена', 
+        description: 'Ваша заявка ожидает подтверждения тренера. Вы получите уведомление после подтверждения.' 
+      });
       setShowConfirmDialog(false);
       setSelectedSlot(null);
     },
@@ -95,7 +134,14 @@ export function BookingWidget() {
     }
   });
 
-  const isOccupied = (date: string, time: string) => occupiedTimes.has(`${date}|${time}`);
+  // Максимальное количество записей на один слот
+  const maxSlotsPerTime = 2;
+
+  const isOccupied = (date: string, time: string) => {
+    const count = occupiedTimes.get(`${date}|${time}`) || 0;
+    console.log(`🔍 Checking slot ${date} ${time}: ${count}/${maxSlotsPerTime} filled`);
+    return count >= maxSlotsPerTime;
+  };
 
   const handleSelectSlot = (time: string) => {
     if (isOccupied(selectedDate, time)) {
@@ -107,10 +153,22 @@ export function BookingWidget() {
       setShowAuthDialog(true);
       return;
     }
+    
+    // Если есть user, но нет currentPupil - это значит пользователь авторизован, но его профиль не в базе
+    // В этом случае используем user.id напрямую для создания записи
     if (!currentPupil) {
+      // Проверяем, есть ли userProfile (данные из auth)
+      if (userProfile && userProfile.id && !userProfile.is_trainer) {
+        console.log('✅ User is authenticated but not in pupils list, using auth ID:', userProfile.id);
+        // Показываем диалог подтверждения, используя ID из профиля
+        setShowConfirmDialog(true);
+        return;
+      }
+      // Если совсем нет данных, показываем диалог создания профиля
       setShowCreatePupil(true);
       return;
     }
+    
     setShowConfirmDialog(true);
   };
 
@@ -166,8 +224,21 @@ export function BookingWidget() {
 
   const handleConfirmBooking = () => {
     if (!selectedSlot) return;
-    if (!currentPupil) return; // safeguarded by dialog logic
-    createAppointmentMutation.mutate({ date: selectedDate, time: selectedSlot, pupilId: currentPupil.id });
+    
+    // Определяем pupilId: либо из currentPupil, либо из userProfile
+    let pupilId: string | undefined;
+    if (currentPupil) {
+      pupilId = currentPupil.id;
+    } else if (userProfile && userProfile.id && !userProfile.is_trainer) {
+      pupilId = userProfile.id;
+    }
+    
+    if (!pupilId) {
+      toast({ title: 'Ошибка', description: 'Не удалось определить ID пользователя', variant: 'destructive' });
+      return;
+    }
+    
+    createAppointmentMutation.mutate({ date: selectedDate, time: selectedSlot, pupilId });
   };
 
   const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];

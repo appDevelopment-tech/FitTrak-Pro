@@ -8,6 +8,7 @@ import { TodaySchedule } from "@/components/schedule/today-schedule";
 import { ProfileView } from "@/components/profile/profile-view";
 import { NewSchedule } from "@/components/schedule/new-schedule";
 import { BookingWidget } from "@/components/schedule/booking-widget";
+import { TrainerSchedule } from "@/components/schedule/trainer-schedule";
 // import { RoleBasedSchedule } from "@/components/schedule/role-based-schedule";
 // import { RoleBasedProfile } from "@/components/profile/role-based-profile";
 // import { PermissionGuard, AdminGuard, PupilGuard } from "@/components/auth/permission-guard";
@@ -138,12 +139,13 @@ export default function Dashboard() {
   const renderContent = () => {
     switch (activeView) {
       case 'schedule':
+        // Если тренер - показываем его расписание с желтым блоком
+        // Если ученик - показываем виджет записи
+        if (userProfile?.is_trainer) {
+          return <TrainerSchedule />;
+        }
         return (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {/* <RoleBasedSchedule 
-              date={selectedDate.toISOString().split('T')[0]} 
-              trainerId={userProfile?.id || ''}
-            /> */}
             <BookingWidget />
           </div>
         );

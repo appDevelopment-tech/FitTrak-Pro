@@ -414,9 +414,18 @@ export const appointmentsDb = {
   },
 
   async create(appointment: InsertAppointment) {
+    // Генерируем обязательные поля для Supabase
+    const now = new Date().toISOString();
+    const appointmentWithDefaults = {
+      ...appointment,
+      id: appointment.id || crypto.randomUUID(),
+      created_at: now,
+      updated_at: now,
+    };
+    
     const { data, error } = await supabase
       .from('appointments')
-      .insert(toSnakeCase(appointment))
+      .insert(toSnakeCase(appointmentWithDefaults))
       .select(`
         *,
         students:pupil_id (
@@ -433,9 +442,15 @@ export const appointmentsDb = {
   },
 
   async update(id: string, appointment: Partial<InsertAppointment>) {
+    // Обновляем updated_at при изменении записи
+    const appointmentWithTimestamp = {
+      ...appointment,
+      updated_at: new Date().toISOString(),
+    };
+    
     const { data, error } = await supabase
       .from('appointments')
-      .update(toSnakeCase(appointment))
+      .update(toSnakeCase(appointmentWithTimestamp))
       .eq('id', id)
       .select(`
         *,

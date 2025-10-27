@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { api } from '@/lib/api';
+import { appointmentsDb } from '@/lib/database';
 
 import type { Appointment, Pupil } from '@shared/schema';
 
@@ -184,9 +184,11 @@ export function ScheduleSlot({
 
     mutationFn: async (pupilId: string) => {
 
-      return await api.appointments.create({
+      console.log("📝 Создаем запись для pupilId:", pupilId, "на", date, time);
 
-        trainerId: trainerId, // Use prop trainerId
+      return await appointmentsDb.create({
+
+        trainerId: trainerId,
 
         pupilId,
 
@@ -204,11 +206,13 @@ export function ScheduleSlot({
 
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
 
+      queryClient.invalidateQueries({ queryKey: ['appointments', trainerId] });
+
       toast({
 
         title: 'Запись создана',
 
-        description: 'Вы успешно записались на тренировку'
+        description: 'Заявка отправлена и ожидает подтверждения тренера'
 
       });
 
@@ -217,6 +221,8 @@ export function ScheduleSlot({
     },
 
     onError: (error: any) => {
+
+      console.error("❌ Ошибка при создании записи:", error);
 
       toast({
 
@@ -238,13 +244,17 @@ export function ScheduleSlot({
 
     mutationFn: async (appointmentId: string) => {
 
-      return await api.appointments.delete(appointmentId);
+      console.log("🗑️ Удаляем запись:", appointmentId);
+
+      return await appointmentsDb.delete(appointmentId);
 
     },
 
     onSuccess: () => {
 
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
+
+      queryClient.invalidateQueries({ queryKey: ['appointments', trainerId] });
 
       toast({
 
@@ -257,6 +267,8 @@ export function ScheduleSlot({
     },
 
     onError: (error: any) => {
+
+      console.error("❌ Ошибка при удалении записи:", error);
 
       toast({
 
@@ -322,6 +334,20 @@ export function ScheduleSlot({
 
 
 
+  const handleCancelBooking = () => {
+
+    if (slotInfo.userAppointment) {
+
+      console.log("🗑️ Отменяем запись:", slotInfo.userAppointment.id);
+
+      deleteAppointmentMutation.mutate(slotInfo.userAppointment.id);
+
+    }
+
+  };
+
+
+
   // Получаем данные учеников для отображения
 
   const getPupilData = (appointment: Appointment): Pupil | undefined => {
@@ -335,6 +361,8 @@ export function ScheduleSlot({
   // Определяем стили и иконки
 
   const getSlotStyles = () => {
+    // Проверяем статус записи пользователя
+    const userStatus = slotInfo.userAppointment?.status;
 
     switch (slotInfo.status) {
 
@@ -371,19 +399,23 @@ export function ScheduleSlot({
         };
 
       case 'user-booked':
-
+        // Если запись pending - показываем желтый цвет
+        if (userStatus === 'pending') {
+          return {
+            bg: 'bg-yellow-50 hover:bg-yellow-100',
+            border: 'border-yellow-300 hover:border-yellow-400',
+            indicator: 'bg-yellow-500',
+            text: 'text-yellow-700',
+            icon: Clock
+          };
+        }
+        // Если confirmed - обычный синий
         return {
-
           bg: 'bg-blue-50 hover:bg-blue-100',
-
           border: 'border-blue-200 hover:border-blue-300',
-
           indicator: 'bg-blue-500',
-
           text: 'text-blue-700',
-
-          icon: UserMinus
-
+          icon: Check
         };
 
       case 'full':
@@ -402,6 +434,14 @@ export function ScheduleSlot({
 
         };
 
+      default:
+        return {
+          bg: 'bg-gray-50',
+          border: 'border-gray-200',
+          indicator: 'bg-gray-400',
+          text: 'text-gray-500',
+          icon: Users
+        };
     }
 
   };
@@ -442,7 +482,9 @@ export function ScheduleSlot({
 
 
 
-  const isDisabled = slotInfo.status === 'full' || slotInfo.status === 'user-booked';
+  // Для учеников: разблокируем кнопку отмены, если есть своя запись
+
+  const isDisabled = slotInfo.status === 'full' && !slotInfo.userAppointment;
 
 
 
@@ -462,7 +504,7 @@ export function ScheduleSlot({
 
         `}
 
-        onClick={isDisabled ? undefined : handleSlotClick}
+        onClick={onSlotClick ? (isDisabled ? undefined : () => onSlotClick(time)) : undefined}
 
       >
 
@@ -529,9 +571,19 @@ export function ScheduleSlot({
                 // Обычный пользователь видит только свой статус
 
                 <div className="text-xs text-center">
-
-                  {slotInfo.status === 'user-booked' ? 'Вы записаны' : 'Есть места'}
-
+                  {slotInfo.status === 'user-booked' ? (
+                    slotInfo.userAppointment?.status === 'pending' ? (
+                      <div className="flex items-center justify-center gap-1 text-yellow-600">
+                        <Clock className="w-3 h-3" />
+                        <span>Ожидает подтверждения</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center gap-1 text-green-600">
+                        <Check className="w-3 h-3" />
+                        <span>Подтверждено</span>
+                      </div>
+                    )
+                  ) : 'Есть места'}
                 </div>
 
               )}
@@ -669,6 +721,22 @@ export function ScheduleSlot({
               disabled={isDisabled}
 
               className="text-xs h-6 px-2"
+
+              onClick={(e) => {
+
+                e.stopPropagation();
+
+                if (slotInfo.status === 'user-booked') {
+
+                  handleCancelBooking();
+
+                } else {
+
+                  handleSlotClick();
+
+                }
+
+              }}
 
             >
 

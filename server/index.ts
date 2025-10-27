@@ -4,6 +4,7 @@ config();
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { startScheduledTasks } from "./reminders";
 
 const app = express();
 
@@ -78,5 +79,8 @@ app.use((req, res, next) => {
   const port = process.env.PORT ? parseInt(process.env.PORT) : 8080;
   server.listen(port, () => {
     log(`serving on port ${port}`);
+    
+    // Запуск планировщика уведомлений
+    startScheduledTasks();
   });
 })();
